@@ -1,3 +1,4 @@
+import 'package:emarko/mark_picker_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -41,6 +42,7 @@ class _MarkCollectionWidgetState extends State<MarkCollectionWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Analoji')),
       body: ScrollablePositionedList.builder(
         itemCount: 99999999999,
         itemScrollController: _itemScrollController,
@@ -48,26 +50,44 @@ class _MarkCollectionWidgetState extends State<MarkCollectionWidget> {
         itemBuilder: (BuildContext context, int index) {
           final List<Widget> widgets = values[index]
                   ?.map(
-                    (item) => Mark(
+                    (item) => MarkWidget(
                       item: item,
                       onTap: () {
-                        _itemScrollController.jumpTo(index: _indexOfDate(DateTime.now()));
+                        _itemScrollController.jumpTo(index: _getDayIndex(DateTime.now()));
                       },
                     ),
                   )
                   .toList() ??
               [];
-          widgets.add(Mark(
+          widgets.add(MarkWidget(
             item: '📝',
             onTap: () {
-              setState(() {
-                if (values[index] == null) {
-                  values[index] = [];
-                }
-                final marks = values[index]!;
-                marks.add('🥸');
-                values[index] = marks;
-              });
+              // Navigator.push<void>(
+              //   context,
+              //   MaterialPageRoute<void>(
+              //     builder: (BuildContext context) => const MarkPickerScreen(),
+              //   ),
+              // );
+
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return MarkPickerScreen(
+                    onSelect: (creationMark) {
+                      setState(
+                        () {
+                          if (values[index] == null) {
+                            values[index] = [];
+                          }
+                          final marks = values[index]!;
+                          marks.add(creationMark.mark);
+                          values[index] = marks;
+                        },
+                      );
+                    },
+                  );
+                },
+              );
             },
           ));
 
@@ -75,7 +95,7 @@ class _MarkCollectionWidgetState extends State<MarkCollectionWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                _formatter.format(_dateFromInt(index)),
+                _formatter.format(_getDateFromInt(index)),
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               GridView.count(
@@ -91,16 +111,16 @@ class _MarkCollectionWidgetState extends State<MarkCollectionWidget> {
     );
   }
 
-  DateTime _dateFromInt(int index) => DateTime.fromMicrosecondsSinceEpoch(1000 * 1000 * 60 * 60 * 24 * index);
+  DateTime _getDateFromInt(int index) => DateTime.fromMicrosecondsSinceEpoch(1000 * 1000 * 60 * 60 * 24 * index);
 
-  int _indexOfDate(DateTime date) => (date.microsecondsSinceEpoch / (1000 * 1000 * 60 * 60 * 24)).round();
+  int _getDayIndex(DateTime date) => (date.microsecondsSinceEpoch / (1000 * 1000 * 60 * 60 * 24)).round();
 }
 
-class Mark extends StatelessWidget {
+class MarkWidget extends StatelessWidget {
   final String item;
   final VoidCallback? onTap;
 
-  const Mark({
+  const MarkWidget({
     Key? key,
     required this.item,
     this.onTap,
@@ -112,7 +132,7 @@ class Mark extends StatelessWidget {
       child: Center(
         child: Text(
           item,
-          style: const TextStyle(fontSize: 50),
+          style: const TextStyle(fontSize: 55),
         ),
       ),
       onTap: onTap,
