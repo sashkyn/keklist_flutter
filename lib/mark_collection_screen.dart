@@ -1,10 +1,11 @@
-import 'package:emarko/storages/pattern_storage.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'mark_picker_screen.dart';
 import 'mark_widget.dart';
+import 'storages/pattern_storage.dart';
 
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
@@ -19,11 +20,9 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  final PatternsStorage _storage = PatternsStorage();
+  final Storage _storage = Storage();
 
-  Mark _findMarkByEmoji(String emoji) => _values.firstWhere((item) => emoji == item.emoji);
-
-  List<Mark> _findMarkByDayIndex(int index) => _values.where((item) => index == item.dayIndex).toList();
+  List<Mark> _findMarksByDayIndex(int index) => _values.where((item) => index == item.dayIndex).toList();
 
   @override
   void initState() {
@@ -41,23 +40,55 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('KEKList')),
+      appBar: AppBar(
+        title: const Text(
+          'Keklist',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+      ),
       body: ScrollablePositionedList.builder(
         padding: const EdgeInsets.only(top: 16.0),
         itemCount: 99999999999,
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
         itemBuilder: (BuildContext context, int index) {
-          final List<Widget> widgets =
-              _findMarkByDayIndex(index).map((item) => _makeMarkWidget(item: item.emoji)).toList();
+          final List<Widget> widgets = _findMarksByDayIndex(index)
+              .map(
+                (item) => MarkWidget(
+                  item: item.emoji,
+                  onTap: () {
+                    showOkAlertDialog(title: item.emoji, message: item.note, context: context);
+                  },
+                  onLongPress: () async {
+                    final result = await showModalActionSheet<String>(
+                      context: context,
+                      actions: [
+                        const SheetAction(
+                          icon: Icons.delete,
+                          label: 'Delete',
+                          key: 'remove_key',
+                          isDestructiveAction: true,
+                        ),
+                      ],
+                    );
+                    setState(() {
+                      if (result == 'remove_key') {
+                        _storage.removeMarkFromDay(item.dayIndex, item.emoji);
+                        _values.remove(item);
+                      }
+                    });
+                  },
+                ),
+              )
+              .toList();
 
-          widgets.add(_makeMarkWidget(
+          widgets.add(MarkWidget(
             item: '📝',
             onTap: () => _showMarkPickerScreen(context, index),
           ));
 
           return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
                 _formatter.format(_getDateFromInt(index)),
@@ -79,26 +110,17 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   void _showMarkPickerScreen(BuildContext context, int index) {
     showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return MarkPickerScreen(
-            storage: _storage,
-            onSelect: (creationMark) {
-              setState(
-                () {
-                  final mark = Mark(dayIndex: index, note: creationMark.note, emoji: creationMark.mark);
-                  _storage.addMark(mark);
-                  _values.add(mark);
-                },
-              );
-            });
-      },
-    );
-  }
-
-  Widget _makeMarkWidget({required String item, VoidCallback? onTap}) {
-    return MarkWidget(
-      item: item,
-      onTap: onTap,
+      builder: (context) => MarkPickerScreen(
+          storage: _storage,
+          onSelect: (creationMark) {
+            setState(
+              () {
+                final mark = Mark(dayIndex: index, note: creationMark.note, emoji: creationMark.mark);
+                _storage.addMark(mark);
+                _values.add(mark);
+              },
+            );
+          }),
     );
   }
 

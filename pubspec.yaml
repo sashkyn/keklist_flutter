@@ -1,4 +1,4 @@
-name: emarko
+name: keklist
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -27,12 +27,12 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  adaptive_dialog: ^1.2.0
   awesome_emojis: ^0.1.1
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   intl: ^0.17.0
-  localstorage: ^4.0.0+1
   scrollable_positioned_list: ^0.2.2
   shared_preferences: ^2.0.8
 

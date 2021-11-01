@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PatternsStorage {
-  late SharedPreferences _prefernces;
+class Storage {
+  late SharedPreferences _prefs;
 
   Future<void> connect() async {
-    _prefernces = await SharedPreferences.getInstance();
+    _prefs = await SharedPreferences.getInstance();
   }
 
   void addPattern(Pattern pattern) {
@@ -15,13 +15,18 @@ class PatternsStorage {
       return;
     }
     patterns.add(pattern);
-    _prefernces.setString('patterns', json.encode(patterns));
+    _prefs.setString('patterns', json.encode(patterns));
   }
 
-  void remove(Pattern pattern) {}
+  void removeFirstFindedPattern(String emoji) {
+    final patterns = getPatterns();
+    final patternToRemove = patterns.firstWhere((i) => i.emoji == emoji);
+    patterns.remove(patternToRemove);
+    _prefs.setString('patterns', json.encode(patterns));
+  }
 
   List<Pattern> getPatterns() {
-    final patternsJSON = _prefernces.getString('patterns');
+    final patternsJSON = _prefs.getString('patterns');
     if (patternsJSON == null) {
       return [];
     }
@@ -33,11 +38,18 @@ class PatternsStorage {
   void addMark(Mark mark) {
     final marks = getMarks();
     marks.add(mark);
-    _prefernces.setString('marks', json.encode(marks)); 
+    _prefs.setString('marks', json.encode(marks));
+  }
+
+  void removeMarkFromDay(int dayIndex, String emoji) {
+    final marks = getMarks();
+    final markToRemove = marks.firstWhere((i) => i.emoji == emoji && i.dayIndex == dayIndex);
+    marks.remove(markToRemove);
+    _prefs.setString('marks', json.encode(marks));
   }
 
   List<Mark> getMarks() {
-    final marksJSON = _prefernces.getString('marks');
+    final marksJSON = _prefs.getString('marks');
     if (marksJSON == null) {
       return [];
     }

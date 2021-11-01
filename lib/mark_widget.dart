@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class MarkWidget extends StatelessWidget {
   final String item;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   const MarkWidget({
     Key? key,
     required this.item,
-    this.onTap,
+    this.onTap, 
+    this.onLongPress,
   }) : super(key: key);
 
   @override
@@ -20,6 +22,7 @@ class MarkWidget extends StatelessWidget {
         ),
       ),
       onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 }

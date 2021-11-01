@@ -1,12 +1,13 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:awesome_emojis/emoji.dart';
-import 'package:emarko/storages/pattern_storage.dart';
-import 'package:emarko/typealiases.dart';
 import 'package:flutter/material.dart';
 
 import 'mark_widget.dart';
+import 'storages/pattern_storage.dart';
+import 'typealiases.dart';
 
 class MarkPickerScreen extends StatefulWidget {
-  final PatternsStorage storage;
+  final Storage storage;
   final ArgumentCallback<CreationMark> onSelect;
 
   const MarkPickerScreen({
@@ -20,7 +21,8 @@ class MarkPickerScreen extends StatefulWidget {
 }
 
 class _MarkPickerScreenState extends State<MarkPickerScreen> {
-  late final List<Emoji> _patternMarks = widget.storage.getPatterns().map((item) => Emoji.byChar(item.emoji)).toList();
+  late final List<Emoji> _patternMarks = [];
+  //widget.storage.getPatterns().map((item) => Emoji.byChar(item.emoji)).toList();
   final List<Emoji> _marks = Emoji.all();
   String _searchText = '';
   List<Emoji> _filteredMarks = [];
@@ -68,9 +70,15 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
                 final mark = _displayedMarks[index].char;
                 return MarkWidget(
                   item: mark,
-                  onTap: () {
-                    _savePattern(mark);
-                    _pickMark(mark);
+                  onTap: () async {
+                    final note = await showTextInputDialog(
+                      context: context,
+                      message: 'Description',
+                      textFields: [const DialogTextField(initialText: '', maxLines: 3)],
+                    );
+                    // final pattern = Pattern(emoji: mark, note: note?.first ?? '');
+                    // _savePattern(pattern);
+                    _pickMark(mark, note?.first ?? '');
                   },
                 );
               },
@@ -82,13 +90,12 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
     );
   }
 
-  void _savePattern(String mark) async {
-    final pattern = Pattern(emoji: mark, note: '');
-    widget.storage.addPattern(pattern);
-  }
+  // void _savePattern(Pattern pattern) async {
+  //   widget.storage.addPattern(pattern);
+  // }
 
-  void _pickMark(String emoji) {
-    final mark = CreationMark(emoji, '');
+  void _pickMark(String emoji, String note) {
+    final mark = CreationMark(emoji, note);
     widget.onSelect(mark);
     Navigator.pop(context);
   }
