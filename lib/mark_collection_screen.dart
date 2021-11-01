@@ -41,9 +41,14 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Keklist',
-          style: TextStyle(color: Colors.black),
+        title: GestureDetector(
+          onTap: () {
+            _scrollToNow();
+          },
+          child: const Text(
+            'Keklist',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         backgroundColor: Colors.white,
       ),
@@ -129,6 +134,17 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   int _getDayIndex(DateTime date) => (date.microsecondsSinceEpoch / (1000 * 1000 * 60 * 60 * 24)).round();
 
   void _jumpToNow() {
-    _itemScrollController.jumpTo(index: _getDayIndex(DateTime.now()));
+    _itemScrollController.jumpTo(
+      index: _getDayIndex(DateTime.now()),
+      alignment: 0.2,
+    );
+  }
+
+  void _scrollToNow() {
+    _itemScrollController.scrollTo(
+      index: _getDayIndex(DateTime.now()),
+      alignment: 0.2,
+      duration: const Duration(milliseconds: 200),
+    );
   }
 }
