@@ -1,13 +1,14 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:keklist/screens/auth/auth_screen.dart';
 import 'package:keklist/storages/entities/mark.dart';
 import 'package:keklist/storages/firebase_storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:uuid/uuid.dart';
 
-import 'mark_picker_screen.dart';
-import 'mark_widget.dart';
+import '../mark_picker/mark_picker_screen.dart';
+import '../../widgets/mark_widget.dart';
 
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
@@ -43,6 +44,22 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return AuthScreen();
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: const Icon(Icons.login, color: Colors.black),
+            ),
+          ),
+        ],
         title: GestureDetector(
           onTap: () {
             _scrollToNow();

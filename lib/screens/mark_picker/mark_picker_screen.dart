@@ -2,8 +2,8 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:awesome_emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
-import 'mark_widget.dart';
-import 'typealiases.dart';
+import '../../widgets/mark_widget.dart';
+import '../../typealiases.dart';
 
 class MarkPickerScreen extends StatefulWidget {
   final ArgumentCallback<CreationMark> onSelect;
