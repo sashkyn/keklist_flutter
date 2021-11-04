@@ -3,17 +3,14 @@ import 'package:awesome_emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
 import 'mark_widget.dart';
-import 'storages/pattern_storage.dart';
 import 'typealiases.dart';
 
 class MarkPickerScreen extends StatefulWidget {
-  final Storage storage;
   final ArgumentCallback<CreationMark> onSelect;
 
   const MarkPickerScreen({
     Key? key,
     required this.onSelect,
-    required this.storage,
   }) : super(key: key);
 
   @override

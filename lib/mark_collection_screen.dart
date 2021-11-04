@@ -1,11 +1,13 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:keklist/storages/entities/mark.dart';
+import 'package:keklist/storages/firebase_storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:uuid/uuid.dart';
 
 import 'mark_picker_screen.dart';
 import 'mark_widget.dart';
-import 'storages/pattern_storage.dart';
 
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
@@ -20,7 +22,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  final Storage _storage = Storage();
+  final FirebaseStorage _firebaseStorage = FirebaseStorage();
 
   List<Mark> _findMarksByDayIndex(int index) => _values.where((item) => index == item.dayIndex).toList();
 
@@ -29,9 +31,9 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     super.initState();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      await _storage.connect();
+      final marks = await _firebaseStorage.getMarks();
       setState(() {
-        _values = _storage.getMarks();
+        _values = marks;
         _jumpToNow();
       });
     });
@@ -66,7 +68,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                     showOkAlertDialog(title: item.emoji, message: item.note, context: context);
                   },
                   onLongPress: () async {
-                    final result = await showModalActionSheet<String>(
+                    final result = await showModalActionSheet(
                       context: context,
                       actions: [
                         const SheetAction(
@@ -77,12 +79,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                         ),
                       ],
                     );
-                    setState(() {
-                      if (result == 'remove_key') {
-                        _storage.removeMarkFromDay(item.dayIndex, item.emoji);
+                    if (result == 'remove_key') {
+                      await _firebaseStorage.removeMarkFromDay(item.uuid);
+                      setState(() {
                         _values.remove(item);
-                      }
-                    });
+                      });
+                    }
                   },
                 ),
               )
@@ -115,17 +117,20 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   void _showMarkPickerScreen(BuildContext context, int index) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => MarkPickerScreen(
-          storage: _storage,
-          onSelect: (creationMark) {
-            setState(
-              () {
-                final mark = Mark(dayIndex: index, note: creationMark.note, emoji: creationMark.mark);
-                _storage.addMark(mark);
-                _values.add(mark);
-              },
-            );
-          }),
+      builder: (context) => MarkPickerScreen(onSelect: (creationMark) async {
+        final mark = Mark(
+          uuid: const Uuid().v4(),
+          dayIndex: index,
+          note: creationMark.note,
+          emoji: creationMark.mark,
+        );
+        await _firebaseStorage.addMark(mark);
+        setState(
+          () {
+            _values.add(mark);
+          },
+        );
+      }),
     );
   }
 
