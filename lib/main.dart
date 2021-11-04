@@ -1,13 +1,21 @@
+// ignore_for_file: prefer_const_constructors_in_immutables
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'mark_collection_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final FirebaseApp app = await Firebase.initializeApp();
+  runApp(MyApp(app: app));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+
+  final FirebaseApp app;
+
+  MyApp({Key? key, required this.app}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
