@@ -16,7 +16,7 @@ class Mark {
   });
 
   Mark.fromJson(Map<String, dynamic> json)
-      : uuid = json['id'],
+      : uuid = json['id'] ?? 0,
         emoji = json['emoji'],
         dayIndex = json['day_index'],
         note = json['note'],
@@ -24,6 +24,7 @@ class Mark {
         sortIndex = json["sort_index"] ?? 0;
 
   Map<String, dynamic> toJson() => {
+        'id': uuid,
         'emoji': emoji,
         'note': note,
         'day_index': dayIndex,
