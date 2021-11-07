@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors_in_immutables, avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:material_segmented_control/material_segmented_control.dart';
 
 class AuthScreen extends StatefulWidget {
   AuthScreen({Key? key}) : super(key: key);
@@ -16,38 +17,88 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  Object? _currentSelection = 0;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _loginTextEditingController,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.all(8),
-            border: UnderlineInputBorder(),
-            hintText: 'Login',
+    const Map<int, Widget> _children = {
+      0: Center(child: Text('Login')),
+      1: Text('Registration'),
+    };
+
+    return Scaffold(
+      body: Column(
+        children: [
+          const SizedBox(height: 16.0),
+          MaterialSegmentedControl(
+            children: _children,
+            selectionIndex: _currentSelection,
+            borderColor: Colors.grey,
+            selectedColor: Colors.blue,
+            unselectedColor: Colors.white,
+            borderRadius: 32.0,
+            onSegmentChosen: (index) {
+              setState(() => _currentSelection = index);
+            },
           ),
-        ),
-        TextField(
-          controller: _passwordTextEditingController,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.all(8),
-            border: UnderlineInputBorder(),
-            hintText: 'Password',
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: _loginTextEditingController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              border: UnderlineInputBorder(),
+              hintText: 'Email',
+            ),
           ),
-        ),
-        ElevatedButton(
-            child: Text('Login'),
-            onPressed: () async {
-              final UserCredential user = (await _auth.signInWithEmailAndPassword(
-                email: _loginTextEditingController.text,
-                password: _passwordTextEditingController.text,
-              ));
-              if (user != null) {
-                print(user.user?.displayName);
-              }
-            }),
-      ],
+          TextField(
+            controller: _passwordTextEditingController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              border: UnderlineInputBorder(),
+              hintText: 'Password',
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Visibility(
+            visible: _currentSelection == 0,
+            child: ElevatedButton(
+              child: const Text('Login'),
+              onPressed: () async {
+                try {
+                  final UserCredential user = await _auth.signInWithEmailAndPassword(
+                    email: _loginTextEditingController.text,
+                    password: _passwordTextEditingController.text,
+                  );
+                  Navigator.pop(context);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  final snackBar = SnackBar(content: Text('$e'));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+            ),
+          ),
+          Visibility(
+            visible: _currentSelection == 1,
+            child: ElevatedButton(
+              child: const Text('Register'),
+              onPressed: () async {
+                try {
+                  final UserCredential user = await _auth.createUserWithEmailAndPassword(
+                    email: _loginTextEditingController.text,
+                    password: _passwordTextEditingController.text,
+                  );
+                  Navigator.pop(context);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  final snackBar = SnackBar(content: Text('$e'));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
