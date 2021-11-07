@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:keklist/screens/settings/settings_screen.dart';
 import 'package:keklist/storages/entities/mark.dart';
 import 'package:keklist/storages/firebase_storage.dart';
+import 'package:keklist/storages/shared_preferences_storage.dart';
+import 'package:keklist/storages/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:uuid/uuid.dart';
 
@@ -28,7 +30,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  late final FirebaseStorage _firebaseStorage = FirebaseStorage(_obtainStand());
+  late final Storage _storage = FirebaseStorage(_obtainStand());
+  // final Storage _storage = SharedPreferencesStorage();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Mark> _values = [];
@@ -38,6 +41,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     super.initState();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await _storage.connect();
       await _obtainMarks();
 
       _auth.authStateChanges().listen((user) async => await _obtainMarks());
@@ -46,7 +50,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   Future<void> _obtainMarks() async {
     print('obtaining...');
-    final marks = await _firebaseStorage.getMarks();
+    final marks = await _storage.getMarks();
     setState(() {
       _values = marks;
       _jumpToNow();
@@ -110,7 +114,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       ],
                     );
                     if (result == 'remove_key') {
-                      await _firebaseStorage.removeMarkFromDay(item.uuid);
+                      await _storage.removeMarkFromDay(item.uuid);
                       setState(() => _values.remove(item));
                     }
                   },
@@ -154,7 +158,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           creationDate: DateTime.now().millisecondsSinceEpoch,
           sortIndex: _findMarksByDayIndex(index).length,
         );
-        await _firebaseStorage.addMark(mark);
+        await _storage.addMark(mark);
         setState(() => _values.add(mark));
       }),
     );

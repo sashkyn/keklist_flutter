@@ -15,17 +15,17 @@ class FirebaseStorage extends Storage {
   FirebaseStorage(this._stand);
 
   @override
+  Future<void> connect() async {
+    // No need to connect.
+  }
+
+  @override
   Future<void> addMark(Mark mark) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       print('userId is null!');
       return;
     }
-
-    // final map = <String, dynamic>{};
-    // map['day_index'] = mark.dayIndex;
-    // map['emoji'] = mark.emoji;
-    // map['note'] = mark.note;
     return _databaseReference.child(_stand).child(userId).child('marks').child(mark.uuid).set(mark.toJson());
   }
 
