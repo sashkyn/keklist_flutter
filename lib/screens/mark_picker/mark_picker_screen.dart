@@ -19,7 +19,6 @@ class MarkPickerScreen extends StatefulWidget {
 
 class _MarkPickerScreenState extends State<MarkPickerScreen> {
   late final List<Emoji> _patternMarks = [];
-  //widget.storage.getPatterns().map((item) => Emoji.byChar(item.emoji)).toList();
   final List<Emoji> _marks = Emoji.all();
   String _searchText = '';
   List<Emoji> _filteredMarks = [];
@@ -70,11 +69,14 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
                   onTap: () async {
                     final note = await showTextInputDialog(
                       context: context,
-                      message: 'Description',
-                      textFields: [const DialogTextField(initialText: '', maxLines: 3)],
+                      message: mark,
+                      textFields: [
+                        const DialogTextField(
+                          initialText: '',
+                          maxLines: 3,
+                        )
+                      ],
                     );
-                    // final pattern = Pattern(emoji: mark, note: note?.first ?? '');
-                    // _savePattern(pattern);
                     _pickMark(mark, note?.first ?? '');
                   },
                 );
@@ -86,10 +88,6 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
       ],
     );
   }
-
-  // void _savePattern(Pattern pattern) async {
-  //   widget.storage.addPattern(pattern);
-  // }
 
   void _pickMark(String emoji, String note) {
     final mark = CreationMark(emoji, note);
