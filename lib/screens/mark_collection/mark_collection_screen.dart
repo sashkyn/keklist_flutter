@@ -42,7 +42,6 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       await _storage.connect();
-      await _obtainMarks();
 
       _auth.authStateChanges().listen((user) async => await _obtainMarks());
     });
@@ -107,6 +106,11 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       actions: [
                         const SheetAction(
                           icon: Icons.delete,
+                          label: 'Copy to now',
+                          key: 'copy_to_now_key',
+                        ),
+                        const SheetAction(
+                          icon: Icons.delete,
                           label: 'Delete',
                           key: 'remove_key',
                           isDestructiveAction: true,
@@ -116,6 +120,23 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                     if (result == 'remove_key') {
                       await _storage.removeMarkFromDay(item.uuid);
                       setState(() => _values.remove(item));
+                    } else if (result == 'copy_to_now_key') {
+                      final note = await showTextInputDialog(
+                        context: context,
+                        message: item.emoji,
+                        textFields: [
+                          DialogTextField(
+                            initialText: item.note,
+                            maxLines: 3,
+                          )
+                        ],
+                      );
+                      _addMarkToStorage(
+                        dayIndex: _getNowDayIndex(),
+                        note: note!.first,
+                        emoji: item.emoji,
+                        sortIndex: item.sortIndex,
+                      );
                     }
                   },
                 ),
@@ -150,18 +171,32 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => MarkPickerScreen(onSelect: (creationMark) async {
-        final mark = Mark(
-          uuid: const Uuid().v4(),
+        await _addMarkToStorage(
           dayIndex: index,
           note: creationMark.note,
           emoji: creationMark.mark,
-          creationDate: DateTime.now().millisecondsSinceEpoch,
           sortIndex: _findMarksByDayIndex(index).length,
         );
-        await _storage.addMark(mark);
-        setState(() => _values.add(mark));
       }),
     );
+  }
+
+  Future<void> _addMarkToStorage({
+    required int dayIndex,
+    required String note,
+    required String emoji,
+    required int sortIndex,
+  }) async {
+    final mark = Mark(
+      uuid: const Uuid().v4(),
+      dayIndex: dayIndex,
+      note: note,
+      emoji: emoji,
+      creationDate: DateTime.now().millisecondsSinceEpoch,
+      sortIndex: sortIndex,
+    );
+    await _storage.addMark(mark);
+    setState(() => _values.add(mark));
   }
 
   DateTime _getDateFromInt(int index) => DateTime.fromMicrosecondsSinceEpoch(_millisecondsInDay * index);
@@ -188,11 +223,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   void _scrollToNow() {
     _itemScrollController.scrollTo(
-      index: _getDayIndex(DateTime.now()),
+      index: _getNowDayIndex(),
       alignment: 0.2,
       duration: const Duration(milliseconds: 200),
     );
   }
+
+  int _getNowDayIndex() => _getDayIndex(DateTime.now());
 }
 
 // MARK: Sorted by.

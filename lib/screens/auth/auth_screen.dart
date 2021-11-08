@@ -44,6 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
           const SizedBox(height: 8.0),
           TextField(
             controller: _loginTextEditingController,
+            keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: UnderlineInputBorder(),
@@ -52,6 +53,7 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
           TextField(
             controller: _passwordTextEditingController,
+            keyboardType: TextInputType.visiblePassword,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: UnderlineInputBorder(),
@@ -65,7 +67,7 @@ class _AuthScreenState extends State<AuthScreen> {
               child: const Text('Login'),
               onPressed: () async {
                 try {
-                  final UserCredential user = await _auth.signInWithEmailAndPassword(
+                  await _auth.signInWithEmailAndPassword(
                     email: _loginTextEditingController.text,
                     password: _passwordTextEditingController.text,
                   );
@@ -84,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen> {
               child: const Text('Register'),
               onPressed: () async {
                 try {
-                  final UserCredential user = await _auth.createUserWithEmailAndPassword(
+                  await _auth.createUserWithEmailAndPassword(
                     email: _loginTextEditingController.text,
                     password: _passwordTextEditingController.text,
                   );
