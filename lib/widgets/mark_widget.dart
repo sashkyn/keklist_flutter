@@ -8,7 +8,7 @@ class MarkWidget extends StatelessWidget {
   const MarkWidget({
     Key? key,
     required this.item,
-    this.onTap, 
+    this.onTap,
     this.onLongPress,
   }) : super(key: key);
 
@@ -18,7 +18,7 @@ class MarkWidget extends StatelessWidget {
       child: Center(
         child: Text(
           item,
-          style: const TextStyle(fontSize: 55),
+          style: const TextStyle(fontSize: 50),
         ),
       ),
       onTap: onTap,

@@ -77,7 +77,10 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
                         )
                       ],
                     );
-                    _pickMark(mark, note?.first ?? '');
+                    if (note == null) {
+                      return;
+                    }
+                    _pickMark(mark, note.first);
                   },
                 );
               },

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keklist/screens/settings/settings_screen.dart';
 import 'package:keklist/storages/entities/mark.dart';
-import 'package:keklist/storages/firebase_storage.dart';
+// import 'package:keklist/storages/firebase_storage.dart';
 import 'package:keklist/storages/shared_preferences_storage.dart';
 import 'package:keklist/storages/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -30,8 +30,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  late final Storage _storage = FirebaseStorage(_obtainStand());
-  // final Storage _storage = SharedPreferencesStorage();
+  // final Storage _storage = FirebaseStorage(_obtainStand());
+  final Storage _storage = SharedPreferencesStorage();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Mark> _values = [];
@@ -43,37 +43,40 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       await _storage.connect();
 
-      _auth.authStateChanges().listen((user) async => await _obtainMarks());
+      _auth.authStateChanges().listen((user) async {
+        await _obtainMarks();
+      });
+      _jumpToNow();
     });
   }
 
   Future<void> _obtainMarks() async {
-    print('obtaining...');
     final marks = await _storage.getMarks();
-    setState(() {
-      _values = marks;
-      _jumpToNow();
-    });
+    setState(() => _values = marks);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(Icons.settings, color: Colors.black),
-            ),
-          ),
-        ],
+        // actions: [
+        //   GestureDetector(
+        //     onTap: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        //       );
+        //     },
+        //     child: const Padding(
+        //       padding: EdgeInsets.all(16.0),
+        //       child: Icon(
+        //         Icons.settings,
+        //         color: Colors.black,
+        //       ),
+        //     ),
+        //   ),
+        // ],
         title: GestureDetector(
           onTap: () => _scrollToNow(),
           child: const Text(
@@ -131,9 +134,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                           )
                         ],
                       );
+                      if (note == null) {
+                        return;
+                      }
                       _addMarkToStorage(
                         dayIndex: _getNowDayIndex(),
-                        note: note!.first,
+                        note: note.first,
                         emoji: item.emoji,
                         sortIndex: item.sortIndex,
                       );
@@ -152,7 +158,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
             children: [
               Text(
                 _formatter.format(_getDateFromInt(index)),
-                style: const TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(fontWeight: index == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
               ),
               GridView.count(
                 primary: false,
@@ -169,15 +175,29 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   void _showMarkPickerScreen(BuildContext context, int index) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
-      builder: (context) => MarkPickerScreen(onSelect: (creationMark) async {
-        await _addMarkToStorage(
-          dayIndex: index,
-          note: creationMark.note,
-          emoji: creationMark.mark,
-          sortIndex: _findMarksByDayIndex(index).length,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.0),
+          topRight: Radius.circular(8.0),
+        ),
+      ),
+      builder: (context) {
+        return SizedBox(
+          height: 500,
+          child: MarkPickerScreen(
+            onSelect: (creationMark) async {
+              await _addMarkToStorage(
+                dayIndex: index,
+                note: creationMark.note,
+                emoji: creationMark.mark,
+                sortIndex: _findMarksByDayIndex(index).length,
+              );
+            },
+          ),
         );
-      }),
+      },
     );
   }
 
@@ -201,30 +221,30 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   DateTime _getDateFromInt(int index) => DateTime.fromMicrosecondsSinceEpoch(_millisecondsInDay * index);
 
-  int _getDayIndex(DateTime date) => (date.microsecondsSinceEpoch / _millisecondsInDay).round();
+  int _getDayIndex(DateTime date) => (date.microsecondsSinceEpoch / _millisecondsInDay).round() - 1;
 
   List<Mark> _findMarksByDayIndex(int index) =>
       _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
-  String _obtainStand() {
-    if (kReleaseMode) {
-      return 'release';
-    } else {
-      return 'debug';
-    }
-  }
+  // String _obtainStand() {
+  //   if (kReleaseMode) {
+  //     return 'release';
+  //   } else {
+  //     return 'debug';
+  //   }
+  // }
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
-      index: _getDayIndex(DateTime.now()),
-      alignment: 0.2,
+      index: _getNowDayIndex(),
+      alignment: 0.02,
     );
   }
 
   void _scrollToNow() {
     _itemScrollController.scrollTo(
       index: _getNowDayIndex(),
-      alignment: 0.2,
+      alignment: 0.02,
       duration: const Duration(milliseconds: 200),
     );
   }
