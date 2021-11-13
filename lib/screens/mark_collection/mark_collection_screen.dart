@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_import
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:keklist/screens/settings/settings_screen.dart';
 import 'package:keklist/storages/entities/mark.dart';
-// import 'package:keklist/storages/firebase_storage.dart';
+import 'package:keklist/storages/firebase_storage.dart';
 import 'package:keklist/storages/shared_preferences_storage.dart';
 import 'package:keklist/storages/storage.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -30,8 +30,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  // final Storage _storage = FirebaseStorage(_obtainStand());
-  final Storage _storage = SharedPreferencesStorage();
+  late final Storage _storage = FirebaseStorage(_obtainStand());
+  // final Storage _storage = SharedPreferencesStorage();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Mark> _values = [];
@@ -60,23 +60,23 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        // actions: [
-        //   GestureDetector(
-        //     onTap: () {
-        //       Navigator.push(
-        //         context,
-        //         MaterialPageRoute(builder: (context) => const SettingsScreen()),
-        //       );
-        //     },
-        //     child: const Padding(
-        //       padding: EdgeInsets.all(16.0),
-        //       child: Icon(
-        //         Icons.settings,
-        //         color: Colors.black,
-        //       ),
-        //     ),
-        //   ),
-        // ],
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
         title: GestureDetector(
           onTap: () => _scrollToNow(),
           child: const Text(
@@ -226,13 +226,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   List<Mark> _findMarksByDayIndex(int index) =>
       _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
-  // String _obtainStand() {
-  //   if (kReleaseMode) {
-  //     return 'release';
-  //   } else {
-  //     return 'debug';
-  //   }
-  // }
+  String _obtainStand() {
+    if (kReleaseMode) {
+      return 'release';
+    } else {
+      return 'debug';
+    }
+  }
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
