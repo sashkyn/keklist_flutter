@@ -31,8 +31,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  late final Storage _storage = FirebaseStorage(_obtainStand());
-  // final Storage _storage = SharedPreferencesStorage();
+  // late final Storage _storage = FirebaseStorage(_obtainStand());
+  final Storage _storage = SharedPreferencesStorage();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Mark> _values = [];
@@ -61,23 +61,23 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   GestureDetector(
+        //     onTap: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        //       );
+        //     },
+        //     child: const Padding(
+        //       padding: EdgeInsets.all(16.0),
+        //       child: Icon(
+        //         Icons.settings,
+        //         color: Colors.black,
+        //       ),
+        //     ),
+        //   ),
+        // ],
         title: GestureDetector(
           onTap: () => _scrollToNow(),
           child: const Text(
