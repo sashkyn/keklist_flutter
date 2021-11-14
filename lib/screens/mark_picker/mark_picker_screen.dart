@@ -59,6 +59,7 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
         ),
         Flexible(
           child: GridView.custom(
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
             childrenDelegate: SliverChildBuilderDelegate(

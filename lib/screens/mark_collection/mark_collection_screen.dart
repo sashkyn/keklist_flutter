@@ -10,6 +10,7 @@ import 'package:keklist/storages/entities/mark.dart';
 import 'package:keklist/storages/firebase_storage.dart';
 import 'package:keklist/storages/shared_preferences_storage.dart';
 import 'package:keklist/storages/storage.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:uuid/uuid.dart';
 
@@ -151,7 +152,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
           widgets.add(MarkWidget(
             item: '📝',
-            onTap: () => _showMarkPickerScreen(context, index),
+            onTap: () async => await _showMarkPickerScreen(context, index),
           ));
 
           return Column(
@@ -173,20 +174,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
-  void _showMarkPickerScreen(BuildContext context, int index) {
-    showModalBottomSheet(
-      isScrollControlled: true,
+  _showMarkPickerScreen(BuildContext context, int index) async {
+    await showCupertinoModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8.0),
-          topRight: Radius.circular(8.0),
-        ),
-      ),
       builder: (context) {
-        return SizedBox(
-          height: 500,
-          child: MarkPickerScreen(
+        return Scaffold(
+          body: MarkPickerScreen(
             onSelect: (creationMark) async {
               await _addMarkToStorage(
                 dayIndex: index,
