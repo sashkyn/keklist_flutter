@@ -2,8 +2,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:keklist/storages/entities/mark.dart';
-import 'package:keklist/storages/storage.dart';
+import 'package:emodzen/storages/entities/mark.dart';
+import 'package:emodzen/storages/storage.dart';
 
 class FirebaseStorage extends Storage {
   final String _stand;
