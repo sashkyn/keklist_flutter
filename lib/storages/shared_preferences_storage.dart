@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:keklist/storages/storage.dart';
+import 'package:emodzen/storages/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'entities/mark.dart';

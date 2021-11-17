@@ -26,6 +26,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Keklist',
+      debugShowCheckedModeBanner: false,
       home: MarkCollectionScreen(),
     );
   }

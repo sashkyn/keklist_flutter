@@ -1,4 +1,4 @@
-name: keklist
+name: emodzen
 description: A new Flutter project.
 
 publish_to: "none"
@@ -34,7 +34,7 @@ dev_dependencies:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/app_icon.png"
+  image_path: "assets/app_icon_2.png"
 
 flutter:
   uses-material-design: true

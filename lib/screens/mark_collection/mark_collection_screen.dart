@@ -1,15 +1,13 @@
-// ignore_for_file: avoid_print, unused_import
+// ignore_for_file: unused_import
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:emodzen/storages/entities/mark.dart';
+import 'package:emodzen/storages/shared_preferences_storage.dart';
+import 'package:emodzen/storages/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:keklist/screens/settings/settings_screen.dart';
-import 'package:keklist/storages/entities/mark.dart';
-import 'package:keklist/storages/firebase_storage.dart';
-import 'package:keklist/storages/shared_preferences_storage.dart';
-import 'package:keklist/storages/storage.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:uuid/uuid.dart';
@@ -25,14 +23,14 @@ class MarkCollectionScreen extends StatefulWidget {
 }
 
 class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
-  static const int _millisecondsInDay = 1000 * 1000 * 60 * 60 * 24;
+  static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
 
   final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   // late final Storage _storage = FirebaseStorage(_obtainStand());
-  final Storage _storage = SharedPreferencesStorage();
+  final SharedPreferencesStorage _storage = SharedPreferencesStorage();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Mark> _values = [];
@@ -81,7 +79,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         title: GestureDetector(
           onTap: () => _scrollToNow(),
           child: const Text(
-            'Keklist',
+            'Emodzen',
             style: TextStyle(color: Colors.black),
           ),
         ),
@@ -142,7 +140,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                         dayIndex: _getNowDayIndex(),
                         note: note.first,
                         emoji: item.emoji,
-                        sortIndex: item.sortIndex,
+                        sortIndex: _findMarksByDayIndex(index).length,
                       );
                     }
                   },
@@ -212,20 +210,21 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     setState(() => _values.add(mark));
   }
 
-  DateTime _getDateFromInt(int index) => DateTime.fromMicrosecondsSinceEpoch(_millisecondsInDay * index);
+  DateTime _getDateFromInt(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
-  int _getDayIndex(DateTime date) => (date.microsecondsSinceEpoch / _millisecondsInDay).round() - 1;
+  int _getDayIndex(DateTime date) =>
+      (date.millisecondsSinceEpoch + date.timeZoneOffset.inMilliseconds) ~/ _millisecondsInDay;
 
   List<Mark> _findMarksByDayIndex(int index) =>
       _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
-  String _obtainStand() {
-    if (kReleaseMode) {
-      return 'release';
-    } else {
-      return 'debug';
-    }
-  }
+  // String _obtainStand() {
+  //   if (kReleaseMode) {
+  //     return 'release';
+  //   } else {
+  //     return 'debug';
+  //   }
+  // }
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
