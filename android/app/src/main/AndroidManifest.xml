@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.emarko">
+    package="com.sashkyn.emodzen">
    <application
-        android:label="emarko"
-        android:icon="@mipmap/launcher_icon">
+        android:label="Emodzen"
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

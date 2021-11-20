@@ -1,5 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:awesome_emojis/emoji.dart';
+import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/mark_widget.dart';
@@ -18,12 +18,11 @@ class MarkPickerScreen extends StatefulWidget {
 }
 
 class _MarkPickerScreenState extends State<MarkPickerScreen> {
-  late final List<Emoji> _patternMarks = [];
   final List<Emoji> _marks = Emoji.all();
   String _searchText = '';
   List<Emoji> _filteredMarks = [];
   List<Emoji> get _displayedMarks => _searchText.isEmpty ? _mainMarks : _filteredMarks;
-  List<Emoji> get _mainMarks => _patternMarks + _marks.where((mark) => !_patternMarks.contains(mark)).toList();
+  List<Emoji> get _mainMarks => _marks;
 
   final TextEditingController _textEditingController = TextEditingController();
 
