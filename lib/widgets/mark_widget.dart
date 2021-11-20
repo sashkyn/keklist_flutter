@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MarkWidget extends StatelessWidget {
   final String item;
@@ -18,7 +19,9 @@ class MarkWidget extends StatelessWidget {
       child: Center(
         child: Text(
           item,
-          style: const TextStyle(fontSize: 50),
+          style: GoogleFonts.notoColorEmojiCompat(
+            fontSize: 50,
+          ),
         ),
       ),
       onTap: onTap,

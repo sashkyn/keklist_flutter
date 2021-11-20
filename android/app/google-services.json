@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "900095335910",
+    "firebase_url": "https://keklist-881d8-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "keklist-881d8",
+    "storage_bucket": "keklist-881d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900095335910:android:9003a12bf4b3bacfd7ca27",
+        "android_client_info": {
+          "package_name": "com.sashkyn.emodzen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900095335910-ft899ob7qdhu4927pbkrfuk0et7gl4hb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYV8Pf-8mT6ttQUgBYOyzGEhzcALX70rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900095335910-ft899ob7qdhu4927pbkrfuk0et7gl4hb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "900095335910-gkffjmjd457fpi8nkhkui6qk81qjnmbp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sashkyn.kekable"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

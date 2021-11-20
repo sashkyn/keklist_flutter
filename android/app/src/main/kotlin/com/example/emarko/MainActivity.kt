@@ -1,4 +1,4 @@
-package com.example.emarko
+package com.sashkyn.emodzen
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,7 +1,9 @@
 // ignore_for_file: unused_import
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
+import 'package:emodzen/storages/firebase_storage.dart';
 import 'package:emodzen/storages/shared_preferences_storage.dart';
 import 'package:emodzen/storages/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -218,13 +220,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   List<Mark> _findMarksByDayIndex(int index) =>
       _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
-  // String _obtainStand() {
-  //   if (kReleaseMode) {
-  //     return 'release';
-  //   } else {
-  //     return 'debug';
-  //   }
-  // }
+  String _obtainStand() {
+    if (kReleaseMode) {
+      return 'release';
+    } else {
+      return 'debug';
+    }
+  }
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
