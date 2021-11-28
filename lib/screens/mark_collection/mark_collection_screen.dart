@@ -35,23 +35,19 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       _jumpToNow();
-      
-      _send(ConnectToLocalStorageMarkEvent());
-      _send(StartListenSyncedUserMarkEvent());
+
+      _sendToBloc(ConnectToLocalStorageMarkEvent());
+      _sendToBloc(StartListenSyncedUserMarkEvent());
 
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
-          setState(() {
-            _values = state.markList;
-          });
+          setState(() => _values = state.markList);
         } else if (state is ConnectToLocalStorageMarkEvent) {
-          _send(ObtainMarksFromLocalStorageMarkEvent());
+          _sendToBloc(ObtainMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
-          _send(ObtainMarksFromCloudStorageMarkEvent());
+          _sendToBloc(ObtainMarksFromCloudStorageMarkEvent());
         } else if (state is ErrorMarkState) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-          final snackBar = SnackBar(content: Text(state.text));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          _showError(text: state.text);
         }
       });
     });
@@ -123,8 +119,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       ],
                     );
                     if (result == 'remove_key') {
-                      // await _storage.removeMarkFromDay(item.uuid);
-                      setState(() => _values.remove(item));
+                      _sendToBloc(DeleteMarkEvent(uuid: item.uuid));
                     } else if (result == 'copy_to_now_key') {
                       final note = await showTextInputDialog(
                         context: context,
@@ -139,12 +134,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       if (note == null) {
                         return;
                       }
-                      // _addMarkToStorage(
-                      //   dayIndex: _getNowDayIndex(),
-                      //   note: note.first,
-                      //   emoji: item.emoji,
-                      //   sortIndex: _findMarksByDayIndex(index).length,
-                      // );
+                      _sendToBloc(
+                        CreateMarkEvent(
+                          dayIndex: _getNowDayIndex(),
+                          note: note.first,
+                          emoji: item.emoji,
+                        ),
+                      );
                     }
                   },
                 ),
@@ -182,36 +178,19 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         return Scaffold(
           body: MarkPickerScreen(
             onSelect: (creationMark) async {
-              // await _addMarkToStorage(
-              //   dayIndex: index,
-              //   note: creationMark.note,
-              //   emoji: creationMark.mark,
-              //   sortIndex: _findMarksByDayIndex(index).length,
-              // );
+              _sendToBloc(
+                CreateMarkEvent(
+                  dayIndex: index,
+                  note: creationMark.note,
+                  emoji: creationMark.mark,
+                ),
+              );
             },
           ),
         );
       },
     );
   }
-
-  // Future<void> _addMarkToStorage({
-  //   required int dayIndex,
-  //   required String note,
-  //   required String emoji,
-  //   required int sortIndex,
-  // }) async {
-  //   final mark = Mark(
-  //     uuid: const Uuid().v4(),
-  //     dayIndex: dayIndex,
-  //     note: note,
-  //     emoji: emoji,
-  //     creationDate: DateTime.now().millisecondsSinceEpoch,
-  //     sortIndex: sortIndex,
-  //   );
-  //   await _storage.addMark(mark);
-  //   setState(() => _values.add(mark));
-  // }
 
   DateTime _getDateFromInt(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
@@ -238,13 +217,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   int _getNowDayIndex() => _getDayIndex(DateTime.now());
 
-  _send(MarkEvent event) {
+  void _sendToBloc(MarkEvent event) {
     context.read<MarkBloc>().add(event);
   }
-}
 
-// MARK: Sorted by.
-
-extension MyIterable<E> on Iterable<E> {
-  Iterable<E> sortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)));
+  void _showError({required String text}) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    final snackBar = SnackBar(content: Text(text));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 }
