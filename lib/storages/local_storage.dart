@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'entities/mark.dart';
 
-class SharedPreferencesStorage extends Storage {
+class LocalStorage extends Storage {
   late SharedPreferences _prefs;
 
   @override
