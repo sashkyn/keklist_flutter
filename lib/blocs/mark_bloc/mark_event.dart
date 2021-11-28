@@ -9,6 +9,12 @@ class ConnectToLocalStorageMarkEvent extends MarkEvent {}
 
 class StartListenSyncedUserMarkEvent extends MarkEvent {}
 
+class UserChangedMarkEvent extends MarkEvent {
+  final User? user;
+
+  UserChangedMarkEvent({this.user});
+}
+
 class ObtainMarksFromLocalStorageMarkEvent extends MarkEvent {}
 
 class ObtainMarksFromCloudStorageMarkEvent extends MarkEvent {}
