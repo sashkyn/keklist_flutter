@@ -19,9 +19,23 @@ class ObtainMarksFromLocalStorageMarkEvent extends MarkEvent {}
 
 class ObtainMarksFromCloudStorageMarkEvent extends MarkEvent {}
 
-class CreateMarkEvent extends MarkEvent {}
+class CreateMarkEvent extends MarkEvent {
+  final int dayIndex;
+  final String note;
+  final String emoji;
 
-class DeleteMarkEvent extends MarkEvent {}
+  CreateMarkEvent({
+    required this.dayIndex,
+    required this.note,
+    required this.emoji,
+  });
+}
+
+class DeleteMarkEvent extends MarkEvent {
+  final String uuid;
+
+  DeleteMarkEvent({required this.uuid});
+}
 
 class EditMarkEvent extends MarkEvent {}
 
