@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// TODO: сделать механизм показа боттом шитов
+
 class AuthScreen extends StatefulWidget {
   AuthScreen({Key? key}) : super(key: key);
 
@@ -17,7 +19,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  int groupValue = 0;
+  int _groupValue = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'Login',
           style: TextStyle(
             fontSize: 14,
-            color: groupValue == 0 ? Colors.black : Colors.white,
+            color: _groupValue == 0 ? Colors.black : Colors.white,
           ),
         ),
       ),
@@ -36,7 +38,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'Registration',
           style: TextStyle(
             fontSize: 14,
-            color: groupValue == 1 ? Colors.black : Colors.white,
+            color: _groupValue == 1 ? Colors.black : Colors.white,
           ),
         ),
       ),
@@ -51,7 +53,7 @@ class _AuthScreenState extends State<AuthScreen> {
               'Sign in Emodzen',
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 16.0,
+                fontSize: 18.0,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -61,11 +63,11 @@ class _AuthScreenState extends State<AuthScreen> {
             backgroundColor: Colors.black,
             thumbColor: Colors.white,
             padding: const EdgeInsets.all(8),
-            groupValue: groupValue,
+            groupValue: _groupValue,
             children: _children,
             onValueChanged: (value) {
               setState(() {
-                groupValue = value!;
+                _groupValue = value!;
               });
             },
           ),
@@ -95,7 +97,7 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
           const SizedBox(height: 16.0),
           Visibility(
-              visible: groupValue == 0,
+              visible: _groupValue == 0,
               child: _buildButton(
                 text: 'Login',
                 onPressed: () async {
@@ -113,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 },
               )),
           Visibility(
-            visible: groupValue == 1,
+            visible: _groupValue == 1,
             child: _buildButton(
               text: 'Register',
               onPressed: () async {
@@ -124,6 +126,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   );
                   Navigator.pop(context);
                 } catch (e) {
+                  // TODO: смаппить ошибки
                   ScaffoldMessenger.of(context).clearSnackBars();
                   final snackBar = SnackBar(content: Text('$e'));
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -136,13 +139,17 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  _buildButton({required String text, VoidCallback? onPressed}) {
+  _buildButton({
+    required String text,
+    VoidCallback? onPressed,
+  }) {
     return ElevatedButton(
       child: SizedBox(
         width: 100,
         height: 44,
         child: Center(child: Text(text)),
       ),
+      style: ElevatedButton.styleFrom(primary: Colors.black),
       onPressed: onPressed,
     );
   }
