@@ -6,13 +6,13 @@ import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/storage.dart';
 
 class FirebaseStorage extends Storage {
-  final String _stand;
+  final String stand;
 
   final DatabaseReference _databaseReference =
       FirebaseDatabase(databaseURL: 'https://keklist-881d8-default-rtdb.europe-west1.firebasedatabase.app/')
           .reference();
 
-  FirebaseStorage(this._stand);
+  FirebaseStorage({required this.stand});
 
   @override
   Future<void> connect() async {
@@ -26,7 +26,7 @@ class FirebaseStorage extends Storage {
       print('userId is null!');
       return;
     }
-    return _databaseReference.child(_stand).child(userId).child('marks').child(mark.uuid).set(mark.toJson());
+    return _databaseReference.child(stand).child(userId).child('marks').child(mark.uuid).set(mark.toJson());
   }
 
   @override
@@ -38,7 +38,7 @@ class FirebaseStorage extends Storage {
     }
 
     final List<Mark> marks = [];
-    await _databaseReference.child(_stand).child(userId).child('marks').once().then((snapshot) {
+    await _databaseReference.child(stand).child(userId).child('marks').once().then((snapshot) {
       snapshot.value.forEach((key, values) {
         final markMap = Map<String, dynamic>.from(values);
         markMap['id'] = key;
@@ -55,6 +55,6 @@ class FirebaseStorage extends Storage {
       print('userId is null!');
       return;
     }
-    return _databaseReference.child(_stand).child(userId).child('marks').child(id).remove();
+    return _databaseReference.child(stand).child(userId).child('marks').child(id).remove();
   }
 }
