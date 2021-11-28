@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/firebase_storage.dart';
@@ -15,6 +17,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   late final Storage _cloudStorage = FirebaseStorage(stand: _obtainStand());
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  StreamSubscription<User?>? _userChangedSubscription;
   List<Mark> _values = [];
 
   MarkBloc() : super(ListMarkState(markList: [])) {
@@ -23,10 +26,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       emit.call(ConnectedToLocalStorageMarkState());
     });
     on<StartListenSyncedUserMarkEvent>((event, emit) async {
-      _auth.authStateChanges().listen((user) async {
-        emit.call(UserSyncedMarkState(isSync: user != null));
-      });
+      _userChangedSubscription?.cancel();
+      _userChangedSubscription = _auth.authStateChanges().listen((user) => add(UserChangedMarkEvent(user: user)));
     });
+    on<UserChangedMarkEvent>((event, emit) async => emit.call(UserSyncedMarkState(isSync: true)));
     on<ObtainMarksFromLocalStorageMarkEvent>((event, emit) async {
       _values = await _localStorage.getMarks();
       final state = ListMarkState(markList: _values);
@@ -40,6 +43,13 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     //on<MarkEvent>((event, emit) async {});
     //on<MarkEvent>((event, emit) async {});
     //on<MarkEvent>((event, emit) async {});
+    //on<MarkEvent>((event, emit) async {});
+  }
+
+  @override
+  Future<void> close() {
+    _userChangedSubscription?.cancel();
+    return super.close();
   }
 
   String _obtainStand() {
