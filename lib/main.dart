@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -53,19 +55,21 @@ class MyBlocObserver extends BlocObserver {
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
+
+    print(error);
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
 
-    print('onChange: $bloc.state');
+    print('onChange: ${bloc.state}');
   }
 
-  @override
-  void onTransition(Bloc bloc, Transition transition) {
-    super.onTransition(bloc, transition);
+  // @override
+  // void onTransition(Bloc bloc, Transition transition) {
+  //   super.onTransition(bloc, transition);
 
-    print('onTransition: $bloc.state');
-  }
+  //   print('onTransition: $bloc.state');
+  // }
 }
