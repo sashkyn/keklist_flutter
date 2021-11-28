@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:emodzen/screens/auth/auth_screen.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -29,12 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             visible: _auth.currentUser == null,
             child: ElevatedButton(
               child: const Text('Enable sync'),
-              onPressed: () async {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => AuthScreen(),
-                );
-              },
+              onPressed: () async => await _showAuth(),
             ),
           ),
           Visibility(
@@ -51,4 +47,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  _showAuth() async => await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => AuthScreen(),
+    );
 }
