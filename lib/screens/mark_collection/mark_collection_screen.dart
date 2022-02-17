@@ -41,7 +41,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
-          setState(() => _values = state.markList);
+          setState(() => _values = state.values);
         } else if (state is ConnectToLocalStorageMarkEvent) {
           _sendToBloc(ObtainMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
@@ -155,7 +155,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           return Column(
             children: [
               Text(
-                _formatter.format(_getDateFromInt(index)),
+                _formatter.format(_getDateFromIndex(index)),
                 style: TextStyle(fontWeight: index == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
               ),
               GridView.count(
@@ -192,10 +192,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
-  DateTime _getDateFromInt(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
-
-  int _getDayIndex(DateTime date) =>
-      (date.millisecondsSinceEpoch + date.timeZoneOffset.inMilliseconds) ~/ _millisecondsInDay;
+  DateTime _getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
   List<Mark> _findMarksByDayIndex(int index) =>
       _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
@@ -215,8 +212,6 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
-  int _getNowDayIndex() => _getDayIndex(DateTime.now());
-
   void _sendToBloc(MarkEvent event) {
     context.read<MarkBloc>().add(event);
   }
@@ -226,4 +221,11 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     final snackBar = SnackBar(content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  // TODO: Move to bloc with new action.
+
+  int _getNowDayIndex() => _getDayIndex(DateTime.now());
+
+  int _getDayIndex(DateTime date) =>
+      (date.millisecondsSinceEpoch + date.timeZoneOffset.inMilliseconds) ~/ _millisecondsInDay;
 }

@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:emodzen/storages/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:collection/collection.dart';
 
 import 'entities/mark.dart';
 
-class LocalStorage extends Storage {
+class LocalStorage extends IStorage {
   late SharedPreferences _prefs;
 
   @override
@@ -34,8 +35,13 @@ class LocalStorage extends Storage {
   @override
   Future<void> removeMarkFromDay(String id) async {
     final marks = await getMarks();
-    final markToRemove = marks.firstWhere((i) => i.uuid == id);
+    final markToRemove = marks.firstWhereOrNull((i) => i.uuid == id);
     marks.remove(markToRemove);
     _prefs.setString('marks', json.encode(marks));
+  }
+
+  @override
+  Future<void> save({required List<Mark> list}) async {
+    await _prefs.setString('marks', json.encode(list));
   }
 }
