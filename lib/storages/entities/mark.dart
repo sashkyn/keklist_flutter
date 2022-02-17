@@ -1,4 +1,6 @@
-class Mark {
+import 'package:equatable/equatable.dart';
+
+class Mark extends Equatable {
   final String uuid;
   final String emoji;
   final String note;
@@ -14,6 +16,9 @@ class Mark {
     required this.creationDate,
     required this.sortIndex,
   });
+
+  @override
+  List<Object?> get props => [uuid];
 
   Mark.fromJson(Map<String, dynamic> json)
       : uuid = json['id'] ?? 0,

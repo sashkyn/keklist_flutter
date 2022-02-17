@@ -3,9 +3,9 @@ part of 'mark_bloc.dart';
 abstract class MarkState {}
 
 class ListMarkState extends MarkState {
-  final List<Mark> markList;
+  final List<Mark> values;
 
-  ListMarkState({required this.markList});
+  ListMarkState({required this.values});
 }
 
 class UserSyncedMarkState extends MarkState {
