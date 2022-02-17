@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/storage.dart';
 
-class FirebaseStorage extends Storage {
+class FirebaseStorage extends IStorage {
   final String stand;
 
   final DatabaseReference _databaseReference =
@@ -56,5 +56,10 @@ class FirebaseStorage extends Storage {
       return;
     }
     return _databaseReference.child(stand).child(userId).child('marks').child(id).remove();
+  }
+
+  @override
+  Future<void> save({required List<Mark> list}) async {
+    // TODO: Implement saving list of Marks
   }
 }
