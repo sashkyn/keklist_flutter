@@ -1,8 +1,8 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
+import 'package:emodzen/screens/mark_collection/search_bar.dart';
 import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -27,6 +27,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
+  List<String> _filteredValuesUuids = [];
   List<Mark> _values = [];
 
   @override
@@ -39,18 +40,74 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       _sendToBloc(ConnectToLocalStorageMarkEvent());
       _sendToBloc(StartListenSyncedUserMarkEvent());
 
+      _searchTextController = TextEditingController(text: null);
+      _searchTextController.addListener(() {
+        _sendToBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
+      });
+
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
           setState(() => _values = state.values);
-        } else if (state is ConnectToLocalStorageMarkEvent) {
-          _sendToBloc(ObtainMarksFromLocalStorageMarkEvent());
+        } else if (state is ConnectedToLocalStorageMarkState) {
+          _sendToBloc(GetMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
-          _sendToBloc(ObtainMarksFromCloudStorageMarkEvent());
+          _sendToBloc(GetMarksFromCloudStorageMarkEvent());
         } else if (state is ErrorMarkState) {
           _showError(text: state.text);
+        } else if (state is SearchingMarkState) {
+          setState(() {
+            _isSearching = state.enabled;
+            _filteredValuesUuids = state.filteredValuesUuid;
+            _values = state.values;
+          });
         }
       });
     });
+  }
+
+  bool _isSearching = false;
+
+  late TextEditingController _searchTextController;
+
+  Widget _getAppBar() {
+    if (_isSearching) {
+      return SearchBar(
+        textController: _searchTextController,
+        onCancel: () => _sendToBloc(StopSearchMarkEvent()),
+      );
+    } else {
+      return GestureDetector(
+        onTap: () => _scrollToNow(),
+        child: const Text(
+          'Emodzen',
+          style: TextStyle(color: Colors.black),
+        ),
+      );
+    }
+  }
+
+  List<Widget>? _getActions() {
+    if (_isSearching) {
+      return null;
+    } else {
+      return [
+        IconButton(
+          icon: const Icon(Icons.search),
+          color: Colors.black,
+          onPressed: () => _sendToBloc(StartSearchMarkEvent()),
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          },
+        ),
+      ];
+    }
   }
 
   @override
@@ -58,30 +115,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ],
-        title: GestureDetector(
-          onTap: () => _scrollToNow(),
-          child: const Text(
-            'Emodzen',
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+        actions: _getActions(),
+        title: _getAppBar(),
         backgroundColor: Colors.white,
       ),
       body: ScrollablePositionedList.builder(
@@ -90,67 +127,34 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
         itemBuilder: (BuildContext context, int index) {
-          final List<Widget> widgets = _findMarksByDayIndex(index)
-              .map(
-                (item) => MarkWidget(
-                  item: item.emoji,
-                  onTap: () {
-                    showOkAlertDialog(
-                      title: item.emoji,
-                      message: item.note,
-                      context: context,
-                    );
-                  },
-                  onLongPress: () async {
-                    final result = await showModalActionSheet(
-                      context: context,
-                      actions: [
-                        const SheetAction(
-                          icon: Icons.delete,
-                          label: 'Copy to now',
-                          key: 'copy_to_now_key',
-                        ),
-                        const SheetAction(
-                          icon: Icons.delete,
-                          label: 'Delete',
-                          key: 'remove_key',
-                          isDestructiveAction: true,
-                        ),
-                      ],
-                    );
-                    if (result == 'remove_key') {
-                      _sendToBloc(DeleteMarkEvent(uuid: item.uuid));
-                    } else if (result == 'copy_to_now_key') {
-                      final note = await showTextInputDialog(
-                        context: context,
-                        message: item.emoji,
-                        textFields: [
-                          DialogTextField(
-                            initialText: item.note,
-                            maxLines: 3,
-                          )
-                        ],
-                      );
-                      if (note == null) {
-                        return;
-                      }
-                      _sendToBloc(
-                        CreateMarkEvent(
-                          dayIndex: _getNowDayIndex(),
-                          note: note.first,
-                          emoji: item.emoji,
-                        ),
-                      );
-                    }
-                  },
+          final List<Widget> widgets = _findMarksByDayIndex(index).map(
+            (item) {
+              final bool isHighlighted;
+              if (_isSearching) {
+                isHighlighted = _filteredValuesUuids.contains(item.uuid);
+              } else {
+                isHighlighted = true;
+              }
+              return MarkWidget(
+                item: item.emoji,
+                onTap: () => showOkAlertDialog(
+                  title: item.emoji,
+                  message: item.note,
+                  context: context,
                 ),
-              )
-              .toList();
+                onLongPress: () async => await _showMarkOptionsActionSheet(context, item),
+                isHighlighted: isHighlighted,
+              );
+            },
+          ).toList();
 
-          widgets.add(MarkWidget(
-            item: '📝',
-            onTap: () async => await _showMarkPickerScreen(context, index),
-          ));
+          widgets.add(
+            MarkWidget(
+              item: '📝',
+              onTap: () async => await _showMarkPickerScreen(context, index),
+              isHighlighted: true,
+            ),
+          );
 
           return Column(
             children: [
@@ -171,24 +175,66 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
+  _showMarkOptionsActionSheet(BuildContext context, Mark item) async {
+    final result = await showModalActionSheet(
+      context: context,
+      actions: [
+        const SheetAction(
+          icon: Icons.delete,
+          label: 'Copy to now',
+          key: 'copy_to_now_key',
+        ),
+        const SheetAction(
+          icon: Icons.delete,
+          label: 'Delete',
+          key: 'remove_key',
+          isDestructiveAction: true,
+        ),
+      ],
+    );
+    if (result == 'remove_key') {
+      _sendToBloc(DeleteMarkEvent(uuid: item.uuid));
+    } else if (result == 'copy_to_now_key') {
+      await _copyToNow(context, item);
+    }
+  }
+
+  _copyToNow(BuildContext context, Mark item) async {
+    final note = await showTextInputDialog(
+      context: context,
+      message: item.emoji,
+      textFields: [
+        DialogTextField(
+          initialText: item.note,
+          maxLines: 3,
+        )
+      ],
+    );
+    if (note != null) {
+      _sendToBloc(
+        CreateMarkEvent(
+          dayIndex: _getNowDayIndex(),
+          note: note.first,
+          emoji: item.emoji,
+        ),
+      );
+    }
+  }
+
   _showMarkPickerScreen(BuildContext context, int index) async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) {
-        return Scaffold(
-          body: MarkPickerScreen(
-            onSelect: (creationMark) async {
-              _sendToBloc(
-                CreateMarkEvent(
-                  dayIndex: index,
-                  note: creationMark.note,
-                  emoji: creationMark.mark,
-                ),
-              );
-            },
+      builder: (context) => Scaffold(
+        body: MarkPickerScreen(
+          onSelect: (creationMark) async => _sendToBloc(
+            CreateMarkEvent(
+              dayIndex: index,
+              note: creationMark.note,
+              emoji: creationMark.mark,
+            ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

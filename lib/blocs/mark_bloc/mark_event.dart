@@ -1,9 +1,10 @@
 part of 'mark_bloc.dart';
 
-// TODO: Factory initialization
-
 @immutable
-abstract class MarkEvent {}
+abstract class MarkEvent extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class ConnectToLocalStorageMarkEvent extends MarkEvent {}
 
@@ -12,12 +13,15 @@ class StartListenSyncedUserMarkEvent extends MarkEvent {}
 class UserChangedMarkEvent extends MarkEvent {
   final User? user;
 
+  @override
+  List<Object?> get props => [user];
+
   UserChangedMarkEvent({this.user});
 }
 
-class ObtainMarksFromLocalStorageMarkEvent extends MarkEvent {}
+class GetMarksFromLocalStorageMarkEvent extends MarkEvent {}
 
-class ObtainMarksFromCloudStorageMarkEvent extends MarkEvent {}
+class GetMarksFromCloudStorageMarkEvent extends MarkEvent {}
 
 class CreateMarkEvent extends MarkEvent {
   final int dayIndex;
@@ -29,16 +33,35 @@ class CreateMarkEvent extends MarkEvent {
     required this.note,
     required this.emoji,
   });
+
+  @override
+  List<Object?> get props => [dayIndex, note, emoji];
 }
 
 class DeleteMarkEvent extends MarkEvent {
   final String uuid;
 
   DeleteMarkEvent({required this.uuid});
+
+  @override
+  List<Object?> get props => [uuid];
 }
 
 class EditMarkEvent extends MarkEvent {}
 
 class MoveMarkEvent extends MarkEvent {}
 
-class CopyMarkEvent extends MarkEvent {}
+class CopyToNowMarkEvent extends MarkEvent {}
+
+class StartSearchMarkEvent extends MarkEvent {}
+
+class EnterTextSearchMarkEvent extends MarkEvent {
+  final String text;
+
+  EnterTextSearchMarkEvent({required this.text});
+
+  @override
+  List<Object?> get props => [text];
+}
+
+class StopSearchMarkEvent extends MarkEvent {}
