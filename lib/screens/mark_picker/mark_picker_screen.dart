@@ -82,6 +82,7 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
                     }
                     _pickMark(mark, note.first);
                   },
+                  isHighlighted: true,
                 );
               },
               childCount: _displayedMarks.length,
