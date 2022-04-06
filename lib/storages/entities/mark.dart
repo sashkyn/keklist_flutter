@@ -8,7 +8,7 @@ class Mark extends Equatable {
   final int creationDate;
   final int sortIndex;
 
-  Mark({
+  const Mark({
     required this.uuid,
     required this.note,
     required this.emoji,

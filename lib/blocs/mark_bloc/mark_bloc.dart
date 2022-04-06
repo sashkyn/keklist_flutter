@@ -20,7 +20,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<User?>? _userChangedSubscription;
-  List<Mark> _values = [];
+  List<Mark> _marks = [];
 
   MarkBloc() : super(ListMarkState(values: [])) {
     on<ConnectToLocalStorageMarkEvent>(_connectToLocalStorage);
@@ -41,9 +41,9 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
     await _localStorage.removeMarkFromDay(event.uuid);
     await _cloudStorage.removeMarkFromDay(event.uuid);
-    final item = _values.firstWhere((item) => item.uuid == event.uuid);
-    _values.remove(item);
-    emit.call(ListMarkState(values: _values));
+    final item = _marks.firstWhere((item) => item.uuid == event.uuid);
+    _marks.remove(item);
+    emit.call(ListMarkState(values: _marks));
   }
 
   FutureOr<void> _createMark(CreateMarkEvent event, emit) async {
@@ -57,26 +57,26 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
     await _localStorage.addMark(mark);
     await _cloudStorage.addMark(mark);
-    _values.add(mark);
-    emit.call(ListMarkState(values: _values));
+    _marks.add(mark);
+    emit.call(ListMarkState(values: _marks));
   }
 
   FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
-    _values.addAll(await _cloudStorage.getMarks());
-    _values = _values.distinct();
-    final state = ListMarkState(values: _values);
+    _marks.addAll(await _cloudStorage.getMarks());
+    _marks = _marks.distinct();
+    final state = ListMarkState(values: _marks);
     emit.call(state);
 
     // TODO: сохранять в сторадж только тех что нет в нём.
     await _localStorage.connect();
     emit.call(ConnectedToLocalStorageMarkState());
-    await _localStorage.save(list: _values);
+    await _localStorage.save(list: _marks);
   }
 
   FutureOr<void> _getMarksFromLocalStorage(GetMarksFromLocalStorageMarkEvent event, emit) async {
-    _values.addAll(await _localStorage.getMarks());
-    _values = _values.distinct();
-    final state = ListMarkState(values: _values);
+    _marks.addAll(await _localStorage.getMarks());
+    _marks = _marks.distinct();
+    final state = ListMarkState(values: _marks);
     emit.call(state);
   }
 
@@ -94,7 +94,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(
       SearchingMarkState(
         enabled: true,
-        values: _values,
+        values: _marks,
         filteredValuesUuid: const [],
       ),
     );
@@ -104,25 +104,29 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(
       SearchingMarkState(
         enabled: false,
-        values: _values,
+        values: _marks,
         filteredValuesUuid: const [],
       ),
     );
   }
 
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
-    var filteredListUuids = _values.where((e) => e.note.contains(event.text)).map((e) => e.uuid).toList();
+    final uuids = _marks
+        .where((mark) => mark.note.toLowerCase().contains(event.text.toLowerCase()))
+        .map((mark) => mark.uuid)
+        .toList();
+        
     emit.call(
       SearchingMarkState(
         enabled: true,
-        values: _values,
-        filteredValuesUuid: filteredListUuids,
+        values: _marks,
+        filteredValuesUuid: uuids,
       ),
     );
   }
 
   List<Mark> _findMarksByDayIndex(int index) =>
-      _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
+      _marks.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
   @override
   Future<void> close() {

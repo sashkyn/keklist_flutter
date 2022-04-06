@@ -27,8 +27,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  List<String> _filteredValuesUuids = [];
-  List<Mark> _values = [];
+  List<Mark> _marks = [];
+
+  SearchingMarkState? _searchingMarkState;
+
+  get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
+  get _filteredValuesUuid => _isSearching ? _searchingMarkState!.filteredValuesUuid : [];
 
   @override
   void initState() {
@@ -47,7 +51,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
-          setState(() => _values = state.values);
+          setState(() => _marks = state.values);
         } else if (state is ConnectedToLocalStorageMarkState) {
           _sendToBloc(GetMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
@@ -55,17 +59,11 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         } else if (state is ErrorMarkState) {
           _showError(text: state.text);
         } else if (state is SearchingMarkState) {
-          setState(() {
-            _isSearching = state.enabled;
-            _filteredValuesUuids = state.filteredValuesUuid;
-            _values = state.values;
-          });
+          setState(() => _searchingMarkState = state);
         }
       });
     });
   }
-
-  bool _isSearching = false;
 
   late TextEditingController _searchTextController;
 
@@ -127,26 +125,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
         itemBuilder: (BuildContext context, int index) {
-          final List<Widget> widgets = _findMarksByDayIndex(index).map(
-            (item) {
-              final bool isHighlighted;
-              if (_isSearching) {
-                isHighlighted = _filteredValuesUuids.contains(item.uuid);
-              } else {
-                isHighlighted = true;
-              }
-              return MarkWidget(
-                item: item.emoji,
-                onTap: () => showOkAlertDialog(
-                  title: item.emoji,
-                  message: item.note,
-                  context: context,
-                ),
-                onLongPress: () async => await _showMarkOptionsActionSheet(context, item),
-                isHighlighted: isHighlighted,
-              );
-            },
-          ).toList();
+          final List<Mark> marksOfDay = _findMarksByDayIndex(index);
+          final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
 
           widgets.add(
             MarkWidget(
@@ -172,6 +152,25 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _makeMarkWidget(Mark mark) {
+    final bool isHighlighted;
+    if (_isSearching) {
+      isHighlighted = _filteredValuesUuid.contains(mark.uuid);
+    } else {
+      isHighlighted = true;
+    }
+    return MarkWidget(
+      item: mark.emoji,
+      onTap: () => showOkAlertDialog(
+        title: mark.emoji,
+        message: mark.note,
+        context: context,
+      ),
+      onLongPress: () async => await _showMarkOptionsActionSheet(context, mark),
+      isHighlighted: isHighlighted,
     );
   }
 
@@ -241,7 +240,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   DateTime _getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
   List<Mark> _findMarksByDayIndex(int index) =>
-      _values.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
+      _marks.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
