@@ -14,7 +14,10 @@ class SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.search),
-      title: TextField(controller: textController),
+      title: TextField(
+        controller: textController,
+        autofocus: true,
+      ),
       trailing: IconButton(
         icon: const Icon(Icons.cancel),
         onPressed: onCancel,
