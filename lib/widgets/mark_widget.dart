@@ -20,7 +20,7 @@ class MarkWidget extends StatelessWidget {
     return GestureDetector(
       child: Center(
         child: GrayedOut(
-          Text(
+          child: Text(
             item,
             style: GoogleFonts.notoColorEmojiCompat(fontSize: 50),
           ),
@@ -37,10 +37,12 @@ class GrayedOut extends StatelessWidget {
   final Widget child;
   final bool grayedOut;
 
-  GrayedOut(this.child, {this.grayedOut = true});
+  const GrayedOut({
+    Key? key,
+    required this.child,
+    required this.grayedOut,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return grayedOut ? Opacity(opacity: 0.5, child: child) : child;
-  }
+  Widget build(BuildContext context) => grayedOut ? Opacity(opacity: 0.25, child: child) : child;
 }

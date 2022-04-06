@@ -71,7 +71,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     if (_isSearching) {
       return SearchBar(
         textController: _searchTextController,
-        onCancel: () => _sendToBloc(StopSearchMarkEvent()),
+        onCancel: () {
+          _searchTextController.text = '';
+          _sendToBloc(StopSearchMarkEvent());
+        },
       );
     } else {
       return GestureDetector(
@@ -92,7 +95,9 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         IconButton(
           icon: const Icon(Icons.search),
           color: Colors.black,
-          onPressed: () => _sendToBloc(StartSearchMarkEvent()),
+          onPressed: () {
+            _sendToBloc(StartSearchMarkEvent());
+          },
         ),
         IconButton(
           icon: const Icon(Icons.settings),
