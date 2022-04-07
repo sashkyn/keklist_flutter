@@ -22,17 +22,18 @@ class MarkCollectionScreen extends StatefulWidget {
 
 class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
-
-  final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
+  static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
+  
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   List<Mark> _marks = [];
-
   SearchingMarkState? _searchingMarkState;
 
+  final TextEditingController _searchTextController = TextEditingController(text: null);
+
   get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
-  get _filteredValuesUuid => _isSearching ? _searchingMarkState!.filteredValuesUuid : [];
+  get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
 
   @override
   void initState() {
@@ -44,7 +45,6 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       _sendToBloc(ConnectToLocalStorageMarkEvent());
       _sendToBloc(StartListenSyncedUserMarkEvent());
 
-      _searchTextController = TextEditingController(text: null);
       _searchTextController.addListener(() {
         _sendToBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
       });
@@ -64,8 +64,6 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       });
     });
   }
-
-  late TextEditingController _searchTextController;
 
   Widget _getAppBar() {
     if (_isSearching) {
@@ -163,7 +161,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   Widget _makeMarkWidget(Mark mark) {
     final bool isHighlighted;
     if (_isSearching) {
-      isHighlighted = _filteredValuesUuid.contains(mark.uuid);
+      isHighlighted = _searchedValues.map((value) => value.uuid).contains(mark.uuid);
     } else {
       isHighlighted = true;
     }

@@ -40,15 +40,15 @@ class ConnectedToLocalStorageMarkState extends MarkState {
 class SearchingMarkState extends MarkState {
   final bool enabled;
   final List<Mark> values;
-  final List<String> filteredValuesUuid;
+  final List<Mark> filteredValues;
 
   SearchingMarkState({
     required this.enabled,
     required this.values,
-    required this.filteredValuesUuid,
+    required this.filteredValues,
   });
 
   // Equatable.
   @override
-  List<Object?> get props => [enabled, values, filteredValuesUuid];
+  List<Object?> get props => [enabled, values, filteredValues];
 }
