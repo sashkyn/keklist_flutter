@@ -15,7 +15,7 @@ class EmojiFetcherBloc extends Bloc<EmojiFetcherEvent, EmojiFetcherState> {
         EmojiFetcherState(
           event.searchtext,
           _emojiList
-              .where((emoji) => emoji.keywords.join().contains(event.searchtext))
+              .where((emoji) => emoji.keywords.join().contains(event.searchtext.toLowerCase().trim()))
               .map((emoji) => emoji.char)
               .toList(),
         ),

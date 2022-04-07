@@ -95,7 +95,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       SearchingMarkState(
         enabled: true,
         values: _marks,
-        filteredValuesUuid: const [],
+        filteredValues: const [],
       ),
     );
   }
@@ -105,22 +105,21 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       SearchingMarkState(
         enabled: false,
         values: _marks,
-        filteredValuesUuid: const [],
+        filteredValues: const [],
       ),
     );
   }
 
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
-    final uuids = _marks
-        .where((mark) => mark.note.toLowerCase().contains(event.text.toLowerCase()))
-        .map((mark) => mark.uuid)
+    final filteredMarks = _marks
+        .where((mark) => mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim()))
         .toList();
-        
+
     emit.call(
       SearchingMarkState(
         enabled: true,
         values: _marks,
-        filteredValuesUuid: uuids,
+        filteredValues: filteredMarks,
       ),
     );
   }

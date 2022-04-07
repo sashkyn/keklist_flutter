@@ -12,16 +12,40 @@ class SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.search),
-      title: TextField(
-        controller: textController,
-        autofocus: true,
-      ),
-      trailing: IconButton(
-        icon: const Icon(Icons.cancel),
-        onPressed: onCancel,
-      ),
+    return Row(
+      children: [
+        const Flexible(
+          flex: 1,
+          child: Icon(
+            Icons.search,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(width: 8.0),
+        Flexible(
+          flex: 10,
+          child: TextField(
+            controller: textController,
+            autofocus: true,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Search for your notes',
+            ),
+          ),
+        ),
+        const SizedBox(width: 8.0),
+        Flexible(
+          flex: 1,
+          child: IconButton(
+            icon: const Icon(
+              Icons.cancel,
+              color: Colors.black,
+            ),
+            onPressed: onCancel,
+          ),
+        ),
+        const SizedBox(width: 4.0),
+      ],
     );
   }
 }
