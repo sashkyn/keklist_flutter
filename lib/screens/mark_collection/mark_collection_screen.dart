@@ -3,6 +3,7 @@ import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
 import 'package:emodzen/screens/mark_collection/search_bar.dart';
 import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
+import 'package:emodzen/typealiases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -23,7 +24,7 @@ class MarkCollectionScreen extends StatefulWidget {
 class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
-  
+
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
@@ -51,7 +52,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
-          setState(() => _marks = state.values);
+          setState(() {
+            // TODO: ничего не приходит сюда
+            _marks = state.values;
+          });
         } else if (state is ConnectedToLocalStorageMarkState) {
           _sendToBloc(GetMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
@@ -69,6 +73,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     if (_isSearching) {
       return SearchBar(
         textController: _searchTextController,
+        onAddEmotion: () {
+          _showMarkPickerScreen(
+            onSelect: (mark) {
+              _searchTextController.text += mark.mark;
+            },
+          );
+        },
         onCancel: () {
           _searchTextController.text = '';
           _sendToBloc(StopSearchMarkEvent());
@@ -134,7 +145,15 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           widgets.add(
             MarkWidget(
               item: '📝',
-              onTap: () async => await _showMarkPickerScreen(context, index),
+              onTap: () async => await _showMarkPickerScreen(onSelect: (creationMark) async {
+                _sendToBloc(
+                  CreateMarkEvent(
+                    dayIndex: index,
+                    note: creationMark.note,
+                    emoji: creationMark.mark,
+                  ),
+                );
+              }),
               isHighlighted: true,
             ),
           );
@@ -223,19 +242,11 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     }
   }
 
-  _showMarkPickerScreen(BuildContext context, int index) async {
+  _showMarkPickerScreen({required ArgumentCallback<CreationMark> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => Scaffold(
-        body: MarkPickerScreen(
-          onSelect: (creationMark) async => _sendToBloc(
-            CreateMarkEvent(
-              dayIndex: index,
-              note: creationMark.note,
-              emoji: creationMark.mark,
-            ),
-          ),
-        ),
+        body: MarkPickerScreen(onSelect: onSelect),
       ),
     );
   }

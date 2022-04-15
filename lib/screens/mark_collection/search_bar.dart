@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SearchBar extends StatelessWidget {
+  final VoidCallback onAddEmotion;
   final VoidCallback onCancel;
   final TextEditingController textController;
 
   const SearchBar({
     Key? key,
     required this.textController,
+    required this.onAddEmotion,
     required this.onCancel,
   }) : super(key: key);
 
@@ -34,6 +36,16 @@ class SearchBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8.0),
+        Flexible(
+          flex: 1,
+          child: IconButton(
+            icon: const Icon(
+              Icons.emoji_emotions,
+              color: Colors.black,
+            ),
+            onPressed: onAddEmotion,
+          ),
+        ),
         Flexible(
           flex: 1,
           child: IconButton(

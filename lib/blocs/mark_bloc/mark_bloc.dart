@@ -5,11 +5,13 @@ import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/firebase_storage.dart';
 import 'package:emodzen/storages/local_storage.dart';
 import 'package:emodzen/storages/storage.dart';
+import 'package:emojis/emoji.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
 
 part 'mark_event.dart';
 part 'mark_state.dart';
@@ -110,10 +112,18 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
+  final _emojiParser = EmojiParser();
+
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
-    final filteredMarks = _marks
-        .where((mark) => mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim()))
-        .toList();
+    final filteredMarks = _marks.where((mark) {
+      final noteCondition = mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim());
+
+      final emojies = _emojiParser.parseEmojis(event.text);
+      // TODO: разобраться
+      final emojiCondintion = emojies.any((emoji) => mark.emoji == emoji);
+      print(emojiCondintion);
+      return noteCondition || emojiCondintion;
+    }).toList();
 
     emit.call(
       SearchingMarkState(

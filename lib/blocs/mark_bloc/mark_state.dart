@@ -9,7 +9,7 @@ class ListMarkState extends MarkState {
 
   // Equatable.
   @override
-  List<Object?> get props => [values];
+  List<Object?> get props => [];
 }
 
 class UserSyncedMarkState extends MarkState {
