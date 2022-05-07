@@ -5,7 +5,6 @@ import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/firebase_storage.dart';
 import 'package:emodzen/storages/local_storage.dart';
 import 'package:emodzen/storages/storage.dart';
-import 'package:emojis/emoji.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -60,7 +59,9 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     await _localStorage.addMark(mark);
     await _cloudStorage.addMark(mark);
     _marks.add(mark);
-    emit.call(ListMarkState(values: _marks));
+    final newState = ListMarkState(values: _marks);
+    // TODO: Почему-то newState и oldState одинаковые на момент отправки
+    emit.call(newState);
   }
 
   FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
@@ -116,12 +117,13 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
     final filteredMarks = _marks.where((mark) {
+      // Note condition.
       final noteCondition = mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim());
 
+      // Emoji condition.
       final emojies = _emojiParser.parseEmojis(event.text);
-      // TODO: разобраться
       final emojiCondintion = emojies.any((emoji) => mark.emoji == emoji);
-      print(emojiCondintion);
+
       return noteCondition || emojiCondintion;
     }).toList();
 
