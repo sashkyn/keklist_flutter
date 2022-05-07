@@ -40,12 +40,13 @@ class SearchBar extends StatelessWidget {
           flex: 1,
           child: IconButton(
             icon: const Icon(
-              Icons.emoji_emotions,
+              Icons.emoji_emotions_outlined,
               color: Colors.black,
             ),
             onPressed: onAddEmotion,
           ),
         ),
+        const SizedBox(width: 8.0),
         Flexible(
           flex: 1,
           child: IconButton(

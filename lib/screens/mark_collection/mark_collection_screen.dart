@@ -52,10 +52,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
       context.read<MarkBloc>().stream.listen((state) {
         if (state is ListMarkState) {
-          setState(() {
-            // TODO: ничего не приходит сюда
-            _marks = state.values;
-          });
+          setState(() => _marks = state.values);
         } else if (state is ConnectedToLocalStorageMarkState) {
           _sendToBloc(GetMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
