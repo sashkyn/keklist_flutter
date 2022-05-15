@@ -1,8 +1,7 @@
+import 'package:emodzen/typealiases.dart';
+import 'package:emodzen/widgets/mark_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
-
-import '../../widgets/mark_widget.dart';
-import '../../typealiases.dart';
 
 class MarkPickerScreen extends StatefulWidget {
   final ArgumentCallback<String> onSelect;
@@ -45,35 +44,37 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _textEditingController,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.all(8),
-            border: UnderlineInputBorder(),
-            hintText: 'Search emoji mark',
-          ),
-        ),
-        Flexible(
-          child: GridView.custom(
-            physics: const ClampingScrollPhysics(),
-            padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
-            childrenDelegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final mark = _displayedMarks[index].char;
-                return MarkWidget(
-                  item: mark,
-                  onTap: () => _pickMark(mark),
-                  isHighlighted: true,
-                );
-              },
-              childCount: _displayedMarks.length,
+    return Scaffold(
+      body: Column(
+        children: [
+          TextField(
+            controller: _textEditingController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              border: UnderlineInputBorder(),
+              hintText: 'Search emoji mark',
             ),
           ),
-        ),
-      ],
+          Flexible(
+            child: GridView.custom(
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
+              childrenDelegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final mark = _displayedMarks[index].char;
+                  return MarkWidget(
+                    item: mark,
+                    onTap: () => _pickMark(mark),
+                    isHighlighted: true,
+                  );
+                },
+                childCount: _displayedMarks.length,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
