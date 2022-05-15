@@ -146,11 +146,12 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   }
 
   String _obtainStand() {
-    if (kReleaseMode) {
-      return 'release';
-    } else {
-      return 'debug';
-    }
+    return 'release';
+    // if (kReleaseMode) {
+    //   return 'release';
+    // } else {
+    //   return 'debug';
+    // }
   }
 }
 
