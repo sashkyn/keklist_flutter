@@ -10,7 +10,7 @@ class MarkWidget extends StatelessWidget {
   const MarkWidget({
     Key? key,
     required this.item,
-    required this.isHighlighted,
+    this.isHighlighted = true,
     this.onTap,
     this.onLongPress,
   }) : super(key: key);

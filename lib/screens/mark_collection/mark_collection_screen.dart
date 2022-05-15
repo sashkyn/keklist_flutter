@@ -1,6 +1,8 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
+import 'package:emodzen/screens/mark_collection/create_mark_bar.dart';
 import 'package:emodzen/screens/mark_collection/search_bar.dart';
+import 'package:emodzen/screens/mark_creator/mark_creator_screen.dart';
 import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/typealiases.dart';
@@ -96,27 +98,27 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   List<Widget>? _getActions() {
     if (_isSearching) {
       return null;
-    } else {
-      return [
-        IconButton(
-          icon: const Icon(Icons.search),
-          color: Colors.black,
-          onPressed: () {
-            _sendToBloc(StartSearchMarkEvent());
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.settings),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          },
-        ),
-      ];
     }
+
+    return [
+      IconButton(
+        icon: const Icon(Icons.search),
+        color: Colors.black,
+        onPressed: () {
+          _sendToBloc(StartSearchMarkEvent());
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings),
+        color: Colors.black,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+          );
+        },
+      ),
+    ];
   }
 
   @override
@@ -130,57 +132,91 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         title: _getAppBar(),
         backgroundColor: Colors.white,
       ),
-      body: ScrollablePositionedList.builder(
-        padding: const EdgeInsets.only(top: 16.0),
-        itemCount: 99999999999,
-        itemScrollController: _itemScrollController,
-        itemPositionsListener: _itemPositionsListener,
-        itemBuilder: (BuildContext context, int index) {
-          final List<Mark> marksOfDay = _findMarksByDayIndex(index);
-          final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
-
-          widgets.add(
-            MarkWidget(
-              item: '📝',
-              onTap: () async => await _showMarkPickerScreen(onSelect: (emoji) async {
-                final note = await showTextInputDialog(
-                  context: context,
-                  message: emoji,
-                  textFields: [
-                    const DialogTextField(
-                      initialText: '',
-                      maxLines: 3,
-                    )
-                  ],
-                );
-                _sendToBloc(
-                  CreateMarkEvent(
-                    dayIndex: index,
-                    note: note?.first ?? '',
-                    emoji: emoji,
-                  ),
-                );
-              }),
-              isHighlighted: true,
-            ),
-          );
-
-          return Column(
-            children: [
-              Text(
-                _formatter.format(_getDateFromIndex(index)),
-                style: TextStyle(fontWeight: index == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+      body: _makeBody(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await showCupertinoModalBottomSheet(
+            expand: false,
+            context: context,
+            builder: (context) => MarkCreatorScreen(
+                onCreate: (data) {
+                  _sendToBloc(
+                    CreateMarkEvent(
+                      dayIndex: _getNowDayIndex(),
+                      note: data.text,
+                      emoji: data.emoji,
+                    ),
+                  );
+                },
               ),
-              GridView.count(
-                primary: false,
-                shrinkWrap: true,
-                crossAxisCount: 5,
-                children: widgets,
-              ),
-            ],
           );
         },
+        child: const Icon(Icons.mood),
       ),
+    );
+  }
+
+  Widget _makeBody() {
+    return Stack(
+      children: [
+        ScrollablePositionedList.builder(
+          padding: const EdgeInsets.only(top: 16.0),
+          itemCount: 99999999999,
+          itemScrollController: _itemScrollController,
+          itemPositionsListener: _itemPositionsListener,
+          itemBuilder: (BuildContext context, int index) {
+            final List<Mark> marksOfDay = _findMarksByDayIndex(index);
+            final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+
+            widgets.add(
+              MarkWidget(
+                item: '📝',
+                onTap: () async => await _showMarkPickerScreen(onSelect: (emoji) async {
+                  final note = await showTextInputDialog(
+                    context: context,
+                    message: emoji,
+                    textFields: [
+                      const DialogTextField(
+                        initialText: '',
+                        maxLines: 3,
+                      )
+                    ],
+                  );
+                  _sendToBloc(
+                    CreateMarkEvent(
+                      dayIndex: index,
+                      note: note?.first ?? '',
+                      emoji: emoji,
+                    ),
+                  );
+                }),
+                isHighlighted: true,
+              ),
+            );
+
+            return Column(
+              children: [
+                Text(
+                  _formatter.format(_getDateFromIndex(index)),
+                  style: TextStyle(fontWeight: index == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+                ),
+                GridView.count(
+                  primary: false,
+                  shrinkWrap: true,
+                  crossAxisCount: 5,
+                  children: widgets,
+                ),
+              ],
+            );
+          },
+        ),
+        // const Align(
+        //   alignment: Alignment.bottomCenter,
+        //   child: CreateMarkBar(
+        //     textController: null,
+        //   ),
+        // ),
+      ],
     );
   }
 
@@ -252,9 +288,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => Scaffold(
-        body: MarkPickerScreen(onSelect: onSelect),
-      ),
+      builder: (context) => MarkPickerScreen(onSelect: onSelect),
     );
   }
 
