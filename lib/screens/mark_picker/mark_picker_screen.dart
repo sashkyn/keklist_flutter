@@ -48,6 +48,7 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
       body: Column(
         children: [
           TextField(
+            autofocus: true,
             controller: _textEditingController,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
