@@ -25,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         foregroundColor: Colors.black,
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Visibility(
             visible: _auth.currentUser == null,

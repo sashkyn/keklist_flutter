@@ -1,4 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +5,7 @@ import '../../widgets/mark_widget.dart';
 import '../../typealiases.dart';
 
 class MarkPickerScreen extends StatefulWidget {
-  final ArgumentCallback<CreationMark> onSelect;
+  final ArgumentCallback<String> onSelect;
 
   const MarkPickerScreen({
     Key? key,
@@ -66,22 +65,7 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
                 final mark = _displayedMarks[index].char;
                 return MarkWidget(
                   item: mark,
-                  onTap: () async {
-                    final note = await showTextInputDialog(
-                      context: context,
-                      message: mark,
-                      textFields: [
-                        const DialogTextField(
-                          initialText: '',
-                          maxLines: 3,
-                        )
-                      ],
-                    );
-                    if (note == null) {
-                      return;
-                    }
-                    _pickMark(mark, note.first);
-                  },
+                  onTap: () => _pickMark(mark),
                   isHighlighted: true,
                 );
               },
@@ -93,16 +77,8 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
     );
   }
 
-  void _pickMark(String emoji, String note) {
-    final mark = CreationMark(emoji, note);
-    widget.onSelect(mark);
-    Navigator.pop(context);
+  void _pickMark(String emoji) {
+    Navigator.of(context).pop();
+    widget.onSelect(emoji);
   }
-}
-
-class CreationMark {
-  final String mark;
-  final String note;
-
-  CreationMark(this.mark, this.note);
 }

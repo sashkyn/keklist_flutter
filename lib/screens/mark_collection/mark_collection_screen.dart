@@ -40,7 +40,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
       _sendToBloc(ConnectToLocalStorageMarkEvent());
@@ -72,8 +72,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         textController: _searchTextController,
         onAddEmotion: () {
           _showMarkPickerScreen(
-            onSelect: (mark) {
-              _searchTextController.text += mark.mark;
+            onSelect: (emoji) {
+              _searchTextController.text += emoji;
             },
           );
         },
@@ -142,12 +142,22 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           widgets.add(
             MarkWidget(
               item: '📝',
-              onTap: () async => await _showMarkPickerScreen(onSelect: (creationMark) async {
+              onTap: () async => await _showMarkPickerScreen(onSelect: (emoji) async {
+                final note = await showTextInputDialog(
+                  context: context,
+                  message: emoji,
+                  textFields: [
+                    const DialogTextField(
+                      initialText: '',
+                      maxLines: 3,
+                    )
+                  ],
+                );
                 _sendToBloc(
                   CreateMarkEvent(
                     dayIndex: index,
-                    note: creationMark.note,
-                    emoji: creationMark.mark,
+                    note: note?.first ?? '',
+                    emoji: emoji,
                   ),
                 );
               }),
@@ -239,7 +249,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     }
   }
 
-  _showMarkPickerScreen({required ArgumentCallback<CreationMark> onSelect}) async {
+  _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => Scaffold(
