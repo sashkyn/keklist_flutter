@@ -63,6 +63,7 @@ class _MarkCreatorScreenState extends State<MarkCreatorScreen> {
             autofocus: true,
             keyboardType: TextInputType.multiline,
             maxLines: null,
+            textCapitalization: TextCapitalization.sentences,
             controller: _textEditingController,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
