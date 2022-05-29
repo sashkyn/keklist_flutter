@@ -52,3 +52,13 @@ class SearchingMarkState extends MarkState {
   @override
   List<Object?> get props => [enabled, values, filteredValues];
 }
+
+class SuggestionsMarkState extends MarkState {
+  final List<String> suggestionMarks;
+
+  SuggestionsMarkState({required this.suggestionMarks});
+
+  // Equatable.
+  @override
+  List<Object?> get props => [suggestionMarks];
+}

@@ -17,29 +17,33 @@ Future<void> main() async {
         providers: [
           BlocProvider(create: (context) => MarkBloc()),
         ],
-        child: MyApp(app: app),
+        child: KeklistApp(app: app),
       ),
     ),
     blocObserver: MyBlocObserver(),
   );
 }
 
-class MyApp extends StatefulWidget {
+class KeklistApp extends StatefulWidget {
   final FirebaseApp app;
 
-  const MyApp({Key? key, required this.app}) : super(key: key);
+  const KeklistApp({Key? key, required this.app}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<KeklistApp> createState() => _KeklistAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _KeklistAppState extends State<KeklistApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Emodzen',
       debugShowCheckedModeBanner: false,
-      home: MarkCollectionScreen(),
+      home: const MarkCollectionScreen(),
+      theme: ThemeData(
+        primarySwatch: Colors.grey,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
     );
   }
 }
@@ -64,6 +68,13 @@ class MyBlocObserver extends BlocObserver {
     super.onChange(bloc, change);
 
     print('onChange: ${bloc.state}');
+  }
+
+  @override
+  void onClose(BlocBase bloc) {
+    super.onClose(bloc);
+
+    print('onClose: ${bloc.runtimeType}');
   }
 
   // @override

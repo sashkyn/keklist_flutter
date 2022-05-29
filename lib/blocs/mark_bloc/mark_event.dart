@@ -65,3 +65,12 @@ class EnterTextSearchMarkEvent extends MarkEvent {
 }
 
 class StopSearchMarkEvent extends MarkEvent {}
+
+class ChangeTextOfCreatingMarkEvent extends MarkEvent {
+  final String text;
+
+  ChangeTextOfCreatingMarkEvent({required this.text});
+
+  @override
+  List<Object?> get props => [text];
+}

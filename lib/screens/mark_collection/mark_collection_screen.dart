@@ -3,6 +3,7 @@ import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
 import 'package:emodzen/screens/mark_collection/create_mark_bar.dart';
 import 'package:emodzen/screens/mark_collection/search_bar.dart';
 import 'package:emodzen/screens/mark_creator/mark_creator_screen.dart';
+import 'package:emodzen/screens/mark_picker/mark_picker_screen.dart';
 import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/typealiases.dart';
@@ -13,7 +14,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/src/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../mark_picker/mark_picker_screen.dart';
 import '../../widgets/mark_widget.dart';
 
 class MarkCollectionScreen extends StatefulWidget {
@@ -32,6 +32,14 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   List<Mark> _marks = [];
   SearchingMarkState? _searchingMarkState;
+  SuggestionsMarkState? _suggestionsMarkState;
+
+  late int _dayIndexToCreateMark = _getNowDayIndex();
+  bool _createMarkBottomBarIsVisible = false;
+
+  // NOTE: Состояние боттом бара с вводом текста.
+  final TextEditingController _createMarkEditingController = TextEditingController(text: null);
+  final FocusNode _createMarkFocusNode = FocusNode();
 
   final TextEditingController _searchTextController = TextEditingController(text: null);
 
@@ -48,8 +56,14 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       _sendToBloc(ConnectToLocalStorageMarkEvent());
       _sendToBloc(StartListenSyncedUserMarkEvent());
 
+      // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
         _sendToBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
+      });
+
+      // NOTE: Слежение за полем ввода в создании нового кека при изменении его значения.
+      _createMarkEditingController.addListener(() {
+        _sendToBloc(ChangeTextOfCreatingMarkEvent(text: _createMarkEditingController.text));
       });
 
       context.read<MarkBloc>().stream.listen((state) {
@@ -63,12 +77,30 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           _showError(text: state.text);
         } else if (state is SearchingMarkState) {
           setState(() => _searchingMarkState = state);
+        } else if (state is SuggestionsMarkState) {
+          setState(() {
+            _suggestionsMarkState = state;
+          });
         }
       });
     });
   }
 
-  Widget _getAppBar() {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+        actions: _makeAppBarActions(),
+        title: _makeAppBarTitle(),
+        backgroundColor: Colors.white,
+      ),
+      body: _makeBody(),
+    );
+  }
+
+  Widget _makeAppBarTitle() {
     if (_isSearching) {
       return SearchBar(
         textController: _searchTextController,
@@ -95,7 +127,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     }
   }
 
-  List<Widget>? _getActions() {
+  List<Widget>? _makeAppBarActions() {
     if (_isSearching) {
       return null;
     }
@@ -105,7 +137,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         icon: const Icon(Icons.search),
         color: Colors.black,
         onPressed: () {
-          _sendToBloc(StartSearchMarkEvent());
+          setState(() {
+            _createMarkBottomBarIsVisible = false;
+            _sendToBloc(StartSearchMarkEvent());
+          });
         },
       ),
       IconButton(
@@ -121,102 +156,93 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     ];
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        actions: _getActions(),
-        title: _getAppBar(),
-        backgroundColor: Colors.white,
-      ),
-      body: _makeBody(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await showCupertinoModalBottomSheet(
-            expand: false,
-            context: context,
-            builder: (context) => MarkCreatorScreen(
-                onCreate: (data) {
-                  _sendToBloc(
-                    CreateMarkEvent(
-                      dayIndex: _getNowDayIndex(),
-                      note: data.text,
-                      emoji: data.emoji,
-                    ),
-                  );
-                },
-              ),
-          );
-        },
-        child: const Icon(Icons.mood),
-      ),
-    );
-  }
-
   Widget _makeBody() {
-    return Stack(
-      children: [
-        ScrollablePositionedList.builder(
-          padding: const EdgeInsets.only(top: 16.0),
-          itemCount: 99999999999,
-          itemScrollController: _itemScrollController,
-          itemPositionsListener: _itemPositionsListener,
-          itemBuilder: (BuildContext context, int index) {
-            final List<Mark> marksOfDay = _findMarksByDayIndex(index);
-            final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+    return SafeArea(
+      child: Stack(
+        children: [
+          GestureDetector(
+            onPanDown: (details) {
+              if (_createMarkFocusNode.hasFocus) {
+                setState(() {
+                  _createMarkBottomBarIsVisible = false;
+                  _hideKeyboard();
+                });
+              }
+            },
+            child: ScrollablePositionedList.builder(
+              padding: const EdgeInsets.only(top: 16.0),
+              itemCount: 99999999999,
+              itemScrollController: _itemScrollController,
+              itemPositionsListener: _itemPositionsListener,
+              itemBuilder: (BuildContext context, int groupIndex) {
+                final List<Mark> marksOfDay = _findMarksByDayIndex(groupIndex);
+                final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
 
-            widgets.add(
-              MarkWidget(
-                item: '📝',
-                onTap: () async => await _showMarkPickerScreen(onSelect: (emoji) async {
-                  final note = await showTextInputDialog(
-                    context: context,
-                    message: emoji,
-                    textFields: [
-                      const DialogTextField(
-                        initialText: '',
-                        maxLines: 3,
-                      )
-                    ],
-                  );
-                  _sendToBloc(
-                    CreateMarkEvent(
-                      dayIndex: index,
-                      note: note?.first ?? '',
-                      emoji: emoji,
+                widgets.add(
+                  MarkWidget(
+                    item: '📝',
+                    onTap: () {
+                      setState(() {
+                        _createMarkBottomBarIsVisible = true;
+                        _scrollToDayIndex(groupIndex);
+                        _dayIndexToCreateMark = groupIndex;
+                        _createMarkFocusNode.requestFocus();
+                      });
+                    },
+                    isHighlighted: true,
+                  ),
+                );
+
+                return Column(
+                  children: [
+                    Text(
+                      _formatter.format(_getDateFromIndex(groupIndex)),
+                      style:
+                          TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
                     ),
-                  );
-                }),
-                isHighlighted: true,
-              ),
-            );
-
-            return Column(
+                    GridView.count(
+                      primary: false,
+                      shrinkWrap: true,
+                      crossAxisCount: 5,
+                      children: widgets,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          Visibility(
+            visible: _createMarkBottomBarIsVisible,
+            child: Stack(
               children: [
-                Text(
-                  _formatter.format(_getDateFromIndex(index)),
-                  style: TextStyle(fontWeight: index == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
-                ),
-                GridView.count(
-                  primary: false,
-                  shrinkWrap: true,
-                  crossAxisCount: 5,
-                  children: widgets,
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: CreateMarkBar(
+                    focusNode: _createMarkFocusNode,
+                    textEditingController: _createMarkEditingController,
+                    onKek: (CreateMarkData data) {
+                      setState(() {
+                        _suggestionsMarkState = null;
+                        _createMarkEditingController.text = '';
+                      });
+                      _sendToBloc(
+                        CreateMarkEvent(
+                          dayIndex: _dayIndexToCreateMark,
+                          note: data.text,
+                          emoji: data.emoji,
+                        ),
+                      );
+                      _hideKeyboard();
+                      _createMarkBottomBarIsVisible = false;
+                    },
+                    suggestionMarks: _suggestionsMarkState?.suggestionMarks ?? [],
+                  ),
                 ),
               ],
-            );
-          },
-        ),
-        // const Align(
-        //   alignment: Alignment.bottomCenter,
-        //   child: CreateMarkBar(
-        //     textController: null,
-        //   ),
-        // ),
-      ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -263,6 +289,13 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     }
   }
 
+  _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => MarkPickerScreen(onSelect: onSelect),
+    );
+  }
+
   _copyToNow(BuildContext context, Mark item) async {
     final note = await showTextInputDialog(
       context: context,
@@ -285,17 +318,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     }
   }
 
-  _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => MarkPickerScreen(onSelect: onSelect),
-    );
-  }
-
   DateTime _getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
   List<Mark> _findMarksByDayIndex(int index) =>
-      _marks.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
+      _marks.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
@@ -305,8 +331,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   }
 
   void _scrollToNow() {
+    _scrollToDayIndex(_getNowDayIndex());
+  }
+
+  void _scrollToDayIndex(int dayIndex) {
     _itemScrollController.scrollTo(
-      index: _getNowDayIndex(),
+      index: dayIndex,
       alignment: 0.02,
       duration: const Duration(milliseconds: 200),
     );
@@ -321,6 +351,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     final snackBar = SnackBar(content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
   // TODO: Move to bloc with new action.
 

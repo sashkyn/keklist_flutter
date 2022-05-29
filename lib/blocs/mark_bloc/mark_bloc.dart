@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:collection/collection.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/storages/firebase_storage.dart';
 import 'package:emodzen/storages/local_storage.dart';
 import 'package:emodzen/storages/storage.dart';
+import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
@@ -23,7 +26,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   StreamSubscription<User?>? _userChangedSubscription;
   List<Mark> _marks = [];
 
-  MarkBloc() : super(ListMarkState(values: [])) {
+  MarkBloc() : super(ListMarkState(values: const [])) {
     on<ConnectToLocalStorageMarkEvent>(_connectToLocalStorage);
     on<StartListenSyncedUserMarkEvent>(_startListenSyncedUser);
     on<UserChangedMarkEvent>(_userWasSynced);
@@ -34,6 +37,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     on<StartSearchMarkEvent>(_startSearch);
     on<StopSearchMarkEvent>(_stopSearch);
     on<EnterTextSearchMarkEvent>(_enterTextSearch);
+    on<ChangeTextOfCreatingMarkEvent>(
+      _changeTextOfCreatingMark,
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 50)).asyncExpand(mapper),
+    );
   }
 
   FutureOr<void> _userWasSynced(UserChangedMarkEvent event, emit) async =>
@@ -60,7 +67,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     await _cloudStorage.addMark(mark);
     _marks.add(mark);
     final newState = ListMarkState(values: _marks);
-    // TODO: Почему-то newState и oldState одинаковые на момент отправки
+    // TODO: Почему-то иногда newState и oldState одинаковые на момент отправки.
     emit.call(newState);
   }
 
@@ -136,8 +143,36 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
+  List<String> _lastSuggestions = [];
+
+  FutureOr<void> _changeTextOfCreatingMark(
+    ChangeTextOfCreatingMarkEvent event,
+    Emitter<MarkState> emit,
+  ) {
+    final List<String> suggestions = _marks
+        .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
+        .map((mark) => mark.emoji)
+        .toList()
+        .distinct()
+        .sorted((mark1, mark2) => _marks
+            .where((element) => element.emoji == mark2)
+            .length
+            .compareTo(_marks.where((element) => element.emoji == mark1).length)) // NOTE: Сортировка очень дорогая
+        .take(9)
+        .toList();
+
+    if (suggestions.isEmpty) {
+      if (_marks.isEmpty) {
+        _lastSuggestions = emojies_pub.Emoji.all().take(9).map((emoji) => emoji.char).toList();
+      }
+    } else {
+      _lastSuggestions = suggestions;
+    }
+    emit.call(SuggestionsMarkState(suggestionMarks: _lastSuggestions));
+  }
+
   List<Mark> _findMarksByDayIndex(int index) =>
-      _marks.where((item) => index == item.dayIndex).sortedBy((it) => it.sortIndex).toList();
+      _marks.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
 
   @override
   Future<void> close() {
@@ -158,5 +193,5 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 // MARK: Sorted by.
 
 extension MyIterable<E> on Iterable<E> {
-  Iterable<E> sortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)));
+  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)));
 }
