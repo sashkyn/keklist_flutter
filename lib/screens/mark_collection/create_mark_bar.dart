@@ -1,14 +1,16 @@
 import 'package:emodzen/screens/mark_creator/mark_creator_screen.dart';
 import 'package:emodzen/typealiases.dart';
 import 'package:emodzen/widgets/mark_widget.dart';
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
-class CreateMarkBar extends StatefulWidget {
+class CreateMarkBar extends StatelessWidget {
   final TextEditingController textEditingController;
   final List<String> suggestionMarks;
-  final ArgumentCallback<CreateMarkData> onKek;
   final FocusNode focusNode;
+  final String selectedEmoji;
+  final VoidCallback onSearchEmoji;
+  final ArgumentCallback<String> onSelectSuggestionEmoji;
+  final ArgumentCallback<CreateMarkData> onKek;
 
   const CreateMarkBar({
     Key? key,
@@ -16,14 +18,10 @@ class CreateMarkBar extends StatefulWidget {
     required this.suggestionMarks,
     required this.onKek,
     required this.focusNode,
+    required this.selectedEmoji,
+    required this.onSelectSuggestionEmoji,
+    required this.onSearchEmoji,
   }) : super(key: key);
-
-  @override
-  State<CreateMarkBar> createState() => _CreateMarkBarState();
-}
-
-class _CreateMarkBarState extends State<CreateMarkBar> {
-  String _selectedEmoji = Emoji.all().first.char;
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +33,13 @@ class _CreateMarkBarState extends State<CreateMarkBar> {
           children: [
             const Divider(color: Colors.grey),
             Row(
-              children: List.generate(widget.suggestionMarks.length, (index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
+              children: List.generate(suggestionMarks.length, (index) {
+                return Flexible(
+                  flex: 1,
                   child: MarkWidget.sized(
-                    item: widget.suggestionMarks[index],
+                    item: suggestionMarks[index],
                     markSize: MarkSize.small,
-                    onTap: () {
-                      setState(() {
-                        _selectedEmoji = widget.suggestionMarks[index];
-                      });
-                    },
+                    onTap: () => onSelectSuggestionEmoji(suggestionMarks[index]),
                   ),
                 );
               }),
@@ -54,16 +48,20 @@ class _CreateMarkBarState extends State<CreateMarkBar> {
             Row(
               children: [
                 const SizedBox(width: 8.0),
-                MarkWidget.sized(item: _selectedEmoji, markSize: MarkSize.medium),
+                MarkWidget.sized(
+                  item: selectedEmoji,
+                  markSize: MarkSize.medium,
+                  onTap: onSearchEmoji,
+                ),
                 const SizedBox(width: 8.0),
                 Flexible(
                   flex: 1,
                   child: TextField(
-                    focusNode: widget.focusNode,
+                    focusNode: focusNode,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     textCapitalization: TextCapitalization.sentences,
-                    controller: widget.textEditingController,
+                    controller: textEditingController,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(12.0),
                       border: const OutlineInputBorder(
@@ -77,10 +75,10 @@ class _CreateMarkBarState extends State<CreateMarkBar> {
                         ),
                         onPressed: () {
                           final data = CreateMarkData(
-                            text: widget.textEditingController.text,
-                            emoji: _selectedEmoji,
+                            text: textEditingController.text,
+                            emoji: selectedEmoji,
                           );
-                          widget.onKek(data);
+                          onKek(data);
                         },
                         child: const Text(
                           'KEK',

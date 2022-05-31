@@ -2,6 +2,7 @@
 
 import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,7 +21,7 @@ Future<void> main() async {
         child: KeklistApp(app: app),
       ),
     ),
-    blocObserver: MyBlocObserver(),
+    blocObserver: !kReleaseMode ? MyBlocObserver() : null,
   );
 }
 
@@ -38,7 +39,6 @@ class _KeklistAppState extends State<KeklistApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Emodzen',
-      debugShowCheckedModeBanner: false,
       home: const MarkCollectionScreen(),
       theme: ThemeData(
         primarySwatch: Colors.grey,
