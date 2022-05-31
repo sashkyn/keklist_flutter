@@ -7,6 +7,7 @@ import 'package:emodzen/screens/mark_picker/mark_picker_screen.dart';
 import 'package:emodzen/screens/settings/settings_screen.dart';
 import 'package:emodzen/storages/entities/mark.dart';
 import 'package:emodzen/typealiases.dart';
+import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -37,10 +38,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   late int _dayIndexToCreateMark = _getNowDayIndex();
   bool _createMarkBottomBarIsVisible = false;
 
-  // NOTE: Состояние боттом бара с вводом текста.
+  // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
   final FocusNode _createMarkFocusNode = FocusNode();
+  String _selectedEmoji = Emoji.all().first.char;
 
+  // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
 
   get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
@@ -236,6 +239,15 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       _createMarkBottomBarIsVisible = false;
                     },
                     suggestionMarks: _suggestionsMarkState?.suggestionMarks ?? [],
+                    selectedEmoji: _selectedEmoji,
+                    onSelectSuggestionEmoji: (String suggestionEmoji) {
+                      setState(() => _selectedEmoji = suggestionEmoji);
+                    },
+                    onSearchEmoji: () {
+                      _showMarkPickerScreen(
+                        onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -326,7 +338,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   void _jumpToNow() {
     _itemScrollController.jumpTo(
       index: _getNowDayIndex(),
-      alignment: 0.02,
+      alignment: 0.015,
     );
   }
 
@@ -337,7 +349,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   void _scrollToDayIndex(int dayIndex) {
     _itemScrollController.scrollTo(
       index: dayIndex,
-      alignment: 0.02,
+      alignment: 0.015,
       duration: const Duration(milliseconds: 200),
     );
   }

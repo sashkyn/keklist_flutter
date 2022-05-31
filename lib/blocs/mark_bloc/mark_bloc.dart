@@ -39,7 +39,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     on<EnterTextSearchMarkEvent>(_enterTextSearch);
     on<ChangeTextOfCreatingMarkEvent>(
       _changeTextOfCreatingMark,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 50)).asyncExpand(mapper),
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
   }
 
@@ -72,7 +72,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   }
 
   FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
-    _marks.addAll(await _cloudStorage.getMarks());
+    _marks..addAll(await _cloudStorage.getMarks())..distinct();
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
     emit.call(state);
