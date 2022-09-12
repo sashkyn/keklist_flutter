@@ -1,6 +1,6 @@
-import 'package:emodzen/screens/mark_picker/mark_picker_screen.dart';
-import 'package:emodzen/typealiases.dart';
-import 'package:emodzen/widgets/mark_widget.dart';
+import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
+import 'package:zenmode/typealiases.dart';
+import 'package:zenmode/widgets/mark_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:emodzen/storages/entities/mark.dart';
-import 'package:emodzen/storages/firebase_storage.dart';
-import 'package:emodzen/storages/local_storage.dart';
-import 'package:emodzen/storages/storage.dart';
+import 'package:zenmode/storages/entities/mark.dart';
+import 'package:zenmode/storages/firebase_storage.dart';
+import 'package:zenmode/storages/local_storage.dart';
+import 'package:zenmode/storages/storage.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -72,7 +72,9 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   }
 
   FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
-    _marks..addAll(await _cloudStorage.getMarks())..distinct();
+    _marks
+      ..addAll(await _cloudStorage.getMarks())
+      ..distinct();
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
     emit.call(state);

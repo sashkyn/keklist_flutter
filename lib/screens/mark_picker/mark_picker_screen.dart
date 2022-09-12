@@ -1,5 +1,5 @@
-import 'package:emodzen/typealiases.dart';
-import 'package:emodzen/widgets/mark_widget.dart';
+import 'package:zenmode/typealiases.dart';
+import 'package:zenmode/widgets/mark_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 

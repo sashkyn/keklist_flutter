@@ -1,12 +1,12 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
-import 'package:emodzen/screens/mark_collection/create_mark_bar.dart';
-import 'package:emodzen/screens/mark_collection/search_bar.dart';
-import 'package:emodzen/screens/mark_creator/mark_creator_screen.dart';
-import 'package:emodzen/screens/mark_picker/mark_picker_screen.dart';
-import 'package:emodzen/screens/settings/settings_screen.dart';
-import 'package:emodzen/storages/entities/mark.dart';
-import 'package:emodzen/typealiases.dart';
+import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
+import 'package:zenmode/screens/mark_collection/search_bar.dart';
+import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
+import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
+import 'package:zenmode/screens/settings/settings_screen.dart';
+import 'package:zenmode/storages/entities/mark.dart';
+import 'package:zenmode/typealiases.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -123,7 +123,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       return GestureDetector(
         onTap: () => _scrollToNow(),
         child: const Text(
-          'Emodzen',
+          'Zenmode',
           style: TextStyle(color: Colors.black),
         ),
       );

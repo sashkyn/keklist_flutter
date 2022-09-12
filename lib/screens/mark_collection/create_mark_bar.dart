@@ -1,6 +1,6 @@
-import 'package:emodzen/screens/mark_creator/mark_creator_screen.dart';
-import 'package:emodzen/typealiases.dart';
-import 'package:emodzen/widgets/mark_widget.dart';
+import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
+import 'package:zenmode/typealiases.dart';
+import 'package:zenmode/widgets/mark_widget.dart';
 import 'package:flutter/material.dart';
 
 class CreateMarkBar extends StatelessWidget {

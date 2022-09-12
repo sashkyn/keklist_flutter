@@ -50,7 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
           const Padding(
             padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
             child: Text(
-              'Sign in Emodzen',
+              'Sign in',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18.0,

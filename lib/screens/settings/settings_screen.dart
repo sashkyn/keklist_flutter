@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:emodzen/screens/auth/auth_screen.dart';
+import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -50,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   _showAuth() async => await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => AuthScreen(),
-    );
+        context: context,
+        builder: (context) => AuthScreen(),
+      );
 }

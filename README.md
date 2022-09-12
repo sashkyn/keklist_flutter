@@ -1,4 +1,4 @@
-# Emodzen
+# Zenmode
 
 A new Flutter project.
 
