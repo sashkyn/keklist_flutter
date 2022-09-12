@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:emodzen/storages/storage.dart';
+import 'package:zenmode/storages/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:collection/collection.dart';
 

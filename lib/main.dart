@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:emodzen/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ class _KeklistAppState extends State<KeklistApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Emodzen',
+      title: 'Zenmode',
       home: const MarkCollectionScreen(),
       theme: ThemeData(
         primarySwatch: Colors.grey,

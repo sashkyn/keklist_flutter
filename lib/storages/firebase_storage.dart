@@ -2,8 +2,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:emodzen/storages/entities/mark.dart';
-import 'package:emodzen/storages/storage.dart';
+import 'package:zenmode/storages/entities/mark.dart';
+import 'package:zenmode/storages/storage.dart';
 
 class FirebaseStorage extends IStorage {
   final String stand;
