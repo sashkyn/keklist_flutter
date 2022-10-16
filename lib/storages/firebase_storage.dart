@@ -42,7 +42,7 @@ class FirebaseStorage extends IStorage {
       snapshot.value.forEach((key, values) {
         final markMap = Map<String, dynamic>.from(values);
         markMap['id'] = key;
-        marks.add(Mark.fromJson(markMap));
+        marks.add(Mark.fromFirebaseJson(markMap));
       });
     });
     return marks;

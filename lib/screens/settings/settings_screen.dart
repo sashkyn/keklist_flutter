@@ -1,7 +1,16 @@
+import 'dart:io';
+
+import 'package:cross_file/cross_file.dart';
+import 'package:csv/csv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:zenmode/screens/auth/auth_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/screens/auth/firebase_auth/firebase_auth_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:zenmode/screens/auth/supabase_auth/supabase_auth_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -11,7 +20,40 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  List<SettingItem> get _items => [
+        _firebaseAuth.currentUser == null ? SettingItem.loginToFirebase : null,
+        SettingItem.loginToSupabase,
+        _firebaseAuth.currentUser != null ? SettingItem.logout : null,
+        SettingItem.exportToCSV,
+      ]
+          .where((element) => element != null)
+          .map(
+            (nullableItem) => nullableItem!,
+          )
+          .toList(growable: false);
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<MarkBloc>().stream.listen((state) async {
+      if (state is ListMarkState) {
+        final List<List<String>> csvEntryList = state.values
+            .map(
+              (e) => e.toCSVEntry(),
+            )
+            .toList(growable: false);
+        final String csv = const ListToCsvConverter().convert(csvEntryList);
+        final Directory temporaryDirectory = await getTemporaryDirectory();
+        final File csvFile = File('${temporaryDirectory.path}/user_data.csv');
+        await csvFile.writeAsString(csv);
+        final XFile fileToShare = XFile(csvFile.path);
+        await Share.shareXFiles([fileToShare]);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,33 +66,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Visibility(
-            visible: _auth.currentUser == null,
-            child: ElevatedButton(
-              child: const Text('Enable sync'),
-              onPressed: () async => await _showAuth(),
-            ),
-          ),
-          Visibility(
-            visible: _auth.currentUser != null,
-            child: ElevatedButton(
-              child: const Text('Logout'),
-              onPressed: () async {
-                await _auth.signOut();
-                Navigator.pop(context);
-              },
-            ),
-          )
-        ],
+      body: ListView.builder(
+        // Let the ListView know how many items it needs to build.
+        itemCount: _items.length,
+        // Provide a builder function. This is where the magic happens.
+        // Convert each item into a widget based on the type of item it is.
+        itemBuilder: (context, index) {
+          final item = _items[index];
+
+          return ListTile(
+            title: Text(item.title),
+            trailing: const Icon(Icons.arrow_circle_right_outlined),
+            onTap: () async {
+              switch (item) {
+                case SettingItem.loginToFirebase:
+                  await showCupertinoModalBottomSheet(
+                    context: context,
+                    builder: (context) => FirebaseAuthScreen(),
+                  );
+                  setState(() {});
+                  break;
+                case SettingItem.logout:
+                  await _firebaseAuth.signOut();
+                  setState(() {});
+                  break;
+                case SettingItem.exportToCSV:
+                  context.read<MarkBloc>().add(GetMarksFromAllStoragesMarkEvent());
+                  break;
+                case SettingItem.loginToSupabase:
+                  await showCupertinoModalBottomSheet(
+                    context: context,
+                    builder: (context) => const SupabaseAuthScreen(),
+                  );
+                  setState(() {});
+                  break;
+              }
+            },
+          );
+        },
       ),
     );
   }
-
-  _showAuth() async => await showCupertinoModalBottomSheet(
-        context: context,
-        builder: (context) => AuthScreen(),
-      );
 }
+
+enum SettingItem {
+  loginToFirebase(title: 'Login to Firebase', type: SettingItemType.disclosure),
+  loginToSupabase(title: 'Login to Supabase', type: SettingItemType.disclosure),
+  logout(title: 'Logout', type: SettingItemType.disclosure),
+  exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure);
+
+  const SettingItem({required this.title, required this.type});
+
+  final String title;
+  final SettingItemType type;
+}
+
+enum SettingItemType { disclosure, redDisclosure }
