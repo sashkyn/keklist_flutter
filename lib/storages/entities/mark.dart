@@ -20,7 +20,7 @@ class Mark extends Equatable {
   @override
   List<Object?> get props => [uuid];
 
-  Mark.fromJson(Map<String, dynamic> json)
+  Mark.fromFirebaseJson(Map<String, dynamic> json)
       : uuid = json['id'] ?? 0,
         emoji = json['emoji'],
         dayIndex = json['day_index'],
@@ -36,4 +36,13 @@ class Mark extends Equatable {
         'sort_index': sortIndex,
         'creation_date': creationDate,
       };
+
+  List<String> toCSVEntry() => [
+        uuid,
+        emoji,
+        note,
+        dayIndex.toString(),
+        sortIndex.toString(),
+        creationDate.toString(),
+      ];
 }

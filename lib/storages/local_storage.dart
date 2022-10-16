@@ -28,7 +28,7 @@ class LocalStorage extends IStorage {
       return [];
     }
     final List<dynamic> list = json.decode(marksJSON);
-    final marks = list.map((item) => Mark.fromJson(item)).toList();
+    final marks = list.map((item) => Mark.fromFirebaseJson(item)).toList();
     return marks;
   }
 

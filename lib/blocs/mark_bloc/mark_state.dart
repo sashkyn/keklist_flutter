@@ -1,6 +1,6 @@
 part of 'mark_bloc.dart';
 
-abstract class MarkState extends Equatable {}
+abstract class MarkState {}
 
 class ListMarkState extends MarkState {
   final List<Mark> values;

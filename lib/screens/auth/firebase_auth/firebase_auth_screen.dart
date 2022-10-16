@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 
 // TODO: сделать механизм показа боттом шитов
 
-class AuthScreen extends StatefulWidget {
-  AuthScreen({Key? key}) : super(key: key);
+class FirebaseAuthScreen extends StatefulWidget {
+  FirebaseAuthScreen({Key? key}) : super(key: key);
 
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  _FirebaseAuthScreenState createState() => _FirebaseAuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
   final _loginTextEditingController = TextEditingController();
   final _passwordTextEditingController = TextEditingController();
 
@@ -147,9 +147,13 @@ class _AuthScreenState extends State<AuthScreen> {
       child: SizedBox(
         width: 100,
         height: 44,
-        child: Center(child: Text(text)),
+        child: Center(
+            child: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
+        )),
       ),
-      style: ElevatedButton.styleFrom(primary: Colors.black),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
       onPressed: onPressed,
     );
   }

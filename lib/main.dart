@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,14 @@ import 'screens/mark_collection/mark_collection_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final FirebaseApp app = await Firebase.initializeApp();
+
+  await Supabase.initialize(
+    url: 'https://vocsvvwlghhgmphrggre.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvY3N2dndsZ2hoZ21waHJnZ3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjU5MzkwNzksImV4cCI6MTk4MTUxNTA3OX0.9wBizohsoXYmiqitoiHQPrLCc7-uVvF-FTu-DyXlfWc',
+    authCallbackUrlHostname: 'login-callback',
+    debug: !kReleaseMode,
+  );
 
   BlocOverrides.runZoned(
     () => runApp(

@@ -23,6 +23,8 @@ class GetMarksFromLocalStorageMarkEvent extends MarkEvent {}
 
 class GetMarksFromCloudStorageMarkEvent extends MarkEvent {}
 
+class GetMarksFromAllStoragesMarkEvent extends MarkEvent {}
+
 class CreateMarkEvent extends MarkEvent {
   final int dayIndex;
   final String note;
