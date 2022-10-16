@@ -20,7 +20,7 @@ part 'mark_state.dart';
 
 class MarkBloc extends Bloc<MarkEvent, MarkState> {
   final IStorage _localStorage = LocalStorage();
-  late final IStorage _cloudStorage = FirebaseStorage(stand: _obtainStand());
+  late final IStorage _firebaseStorage = FirebaseStorage(stand: _obtainStand());
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<User?>? _userChangedSubscription;
@@ -32,6 +32,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     on<UserChangedMarkEvent>(_userWasSynced);
     on<GetMarksFromLocalStorageMarkEvent>(_getMarksFromLocalStorage);
     on<GetMarksFromCloudStorageMarkEvent>(_getMarksFromCloudStorage);
+    on<GetMarksFromAllStoragesMarkEvent>(_getMarksFromAllStorages);
     on<CreateMarkEvent>(_createMark);
     on<DeleteMarkEvent>(_deleteMark);
     on<StartSearchMarkEvent>(_startSearch);
@@ -48,7 +49,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
     await _localStorage.removeMarkFromDay(event.uuid);
-    await _cloudStorage.removeMarkFromDay(event.uuid);
+    await _firebaseStorage.removeMarkFromDay(event.uuid);
     final item = _marks.firstWhere((item) => item.uuid == event.uuid);
     _marks.remove(item);
     emit.call(ListMarkState(values: _marks));
@@ -64,7 +65,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       sortIndex: _findMarksByDayIndex(event.dayIndex).length,
     );
     await _localStorage.addMark(mark);
-    await _cloudStorage.addMark(mark);
+    await _firebaseStorage.addMark(mark);
     _marks.add(mark);
     final newState = ListMarkState(values: _marks);
     // TODO: Почему-то иногда newState и oldState одинаковые на момент отправки.
@@ -73,7 +74,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
     _marks
-      ..addAll(await _cloudStorage.getMarks())
+      ..addAll(await _firebaseStorage.getMarks())
       ..distinct();
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
@@ -89,6 +90,14 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     _marks.addAll(await _localStorage.getMarks());
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
+    emit.call(state);
+  }
+
+  FutureOr<void> _getMarksFromAllStorages(GetMarksFromAllStoragesMarkEvent event, emit) async {
+    final marksFromLocalStorage = await _localStorage.getMarks();
+    final marksFromFirebaseStorage = await _firebaseStorage.getMarks();
+    final allMarks = (marksFromLocalStorage + marksFromFirebaseStorage).distinct();
+    final state = ListMarkState(values: allMarks);
     emit.call(state);
   }
 
