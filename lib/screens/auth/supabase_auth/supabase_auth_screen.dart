@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-// TODO: сделать механизм показа боттом шитов
+import 'package:zenmode/helpers/auth_state.dart';
 
 class SupabaseAuthScreen extends StatefulWidget {
   const SupabaseAuthScreen({Key? key}) : super(key: key);
@@ -11,41 +10,21 @@ class SupabaseAuthScreen extends StatefulWidget {
   _SupabaseAuthScreenState createState() => _SupabaseAuthScreenState();
 }
 
-class _SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
+class _SupabaseAuthScreenState extends AuthWidgetState<SupabaseAuthScreen> {
   final _loginTextEditingController = TextEditingController();
 
   final SupabaseClient _client = Supabase.instance.client;
 
-  int _groupValue = 0;
-
   @override
   Widget build(BuildContext context) {
-    Map<int, Widget> _children = {
-      0: Center(
-        child: Text(
-          'Login',
-          style: TextStyle(
-            fontSize: 14,
-            color: _groupValue == 0 ? Colors.black : Colors.white,
-          ),
-        ),
-      ),
-      1: Center(
-        child: Text(
-          'Registration',
-          style: TextStyle(
-            fontSize: 14,
-            color: _groupValue == 1 ? Colors.black : Colors.white,
-          ),
-        ),
-      ),
-    };
-
     return Scaffold(
       body: Column(
         children: [
           const Padding(
-            padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+            padding: EdgeInsets.only(
+              top: 16.0,
+              bottom: 16.0,
+            ),
             child: Text(
               'Sign in',
               style: TextStyle(
@@ -55,20 +34,6 @@ class _SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16.0),
-          CupertinoSlidingSegmentedControl<int>(
-            backgroundColor: Colors.black,
-            thumbColor: Colors.white,
-            padding: const EdgeInsets.all(8),
-            groupValue: _groupValue,
-            children: _children,
-            onValueChanged: (value) {
-              setState(() {
-                _groupValue = value!;
-              });
-            },
-          ),
-          const SizedBox(height: 8.0),
           TextField(
             controller: _loginTextEditingController,
             keyboardType: TextInputType.emailAddress,
@@ -93,16 +58,17 @@ class _SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
             ),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
             onPressed: () async {
-              final response = await _client.auth.signIn(
+              await _client.auth.signIn(
                 email: _loginTextEditingController.text,
                 options: AuthOptions(
                   redirectTo: 'io.supabase.zenmode://login-callback/',
                 ),
               );
-              // TODO: показать алерт что нужно перейти на почту
-              // TODO: сделать перехватчик диплинка              
-
-              print(response);
+              showOkAlertDialog(
+                context: context,
+                title: 'Success',
+                message: 'Go to your email app and open magic link',
+              );
             },
           ),
         ],
