@@ -21,7 +21,9 @@ class UserChangedMarkEvent extends MarkEvent {
 
 class GetMarksFromLocalStorageMarkEvent extends MarkEvent {}
 
-class GetMarksFromCloudStorageMarkEvent extends MarkEvent {}
+class GetMarksFromFirebaseStorageMarkEvent extends MarkEvent {}
+
+class GetMarksFromSupabaseStorageMarkEvent extends MarkEvent {}
 
 class GetMarksFromAllStoragesMarkEvent extends MarkEvent {}
 

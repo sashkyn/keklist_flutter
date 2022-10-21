@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'entities/mark.dart';
 
 abstract class IStorage {
-  Future<void> connect();
-  Future<void> addMark(Mark mark);
-  Future<void> removeMarkFromDay(String id);
-  Future<void> save({required List<Mark> list});
-  Future<List<Mark>> getMarks();
+  FutureOr<void> connect();
+  FutureOr<void> addMark(Mark mark);
+  FutureOr<void> removeMarkFromDay(String id);
+  FutureOr<void> save({required List<Mark> list});
+  FutureOr<List<Mark>> getMarks();
 }
