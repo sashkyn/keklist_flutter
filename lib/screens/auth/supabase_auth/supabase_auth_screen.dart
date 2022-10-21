@@ -67,7 +67,7 @@ class _SupabaseAuthScreenState extends AuthWidgetState<SupabaseAuthScreen> {
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
-                message: 'Go to your email app and open magic link',
+                message: 'Please, go to your email app and open magic link',
               );
             },
           ),

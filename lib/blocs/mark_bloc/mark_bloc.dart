@@ -14,6 +14,7 @@ import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:zenmode/storages/supabase_storage.dart';
 
 part 'mark_event.dart';
 part 'mark_state.dart';
@@ -21,6 +22,7 @@ part 'mark_state.dart';
 class MarkBloc extends Bloc<MarkEvent, MarkState> {
   final IStorage _localStorage = LocalStorage();
   late final IStorage _firebaseStorage = FirebaseStorage(stand: _obtainStand());
+  late final IStorage _supabaseStorage = SupabaseStorage();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<User?>? _userChangedSubscription;
@@ -31,7 +33,8 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     on<StartListenSyncedUserMarkEvent>(_startListenSyncedUser);
     on<UserChangedMarkEvent>(_userWasSynced);
     on<GetMarksFromLocalStorageMarkEvent>(_getMarksFromLocalStorage);
-    on<GetMarksFromCloudStorageMarkEvent>(_getMarksFromCloudStorage);
+    on<GetMarksFromFirebaseStorageMarkEvent>(_getMarksFromFirebaseStorage);
+    on<GetMarksFromSupabaseStorageMarkEvent>(_getMarksFromSupabaseStorage);
     on<GetMarksFromAllStoragesMarkEvent>(_getMarksFromAllStorages);
     on<CreateMarkEvent>(_createMark);
     on<DeleteMarkEvent>(_deleteMark);
@@ -72,7 +75,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarksFromCloudStorage(GetMarksFromCloudStorageMarkEvent event, emit) async {
+  FutureOr<void> _getMarksFromFirebaseStorage(GetMarksFromFirebaseStorageMarkEvent event, emit) async {
     _marks
       ..addAll(await _firebaseStorage.getMarks())
       ..distinct();
@@ -84,6 +87,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     await _localStorage.connect();
     emit.call(ConnectedToLocalStorageMarkState());
     await _localStorage.save(list: _marks);
+  }
+
+  FutureOr<void> _getMarksFromSupabaseStorage(GetMarksFromSupabaseStorageMarkEvent event, emit) async {
+    final marks = await _supabaseStorage.getMarks();
   }
 
   FutureOr<void> _getMarksFromLocalStorage(GetMarksFromLocalStorageMarkEvent event, emit) async {

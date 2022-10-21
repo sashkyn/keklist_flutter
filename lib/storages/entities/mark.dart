@@ -28,13 +28,31 @@ class Mark extends Equatable {
         creationDate = json['creation_date'] ?? 0,
         sortIndex = json["sort_index"] ?? 0;
 
-  Map<String, dynamic> toJson() => {
+  Mark.fromSupabaseJson(Map<String, dynamic> json)
+      : uuid = json['uuid'] ?? 0,
+        emoji = json['emoji'],
+        dayIndex = json['day_index'],
+        note = json['note'],
+        // creationDate = json['created_at'] ?? 0, // TODO: сделать нормальный парсинг TimeStamp
+        creationDate = 0,
+        sortIndex = json["sort_index"] ?? 0;
+
+  Map<String, dynamic> toFirebaseJson() => {
         'id': uuid,
         'emoji': emoji,
         'note': note,
         'day_index': dayIndex,
         'sort_index': sortIndex,
         'creation_date': creationDate,
+      };
+
+  Map<String, dynamic> toSupabaseJson({required String userId}) => {
+        'user_id': userId,
+        'uuid': uuid,
+        'emoji': emoji,
+        'note': note,
+        'day_index': dayIndex,
+        'sort_index': sortIndex,
       };
 
   List<String> toCSVEntry() => [
