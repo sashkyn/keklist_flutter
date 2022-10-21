@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:zenmode/storages/entities/mark.dart';
@@ -15,22 +17,22 @@ class FirebaseStorage extends IStorage {
   FirebaseStorage({required this.stand});
 
   @override
-  Future<void> connect() async {
+  FutureOr<void> connect() async {
     // No need to connect.
   }
 
   @override
-  Future<void> addMark(Mark mark) async {
+  FutureOr<void> addMark(Mark mark) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       print('userId is null!');
       return;
     }
-    return _databaseReference.child(stand).child(userId).child('marks').child(mark.uuid).set(mark.toJson());
+    return _databaseReference.child(stand).child(userId).child('marks').child(mark.uuid).set(mark.toFirebaseJson());
   }
 
   @override
-  Future<List<Mark>> getMarks() async {
+  FutureOr<List<Mark>> getMarks() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       print('userId is null!');
@@ -49,7 +51,7 @@ class FirebaseStorage extends IStorage {
   }
 
   @override
-  Future<void> removeMarkFromDay(String id) async {
+  FutureOr<void> removeMarkFromDay(String id) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       print('userId is null!');
@@ -59,7 +61,7 @@ class FirebaseStorage extends IStorage {
   }
 
   @override
-  Future<void> save({required List<Mark> list}) async {
+  FutureOr<void> save({required List<Mark> list}) async {
     // TODO: Implement saving list of Marks
   }
 }

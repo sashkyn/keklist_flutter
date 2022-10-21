@@ -58,6 +58,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
       _sendToBloc(ConnectToLocalStorageMarkEvent());
       _sendToBloc(StartListenSyncedUserMarkEvent());
+      _sendToBloc(GetMarksFromSupabaseStorageMarkEvent());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
@@ -75,7 +76,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         } else if (state is ConnectedToLocalStorageMarkState) {
           _sendToBloc(GetMarksFromLocalStorageMarkEvent());
         } else if (state is UserSyncedMarkState) {
-          _sendToBloc(GetMarksFromCloudStorageMarkEvent());
+          _sendToBloc(GetMarksFromFirebaseStorageMarkEvent());
         } else if (state is ErrorMarkState) {
           _showError(text: state.text);
         } else if (state is SearchingMarkState) {
