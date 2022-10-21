@@ -19,21 +19,19 @@ import 'package:zenmode/storages/supabase_storage.dart';
 part 'mark_event.dart';
 part 'mark_state.dart';
 
+// TODO: удалить все что связано с Firebase
+
 class MarkBloc extends Bloc<MarkEvent, MarkState> {
   final IStorage _localStorage = LocalStorage();
   late final IStorage _firebaseStorage = FirebaseStorage(stand: _obtainStand());
   late final IStorage _supabaseStorage = SupabaseStorage();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  StreamSubscription<User?>? _userChangedSubscription;
   List<Mark> _marks = [];
 
   MarkBloc() : super(ListMarkState(values: const [])) {
     on<ConnectToLocalStorageMarkEvent>(_connectToLocalStorage);
-    on<StartListenSyncedUserMarkEvent>(_startListenSyncedUser);
     on<UserChangedMarkEvent>(_userWasSynced);
     on<GetMarksFromLocalStorageMarkEvent>(_getMarksFromLocalStorage);
-    on<GetMarksFromFirebaseStorageMarkEvent>(_getMarksFromFirebaseStorage);
     on<GetMarksFromSupabaseStorageMarkEvent>(_getMarksFromSupabaseStorage);
     on<GetMarksFromAllStoragesMarkEvent>(_getMarksFromAllStorages);
     on<CreateMarkEvent>(_createMark);
@@ -51,8 +49,8 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       emit.call(UserSyncedMarkState(isSync: event.user != null));
 
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
-    await _localStorage.removeMarkFromDay(event.uuid);
-    await _firebaseStorage.removeMarkFromDay(event.uuid);
+    // await _localStorage.removeMarkFromDay(event.uuid);
+    await _supabaseStorage.removeMarkFromDay(event.uuid);
     final item = _marks.firstWhere((item) => item.uuid == event.uuid);
     _marks.remove(item);
     emit.call(ListMarkState(values: _marks));
@@ -67,8 +65,9 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMarksByDayIndex(event.dayIndex).length,
     );
-    await _localStorage.addMark(mark);
-    await _firebaseStorage.addMark(mark);
+    // await _localStorage.addMark(mark);
+    // await _firebaseStorage.addMark(mark);
+    await _supabaseStorage.addMark(mark);
     _marks.add(mark);
     final newState = ListMarkState(values: _marks);
     // TODO: Почему-то иногда newState и oldState одинаковые на момент отправки.
@@ -90,7 +89,17 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   }
 
   FutureOr<void> _getMarksFromSupabaseStorage(GetMarksFromSupabaseStorageMarkEvent event, emit) async {
-    final marks = await _supabaseStorage.getMarks();
+    _marks
+      ..addAll(await _supabaseStorage.getMarks())
+      ..distinct();
+    _marks = _marks.distinct(); // TODO: проверить нужен ли он
+    final state = ListMarkState(values: _marks);
+    emit.call(state);
+
+    // TODO: сохранять в сторадж только тех что нет в нём.
+    // await _localStorage.connect();
+    // emit.call(ConnectedToLocalStorageMarkState());
+    // await _localStorage.save(list: _marks);
   }
 
   FutureOr<void> _getMarksFromLocalStorage(GetMarksFromLocalStorageMarkEvent event, emit) async {
@@ -102,15 +111,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   FutureOr<void> _getMarksFromAllStorages(GetMarksFromAllStoragesMarkEvent event, emit) async {
     final marksFromLocalStorage = await _localStorage.getMarks();
-    final marksFromFirebaseStorage = await _firebaseStorage.getMarks();
-    final allMarks = (marksFromLocalStorage + marksFromFirebaseStorage).distinct();
+    final marksFromSupabaseStorage = await _firebaseStorage.getMarks();
+    final allMarks = (marksFromLocalStorage + marksFromSupabaseStorage).distinct();
     final state = ListMarkState(values: allMarks);
     emit.call(state);
-  }
-
-  FutureOr<void> _startListenSyncedUser(StartListenSyncedUserMarkEvent event, emit) async {
-    _userChangedSubscription?.cancel();
-    _userChangedSubscription = _auth.authStateChanges().listen((user) => add(UserChangedMarkEvent(user: user)));
   }
 
   FutureOr<void> _connectToLocalStorage(ConnectToLocalStorageMarkEvent event, emit) async {
@@ -194,7 +198,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   @override
   Future<void> close() {
-    _userChangedSubscription?.cancel();
+    // _userChangedSubscription?.cancel();
     return super.close();
   }
 
