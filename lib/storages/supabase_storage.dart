@@ -69,7 +69,14 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    await _client.from('minds').delete().eq('uuid', id).limit(1).execute();
+    await _client
+        .from('minds')
+        .delete()
+        .eq(
+          'uuid',
+          id,
+        )
+        .execute();
   }
 
   @override
