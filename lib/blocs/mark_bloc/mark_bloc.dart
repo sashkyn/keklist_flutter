@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:zenmode/storages/entities/mark.dart';
-import 'package:zenmode/storages/firebase_storage.dart';
-import 'package:zenmode/storages/local_storage.dart';
 import 'package:zenmode/storages/storage.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
@@ -19,21 +16,13 @@ import 'package:zenmode/storages/supabase_storage.dart';
 part 'mark_event.dart';
 part 'mark_state.dart';
 
-// TODO: удалить все что связано с Firebase
-
 class MarkBloc extends Bloc<MarkEvent, MarkState> {
-  final IStorage _localStorage = LocalStorage();
-  late final IStorage _firebaseStorage = FirebaseStorage(stand: _obtainStand());
   late final IStorage _supabaseStorage = SupabaseStorage();
 
   List<Mark> _marks = [];
 
   MarkBloc() : super(ListMarkState(values: const [])) {
-    on<ConnectToLocalStorageMarkEvent>(_connectToLocalStorage);
-    on<UserChangedMarkEvent>(_userWasSynced);
-    on<GetMarksFromLocalStorageMarkEvent>(_getMarksFromLocalStorage);
     on<GetMarksFromSupabaseStorageMarkEvent>(_getMarksFromSupabaseStorage);
-    on<GetMarksFromAllStoragesMarkEvent>(_getMarksFromAllStorages);
     on<CreateMarkEvent>(_createMark);
     on<DeleteMarkEvent>(_deleteMark);
     on<StartSearchMarkEvent>(_startSearch);
@@ -45,11 +34,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
-  FutureOr<void> _userWasSynced(UserChangedMarkEvent event, emit) async =>
-      emit.call(UserSyncedMarkState(isSync: event.user != null));
-
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
-    // await _localStorage.removeMarkFromDay(event.uuid);
     await _supabaseStorage.removeMarkFromDay(event.uuid);
     final item = _marks.firstWhere((item) => item.uuid == event.uuid);
     _marks.remove(item);
@@ -65,61 +50,17 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMarksByDayIndex(event.dayIndex).length,
     );
-    // await _localStorage.addMark(mark);
-    // await _firebaseStorage.addMark(mark);
     await _supabaseStorage.addMark(mark);
     _marks.add(mark);
     final newState = ListMarkState(values: _marks);
-    // TODO: Почему-то иногда newState и oldState одинаковые на момент отправки.
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarksFromFirebaseStorage(GetMarksFromFirebaseStorageMarkEvent event, emit) async {
-    _marks
-      ..addAll(await _firebaseStorage.getMarks())
-      ..distinct();
-    _marks = _marks.distinct();
-    final state = ListMarkState(values: _marks);
-    emit.call(state);
-
-    // TODO: сохранять в сторадж только тех что нет в нём.
-    await _localStorage.connect();
-    emit.call(ConnectedToLocalStorageMarkState());
-    await _localStorage.save(list: _marks);
-  }
-
   FutureOr<void> _getMarksFromSupabaseStorage(GetMarksFromSupabaseStorageMarkEvent event, emit) async {
-    _marks
-      ..addAll(await _supabaseStorage.getMarks())
-      ..distinct();
-    _marks = _marks.distinct(); // TODO: проверить нужен ли он
-    final state = ListMarkState(values: _marks);
-    emit.call(state);
-
-    // TODO: сохранять в сторадж только тех что нет в нём.
-    // await _localStorage.connect();
-    // emit.call(ConnectedToLocalStorageMarkState());
-    // await _localStorage.save(list: _marks);
-  }
-
-  FutureOr<void> _getMarksFromLocalStorage(GetMarksFromLocalStorageMarkEvent event, emit) async {
-    _marks.addAll(await _localStorage.getMarks());
+    _marks.addAll(await _supabaseStorage.getMarks());
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
     emit.call(state);
-  }
-
-  FutureOr<void> _getMarksFromAllStorages(GetMarksFromAllStoragesMarkEvent event, emit) async {
-    final marksFromLocalStorage = await _localStorage.getMarks();
-    final marksFromSupabaseStorage = await _firebaseStorage.getMarks();
-    final allMarks = (marksFromLocalStorage + marksFromSupabaseStorage).distinct();
-    final state = ListMarkState(values: allMarks);
-    emit.call(state);
-  }
-
-  FutureOr<void> _connectToLocalStorage(ConnectToLocalStorageMarkEvent event, emit) async {
-    await _localStorage.connect();
-    emit.call(ConnectedToLocalStorageMarkState());
   }
 
   FutureOr<void> _startSearch(StartSearchMarkEvent event, emit) async {
@@ -147,7 +88,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
     final filteredMarks = _marks.where((mark) {
       // Note condition.
-      final noteCondition = mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim());
+      final noteCondition = mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim(),);
 
       // Emoji condition.
       final emojies = _emojiParser.parseEmojis(event.text);
@@ -193,27 +134,16 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(SuggestionsMarkState(suggestionMarks: _lastSuggestions));
   }
 
-  List<Mark> _findMarksByDayIndex(int index) =>
-      _marks.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
-
-  @override
-  Future<void> close() {
-    // _userChangedSubscription?.cancel();
-    return super.close();
-  }
-
-  String _obtainStand() {
-    return 'release';
-    // if (kReleaseMode) {
-    //   return 'release';
-    // } else {
-    //   return 'debug';
-    // }
-  }
+  List<Mark> _findMarksByDayIndex(int index) => _marks
+      .where((item) => index == item.dayIndex)
+      .mySortedBy(
+        (it) => it.sortIndex,
+      )
+      .toList();
 }
 
 // MARK: Sorted by.
 
 extension MyIterable<E> on Iterable<E> {
-  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)));
+  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)),);
 }
