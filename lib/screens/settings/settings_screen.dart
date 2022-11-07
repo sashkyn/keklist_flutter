@@ -119,7 +119,8 @@ class _SettingsScreenState extends AuthWidgetState<SettingsScreen> {
                         setState(() {});
                         break;
                       case SettingItem.exportToCSV:
-                        context.read<MarkBloc>().add(GetMarksFromAllStoragesMarkEvent());
+                        // TODO: добавить блок настройкам и выполнение запроса на все марки
+                        //context.read<MarkBloc>().add(GetMarksFromSupabaseStorageMarkEvent());
                         break;
                       case SettingItem.loginToSupabase:
                         await showCupertinoModalBottomSheet(

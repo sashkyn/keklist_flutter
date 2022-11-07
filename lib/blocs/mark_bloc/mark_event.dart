@@ -6,26 +6,7 @@ abstract class MarkEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class ConnectToLocalStorageMarkEvent extends MarkEvent {}
-
-class StartListenSyncedUserMarkEvent extends MarkEvent {}
-
-class UserChangedMarkEvent extends MarkEvent {
-  final User? user;
-
-  @override
-  List<Object?> get props => [user];
-
-  UserChangedMarkEvent({this.user});
-}
-
-class GetMarksFromLocalStorageMarkEvent extends MarkEvent {}
-
-class GetMarksFromFirebaseStorageMarkEvent extends MarkEvent {}
-
 class GetMarksFromSupabaseStorageMarkEvent extends MarkEvent {}
-
-class GetMarksFromAllStoragesMarkEvent extends MarkEvent {}
 
 class CreateMarkEvent extends MarkEvent {
   final int dayIndex;
