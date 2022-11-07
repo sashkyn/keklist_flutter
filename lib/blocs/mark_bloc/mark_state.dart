@@ -12,16 +12,6 @@ class ListMarkState extends MarkState {
   List<Object?> get props => [values];
 }
 
-class UserSyncedMarkState extends MarkState {
-  final bool isSync;
-
-  UserSyncedMarkState({required this.isSync});
-
-  // Equatable.
-  @override
-  List<Object?> get props => [isSync];
-}
-
 class ErrorMarkState extends MarkState {
   final String text;
 
@@ -29,12 +19,6 @@ class ErrorMarkState extends MarkState {
 
   @override
   List<Object?> get props => [text];
-}
-
-class ConnectedToLocalStorageMarkState extends MarkState {
-  // Equatable.
-  @override
-  List<Object?> get props => [];
 }
 
 class SearchingMarkState extends MarkState {

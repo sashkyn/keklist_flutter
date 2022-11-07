@@ -14,8 +14,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 // ignore: implementation_imports
 import 'package:provider/src/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import '../../widgets/mark_widget.dart';
+import 'package:zenmode/widgets/mark_widget.dart';
 
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
@@ -110,7 +109,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
           );
         },
         onCancel: () {
-          _searchTextController.text = '';
+          _searchTextController.clear();
           _sendToBloc(StopSearchMarkEvent());
         },
       );
@@ -198,6 +197,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                       style:
                           TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
                     ),
+                    // TODO: поменять на non-scrollable grid
                     GridView.count(
                       primary: false,
                       shrinkWrap: true,
