@@ -1,16 +1,15 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:zenmode/helpers/auth_state.dart';
 
 class SupabaseAuthScreen extends StatefulWidget {
   const SupabaseAuthScreen({Key? key}) : super(key: key);
 
   @override
-  _SupabaseAuthScreenState createState() => _SupabaseAuthScreenState();
+  SupabaseAuthScreenState createState() => SupabaseAuthScreenState();
 }
 
-class _SupabaseAuthScreenState extends AuthWidgetState<SupabaseAuthScreen> {
+class SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
   final _loginTextEditingController = TextEditingController();
 
   final SupabaseClient _client = Supabase.instance.client;
@@ -47,6 +46,18 @@ class _SupabaseAuthScreenState extends AuthWidgetState<SupabaseAuthScreen> {
           ),
           const SizedBox(height: 16.0),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+            onPressed: () async {
+              await _client.auth.signInWithOtp(
+                email: _loginTextEditingController.text,
+                emailRedirectTo: 'io.supabase.zenmode://login-callback/'
+              );
+              showOkAlertDialog(
+                context: context,
+                title: 'Success',
+                message: 'Please, go to your email app and open magic link',
+              );
+            },
             child: const SizedBox(
               width: 100,
               height: 44,
@@ -56,20 +67,6 @@ class _SupabaseAuthScreenState extends AuthWidgetState<SupabaseAuthScreen> {
                 style: TextStyle(color: Colors.white),
               )),
             ),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            onPressed: () async {
-              await _client.auth.signIn(
-                email: _loginTextEditingController.text,
-                options: AuthOptions(
-                  redirectTo: 'io.supabase.zenmode://login-callback/',
-                ),
-              );
-              showOkAlertDialog(
-                context: context,
-                title: 'Success',
-                message: 'Please, go to your email app and open magic link',
-              );
-            },
           ),
         ],
       ),
