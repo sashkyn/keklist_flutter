@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 
 enum MarkSize {
   small,
@@ -58,20 +58,23 @@ class MarkWidget extends StatelessWidget {
     }
   }
 
+  // TODO: вернуть использование шрифта noto colored
+  /// https://github.com/material-foundation/google-fonts-flutter/issues?q=is%3Aissue+is%3Aopen+noto
+  /// Мониторить эту issue
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: Center(
-        child: GrayedOut(
-          child: Text(
-            item,
-            style: GoogleFonts.notoColorEmojiCompat(fontSize: fontSize),
-          ),
-          grayedOut: !isHighlighted,
-        ),
-      ),
       onTap: onTap,
       onLongPress: onLongPress,
+      child: Center(
+        child: GrayedOut(
+            grayedOut: !isHighlighted,
+            child: Text(
+              item,
+              style: TextStyle(fontSize: fontSize), //GoogleFonts.notoEmoji(fontSize: fontSize),
+            )),
+      ),
     );
   }
 }

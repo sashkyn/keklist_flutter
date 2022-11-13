@@ -16,6 +16,17 @@ import 'package:provider/src/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:zenmode/widgets/mark_widget.dart';
 
+// TODO: сделать таб бар с поиском и настройками
+// TODO: сделать дни недели сверху как неделя с раскрытием по нажатию до месяца, очень крутая идея
+// TODO: вынести авторизацию в bottom sheet
+// TODO: добавить вход через соцсетки
+// TODO: сделать ввод текста модальным окошком
+// TODO: при отображении эмодзиков сверху отображать предложенные по тексту
+// TODO: при скроле добавить пагинацию
+// TODO: сделать более оптимизированный скролл с переиспользованием каждого эмодзика как элемента
+// TODO: добавить смену шрифта на чернобелый в настройках
+// TODO: добавить смену размера шрифта в настройках
+
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
 
@@ -45,8 +56,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
 
-  get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
-  get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
+  bool get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
+  List<Mark> get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
 
   @override
   void initState() {
