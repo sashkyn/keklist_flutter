@@ -18,14 +18,10 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final response = await _client
-        .from('minds')
-        .select()
-        .eq(
+    final response = await _client.from('minds').select().eq(
           'user_id',
           _client.auth.currentUser!.id,
-        )
-        .execute();
+        );
 
     if (response.error != null) {
       return Future.error(response.error!.message);
@@ -51,12 +47,9 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final response = await _client
-        .from('minds')
-        .insert(
+    final response = await _client.from('minds').insert(
           mark.toSupabaseJson(userId: _client.auth.currentUser!.id),
-        )
-        .execute();
+        );
 
     if (response.error != null) {
       return Future.error(response.error!.message);
@@ -69,21 +62,13 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    await _client
-        .from('minds')
-        .delete()
-        .eq(
-          'uuid',
-          id,
-        )
-        .execute();
+    await _client.from('minds').delete().eq('uuid', id);
   }
 
   @override
   FutureOr<void> save({required List<Mark> list}) async {
     await Future.forEach(list, (Mark element) async {
       await addMark(element);
-      print('Added: ${element.emoji} - ${element.note}');
     });
   }
 }
