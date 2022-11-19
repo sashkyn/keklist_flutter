@@ -8,7 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:zenmode/screens/auth/supabase_auth/supabase_auth_screen.dart';
+import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/storages/entities/mark.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -105,7 +105,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       case SettingItem.loginToSupabase:
                         await showCupertinoModalBottomSheet(
                           context: context,
-                          builder: (context) => const SupabaseAuthScreen(),
+                          builder: (context) => const AuthScreen(),
                         );
                         setState(() {});
                         break;
