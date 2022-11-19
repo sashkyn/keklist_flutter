@@ -1,18 +1,28 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 
-class SupabaseAuthScreen extends StatefulWidget {
-  const SupabaseAuthScreen({Key? key}) : super(key: key);
+class AuthScreen extends StatefulWidget {
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
-  SupabaseAuthScreenState createState() => SupabaseAuthScreenState();
+  AuthScreenState createState() => AuthScreenState();
 }
 
-class SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
+class AuthScreenState extends State<AuthScreen> {
   final _loginTextEditingController = TextEditingController();
 
-  final SupabaseClient _client = Supabase.instance.client;
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<AuthBloc>().stream.listen((state) {
+      if (state is SingedIn) {
+        Navigator.pop(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +58,8 @@ class SupabaseAuthScreenState extends State<SupabaseAuthScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
             onPressed: () async {
-              await _client.auth.signInWithOtp(
-                email: _loginTextEditingController.text,
-                emailRedirectTo: 'io.supabase.zenmode://login-callback/'
-              );
+              context.read<AuthBloc>().add(Login(_loginTextEditingController.text));
+              // TODO: показать алерт на экшен в блоке.
               showOkAlertDialog(
                 context: context,
                 title: 'Success',

@@ -8,11 +8,6 @@ class SupabaseStorage implements IStorage {
   final _client = Supabase.instance.client;
 
   @override
-  Future<void> connect() async {
-    // No need to connect.
-  }
-
-  @override
   FutureOr<List<Mark>> getMarks() async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
