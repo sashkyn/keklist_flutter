@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
       MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => MarkBloc()),
+          BlocProvider(create: (context) => AuthBloc()),
         ],
         child: KeklistApp(app: app),
       ),
