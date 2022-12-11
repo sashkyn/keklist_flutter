@@ -15,6 +15,6 @@ class Login extends AuthEvent {
 
 class Logout extends AuthEvent {}
 
-class UserWasAppear extends AuthEvent {}
+class UserUpdated extends AuthEvent {}
 
-class UserWasDisapear extends AuthEvent {}
+class UserDeleted extends AuthEvent {}

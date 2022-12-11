@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
@@ -7,6 +8,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zenmode/cubits/mark_searcher/mark_searcher_cubit.dart';
+import 'package:zenmode/di/containers.dart';
+import 'package:zenmode/storages/storage.dart';
 
 import 'screens/mark_collection/mark_collection_screen.dart';
 
@@ -14,6 +18,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final FirebaseApp app = await Firebase.initializeApp();
 
+  // Инициализация настроек Supabase.
   await Supabase.initialize(
     url: '***REMOVED***',
     anonKey:
@@ -22,30 +27,40 @@ Future<void> main() async {
     debug: !kReleaseMode,
   );
 
-  BlocOverrides.runZoned(
-    () => runApp(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => MarkBloc()),
-          BlocProvider(create: (context) => AuthBloc()),
-        ],
-        child: KeklistApp(app: app),
+  // Инициализация DI-контейнера.
+  final mainContainer = MainContainer().initialise(Injector());
+
+  if (!kReleaseMode) {
+    Bloc.observer = LoggerBlocObserver();
+  }
+
+  // Инициализация приложения.
+  final Widget application = MultiBlocProvider(
+    providers: [
+      BlocProvider(
+        create: (context) => MarkBloc(
+          storage: mainContainer.get<IStorage>(),
+          searcherCubit: mainContainer.get<MarkSearcherCubit>(),
+        ),
       ),
-    ),
-    blocObserver: !kReleaseMode ? MyBlocObserver() : null,
+      BlocProvider(create: (context) => mainContainer.get<MarkSearcherCubit>()),
+      BlocProvider(create: (context) => AuthBloc()),
+    ],
+    child: ZenmodeApp(app: app),
   );
+  runApp(application);
 }
 
-class KeklistApp extends StatefulWidget {
+class ZenmodeApp extends StatefulWidget {
   final FirebaseApp app;
 
-  const KeklistApp({Key? key, required this.app}) : super(key: key);
+  const ZenmodeApp({Key? key, required this.app}) : super(key: key);
 
   @override
-  State<KeklistApp> createState() => _KeklistAppState();
+  State<ZenmodeApp> createState() => ZenmodeAppState();
 }
 
-class _KeklistAppState extends State<KeklistApp> {
+class ZenmodeAppState extends State<ZenmodeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -59,7 +74,7 @@ class _KeklistAppState extends State<KeklistApp> {
   }
 }
 
-class MyBlocObserver extends BlocObserver {
+class LoggerBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);

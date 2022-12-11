@@ -12,10 +12,10 @@ class MarkPickerScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MarkPickerScreenState createState() => _MarkPickerScreenState();
+  MarkPickerScreenState createState() => MarkPickerScreenState();
 }
 
-class _MarkPickerScreenState extends State<MarkPickerScreen> {
+class MarkPickerScreenState extends State<MarkPickerScreen> {
   final List<Emoji> _marks = Emoji.all();
   String _searchText = '';
   List<Emoji> _filteredMarks = [];
@@ -58,7 +58,7 @@ class _MarkPickerScreenState extends State<MarkPickerScreen> {
           ),
           Flexible(
             child: GridView.custom(
-              physics: const ClampingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
               childrenDelegate: SliverChildBuilderDelegate(
