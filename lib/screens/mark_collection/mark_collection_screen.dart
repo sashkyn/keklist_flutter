@@ -55,7 +55,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToBloc(GetMarksFromSupabaseStorageMarkEvent());
+      _sendToBloc(GetMarksFromStorageMarkEvent());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
@@ -256,7 +256,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   Widget _makeMarkWidget(Mark mark) {
     final bool isHighlighted;
     if (_isSearching) {
-      isHighlighted = _searchedValues.map((value) => value.uuid).contains(mark.uuid);
+      isHighlighted = _searchedValues.map((value) => value.id).contains(mark.id);
     } else {
       isHighlighted = true;
     }
@@ -290,7 +290,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       ],
     );
     if (result == 'remove_key') {
-      _sendToBloc(DeleteMarkEvent(uuid: item.uuid));
+      _sendToBloc(DeleteMarkEvent(uuid: item.id));
     } else if (result == 'copy_to_now_key') {
       await _copyToNow(item);
     }
