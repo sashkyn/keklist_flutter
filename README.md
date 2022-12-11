@@ -2,15 +2,22 @@
 
 A new Flutter project.
 
-## Getting Started
+## TODO List
 
-This project is a starting point for a Flutter application.
+### Features:
+- [ ] Сделать таб бар с поиском и настройками
+- [ ] Сделать дни недели сверху как неделя с раскрытием по нажатию до месяца, очень крутая идея
+- [ ] Вынести авторизацию в bottom sheet
+- [ ] Добавить вход через соцсетки
+- [ ] Сделать ввод текста модальным окошком
+- [ ] При отображении эмодзиков сверху отображать предложенные по тексту
+- [ ] При скроле добавить пагинацию
+- [ ] Сделать более оптимизированный скролл с переиспользованием каждого эмодзика как элемента
+- [ ] Добавить смену шрифта на чернобелый в настройках
+- [ ] Добавить смену размера шрифта в настройках
+- [ ] Добавить драг энд дроп меджду элементами
 
-A few resources to get you started if this is your first Flutter project:
+### Bugs to fix:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Completed Column ✓
+- [x] Completed task title 
