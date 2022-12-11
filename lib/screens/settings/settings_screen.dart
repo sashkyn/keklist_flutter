@@ -25,6 +25,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         SettingItem.supabaseTitle,
         _supabaseClient.auth.currentUser == null ? SettingItem.loginToSupabase : null,
         _supabaseClient.auth.currentUser != null ? SettingItem.logoutFromSupabase : null,
+        _supabaseClient.auth.currentUser != null ? SettingItem.deleteAccount : null,
         SettingItem.otherThingsTitle,
         SettingItem.exportToCSV,
       ]
@@ -113,6 +114,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                         await _supabaseClient.auth.signOut();
                         setState(() {});
                         break;
+                      case SettingItem.deleteAccount:
+                        // TODO: удалить аккаунт реально
+                        // TODO: показать алерт
+                        await _supabaseClient.auth.signOut();
+                        setState(() {});
+                        break;
                       default:
                         break;
                     }
@@ -135,7 +142,9 @@ enum SettingItem {
   otherThingsTitle(title: 'Other things', type: SettingItemType.title),
   loginToSupabase(title: 'Login to Supabase', type: SettingItemType.disclosure),
   logoutFromSupabase(title: 'Logout from Supabase', type: SettingItemType.disclosure),
-  exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure);
+  exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
+  interface(title: 'Interface', type: SettingItemType.disclosure),
+  deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);
 
   const SettingItem({required this.title, required this.type});
 
