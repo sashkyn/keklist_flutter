@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mark_collection/search_bar.dart';
@@ -12,20 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 // ignore: implementation_imports
-import 'package:provider/src/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:zenmode/widgets/mark_widget.dart';
-
-// TODO: сделать таб бар с поиском и настройками
-// TODO: сделать дни недели сверху как неделя с раскрытием по нажатию до месяца, очень крутая идея
-// TODO: вынести авторизацию в bottom sheet
-// TODO: добавить вход через соцсетки
-// TODO: сделать ввод текста модальным окошком
-// TODO: при отображении эмодзиков сверху отображать предложенные по тексту
-// TODO: при скроле добавить пагинацию
-// TODO: сделать более оптимизированный скролл с переиспользованием каждого эмодзика как элемента
-// TODO: добавить смену шрифта на чернобелый в настройках
-// TODO: добавить смену размера шрифта в настройках
 
 class MarkCollectionScreen extends StatefulWidget {
   const MarkCollectionScreen({Key? key}) : super(key: key);
@@ -128,7 +117,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       return GestureDetector(
         onTap: () => _scrollToNow(),
         child: const Text(
-          'Zenmode',
+          'Minds',
           style: TextStyle(color: Colors.black),
         ),
       );
@@ -278,12 +267,12 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         message: mark.note,
         context: context,
       ),
-      onLongPress: () async => await _showMarkOptionsActionSheet(context, mark),
+      onLongPress: () async => await _showMarkOptionsActionSheet(mark),
       isHighlighted: isHighlighted,
     );
   }
 
-  _showMarkOptionsActionSheet(BuildContext context, Mark item) async {
+  _showMarkOptionsActionSheet(Mark item) async {
     final result = await showModalActionSheet(
       context: context,
       actions: [
@@ -303,7 +292,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     if (result == 'remove_key') {
       _sendToBloc(DeleteMarkEvent(uuid: item.uuid));
     } else if (result == 'copy_to_now_key') {
-      await _copyToNow(context, item);
+      await _copyToNow(item);
     }
   }
 
@@ -314,7 +303,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
-  _copyToNow(BuildContext context, Mark item) async {
+  _copyToNow(Mark item) async {
     final note = await showTextInputDialog(
       context: context,
       message: item.emoji,

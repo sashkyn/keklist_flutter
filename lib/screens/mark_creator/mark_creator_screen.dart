@@ -14,10 +14,10 @@ class MarkCreatorScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MarkCreatorScreenState createState() => _MarkCreatorScreenState();
+  MarkCreatorScreenState createState() => MarkCreatorScreenState();
 }
 
-class _MarkCreatorScreenState extends State<MarkCreatorScreen> {
+class MarkCreatorScreenState extends State<MarkCreatorScreen> {
   String _emoji = Emoji.all().first.char;
   String _text = '';
 
@@ -68,7 +68,7 @@ class _MarkCreatorScreenState extends State<MarkCreatorScreen> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: OutlineInputBorder(),
-              hintText: 'Enter text for mark...',
+              hintText: 'Enter text for new mind...',
             ),
           ),
         ],
