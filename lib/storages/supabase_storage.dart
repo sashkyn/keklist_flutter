@@ -6,9 +6,14 @@ import 'package:zenmode/storages/storage.dart';
 
 class SupabaseStorage implements IStorage {
   final _client = Supabase.instance.client;
+  final List<Mark> _marks = [];
 
   @override
   FutureOr<List<Mark>> getMarks() async {
+    if (_marks.isNotEmpty) {
+      return _marks;
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -33,6 +38,10 @@ class SupabaseStorage implements IStorage {
         )
         .toList();
 
+    _marks
+      ..clear()
+      ..addAll(listOfMarks);
+
     return listOfMarks;
   }
 
@@ -49,15 +58,25 @@ class SupabaseStorage implements IStorage {
     if (response.error != null) {
       return Future.error(response.error!.message);
     }
+
+    _marks.add(mark);
   }
 
   @override
-  FutureOr<void> removeMarkFromDay(String id) async {
+  FutureOr<void> removeMark(String id) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
 
-    await _client.from('minds').delete().eq('uuid', id);
+    final response = await _client.from('minds').delete().eq('uuid', id);
+
+    if (response.error != null) {
+      return Future.error(response.error!.message);
+    }
+
+    _marks.removeWhere(
+      (element) => element.id == id,
+    );
   }
 
   @override

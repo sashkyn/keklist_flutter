@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:zenmode/cubits/mark_searcher/mark_searcher_cubit.dart';
 import 'package:zenmode/storages/entities/mark.dart';
 import 'package:zenmode/storages/storage.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
@@ -10,19 +11,24 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:zenmode/storages/supabase_storage.dart';
 
 part 'mark_event.dart';
 part 'mark_state.dart';
 
 class MarkBloc extends Bloc<MarkEvent, MarkState> {
-  late final IStorage _supabaseStorage = SupabaseStorage();
+  late final IStorage _supabaseStorage;
+  late final MarkSearcherCubit _searcherCubit;
 
   List<Mark> _marks = [];
 
-  MarkBloc() : super(ListMarkState(values: const [])) {
-    on<GetMarksFromSupabaseStorageMarkEvent>(_getMarksFromSupabaseStorage);
+  MarkBloc({
+    required IStorage storage,
+    required MarkSearcherCubit searcherCubit,
+  }) : super(ListMarkState(values: const [])) {
+    _supabaseStorage = storage;
+    _searcherCubit = searcherCubit;
+
+    on<GetMarksFromStorageMarkEvent>(_getMarks);
     on<CreateMarkEvent>(_createMark);
     on<DeleteMarkEvent>(_deleteMark);
     on<StartSearchMarkEvent>(_startSearch);
@@ -35,15 +41,15 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   }
 
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
-    await _supabaseStorage.removeMarkFromDay(event.uuid);
-    final item = _marks.firstWhere((item) => item.uuid == event.uuid);
+    await _supabaseStorage.removeMark(event.uuid);
+    final item = _marks.firstWhere((item) => item.id == event.uuid);
     _marks.remove(item);
     emit.call(ListMarkState(values: _marks));
   }
 
   FutureOr<void> _createMark(CreateMarkEvent event, emit) async {
     final mark = Mark(
-      uuid: const Uuid().v4(),
+      id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
       emoji: event.emoji,
@@ -56,7 +62,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarksFromSupabaseStorage(GetMarksFromSupabaseStorageMarkEvent event, emit) async {
+  FutureOr<void> _getMarks(GetMarksFromStorageMarkEvent event, emit) async {
     _marks.addAll(await _supabaseStorage.getMarks());
     _marks = _marks.distinct();
     final state = ListMarkState(values: _marks);
@@ -83,19 +89,8 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
-  final _emojiParser = EmojiParser();
-
   FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
-    final filteredMarks = _marks.where((mark) {
-      // Note condition.
-      final noteCondition = mark.note.trim().toLowerCase().contains(event.text.toLowerCase().trim(),);
-
-      // Emoji condition.
-      final emojies = _emojiParser.parseEmojis(event.text);
-      final emojiCondintion = emojies.any((emoji) => mark.emoji == emoji);
-
-      return noteCondition || emojiCondintion;
-    }).toList();
+    final filteredMarks = await _searcherCubit.searchMarkList(event.text);
 
     emit.call(
       SearchingMarkState(
@@ -108,6 +103,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   List<String> _lastSuggestions = [];
 
+  // TODO: переместить в MarkSearcherCubit;
   FutureOr<void> _changeTextOfCreatingMark(
     ChangeTextOfCreatingMarkEvent event,
     Emitter<MarkState> emit,
@@ -145,5 +141,8 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 // MARK: Sorted by.
 
 extension MyIterable<E> on Iterable<E> {
-  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()..sort((a, b) => key(a).compareTo(key(b)),);
+  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()
+    ..sort(
+      (a, b) => key(a).compareTo(key(b)),
+    );
 }

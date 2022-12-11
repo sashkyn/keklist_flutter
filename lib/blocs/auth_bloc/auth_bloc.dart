@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_event.dart';
@@ -11,13 +10,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc() : super(AuthInitial()) {
     _client.auth.onAuthStateChange.listen((event) {
-      if (kDebugMode) {
-        print(event.event);
-      }
       if (event.session?.user != null) {
-        add(UserWasAppear());
+        add(UserUpdated());
       } else {
-        add(UserWasDisapear());
+        add(UserDeleted());
       }
     });
     on<Login>((event, emit) async {
@@ -26,14 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emailRedirectTo: 'io.supabase.zenmode://login-callback/',
       );
     });
-    on<Logout>((event, emit) async {
-      await _client.auth.signOut();
-    });
-    on<UserWasAppear>((event, emit) async {
-      emit.call(SingedIn());
-    });
-    on<UserWasDisapear>((event, emit) async {
-      emit.call(Logouted());
-    });
+    on<Logout>((event, emit) async => await _client.auth.signOut());
+    on<UserUpdated>((event, emit) async => emit.call(SingedIn()));
+    on<UserDeleted>((event, emit) async => emit.call(Logouted()));
   }
 }

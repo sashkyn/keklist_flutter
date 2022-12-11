@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Mark extends Equatable {
-  final String uuid;
+  final String id;
   final String emoji;
   final String note;
   final int dayIndex;
@@ -9,7 +9,7 @@ class Mark extends Equatable {
   final int sortIndex;
 
   const Mark({
-    required this.uuid,
+    required this.id,
     required this.note,
     required this.emoji,
     required this.dayIndex,
@@ -18,10 +18,10 @@ class Mark extends Equatable {
   });
 
   @override
-  List<Object?> get props => [uuid];
+  List<Object?> get props => [id];
 
   Mark.fromSupabaseJson(Map<String, dynamic> json)
-      : uuid = json['uuid'] ?? 0,
+      : id = json['uuid'] ?? 0,
         emoji = json['emoji'],
         dayIndex = json['day_index'],
         note = json['note'],
@@ -31,7 +31,7 @@ class Mark extends Equatable {
 
   Map<String, dynamic> toSupabaseJson({required String userId}) => {
         'user_id': userId,
-        'uuid': uuid,
+        'uuid': id,
         'emoji': emoji,
         'note': note,
         'day_index': dayIndex,
@@ -39,7 +39,7 @@ class Mark extends Equatable {
       };
 
   List<String> toCSVEntry() => [
-        uuid,
+        id,
         emoji,
         note,
         dayIndex.toString(),
