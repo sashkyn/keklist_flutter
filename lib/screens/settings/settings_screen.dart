@@ -28,12 +28,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         _supabaseClient.auth.currentUser != null ? SettingItem.deleteAccount : null,
         SettingItem.otherThingsTitle,
         SettingItem.exportToCSV,
-      ]
-          .where((element) => element != null)
-          .map(
-            (nullableItem) => nullableItem!,
-          )
-          .toList(growable: false);
+      ].where((element) => element != null).map((nullableItem) => nullableItem!).toList(growable: false);
 
   @override
   void initState() {
@@ -41,17 +36,13 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     context.read<MarkBloc>().stream.listen((state) async {
       if (state is ListMarkState) {
-        await _shareCSVFile(marks: state.values);
+        // await _shareCSVFile(marks: state.values);
       }
     });
   }
 
   Future<void> _shareCSVFile({required List<Mark> marks}) async {
-    final List<List<String>> csvEntryList = marks
-        .map(
-          (e) => e.toCSVEntry(),
-        )
-        .toList(growable: false);
+    final List<List<String>> csvEntryList = marks.map((entry) => entry.toCSVEntry()).toList(growable: false);
     final String csv = const ListToCsvConverter().convert(csvEntryList);
     final Directory temporaryDirectory = await getTemporaryDirectory();
     final File csvFile = File('${temporaryDirectory.path}/user_data.csv');

@@ -19,7 +19,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   late final IStorage _supabaseStorage;
   late final MarkSearcherCubit _searcherCubit;
 
-  List<Mark> _marks = [];
+  final List<Mark> _marks = [];
 
   MarkBloc({
     required IStorage storage,
@@ -28,7 +28,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     _supabaseStorage = storage;
     _searcherCubit = searcherCubit;
 
-    on<GetMarksFromStorageMarkEvent>(_getMarks);
+    on<GetMarksMarkEvent>(_getMarks);
     on<CreateMarkEvent>(_createMark);
     on<DeleteMarkEvent>(_deleteMark);
     on<StartSearchMarkEvent>(_startSearch);
@@ -62,9 +62,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarks(GetMarksFromStorageMarkEvent event, emit) async {
-    _marks.addAll(await _supabaseStorage.getMarks());
-    _marks = _marks.distinct();
+  FutureOr<void> _getMarks(GetMarksMarkEvent event, emit) async {
+    _marks
+      ..clear()
+      ..addAll(await _supabaseStorage.getMarks());
     final state = ListMarkState(values: _marks);
     emit.call(state);
   }

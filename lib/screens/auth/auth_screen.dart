@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
@@ -29,20 +30,16 @@ class AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(
-              top: 16.0,
-              bottom: 16.0,
-            ),
-            child: Text(
-              'Sign in',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w500,
-              ),
+          const SizedBox(height: 16.0),
+          const Text(
+            'Sign in',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18.0,
+              fontWeight: FontWeight.w500,
             ),
           ),
+          const SizedBox(height: 16.0),
           TextField(
             controller: _loginTextEditingController,
             keyboardType: TextInputType.emailAddress,
@@ -58,7 +55,7 @@ class AuthScreenState extends State<AuthScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
             onPressed: () async {
-              context.read<AuthBloc>().add(Login(_loginTextEditingController.text));
+              context.read<AuthBloc>().add(LoginWithEmail(_loginTextEditingController.text));
               // TODO: показать алерт на экшен в блоке.
               showOkAlertDialog(
                 context: context,
@@ -75,6 +72,41 @@ class AuthScreenState extends State<AuthScreen> {
                 style: TextStyle(color: Colors.white),
               )),
             ),
+          ),
+          const SizedBox(height: 24.0),
+          const Text(
+            'or continue with social networks:',
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppleAuthButton(
+                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.apple)),
+                style: const AuthButtonStyle(
+                  buttonType: AuthButtonType.icon,
+                ),
+              ),
+              const SizedBox(width: 16.0),
+              GoogleAuthButton(
+                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.google)),
+                style: const AuthButtonStyle(
+                  buttonType: AuthButtonType.icon,
+                ),
+              ),
+              const SizedBox(width: 16.0),
+              FacebookAuthButton(
+                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.facebook)),
+                style: const AuthButtonStyle(
+                  buttonType: AuthButtonType.icon,
+                ),
+              ),
+            ],
           ),
         ],
       ),
