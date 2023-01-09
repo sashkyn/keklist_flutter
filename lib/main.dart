@@ -25,6 +25,7 @@ Future<void> main() async {
         '***REMOVED***',
     authCallbackUrlHostname: 'login-callback',
     debug: !kReleaseMode,
+    storageRetryAttempts: 5,
   );
 
   // Инициализация DI-контейнера.
