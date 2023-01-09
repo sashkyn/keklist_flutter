@@ -6,7 +6,7 @@ import 'package:zenmode/storages/storage.dart';
 
 class SupabaseStorage implements IStorage {
   final _client = Supabase.instance.client;
-  final List<Mark> _marks = [];
+  final List<Mark> _marks = List.empty(growable: true);
 
   @override
   FutureOr<List<Mark>> getMarks() async {
@@ -18,25 +18,12 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final response = await _client.from('minds').select().eq(
+    final List<dynamic> listOfEntities = await _client.from('minds').select().eq(
           'user_id',
           _client.auth.currentUser!.id,
         );
 
-    if (response.error != null) {
-      return Future.error(response.error!.message);
-    }
-
-    if (response.data == null) {
-      return [];
-    }
-
-    final List<dynamic> listOfEntities = response.data;
-    final List<Mark> listOfMarks = listOfEntities
-        .map(
-          (e) => Mark.fromSupabaseJson(e),
-        )
-        .toList();
+    final List<Mark> listOfMarks = listOfEntities.map((e) => Mark.fromSupabaseJson(e)).toList();
 
     _marks
       ..clear()
@@ -51,13 +38,9 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final response = await _client.from('minds').insert(
+    await _client.from('minds').insert(
           mark.toSupabaseJson(userId: _client.auth.currentUser!.id),
         );
-
-    if (response.error != null) {
-      return Future.error(response.error!.message);
-    }
 
     _marks.add(mark);
   }
@@ -68,19 +51,13 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final response = await _client.from('minds').delete().eq('uuid', id);
+    await _client.from('minds').delete().eq('uuid', id);
 
-    if (response.error != null) {
-      return Future.error(response.error!.message);
-    }
-
-    _marks.removeWhere(
-      (element) => element.id == id,
-    );
+    _marks.removeWhere((element) => element.id == id);
   }
 
   @override
-  FutureOr<void> save({required List<Mark> list}) async {
+  FutureOr<void> addAll({required List<Mark> list}) async {
     await Future.forEach(list, (Mark element) async {
       await addMark(element);
     });

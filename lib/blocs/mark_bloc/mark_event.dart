@@ -6,7 +6,7 @@ abstract class MarkEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class GetMarksFromStorageMarkEvent extends MarkEvent {}
+class GetMarksMarkEvent extends MarkEvent {}
 
 class CreateMarkEvent extends MarkEvent {
   final int dayIndex;

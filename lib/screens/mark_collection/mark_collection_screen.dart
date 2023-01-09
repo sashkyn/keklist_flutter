@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mark_collection/search_bar.dart';
@@ -55,16 +56,16 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToBloc(GetMarksFromStorageMarkEvent());
+      _sendToMarkBloc(GetMarksMarkEvent());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
-        _sendToBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
+        _sendToMarkBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
       });
 
-      // NOTE: Слежение за полем ввода в создании нового кека при изменении его значения.
+      // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        _sendToBloc(ChangeTextOfCreatingMarkEvent(text: _createMarkEditingController.text));
+        _sendToMarkBloc(ChangeTextOfCreatingMarkEvent(text: _createMarkEditingController.text));
       });
 
       context.read<MarkBloc>().stream.listen((state) {
@@ -77,6 +78,16 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         } else if (state is SuggestionsMarkState) {
           setState(() {
             _suggestionsMarkState = state;
+          });
+        }
+      });
+
+      context.read<AuthBloc>().stream.listen((state) {
+        if (state is SingedIn) {
+          _sendToMarkBloc(GetMarksMarkEvent());
+        } else if (state is Logouted) {
+          setState(() {
+            _marks = [];
           });
         }
       });
@@ -110,7 +121,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         },
         onCancel: () {
           _searchTextController.clear();
-          _sendToBloc(StopSearchMarkEvent());
+          _sendToMarkBloc(StopSearchMarkEvent());
         },
       );
     } else {
@@ -136,7 +147,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         onPressed: () {
           setState(() {
             _createMarkBottomBarIsVisible = false;
-            _sendToBloc(StartSearchMarkEvent());
+            _sendToMarkBloc(StartSearchMarkEvent());
           });
         },
       ),
@@ -223,7 +234,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                         _suggestionsMarkState = null;
                         _createMarkEditingController.text = '';
                       });
-                      _sendToBloc(
+                      _sendToMarkBloc(
                         CreateMarkEvent(
                           dayIndex: _dayIndexToCreateMark,
                           note: data.text,
@@ -290,7 +301,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       ],
     );
     if (result == 'remove_key') {
-      _sendToBloc(DeleteMarkEvent(uuid: item.id));
+      _sendToMarkBloc(DeleteMarkEvent(uuid: item.id));
     } else if (result == 'copy_to_now_key') {
       await _copyToNow(item);
     }
@@ -315,7 +326,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       ],
     );
     if (note != null) {
-      _sendToBloc(
+      _sendToMarkBloc(
         CreateMarkEvent(
           dayIndex: _getNowDayIndex(),
           note: note.first,
@@ -349,7 +360,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
     );
   }
 
-  void _sendToBloc(MarkEvent event) {
+  void _sendToMarkBloc(MarkEvent event) {
     context.read<MarkBloc>().add(event);
   }
 

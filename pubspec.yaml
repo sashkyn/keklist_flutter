@@ -10,6 +10,7 @@ environment:
 
 dependencies:
   adaptive_dialog: ^1.2.0
+  auth_buttons: ^3.0.0
   bloc: ^8.1.0
   collection: ^1.15.0
   cross_file: ^0.3.3+2
@@ -25,6 +26,7 @@ dependencies:
   flutter_bloc: ^8.1.1
   flutter_emoji: ^2.4.0
   flutter_simple_dependency_injection: ^2.0.0
+  flutter_web_auth: ^0.5.0
   google_fonts: ^3.0.1
   intl: ^0.17.0
   material_segmented_control: ^4.0.0
@@ -34,7 +36,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.5
   share_plus: ^6.2.0
   shared_preferences: ^2.0.8
-  supabase_flutter: ^1.2.0
+  supabase_flutter: ^1.2.2
   uuid: ^3.0.5
 
 dev_dependencies:
