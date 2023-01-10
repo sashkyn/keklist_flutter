@@ -1,14 +1,17 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
+abstract class AuthState {
   const AuthState();
-  
-  @override
-  List<Object> get props => [];
 }
 
 class AuthInitial extends AuthState {}
 
-class SingedIn extends AuthState {}
+class LoggedIn extends AuthState {}
 
 class Logouted extends AuthState {}
+
+class CurrentUserAuthStatus extends AuthState {
+  final bool isLoggedIn;
+
+  const CurrentUserAuthStatus({required this.isLoggedIn});
+}

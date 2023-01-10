@@ -38,6 +38,12 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       _changeTextOfCreatingMark,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
+    on<ResetStorageMarkEvent>((event, emit) async {
+      await _supabaseStorage.reset();
+      _marks.clear();
+      final state = ListMarkState(values: []);
+      emit(state);  
+    });
   }
 
   FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
@@ -67,7 +73,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
       ..clear()
       ..addAll(await _supabaseStorage.getMarks());
     final state = ListMarkState(values: _marks);
-    emit.call(state);
+    emit(state);
   }
 
   FutureOr<void> _startSearch(StartSearchMarkEvent event, emit) async {

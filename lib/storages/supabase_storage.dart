@@ -6,7 +6,7 @@ import 'package:zenmode/storages/storage.dart';
 
 class SupabaseStorage implements IStorage {
   final _client = Supabase.instance.client;
-  final List<Mark> _marks = List.empty(growable: true);
+  final List<Mark> _marks = [];
 
   @override
   FutureOr<List<Mark>> getMarks() async {
@@ -18,11 +18,7 @@ class SupabaseStorage implements IStorage {
       return Future.error('You did not auth to Supabase');
     }
 
-    final List<dynamic> listOfEntities = await _client.from('minds').select().eq(
-          'user_id',
-          _client.auth.currentUser!.id,
-        );
-
+    final List<dynamic> listOfEntities = await _client.from('minds').select();
     final List<Mark> listOfMarks = listOfEntities.map((e) => Mark.fromSupabaseJson(e)).toList();
 
     _marks
@@ -61,5 +57,11 @@ class SupabaseStorage implements IStorage {
     await Future.forEach(list, (Mark element) async {
       await addMark(element);
     });
+  }
+
+  @override
+  FutureOr<void> reset() {
+    // Очищаем закешированные данные.
+    _marks.clear();
   }
 }

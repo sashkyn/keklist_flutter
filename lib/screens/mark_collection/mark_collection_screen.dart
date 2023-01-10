@@ -83,12 +83,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
       });
 
       context.read<AuthBloc>().stream.listen((state) {
-        if (state is SingedIn) {
+        if (state is LoggedIn) {
           _sendToMarkBloc(GetMarksMarkEvent());
         } else if (state is Logouted) {
-          setState(() {
-            _marks = [];
-          });
+          _sendToMarkBloc(ResetStorageMarkEvent());
         }
       });
     });

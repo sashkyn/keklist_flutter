@@ -59,3 +59,5 @@ class ChangeTextOfCreatingMarkEvent extends MarkEvent {
   @override
   List<Object?> get props => [text];
 }
+
+class ResetStorageMarkEvent extends MarkEvent {}
