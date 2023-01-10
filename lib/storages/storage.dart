@@ -7,4 +7,5 @@ abstract class IStorage {
   FutureOr<void> removeMark(String id);
   FutureOr<void> addAll({required List<Mark> list});
   FutureOr<List<Mark>> getMarks();
+  FutureOr<void> reset();
 }

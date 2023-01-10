@@ -22,6 +22,8 @@ class UserUpdated extends AuthEvent {}
 
 class UserDeleted extends AuthEvent {}
 
+class GetAuthStatus extends AuthEvent {}
+
 enum SocialNetwork {
   google,
   facebook,

@@ -19,7 +19,7 @@ class AuthScreenState extends State<AuthScreen> {
     super.initState();
 
     context.read<AuthBloc>().stream.listen((state) {
-      if (state is SingedIn) {
+      if (state is LoggedIn) {
         Navigator.pop(context);
       }
     });

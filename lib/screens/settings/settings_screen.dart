@@ -1,15 +1,9 @@
-import 'dart:io';
-
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
+import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
-import 'package:zenmode/storages/entities/mark.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -19,14 +13,14 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
-  final SupabaseClient _supabaseClient = Supabase.instance.client;
+  bool _isLoggedIn = false;
 
   List<SettingItem> get _items => [
-        SettingItem.supabaseTitle,
-        _supabaseClient.auth.currentUser == null ? SettingItem.loginToSupabase : null,
-        _supabaseClient.auth.currentUser != null ? SettingItem.logoutFromSupabase : null,
-        _supabaseClient.auth.currentUser != null ? SettingItem.deleteAccount : null,
-        SettingItem.otherThingsTitle,
+        SettingItem.userTitle,
+        !_isLoggedIn ? SettingItem.login : null,
+        _isLoggedIn ? SettingItem.logout : null,
+        _isLoggedIn ? SettingItem.deleteAccount : null,
+        SettingItem.otherTitle,
         SettingItem.exportToCSV,
       ].where((element) => element != null).map((nullableItem) => nullableItem!).toList(growable: false);
 
@@ -34,21 +28,19 @@ class SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
 
-    context.read<MarkBloc>().stream.listen((state) async {
-      if (state is ListMarkState) {
-        // await _shareCSVFile(marks: state.values);
-      }
+    context.read<AuthBloc>().stream.listen((state) async {
+      setState(() {
+        if (state is CurrentUserAuthStatus) {
+          _isLoggedIn = state.isLoggedIn;
+        } else if (state is LoggedIn) {
+          _isLoggedIn = true;
+        } else if (state is Logouted) {
+          _isLoggedIn = false;
+        }
+      });
     });
-  }
 
-  Future<void> _shareCSVFile({required List<Mark> marks}) async {
-    final List<List<String>> csvEntryList = marks.map((entry) => entry.toCSVEntry()).toList(growable: false);
-    final String csv = const ListToCsvConverter().convert(csvEntryList);
-    final Directory temporaryDirectory = await getTemporaryDirectory();
-    final File csvFile = File('${temporaryDirectory.path}/user_data.csv');
-    await csvFile.writeAsString(csv);
-    final XFile fileToShare = XFile(csvFile.path);
-    await Share.shareXFiles([fileToShare]);
+    context.read<AuthBloc>().add(GetAuthStatus());
   }
 
   @override
@@ -91,24 +83,24 @@ class SettingsScreenState extends State<SettingsScreen> {
                   onTap: () async {
                     switch (item) {
                       case SettingItem.exportToCSV:
-                        // TODO: добавить блок настройкам и выполнение запроса на все марки
-                        //context.read<MarkBloc>().add(GetMarksFromSupabaseStorageMarkEvent());
+                        context.read<SettingsBloc>().add(ExportMarksToCSVSettingsEvent());
                         break;
-                      case SettingItem.loginToSupabase:
+                      case SettingItem.login:
                         await showCupertinoModalBottomSheet(
                           context: context,
                           builder: (context) => const AuthScreen(),
                         );
                         setState(() {});
                         break;
-                      case SettingItem.logoutFromSupabase:
-                        await _supabaseClient.auth.signOut();
+                      case SettingItem.logout:
+                        context.read<AuthBloc>().add(Logout());
                         setState(() {});
                         break;
                       case SettingItem.deleteAccount:
                         // TODO: удалить аккаунт реально
                         // TODO: показать алерт
-                        await _supabaseClient.auth.signOut();
+                        // TODO: предложить сохранить эмоции перед удалением
+                        context.read<AuthBloc>().add(Logout());
                         setState(() {});
                         break;
                       default:
@@ -129,10 +121,10 @@ enum SettingItemType {
 }
 
 enum SettingItem {
-  supabaseTitle(title: 'Supabase', type: SettingItemType.title),
-  otherThingsTitle(title: 'Other things', type: SettingItemType.title),
-  loginToSupabase(title: 'Login to Supabase', type: SettingItemType.disclosure),
-  logoutFromSupabase(title: 'Logout from Supabase', type: SettingItemType.disclosure),
+  userTitle(title: 'User', type: SettingItemType.title),
+  otherTitle(title: 'Other', type: SettingItemType.title),
+  login(title: 'Login to Supabase', type: SettingItemType.disclosure),
+  logout(title: 'Logout from Supabase', type: SettingItemType.disclosure),
   exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
   interface(title: 'Interface', type: SettingItemType.disclosure),
   deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);
