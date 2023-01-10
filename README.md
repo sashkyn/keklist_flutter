@@ -3,7 +3,6 @@
 A new Flutter project.
 
 ## TODO
-- Добавить вход через Facebook
 - Донастроить Google и верифицировать консоль
 
 ## In Progress:
@@ -28,4 +27,4 @@ A new Flutter project.
 - [ ] 
 
 ### DONE ✓
-- [x] Вход через соцсети (Apple, Google)
+- [x] Вход через соцсети (Apple, Google, Facebook)
