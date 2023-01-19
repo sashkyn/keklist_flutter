@@ -10,6 +10,8 @@ class LoggedIn extends AuthState {}
 
 class Logouted extends AuthState {}
 
+class UserDeletedHimself extends AuthState {}
+
 class CurrentUserAuthStatus extends AuthState {
   final bool isLoggedIn;
 

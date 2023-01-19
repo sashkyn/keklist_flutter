@@ -3,7 +3,7 @@ part of 'mark_bloc.dart';
 abstract class MarkState {}
 
 class ListMarkState extends MarkState {
-  final List<Mark> values;
+  final Iterable<Mark> values;
 
   ListMarkState({required this.values});
 
@@ -23,8 +23,8 @@ class ErrorMarkState extends MarkState {
 
 class SearchingMarkState extends MarkState {
   final bool enabled;
-  final List<Mark> values;
-  final List<Mark> filteredValues;
+  final Iterable<Mark> values;
+  final Iterable<Mark> filteredValues;
 
   SearchingMarkState({
     required this.enabled,

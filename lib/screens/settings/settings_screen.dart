@@ -1,9 +1,11 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
+import 'package:zenmode/helpers/extensions/state_extensions.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -77,8 +79,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                 );
               case SettingItemType.disclosure:
               case SettingItemType.redDisclosure:
+                final textColor = item.type == SettingItemType.redDisclosure ? Colors.red : Colors.black;
                 return ListTile(
-                  title: Text(item.title),
+                  title: Text(
+                    item.title,
+                    style: TextStyle(color: textColor),
+                  ),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () async {
                     switch (item) {
@@ -97,11 +103,22 @@ class SettingsScreenState extends State<SettingsScreen> {
                         setState(() {});
                         break;
                       case SettingItem.deleteAccount:
-                        // TODO: удалить аккаунт реально
-                        // TODO: показать алерт
                         // TODO: предложить сохранить эмоции перед удалением
-                        context.read<AuthBloc>().add(Logout());
-                        setState(() {});
+                        final result = await showOkCancelAlertDialog(
+                          context: context,
+                          title: 'Are you sure?',
+                          message: 'If you delete yourself from system your emotions will be deleted too.',
+                          cancelLabel: 'No',
+                          okLabel: 'Delete me',
+                          isDestructiveAction: true,
+                        );
+                        switch (result) {
+                          case OkCancelResult.ok:
+                            mountedContext?.read<AuthBloc>().add(DeleteUser());
+                            break;
+                          case OkCancelResult.cancel:
+                            break;
+                        }
                         break;
                       default:
                         break;
