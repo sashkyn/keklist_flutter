@@ -19,7 +19,7 @@ class AuthScreenState extends State<AuthScreen> {
     super.initState();
 
     context.read<AuthBloc>().stream.listen((state) {
-      if (state is LoggedIn) {
+      if (state is AuthLoggedIn) {
         Navigator.pop(context);
       }
     });
@@ -27,88 +27,91 @@ class AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 16.0),
-          const Text(
-            'Sign in',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: _loginTextEditingController,
-            keyboardType: TextInputType.emailAddress,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              border: UnderlineInputBorder(),
-              hintText: 'Email',
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            onPressed: () async {
-              context.read<AuthBloc>().add(LoginWithEmail(_loginTextEditingController.text));
-              // TODO: показать алерт на экшен в блоке.
-              showOkAlertDialog(
-                context: context,
-                title: 'Success',
-                message: 'Please, go to your email app and open magic link',
-              );
-            },
-            child: const SizedBox(
-              width: 100,
-              height: 44,
-              child: Center(
-                  child: Text(
-                'Get magic link',
-                style: TextStyle(color: Colors.white),
-              )),
-            ),
-          ),
-          const SizedBox(height: 24.0),
-          const Text(
-            'or continue with social networks:',
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppleAuthButton(
-                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.apple)),
-                style: const AuthButtonStyle(
-                  buttonType: AuthButtonType.icon,
-                ),
+    return SafeArea(
+      child: Material(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16.0),
+            const Text(
+              'Sign in',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18.0,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(width: 16.0),
-              GoogleAuthButton(
-                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.google)),
-                style: const AuthButtonStyle(
-                  buttonType: AuthButtonType.icon,
-                ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _loginTextEditingController,
+              keyboardType: TextInputType.emailAddress,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.all(8),
+                border: UnderlineInputBorder(),
+                hintText: 'Email',
               ),
-              const SizedBox(width: 16.0),
-              FacebookAuthButton(
-                onPressed: () => context.read<AuthBloc>().add(LoginWithSocialNetwork(SocialNetwork.facebook)),
-                style: const AuthButtonStyle(
-                  buttonType: AuthButtonType.icon,
-                ),
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              onPressed: () async {
+                context.read<AuthBloc>().add(AuthLoginWithEmail(_loginTextEditingController.text));
+                // TODO: показать алерт на экшен в блоке.
+                showOkAlertDialog(
+                  context: context,
+                  title: 'Success',
+                  message: 'Please, go to your email app and open magic link',
+                );
+              },
+              child: const SizedBox(
+                width: 100,
+                height: 44,
+                child: Center(
+                    child: Text(
+                  'Get magic link',
+                  style: TextStyle(color: Colors.white),
+                )),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 24.0),
+            const Text(
+              'or continue with social networks:',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 14.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppleAuthButton(
+                  onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.apple)),
+                  style: const AuthButtonStyle(
+                    buttonType: AuthButtonType.icon,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                GoogleAuthButton(
+                  onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.google)),
+                  style: const AuthButtonStyle(
+                    buttonType: AuthButtonType.icon,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                FacebookAuthButton(
+                  onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.facebook)),
+                  style: const AuthButtonStyle(
+                    buttonType: AuthButtonType.icon,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
