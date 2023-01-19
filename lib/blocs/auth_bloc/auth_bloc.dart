@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,9 +11,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     _client.auth.onAuthStateChange.listen((event) {
       if (event.session?.user != null) {
-        add(UserUpdated());
+        add(UserAppearedInSession());
       } else {
-        add(UserDeleted());
+        add(UserGoneFromSession());
       }
     });
     on<LoginWithEmail>((event, emit) async {
@@ -36,9 +35,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           break;
       }
     });
+    on<DeleteUser>(
+      (event, emit) async {
+        await _client.rpc('deleteUser');
+        add(Logout());
+      },
+    );
     on<Logout>((event, emit) async => await _client.auth.signOut());
-    on<UserUpdated>((event, emit) async => emit(LoggedIn()));
-    on<UserDeleted>((event, emit) async => emit(Logouted()));
+    on<UserAppearedInSession>((event, emit) => emit(LoggedIn()));
+    on<UserGoneFromSession>((event, emit) => emit(Logouted()));
     on<GetAuthStatus>((event, emit) => emit(CurrentUserAuthStatus(isLoggedIn: _client.auth.currentUser != null)));
   }
 

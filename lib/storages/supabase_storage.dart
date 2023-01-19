@@ -6,10 +6,10 @@ import 'package:zenmode/storages/storage.dart';
 
 class SupabaseStorage implements IStorage {
   final _client = Supabase.instance.client;
-  final List<Mark> _marks = [];
+  final Set<Mark> _marks = {};
 
   @override
-  FutureOr<List<Mark>> getMarks() async {
+  FutureOr<Iterable<Mark>> getMarks() async {
     if (_marks.isNotEmpty) {
       return _marks;
     }
