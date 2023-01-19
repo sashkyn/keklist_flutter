@@ -11,18 +11,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     _client.auth.onAuthStateChange.listen((event) {
       if (event.session?.user != null) {
-        add(UserAppearedInSession());
+        add(AuthUserAppearedInSession());
       } else {
-        add(UserGoneFromSession());
+        add(AuthUserGoneFromSession());
       }
     });
-    on<LoginWithEmail>((event, emit) async {
+    on<AuthLoginWithEmail>((event, emit) async {
       await _client.auth.signInWithOtp(
         email: event.email,
         emailRedirectTo: 'io.supabase.zenmode://login-callback/',
       );
     });
-    on<LoginWithSocialNetwork>((event, emit) async {
+    on<AuthLoginWithSocialNetwork>((event, emit) async {
       switch (event.socialNetwork) {
         case SocialNetwork.google:
           await _signInWithWebOAuth(Provider.google);
@@ -35,16 +35,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           break;
       }
     });
-    on<DeleteUser>(
+    on<AuthDeleteUser>(
       (event, emit) async {
         await _client.rpc('deleteUser');
-        add(Logout());
+        add(AuthLogout());
       },
     );
-    on<Logout>((event, emit) async => await _client.auth.signOut());
-    on<UserAppearedInSession>((event, emit) => emit(LoggedIn()));
-    on<UserGoneFromSession>((event, emit) => emit(Logouted()));
-    on<GetAuthStatus>((event, emit) => emit(CurrentUserAuthStatus(isLoggedIn: _client.auth.currentUser != null)));
+    on<AuthLogout>((event, emit) async => await _client.auth.signOut());
+    on<AuthUserAppearedInSession>((event, emit) => emit(AuthLoggedIn()));
+    on<AuthUserGoneFromSession>((event, emit) => emit(AuthLogouted()));
+    on<AuthGetStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: _client.auth.currentUser != null)));
   }
 
   Future<void> _signInWithWebOAuth(Provider provider) async {

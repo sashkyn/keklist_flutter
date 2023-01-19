@@ -7,6 +7,8 @@ import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/helpers/extensions/state_extensions.dart';
 
+// TODO: разобраться с улучшенной навигацией во Flutter: go_router
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
@@ -32,17 +34,17 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     context.read<AuthBloc>().stream.listen((state) async {
       setState(() {
-        if (state is CurrentUserAuthStatus) {
+        if (state is AuthCurrentStatus) {
           _isLoggedIn = state.isLoggedIn;
-        } else if (state is LoggedIn) {
+        } else if (state is AuthLoggedIn) {
           _isLoggedIn = true;
-        } else if (state is Logouted) {
+        } else if (state is AuthLogouted) {
           _isLoggedIn = false;
         }
       });
     });
 
-    context.read<AuthBloc>().add(GetAuthStatus());
+    context.read<AuthBloc>().add(AuthGetStatus());
   }
 
   @override
@@ -99,11 +101,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                         setState(() {});
                         break;
                       case SettingItem.logout:
-                        context.read<AuthBloc>().add(Logout());
+                        context.read<AuthBloc>().add(AuthLogout());
                         setState(() {});
                         break;
                       case SettingItem.deleteAccount:
-                        // TODO: предложить сохранить эмоции перед удалением
                         final result = await showOkCancelAlertDialog(
                           context: context,
                           title: 'Are you sure?',
@@ -114,7 +115,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         );
                         switch (result) {
                           case OkCancelResult.ok:
-                            mountedContext?.read<AuthBloc>().add(DeleteUser());
+                            mountedContext?.read<AuthBloc>().add(AuthDeleteUser());
                             break;
                           case OkCancelResult.cancel:
                             break;

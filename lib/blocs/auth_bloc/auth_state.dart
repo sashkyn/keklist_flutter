@@ -6,14 +6,14 @@ abstract class AuthState {
 
 class AuthInitial extends AuthState {}
 
-class LoggedIn extends AuthState {}
+class AuthLoggedIn extends AuthState {}
 
-class Logouted extends AuthState {}
+class AuthLogouted extends AuthState {}
 
-class UserDeletedHimself extends AuthState {}
+class AuthUserDeletedHimself extends AuthState {}
 
-class CurrentUserAuthStatus extends AuthState {
+class AuthCurrentStatus extends AuthState {
   final bool isLoggedIn;
 
-  const CurrentUserAuthStatus({required this.isLoggedIn});
+  const AuthCurrentStatus({required this.isLoggedIn});
 }

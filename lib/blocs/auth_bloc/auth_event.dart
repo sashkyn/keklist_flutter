@@ -4,27 +4,27 @@ abstract class AuthEvent {
   const AuthEvent();
 }
 
-class LoginWithEmail extends AuthEvent {
+class AuthLoginWithEmail extends AuthEvent {
   final String email;
 
-  const LoginWithEmail(this.email);
+  const AuthLoginWithEmail(this.email);
 }
 
-class LoginWithSocialNetwork extends AuthEvent {
+class AuthLoginWithSocialNetwork extends AuthEvent {
   final SocialNetwork socialNetwork;
 
-  LoginWithSocialNetwork(this.socialNetwork);
+  AuthLoginWithSocialNetwork(this.socialNetwork);
 }
 
-class Logout extends AuthEvent {}
+class AuthLogout extends AuthEvent {}
 
-class DeleteUser extends AuthEvent {}
+class AuthDeleteUser extends AuthEvent {}
 
-class UserAppearedInSession extends AuthEvent {}
+class AuthUserAppearedInSession extends AuthEvent {}
 
-class UserGoneFromSession extends AuthEvent {}
+class AuthUserGoneFromSession extends AuthEvent {}
 
-class GetAuthStatus extends AuthEvent {}
+class AuthGetStatus extends AuthEvent {}
 
 enum SocialNetwork {
   google,

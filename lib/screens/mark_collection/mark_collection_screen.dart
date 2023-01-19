@@ -1,7 +1,12 @@
+import 'dart:math';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:blur/blur.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mark_collection/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
@@ -13,7 +18,6 @@ import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-// ignore: implementation_imports
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:zenmode/widgets/mark_widget.dart';
 
@@ -24,7 +28,7 @@ class MarkCollectionScreen extends StatefulWidget {
   State<MarkCollectionScreen> createState() => _MarkCollectionScreenState();
 }
 
-class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
+class _MarkCollectionScreenState extends State<MarkCollectionScreen> with TickerProviderStateMixin {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
@@ -37,6 +41,9 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   late int _dayIndexToCreateMark = _getNowDayIndex();
   bool _createMarkBottomBarIsVisible = false;
+
+  bool _isDemoMode = false;
+  late AnimationController _demoScrollingAnimationController;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -82,13 +89,24 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
         }
       });
 
-      context.read<AuthBloc>().stream.listen((state) {
-        if (state is LoggedIn) {
+      context.read<AuthBloc>().stream.listen((state) async {
+        if (state is AuthLoggedIn) {
+          _disableDemoMode();
           _sendToMarkBloc(GetMarksMarkEvent());
-        } else if (state is Logouted) {
+        } else if (state is AuthLogouted) {
+          _enableDemoMode();
           _sendToMarkBloc(ResetStorageMarkEvent());
+        } else if (state is AuthCurrentStatus && !state.isLoggedIn) {
+          _enableDemoMode();
+          await showCupertinoModalBottomSheet(
+            context: context,
+            builder: (context) => const AuthScreen(),
+            isDismissible: false,
+            enableDrag: false,
+          );
         }
       });
+      context.read<AuthBloc>().add(AuthGetStatus());
     });
   }
 
@@ -163,6 +181,68 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   }
 
   Widget _makeBody() {
+    final Widget scrollablePositionedList = ScrollablePositionedList.builder(
+      padding: const EdgeInsets.only(top: 16.0),
+      itemCount: 99999999999,
+      itemScrollController: _itemScrollController,
+      itemPositionsListener: _itemPositionsListener,
+      itemBuilder: (BuildContext context, int groupIndex) {
+        final List<Widget> widgets;
+        if (_isDemoMode) {
+          final random = Random();
+
+          widgets = List.generate(
+            15,
+            (index) {
+              // TODO: можно сделать список Demo эмодзиков из которых можно сделать эмоции.
+              final randomEmoji = Emoji.all()[random.nextInt(Emoji.all().length - 1)].char;
+              return Mark(
+                emoji: randomEmoji,
+                creationDate: 0,
+                note: '',
+                dayIndex: 0,
+                id: const Uuid().v4(),
+                sortIndex: 0,
+              );
+            },
+          ).map((randomMark) => _makeMarkWidget(randomMark)).toList();
+        } else {
+          final List<Mark> marksOfDay = _findMarksByDayIndex(groupIndex);
+          widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+
+          widgets.add(
+            MarkWidget(
+              item: '📝',
+              onTap: () {
+                setState(() {
+                  _createMarkBottomBarIsVisible = true;
+                  _scrollToDayIndex(groupIndex);
+                  _dayIndexToCreateMark = groupIndex;
+                  _createMarkFocusNode.requestFocus();
+                });
+              },
+              isHighlighted: true,
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            Text(
+              _formatter.format(_getDateFromIndex(groupIndex)),
+              style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+            ),
+            // TODO: поменять на non-scrollable grid
+            GridView.count(
+              primary: false,
+              shrinkWrap: true,
+              crossAxisCount: 5,
+              children: widgets,
+            ),
+          ],
+        );
+      },
+    );
     return SafeArea(
       child: Stack(
         children: [
@@ -175,48 +255,14 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
                 });
               }
             },
-            child: ScrollablePositionedList.builder(
-              padding: const EdgeInsets.only(top: 16.0),
-              itemCount: 99999999999,
-              itemScrollController: _itemScrollController,
-              itemPositionsListener: _itemPositionsListener,
-              itemBuilder: (BuildContext context, int groupIndex) {
-                final List<Mark> marksOfDay = _findMarksByDayIndex(groupIndex);
-                final List<Widget> widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
-
-                widgets.add(
-                  MarkWidget(
-                    item: '📝',
-                    onTap: () {
-                      setState(() {
-                        _createMarkBottomBarIsVisible = true;
-                        _scrollToDayIndex(groupIndex);
-                        _dayIndexToCreateMark = groupIndex;
-                        _createMarkFocusNode.requestFocus();
-                      });
-                    },
-                    isHighlighted: true,
-                  ),
-                );
-
-                return Column(
-                  children: [
-                    Text(
-                      _formatter.format(_getDateFromIndex(groupIndex)),
-                      style:
-                          TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
-                    ),
-                    // TODO: поменять на non-scrollable grid
-                    GridView.count(
-                      primary: false,
-                      shrinkWrap: true,
-                      crossAxisCount: 5,
-                      children: widgets,
-                    ),
-                  ],
-                );
-              },
-            ),
+            child: _isDemoMode
+                ? Blur(
+                    blur: 3,
+                    blurColor: Colors.transparent,
+                    colorOpacity: 0.2,
+                    child: scrollablePositionedList,
+                  )
+                : scrollablePositionedList,
           ),
           Visibility(
             visible: _createMarkBottomBarIsVisible,
@@ -370,10 +416,39 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
 
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
-  // TODO: Move to bloc with new action.
-
   int _getNowDayIndex() => _getDayIndex(DateTime.now());
 
   int _getDayIndex(DateTime date) =>
       (date.millisecondsSinceEpoch + date.timeZoneOffset.inMilliseconds) ~/ _millisecondsInDay;
+
+  // NOTE: Demo режим для авторизации
+
+  void _enableDemoMode() {
+    setState(() {
+      _isDemoMode = true;
+    });
+    int initialIndex = _getNowDayIndex();
+    _demoScrollingAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          initialIndex++;
+          _itemScrollController.scrollTo(
+            index: initialIndex,
+            alignment: 0.015,
+            duration: const Duration(milliseconds: 2100),
+          );
+          _demoScrollingAnimationController.forward(from: 0);
+        }
+      });
+    _demoScrollingAnimationController.forward();
+  }
+
+  void _disableDemoMode() {
+    _isDemoMode = false;
+    _demoScrollingAnimationController.stop();
+    _demoScrollingAnimationController.dispose();
+    _jumpToNow();
+  }
 }
