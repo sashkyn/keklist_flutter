@@ -31,7 +31,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  List<Mark> _marks = [];
+  Iterable<Mark> _marks = [];
   SearchingMarkState? _searchingMarkState;
   SuggestionsMarkState? _suggestionsMarkState;
 
@@ -47,7 +47,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> {
   final TextEditingController _searchTextController = TextEditingController(text: null);
 
   bool get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
-  List<Mark> get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
+  Iterable<Mark> get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
 
   @override
   void initState() {

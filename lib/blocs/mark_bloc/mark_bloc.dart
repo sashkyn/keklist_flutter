@@ -19,7 +19,7 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
   late final IStorage _supabaseStorage;
   late final MarkSearcherCubit _searcherCubit;
 
-  final List<Mark> _marks = [];
+  final Set<Mark> _marks = {};
 
   MarkBloc({
     required IStorage storage,
