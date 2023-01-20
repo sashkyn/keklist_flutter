@@ -6,7 +6,7 @@ import 'package:zenmode/services/main_service.dart';
 
 class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;
-  final Set<Mind> _cachedMinds = {};
+  late final Set<Mind> _cachedMinds = {};
 
   @override
   FutureOr<Iterable<Mind>> getMindList() async {
@@ -19,13 +19,13 @@ class MainSupabaseService implements MainService {
     }
 
     final List<dynamic> listOfEntities = await _client.from('minds').select();
-    final List<Mind> listOfMarks = listOfEntities.map((e) => Mind.fromSupabaseJson(e)).toList();
+    final List<Mind> minds = listOfEntities.map((e) => Mind.fromSupabaseJson(e)).toList();
 
     _cachedMinds
       ..clear()
-      ..addAll(listOfMarks);
+      ..addAll(minds);
 
-    return listOfMarks;
+    return minds;
   }
 
   @override
@@ -61,6 +61,10 @@ class MainSupabaseService implements MainService {
 
   @override
   FutureOr<void> deleteAccount() async {
+    // NOTE: защита от дурака.
+    if (_client.auth.currentUser?.email != 'sashkn2@gmail.com') {
+      return Future.error('Trying to delete admin account!');
+    }
     await _client.rpc('deleteUser');
   }
 
