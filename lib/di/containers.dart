@@ -9,9 +9,7 @@ class MainContainer {
       (injector) => MainSupabaseService(),
       isSingleton: true,
     );
-    injector.map<MindSearcherCubit>(
-      (injector) => MindSearcherCubit(mainService: injector.get<MainService>()),
-    );
+    injector.map<MindSearcherCubit>((injector) => MindSearcherCubit(mainService: injector.get<MainService>()));
     return injector;
   }
 }

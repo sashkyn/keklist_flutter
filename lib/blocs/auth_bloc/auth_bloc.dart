@@ -1,14 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:zenmode/services/main_service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final MainService mainService;
   final SupabaseClient _client = Supabase.instance.client;
 
-  AuthBloc() : super(AuthInitial()) {
+  AuthBloc({required this.mainService}) : super(AuthInitial()) {
     _client.auth.onAuthStateChange.listen((event) {
       if (event.session?.user != null) {
         add(AuthUserAppearedInSession());
@@ -37,7 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AuthDeleteAccount>(
       (event, emit) async {
-        await _client.rpc('deleteUser');
+        await mainService.deleteAccount();
         add(AuthLogout());
       },
     );

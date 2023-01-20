@@ -19,7 +19,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   late final MainService _storage;
   late final MindSearcherCubit _searcherCubit;
 
-  final Set<Mind> _marks = {};
+  final Set<Mind> _minds = {};
 
   MindBloc({
     required MainService mainService,
@@ -28,9 +28,9 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     _storage = mainService;
     _searcherCubit = mindSearcherCubit;
 
-    on<MindGetList>(_getMarks);
-    on<MindCreate>(_createMark);
-    on<MindDelete>(_deleteMark);
+    on<MindGetList>(_getMinds);
+    on<MindCreate>(_createMind);
+    on<MindDelete>(_deleteMind);
     on<MindStartSearch>(_startSearch);
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(_enterTextSearch);
@@ -40,39 +40,38 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     );
     on<MindResetStorage>((event, emit) async {
       await _storage.reset();
-      _marks.clear();
+      _minds.clear();
       final state = MindListState(values: []);
       emit(state);
     });
   }
 
-  FutureOr<void> _deleteMark(MindDelete event, emit) async {
+  FutureOr<void> _deleteMind(MindDelete event, emit) async {
     await _storage.removeMind(event.uuid);
-    final item = _marks.firstWhere((item) => item.id == event.uuid);
-    _marks.remove(item);
-    emit.call(MindListState(values: _marks));
+    _minds.removeWhere((item) => item.id == event.uuid);
+    emit.call(MindListState(values: _minds));
   }
 
-  FutureOr<void> _createMark(MindCreate event, emit) async {
+  FutureOr<void> _createMind(MindCreate event, emit) async {
     final mark = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
       emoji: event.emoji,
       creationDate: DateTime.now().millisecondsSinceEpoch,
-      sortIndex: _findMarksByDayIndex(event.dayIndex).length,
+      sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
     await _storage.addMind(mark);
-    _marks.add(mark);
-    final newState = MindListState(values: _marks);
+    _minds.add(mark);
+    final newState = MindListState(values: _minds);
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarks(MindGetList event, emit) async {
-    _marks
+  FutureOr<void> _getMinds(MindGetList event, emit) async {
+    _minds
       ..clear()
       ..addAll(await _storage.getMindList());
-    final state = MindListState(values: _marks);
+    final state = MindListState(values: _minds);
     emit(state);
   }
 
@@ -80,7 +79,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(
       MindSearching(
         enabled: true,
-        values: _marks,
+        values: _minds,
         filteredValues: const [],
       ),
     );
@@ -90,7 +89,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(
       MindSearching(
         enabled: false,
-        values: _marks,
+        values: _minds,
         filteredValues: const [],
       ),
     );
@@ -99,10 +98,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
     final filteredMarks = await _searcherCubit.searchMarkList(event.text);
 
-    emit.call(
+    emit(
       MindSearching(
         enabled: true,
-        values: _marks,
+        values: _minds,
         filteredValues: filteredMarks,
       ),
     );
@@ -110,25 +109,25 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
   List<String> _lastSuggestions = [];
 
-  // TODO: переместить в MarkSearcherCubit;
+  // TODO: переместить в MindSearcherCubit;
   FutureOr<void> _changeTextOfCreatingMark(
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) {
-    final List<String> suggestions = _marks
+    final List<String> suggestions = _minds
         .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
         .map((mark) => mark.emoji)
         .toList()
         .distinct()
-        .sorted((mark1, mark2) => _marks
-            .where((element) => element.emoji == mark2)
+        .sorted((mind1, mind2) => _minds
+            .where((element) => element.emoji == mind2)
             .length
-            .compareTo(_marks.where((element) => element.emoji == mark1).length)) // NOTE: Сортировка очень дорогая
+            .compareTo(_minds.where((e) => e.emoji == mind1).length)) // NOTE: Сортировка очень дорогая
         .take(9)
         .toList();
 
     if (suggestions.isEmpty) {
-      if (_marks.isEmpty) {
+      if (_minds.isEmpty) {
         _lastSuggestions = emojies_pub.Emoji.all().take(9).map((emoji) => emoji.char).toList();
       }
     } else {
@@ -137,7 +136,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(MindSuggestions(suggestionMarks: _lastSuggestions));
   }
 
-  List<Mind> _findMarksByDayIndex(int index) => _marks
+  List<Mind> _findMindsByDayIndex(int index) => _minds
       .where((item) => index == item.dayIndex)
       .mySortedBy(
         (it) => it.sortIndex,
@@ -145,9 +144,9 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       .toList();
 }
 
-// MARK: Sorted by.
+// NOTE: Sorted by.
 
-extension MyIterable<E> on Iterable<E> {
+extension ListIterable<E> on Iterable<E> {
   Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()
     ..sort(
       (a, b) => key(a).compareTo(key(b)),
