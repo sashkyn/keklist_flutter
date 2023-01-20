@@ -12,15 +12,15 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  final MainService storage;
+  final MainService mainService;
 
-  SettingsBloc({required this.storage}) : super(const SettingsState()) {
+  SettingsBloc({required this.mainService}) : super(const SettingsState()) {
     on<ExportMarksToCSVSettingsEvent>(_shareCSVFileWithMarks);
   }
 
   FutureOr<void> _shareCSVFileWithMarks(event, emit) async {
     // Получение minds.
-    final marks = await storage.getMindList();
+    final marks = await mainService.getMindList();
     // Конвертация в CSV и шаринг.
     final List<List<String>> csvEntryList = marks.map((entry) => entry.toCSVEntry()).toList(growable: false);
     final String csv = const ListToCsvConverter().convert(csvEntryList);

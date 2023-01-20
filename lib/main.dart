@@ -17,7 +17,6 @@ import 'screens/mark_collection/mark_collection_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // final FirebaseApp app = await Firebase.initializeApp();
 
   // Инициализация настроек Supabase.
   await Supabase.initialize(
@@ -47,9 +46,9 @@ Future<void> main() async {
         ),
       ),
       BlocProvider(create: (context) => mainContainer.get<MindSearcherCubit>()),
-      BlocProvider(create: (context) => AuthBloc()),
+      BlocProvider(create: (context) => AuthBloc(mainService: mainContainer.get<MainService>())),
       BlocProvider(
-        create: (context) => SettingsBloc(storage: mainContainer.get<MainService>()),
+        create: (context) => SettingsBloc(mainService: mainContainer.get<MainService>()),
       ),
     ],
     child: const ZenmodeApp(),
