@@ -10,7 +10,7 @@ class CreateMindBar extends StatelessWidget {
   final String selectedEmoji;
   final VoidCallback onSearchEmoji;
   final ArgumentCallback<String> onSelectSuggestionEmoji;
-  final ArgumentCallback<CreateMarkData> onKek;
+  final ArgumentCallback<CreateMindData> onKek;
 
   const CreateMindBar({
     Key? key,
@@ -74,7 +74,7 @@ class CreateMindBar extends StatelessWidget {
                           foregroundColor: MaterialStateProperty.all(Colors.blue),
                         ),
                         onPressed: () {
-                          final data = CreateMarkData(
+                          final data = CreateMindData(
                             text: textEditingController.text,
                             emoji: selectedEmoji,
                           );
