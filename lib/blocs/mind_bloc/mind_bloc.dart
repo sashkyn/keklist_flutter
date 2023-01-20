@@ -12,49 +12,49 @@ import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
-part 'mark_event.dart';
-part 'mark_state.dart';
+part 'mind_event.dart';
+part 'mind_state.dart';
 
-class MarkBloc extends Bloc<MarkEvent, MarkState> {
+class MindBloc extends Bloc<MindEvent, MindState> {
   late final IStorage _supabaseStorage;
   late final MarkSearcherCubit _searcherCubit;
 
-  final Set<Mark> _marks = {};
+  final Set<Mind> _marks = {};
 
-  MarkBloc({
+  MindBloc({
     required IStorage storage,
     required MarkSearcherCubit searcherCubit,
-  }) : super(ListMarkState(values: const [])) {
+  }) : super(MindListState(values: const [])) {
     _supabaseStorage = storage;
     _searcherCubit = searcherCubit;
 
-    on<GetMarksMarkEvent>(_getMarks);
-    on<CreateMarkEvent>(_createMark);
-    on<DeleteMarkEvent>(_deleteMark);
-    on<StartSearchMarkEvent>(_startSearch);
-    on<StopSearchMarkEvent>(_stopSearch);
-    on<EnterTextSearchMarkEvent>(_enterTextSearch);
-    on<ChangeTextOfCreatingMarkEvent>(
+    on<MindGetMinds>(_getMarks);
+    on<MindCreate>(_createMark);
+    on<MindDelete>(_deleteMark);
+    on<MindStartSearch>(_startSearch);
+    on<MindStopSearch>(_stopSearch);
+    on<MindEnterSearchText>(_enterTextSearch);
+    on<MindChangeCreateText>(
       _changeTextOfCreatingMark,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
-    on<ResetStorageMarkEvent>((event, emit) async {
+    on<MindResetStorage>((event, emit) async {
       await _supabaseStorage.reset();
       _marks.clear();
-      final state = ListMarkState(values: []);
-      emit(state);  
+      final state = MindListState(values: []);
+      emit(state);
     });
   }
 
-  FutureOr<void> _deleteMark(DeleteMarkEvent event, emit) async {
+  FutureOr<void> _deleteMark(MindDelete event, emit) async {
     await _supabaseStorage.removeMark(event.uuid);
     final item = _marks.firstWhere((item) => item.id == event.uuid);
     _marks.remove(item);
-    emit.call(ListMarkState(values: _marks));
+    emit.call(MindListState(values: _marks));
   }
 
-  FutureOr<void> _createMark(CreateMarkEvent event, emit) async {
-    final mark = Mark(
+  FutureOr<void> _createMark(MindCreate event, emit) async {
+    final mark = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
@@ -64,21 +64,21 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
     await _supabaseStorage.addMark(mark);
     _marks.add(mark);
-    final newState = ListMarkState(values: _marks);
+    final newState = MindListState(values: _marks);
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarks(GetMarksMarkEvent event, emit) async {
+  FutureOr<void> _getMarks(MindGetMinds event, emit) async {
     _marks
       ..clear()
       ..addAll(await _supabaseStorage.getMarks());
-    final state = ListMarkState(values: _marks);
+    final state = MindListState(values: _marks);
     emit(state);
   }
 
-  FutureOr<void> _startSearch(StartSearchMarkEvent event, emit) async {
+  FutureOr<void> _startSearch(MindStartSearch event, emit) async {
     emit.call(
-      SearchingMarkState(
+      MindSearching(
         enabled: true,
         values: _marks,
         filteredValues: const [],
@@ -86,9 +86,9 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
-  FutureOr<void> _stopSearch(StopSearchMarkEvent event, emit) async {
+  FutureOr<void> _stopSearch(MindStopSearch event, emit) async {
     emit.call(
-      SearchingMarkState(
+      MindSearching(
         enabled: false,
         values: _marks,
         filteredValues: const [],
@@ -96,11 +96,11 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     );
   }
 
-  FutureOr<void> _enterTextSearch(EnterTextSearchMarkEvent event, Emitter<MarkState> emit) async {
+  FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
     final filteredMarks = await _searcherCubit.searchMarkList(event.text);
 
     emit.call(
-      SearchingMarkState(
+      MindSearching(
         enabled: true,
         values: _marks,
         filteredValues: filteredMarks,
@@ -112,8 +112,8 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
 
   // TODO: переместить в MarkSearcherCubit;
   FutureOr<void> _changeTextOfCreatingMark(
-    ChangeTextOfCreatingMarkEvent event,
-    Emitter<MarkState> emit,
+    MindChangeCreateText event,
+    Emitter<MindState> emit,
   ) {
     final List<String> suggestions = _marks
         .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
@@ -134,10 +134,10 @@ class MarkBloc extends Bloc<MarkEvent, MarkState> {
     } else {
       _lastSuggestions = suggestions;
     }
-    emit.call(SuggestionsMarkState(suggestionMarks: _lastSuggestions));
+    emit.call(MindSuggestions(suggestionMarks: _lastSuggestions));
   }
 
-  List<Mark> _findMarksByDayIndex(int index) => _marks
+  List<Mind> _findMarksByDayIndex(int index) => _marks
       .where((item) => index == item.dayIndex)
       .mySortedBy(
         (it) => it.sortIndex,

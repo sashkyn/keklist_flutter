@@ -17,9 +17,9 @@ class MarkSearcherCubit extends Cubit<MarkSearcherState> {
 
   final _emojiParser = EmojiParser();
 
-  Future<List<Mark>> searchMarkList(String text) async {
+  Future<List<Mind>> searchMarkList(String text) async {
     final lowerCasedTrimmedText = text.toLowerCase().trim();
-    
+
     final marks = await _storage.getMarks();
     final filteredMarks = marks.where((mark) {
       // Note condition.

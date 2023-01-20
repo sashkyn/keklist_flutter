@@ -3,19 +3,19 @@ import 'package:zenmode/typealiases.dart';
 import 'package:zenmode/widgets/mark_widget.dart';
 import 'package:flutter/material.dart';
 
-class CreateMarkBar extends StatelessWidget {
+class CreateMindBar extends StatelessWidget {
   final TextEditingController textEditingController;
-  final List<String> suggestionMarks;
+  final List<String> suggestionMinds;
   final FocusNode focusNode;
   final String selectedEmoji;
   final VoidCallback onSearchEmoji;
   final ArgumentCallback<String> onSelectSuggestionEmoji;
   final ArgumentCallback<CreateMarkData> onKek;
 
-  const CreateMarkBar({
+  const CreateMindBar({
     Key? key,
     required this.textEditingController,
-    required this.suggestionMarks,
+    required this.suggestionMinds,
     required this.onKek,
     required this.focusNode,
     required this.selectedEmoji,
@@ -33,13 +33,13 @@ class CreateMarkBar extends StatelessWidget {
           children: [
             const Divider(color: Colors.grey),
             Row(
-              children: List.generate(suggestionMarks.length, (index) {
+              children: List.generate(suggestionMinds.length, (index) {
                 return Flexible(
                   flex: 1,
-                  child: MarkWidget.sized(
-                    item: suggestionMarks[index],
-                    markSize: MarkSize.small,
-                    onTap: () => onSelectSuggestionEmoji(suggestionMarks[index]),
+                  child: MindWidget.sized(
+                    item: suggestionMinds[index],
+                    markSize: MindSize.small,
+                    onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
                   ),
                 );
               }),
@@ -48,9 +48,9 @@ class CreateMarkBar extends StatelessWidget {
             Row(
               children: [
                 const SizedBox(width: 8.0),
-                MarkWidget.sized(
+                MindWidget.sized(
                   item: selectedEmoji,
-                  markSize: MarkSize.medium,
+                  markSize: MindSize.medium,
                   onTap: onSearchEmoji,
                 ),
                 const SizedBox(width: 8.0),
