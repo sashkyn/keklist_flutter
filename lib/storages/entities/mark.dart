@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Mark extends Equatable {
+class Mind extends Equatable {
   final String id;
   final String emoji;
   final String note;
@@ -8,7 +8,7 @@ class Mark extends Equatable {
   final int creationDate;
   final int sortIndex;
 
-  const Mark({
+  const Mind({
     required this.id,
     required this.note,
     required this.emoji,
@@ -20,7 +20,7 @@ class Mark extends Equatable {
   @override
   List<Object?> get props => [id];
 
-  Mark.fromSupabaseJson(Map<String, dynamic> json)
+  Mind.fromSupabaseJson(Map<String, dynamic> json)
       : id = json['uuid'] ?? 0,
         emoji = json['emoji'],
         dayIndex = json['day_index'],

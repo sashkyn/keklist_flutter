@@ -5,7 +5,7 @@ import 'package:blur/blur.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
-import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mark_collection/search_bar.dart';
@@ -21,26 +21,26 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:zenmode/widgets/mark_widget.dart';
 
-class MarkCollectionScreen extends StatefulWidget {
-  const MarkCollectionScreen({Key? key}) : super(key: key);
+class MindCollectionScreen extends StatefulWidget {
+  const MindCollectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<MarkCollectionScreen> createState() => _MarkCollectionScreenState();
+  State<MindCollectionScreen> createState() => _MindCollectionScreenState();
 }
 
-class _MarkCollectionScreenState extends State<MarkCollectionScreen> with TickerProviderStateMixin {
+class _MindCollectionScreenState extends State<MindCollectionScreen> with TickerProviderStateMixin {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
-  Iterable<Mark> _marks = [];
-  SearchingMarkState? _searchingMarkState;
-  SuggestionsMarkState? _suggestionsMarkState;
+  Iterable<Mind> _minds = [];
+  MindSearching? _searchingMindState;
+  MindSuggestions? _suggestionsMarkState;
 
   late int _dayIndexToCreateMark = _getNowDayIndex();
-  bool _createMarkBottomBarIsVisible = false;
+  bool _createMindBottomBarIsVisible = false;
 
   bool _isDemoMode = false;
   late AnimationController _demoScrollingAnimationController;
@@ -53,8 +53,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
 
-  bool get _isSearching => _searchingMarkState != null && _searchingMarkState!.enabled;
-  Iterable<Mark> get _searchedValues => _isSearching ? _searchingMarkState!.filteredValues : [];
+  bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
+  Iterable<Mind> get _searchedMinds => _isSearching ? _searchingMindState!.filteredValues : [];
 
   @override
   void initState() {
@@ -63,26 +63,26 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToMarkBloc(GetMarksMarkEvent());
+      _sendToMarkBloc(MindGetMinds());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
-        _sendToMarkBloc(EnterTextSearchMarkEvent(text: _searchTextController.text));
+        _sendToMarkBloc(MindEnterSearchText(text: _searchTextController.text));
       });
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        _sendToMarkBloc(ChangeTextOfCreatingMarkEvent(text: _createMarkEditingController.text));
+        _sendToMarkBloc(MindChangeCreateText(text: _createMarkEditingController.text));
       });
 
-      context.read<MarkBloc>().stream.listen((state) {
-        if (state is ListMarkState) {
-          setState(() => _marks = state.values);
-        } else if (state is ErrorMarkState) {
+      context.read<MindBloc>().stream.listen((state) {
+        if (state is MindListState) {
+          setState(() => _minds = state.values);
+        } else if (state is MindError) {
           _showError(text: state.text);
-        } else if (state is SearchingMarkState) {
-          setState(() => _searchingMarkState = state);
-        } else if (state is SuggestionsMarkState) {
+        } else if (state is MindSearching) {
+          setState(() => _searchingMindState = state);
+        } else if (state is MindSuggestions) {
           setState(() {
             _suggestionsMarkState = state;
           });
@@ -92,10 +92,10 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
       context.read<AuthBloc>().stream.listen((state) async {
         if (state is AuthLoggedIn) {
           _disableDemoMode();
-          _sendToMarkBloc(GetMarksMarkEvent());
+          _sendToMarkBloc(MindGetMinds());
         } else if (state is AuthLogouted) {
           _enableDemoMode();
-          _sendToMarkBloc(ResetStorageMarkEvent());
+          _sendToMarkBloc(MindResetStorage());
         } else if (state is AuthCurrentStatus && !state.isLoggedIn) {
           _enableDemoMode();
           await showCupertinoModalBottomSheet(
@@ -113,14 +113,22 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        actions: _makeAppBarActions(),
-        title: _makeAppBarTitle(),
-        backgroundColor: Colors.white,
-      ),
+      appBar: _makeAppBar(),
       body: _makeBody(),
+    );
+  }
+
+  AppBar? _makeAppBar() {
+    if (_isDemoMode) {
+      return null;
+    }
+
+    return AppBar(
+      centerTitle: true,
+      automaticallyImplyLeading: true,
+      actions: _makeAppBarActions(),
+      title: _makeAppBarTitle(),
+      backgroundColor: Colors.white,
     );
   }
 
@@ -137,7 +145,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
         },
         onCancel: () {
           _searchTextController.clear();
-          _sendToMarkBloc(StopSearchMarkEvent());
+          _sendToMarkBloc(MindStopSearch());
         },
       );
     } else {
@@ -162,8 +170,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
         color: Colors.black,
         onPressed: () {
           setState(() {
-            _createMarkBottomBarIsVisible = false;
-            _sendToMarkBloc(StartSearchMarkEvent());
+            _createMindBottomBarIsVisible = false;
+            _sendToMarkBloc(MindStartSearch());
           });
         },
       ),
@@ -187,35 +195,37 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
       itemScrollController: _itemScrollController,
       itemPositionsListener: _itemPositionsListener,
       itemBuilder: (BuildContext context, int groupIndex) {
-        final List<Widget> widgets;
+        final List<Widget> mindWidgets = [];
         if (_isDemoMode) {
           final random = Random();
 
-          widgets = List.generate(
-            15,
-            (index) {
-              // TODO: можно сделать список Demo эмодзиков из которых можно сделать эмоции.
-              final randomEmoji = Emoji.all()[random.nextInt(Emoji.all().length - 1)].char;
-              return Mark(
-                emoji: randomEmoji,
-                creationDate: 0,
-                note: '',
-                dayIndex: 0,
-                id: const Uuid().v4(),
-                sortIndex: 0,
-              );
-            },
-          ).map((randomMark) => _makeMarkWidget(randomMark)).toList();
+          mindWidgets.addAll(
+            List.generate(
+              15,
+              (index) {
+                final randomEmoji = Emoji.all()[random.nextInt(Emoji.all().length - 1)].char;
+                return Mind(
+                  emoji: randomEmoji,
+                  creationDate: 0,
+                  note: '',
+                  dayIndex: 0,
+                  id: const Uuid().v4(),
+                  sortIndex: 0,
+                );
+              },
+            ).map((randomMark) => _makeMarkWidget(randomMark)).toList(),
+          );
         } else {
-          final List<Mark> marksOfDay = _findMarksByDayIndex(groupIndex);
-          widgets = marksOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+          final List<Mind> mindsOfDay = _findMarksByDayIndex(groupIndex);
+          final List<Widget> realMindWidgets = mindsOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+          mindWidgets.addAll(realMindWidgets);
 
-          widgets.add(
-            MarkWidget(
+          mindWidgets.add(
+            MindWidget(
               item: '📝',
               onTap: () {
                 setState(() {
-                  _createMarkBottomBarIsVisible = true;
+                  _createMindBottomBarIsVisible = true;
                   _scrollToDayIndex(groupIndex);
                   _dayIndexToCreateMark = groupIndex;
                   _createMarkFocusNode.requestFocus();
@@ -227,6 +237,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
         }
 
         return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               _formatter.format(_getDateFromIndex(groupIndex)),
@@ -237,85 +248,83 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
               primary: false,
               shrinkWrap: true,
               crossAxisCount: 5,
-              children: widgets,
+              children: mindWidgets,
             ),
           ],
         );
       },
     );
-    return SafeArea(
-      child: Stack(
-        children: [
-          GestureDetector(
-            onPanDown: (details) {
-              if (_createMarkFocusNode.hasFocus) {
-                setState(() {
-                  _createMarkBottomBarIsVisible = false;
-                  _hideKeyboard();
-                });
-              }
-            },
-            child: _isDemoMode
-                ? Blur(
-                    blur: 3,
-                    blurColor: Colors.transparent,
-                    colorOpacity: 0.2,
-                    child: scrollablePositionedList,
-                  )
-                : scrollablePositionedList,
-          ),
-          Visibility(
-            visible: _createMarkBottomBarIsVisible,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: CreateMarkBar(
-                    focusNode: _createMarkFocusNode,
-                    textEditingController: _createMarkEditingController,
-                    onKek: (CreateMarkData data) {
-                      setState(() {
-                        _suggestionsMarkState = null;
-                        _createMarkEditingController.text = '';
-                      });
-                      _sendToMarkBloc(
-                        CreateMarkEvent(
-                          dayIndex: _dayIndexToCreateMark,
-                          note: data.text,
-                          emoji: data.emoji,
-                        ),
-                      );
-                      _hideKeyboard();
-                      _createMarkBottomBarIsVisible = false;
-                    },
-                    suggestionMarks: _suggestionsMarkState?.suggestionMarks ?? [],
-                    selectedEmoji: _selectedEmoji,
-                    onSelectSuggestionEmoji: (String suggestionEmoji) {
-                      setState(() => _selectedEmoji = suggestionEmoji);
-                    },
-                    onSearchEmoji: () {
-                      _showMarkPickerScreen(
-                        onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
-                      );
-                    },
-                  ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onPanDown: (details) {
+            if (_createMarkFocusNode.hasFocus) {
+              setState(() {
+                _createMindBottomBarIsVisible = false;
+                _hideKeyboard();
+              });
+            }
+          },
+          child: _isDemoMode
+              ? Blur(
+                  blur: 3,
+                  blurColor: Colors.transparent,
+                  colorOpacity: 0.2,
+                  child: scrollablePositionedList,
+                )
+              : scrollablePositionedList,
+        ),
+        Visibility(
+          visible: _createMindBottomBarIsVisible,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: CreateMindBar(
+                  focusNode: _createMarkFocusNode,
+                  textEditingController: _createMarkEditingController,
+                  onKek: (CreateMarkData data) {
+                    setState(() {
+                      _suggestionsMarkState = null;
+                      _createMarkEditingController.text = '';
+                    });
+                    _sendToMarkBloc(
+                      MindCreate(
+                        dayIndex: _dayIndexToCreateMark,
+                        note: data.text,
+                        emoji: data.emoji,
+                      ),
+                    );
+                    _hideKeyboard();
+                    _createMindBottomBarIsVisible = false;
+                  },
+                  suggestionMinds: _suggestionsMarkState?.suggestionMarks ?? [],
+                  selectedEmoji: _selectedEmoji,
+                  onSelectSuggestionEmoji: (String suggestionEmoji) {
+                    setState(() => _selectedEmoji = suggestionEmoji);
+                  },
+                  onSearchEmoji: () {
+                    _showMarkPickerScreen(
+                      onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _makeMarkWidget(Mark mark) {
+  Widget _makeMarkWidget(Mind mark) {
     final bool isHighlighted;
     if (_isSearching) {
-      isHighlighted = _searchedValues.map((value) => value.id).contains(mark.id);
+      isHighlighted = _searchedMinds.map((value) => value.id).contains(mark.id);
     } else {
       isHighlighted = true;
     }
-    return MarkWidget(
+    return MindWidget(
       item: mark.emoji,
       onTap: () => showOkAlertDialog(
         title: mark.emoji,
@@ -327,7 +336,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
     );
   }
 
-  _showMarkOptionsActionSheet(Mark item) async {
+  _showMarkOptionsActionSheet(Mind item) async {
     final result = await showModalActionSheet(
       context: context,
       actions: [
@@ -345,7 +354,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
       ],
     );
     if (result == 'remove_key') {
-      _sendToMarkBloc(DeleteMarkEvent(uuid: item.id));
+      _sendToMarkBloc(MindDelete(uuid: item.id));
     } else if (result == 'copy_to_now_key') {
       await _copyToNow(item);
     }
@@ -358,7 +367,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
     );
   }
 
-  _copyToNow(Mark item) async {
+  _copyToNow(Mind item) async {
     final note = await showTextInputDialog(
       context: context,
       message: item.emoji,
@@ -371,7 +380,7 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
     );
     if (note != null) {
       _sendToMarkBloc(
-        CreateMarkEvent(
+        MindCreate(
           dayIndex: _getNowDayIndex(),
           note: note.first,
           emoji: item.emoji,
@@ -382,8 +391,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
 
   DateTime _getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
 
-  List<Mark> _findMarksByDayIndex(int index) =>
-      _marks.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
+  List<Mind> _findMarksByDayIndex(int index) =>
+      _minds.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(
@@ -404,8 +413,8 @@ class _MarkCollectionScreenState extends State<MarkCollectionScreen> with Ticker
     );
   }
 
-  void _sendToMarkBloc(MarkEvent event) {
-    context.read<MarkBloc>().add(event);
+  void _sendToMarkBloc(MindEvent event) {
+    context.read<MindBloc>().add(event);
   }
 
   void _showError({required String text}) {

@@ -47,7 +47,7 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          MarkWidget(
+          MindWidget(
             item: _emoji,
             isHighlighted: true,
             onTap: () {

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 
-enum MarkSize {
+enum MindSize {
   small,
   medium,
   large,
 }
 
-class MarkWidget extends StatelessWidget {
+class MindWidget extends StatelessWidget {
   final String item;
   final bool isHighlighted;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final double fontSize;
 
-  const MarkWidget({
+  const MindWidget({
     Key? key,
     required this.item,
     this.isHighlighted = true,
@@ -23,32 +23,32 @@ class MarkWidget extends StatelessWidget {
     this.fontSize = 50,
   }) : super(key: key);
 
-  factory MarkWidget.sized({
+  factory MindWidget.sized({
     required String item,
-    required MarkSize markSize,
+    required MindSize markSize,
     bool isHighlighted = true,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
   }) {
     switch (markSize) {
-      case MarkSize.small:
-        return MarkWidget(
+      case MindSize.small:
+        return MindWidget(
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
           onLongPress: onLongPress,
           fontSize: 32,
         );
-      case MarkSize.medium:
-        return MarkWidget(
+      case MindSize.medium:
+        return MindWidget(
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
           onLongPress: onLongPress,
           fontSize: 40,
         );
-      case MarkSize.large:
-        return MarkWidget(
+      case MindSize.large:
+        return MindWidget(
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
