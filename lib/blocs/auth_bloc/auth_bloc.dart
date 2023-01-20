@@ -35,7 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           break;
       }
     });
-    on<AuthDeleteUser>(
+    on<AuthDeleteAccount>(
       (event, emit) async {
         await _client.rpc('deleteUser');
         add(AuthLogout());

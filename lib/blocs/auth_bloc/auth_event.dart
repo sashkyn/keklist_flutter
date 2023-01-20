@@ -18,7 +18,7 @@ class AuthLoginWithSocialNetwork extends AuthEvent {
 
 class AuthLogout extends AuthEvent {}
 
-class AuthDeleteUser extends AuthEvent {}
+class AuthDeleteAccount extends AuthEvent {}
 
 class AuthUserAppearedInSession extends AuthEvent {}
 
