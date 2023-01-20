@@ -13,7 +13,7 @@ import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/di/containers.dart';
 import 'package:zenmode/services/main_service.dart';
 
-import 'screens/mark_collection/mark_collection_screen.dart';
+import 'screens/mind_collection/mind_collection_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

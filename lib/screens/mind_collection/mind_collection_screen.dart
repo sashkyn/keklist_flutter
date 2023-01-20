@@ -7,8 +7,8 @@ import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
-import 'package:zenmode/screens/mark_collection/create_mark_bar.dart';
-import 'package:zenmode/screens/mark_collection/search_bar.dart';
+import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
+import 'package:zenmode/screens/mind_collection/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
 import 'package:zenmode/screens/settings/settings_screen.dart';
@@ -435,23 +435,24 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
   void _enableDemoMode() {
     setState(() {
       _isDemoMode = true;
+      _jumpToNow();
+      int initialIndex = _getNowDayIndex();
+      _demoScrollingAnimationController = AnimationController(
+        duration: const Duration(milliseconds: 4000),
+        vsync: this,
+      )..addStatusListener((status) {
+          if (status == AnimationStatus.completed) {
+            initialIndex++;
+            _itemScrollController.scrollTo(
+              index: initialIndex,
+              alignment: 0.015,
+              duration: const Duration(milliseconds: 4100),
+            );
+            _demoScrollingAnimationController.forward(from: 0);
+          }
+        });
+      _demoScrollingAnimationController.forward();
     });
-    int initialIndex = _getNowDayIndex();
-    _demoScrollingAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          initialIndex++;
-          _itemScrollController.scrollTo(
-            index: initialIndex,
-            alignment: 0.015,
-            duration: const Duration(milliseconds: 2100),
-          );
-          _demoScrollingAnimationController.forward(from: 0);
-        }
-      });
-    _demoScrollingAnimationController.forward();
   }
 
   void _disableDemoMode() {
