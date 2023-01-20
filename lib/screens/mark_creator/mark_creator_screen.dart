@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MarkCreatorScreen extends StatefulWidget {
-  final ArgumentCallback<CreateMarkData> onCreate;
+  final ArgumentCallback<CreateMindData> onCreate;
 
   const MarkCreatorScreen({
     Key? key,
@@ -77,7 +77,7 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.of(context).pop();
-          final CreateMarkData data = CreateMarkData(
+          final CreateMindData data = CreateMindData(
             emoji: _emoji,
             text: _text,
           );
@@ -95,11 +95,11 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
   }
 }
 
-class CreateMarkData {
+class CreateMindData {
   final String text;
   final String emoji;
 
-  const CreateMarkData({
+  const CreateMindData({
     required this.text,
     required this.emoji,
   });
