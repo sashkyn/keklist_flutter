@@ -8,6 +8,7 @@ import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
+import 'package:zenmode/screens/mind_collection/my_table.dart';
 import 'package:zenmode/screens/mind_collection/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
@@ -213,11 +214,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
                   sortIndex: 0,
                 );
               },
-            ).map((randomMark) => _makeMarkWidget(randomMark)).toList(),
+            ).map((randomMark) => _makeMindWidget(randomMark)).toList(),
           );
         } else {
           final List<Mind> mindsOfDay = _findMarksByDayIndex(groupIndex);
-          final List<Widget> realMindWidgets = mindsOfDay.map((mark) => _makeMarkWidget(mark)).toList();
+          final List<Widget> realMindWidgets = mindsOfDay.map((mark) => _makeMindWidget(mark)).toList();
           mindWidgets.addAll(realMindWidgets);
 
           mindWidgets.add(
@@ -236,20 +237,17 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
           );
         }
 
+        const int countOfWidgetsInRow = 5;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              _formatter.format(_getDateFromIndex(groupIndex)),
-              style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
-            ),
-            // TODO: поменять на non-scrollable grid
-            GridView.count(
-              primary: false,
-              shrinkWrap: true,
-              crossAxisCount: 5,
-              children: mindWidgets,
-            ),
+            const SizedBox(height: 18.0),
+            _makeMindsTitleWidget(groupIndex),
+            const SizedBox(height: 10.0),
+            MyTable(
+              widgets: mindWidgets,
+              countOfWidgetsInRow: countOfWidgetsInRow,
+            )
           ],
         );
       },
@@ -317,21 +315,28 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
     );
   }
 
-  Widget _makeMarkWidget(Mind mark) {
+  Text _makeMindsTitleWidget(int groupIndex) {
+    return Text(
+      _formatter.format(_getDateFromIndex(groupIndex)),
+      style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+    );
+  }
+
+  Widget _makeMindWidget(Mind mind) {
     final bool isHighlighted;
     if (_isSearching) {
-      isHighlighted = _searchedMinds.map((value) => value.id).contains(mark.id);
+      isHighlighted = _searchedMinds.map((value) => value.id).contains(mind.id);
     } else {
       isHighlighted = true;
     }
     return MindWidget(
-      item: mark.emoji,
+      item: mind.emoji,
       onTap: () => showOkAlertDialog(
-        title: mark.emoji,
-        message: mark.note,
+        title: mind.emoji,
+        message: mind.note,
         context: context,
       ),
-      onLongPress: () async => await _showMarkOptionsActionSheet(mark),
+      onLongPress: () async => await _showMarkOptionsActionSheet(mind),
       isHighlighted: isHighlighted,
     );
   }
