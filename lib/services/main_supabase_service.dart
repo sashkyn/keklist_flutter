@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:zenmode/storages/entities/mark.dart';
-import 'package:zenmode/storages/storage.dart';
+import 'package:zenmode/services/entities/mind.dart';
+import 'package:zenmode/services/main_service.dart';
 
-class SupabaseStorage implements IStorage {
+class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;
-  final Set<Mind> _marks = {};
+  final Set<Mind> _cachedMinds = {};
 
   @override
-  FutureOr<Iterable<Mind>> getMarks() async {
-    if (_marks.isNotEmpty) {
-      return _marks;
+  FutureOr<Iterable<Mind>> getMindList() async {
+    if (_cachedMinds.isNotEmpty) {
+      return _cachedMinds;
     }
 
     if (_client.auth.currentUser == null) {
@@ -21,7 +21,7 @@ class SupabaseStorage implements IStorage {
     final List<dynamic> listOfEntities = await _client.from('minds').select();
     final List<Mind> listOfMarks = listOfEntities.map((e) => Mind.fromSupabaseJson(e)).toList();
 
-    _marks
+    _cachedMinds
       ..clear()
       ..addAll(listOfMarks);
 
@@ -29,7 +29,7 @@ class SupabaseStorage implements IStorage {
   }
 
   @override
-  FutureOr<void> addMark(Mind mark) async {
+  FutureOr<void> addMind(Mind mark) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -38,30 +38,35 @@ class SupabaseStorage implements IStorage {
           mark.toSupabaseJson(userId: _client.auth.currentUser!.id),
         );
 
-    _marks.add(mark);
+    _cachedMinds.add(mark);
   }
 
   @override
-  FutureOr<void> removeMark(String id) async {
+  FutureOr<void> removeMind(String id) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
 
     await _client.from('minds').delete().eq('uuid', id);
 
-    _marks.removeWhere((element) => element.id == id);
+    _cachedMinds.removeWhere((element) => element.id == id);
   }
 
   @override
   FutureOr<void> addAll({required List<Mind> list}) async {
     await Future.forEach(list, (Mind element) async {
-      await addMark(element);
+      await addMind(element);
     });
+  }
+
+  @override
+  FutureOr<void> deleteAccount() async {
+    await _client.rpc('deleteUser');
   }
 
   @override
   FutureOr<void> reset() {
     // Очищаем закешированные данные.
-    _marks.clear();
+    _cachedMinds.clear();
   }
 }

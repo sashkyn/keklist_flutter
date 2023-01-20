@@ -1,12 +1,17 @@
 import 'package:flutter_simple_dependency_injection/injector.dart';
-import 'package:zenmode/cubits/mark_searcher/mark_searcher_cubit.dart';
-import 'package:zenmode/storages/storage.dart';
-import 'package:zenmode/storages/supabase_storage.dart';
+import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:zenmode/services/main_service.dart';
+import 'package:zenmode/services/main_supabase_service.dart';
 
 class MainContainer {
-  Injector initialise(Injector injector) {
-    injector.map<IStorage>((injector) => SupabaseStorage(), isSingleton: true);
-    injector.map<MarkSearcherCubit>((injector) => MarkSearcherCubit(storage: injector.get<IStorage>()));
+  Injector initialize(Injector injector) {
+    injector.map<MainService>(
+      (injector) => MainSupabaseService(),
+      isSingleton: true,
+    );
+    injector.map<MindSearcherCubit>(
+      (injector) => MindSearcherCubit(mainService: injector.get<MainService>()),
+    );
     return injector;
   }
 }
