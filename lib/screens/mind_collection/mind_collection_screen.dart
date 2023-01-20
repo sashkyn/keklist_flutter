@@ -125,9 +125,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
   }
 
   AppBar? _makeAppBar() {
-    // if (_isDemoMode) {
-    //   return null;
-    // }
+    if (_isDemoMode) {
+      return null;
+    }
 
     return AppBar(
       centerTitle: true,
@@ -251,7 +251,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
             const SizedBox(height: 10.0),
             MyTable(
               widgets: mindWidgets,
-              countOfWidgetsInRow: countOfWidgetsInRow,
+              widgetsInRowCount: countOfWidgetsInRow,
             )
           ],
         );
