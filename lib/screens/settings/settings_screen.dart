@@ -115,7 +115,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         );
                         switch (result) {
                           case OkCancelResult.ok:
-                            mountedContext?.read<AuthBloc>().add(AuthDeleteUser());
+                            mountedContext?.read<AuthBloc>().add(AuthDeleteAccount());
                             break;
                           case OkCancelResult.cancel:
                             break;

@@ -6,7 +6,7 @@ abstract class MindEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class MindGetMinds extends MindEvent {}
+class MindGetList extends MindEvent {}
 
 class MindCreate extends MindEvent {
   final int dayIndex;

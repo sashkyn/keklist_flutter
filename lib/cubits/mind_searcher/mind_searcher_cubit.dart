@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:zenmode/storages/entities/mark.dart';
-import 'package:zenmode/storages/storage.dart';
+import 'package:zenmode/services/entities/mind.dart';
+import 'package:zenmode/services/main_service.dart';
 
-part 'mark_searcher_state.dart';
+part 'mind_searcher_state.dart';
 
-class MarkSearcherCubit extends Cubit<MarkSearcherState> {
-  late final IStorage _storage;
+class MindSearcherCubit extends Cubit<MindSearcherState> {
+  late final MainService _storage;
 
-  MarkSearcherCubit({required IStorage storage}) : super(MarkSearcherInitial()) {
-    _storage = storage;
+  MindSearcherCubit({required MainService mainService}) : super(MindSearcherInitial()) {
+    _storage = mainService;
   }
 
   final _emojiParser = EmojiParser();
@@ -20,7 +20,7 @@ class MarkSearcherCubit extends Cubit<MarkSearcherState> {
   Future<List<Mind>> searchMarkList(String text) async {
     final lowerCasedTrimmedText = text.toLowerCase().trim();
 
-    final marks = await _storage.getMarks();
+    final marks = await _storage.getMindList();
     final filteredMarks = marks.where((mark) {
       // Note condition.
       final noteCondition = mark.note.trim().toLowerCase().contains(

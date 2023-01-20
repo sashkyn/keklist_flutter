@@ -12,7 +12,7 @@ import 'package:zenmode/screens/mark_collection/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
 import 'package:zenmode/screens/settings/settings_screen.dart';
-import 'package:zenmode/storages/entities/mark.dart';
+import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/typealiases.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +63,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToMarkBloc(MindGetMinds());
+      _sendToMarkBloc(MindGetList());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
@@ -92,7 +92,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
       context.read<AuthBloc>().stream.listen((state) async {
         if (state is AuthLoggedIn) {
           _disableDemoMode();
-          _sendToMarkBloc(MindGetMinds());
+          _sendToMarkBloc(MindGetList());
         } else if (state is AuthLogouted) {
           _enableDemoMode();
           _sendToMarkBloc(MindResetStorage());

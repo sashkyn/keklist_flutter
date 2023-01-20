@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:zenmode/cubits/mark_searcher/mark_searcher_cubit.dart';
-import 'package:zenmode/storages/entities/mark.dart';
-import 'package:zenmode/storages/storage.dart';
+import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:zenmode/services/entities/mind.dart';
+import 'package:zenmode/services/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -16,19 +16,19 @@ part 'mind_event.dart';
 part 'mind_state.dart';
 
 class MindBloc extends Bloc<MindEvent, MindState> {
-  late final IStorage _supabaseStorage;
-  late final MarkSearcherCubit _searcherCubit;
+  late final MainService _storage;
+  late final MindSearcherCubit _searcherCubit;
 
   final Set<Mind> _marks = {};
 
   MindBloc({
-    required IStorage storage,
-    required MarkSearcherCubit searcherCubit,
+    required MainService mainService,
+    required MindSearcherCubit mindSearcherCubit,
   }) : super(MindListState(values: const [])) {
-    _supabaseStorage = storage;
-    _searcherCubit = searcherCubit;
+    _storage = mainService;
+    _searcherCubit = mindSearcherCubit;
 
-    on<MindGetMinds>(_getMarks);
+    on<MindGetList>(_getMarks);
     on<MindCreate>(_createMark);
     on<MindDelete>(_deleteMark);
     on<MindStartSearch>(_startSearch);
@@ -39,7 +39,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
     on<MindResetStorage>((event, emit) async {
-      await _supabaseStorage.reset();
+      await _storage.reset();
       _marks.clear();
       final state = MindListState(values: []);
       emit(state);
@@ -47,7 +47,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _deleteMark(MindDelete event, emit) async {
-    await _supabaseStorage.removeMark(event.uuid);
+    await _storage.removeMind(event.uuid);
     final item = _marks.firstWhere((item) => item.id == event.uuid);
     _marks.remove(item);
     emit.call(MindListState(values: _marks));
@@ -62,16 +62,16 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMarksByDayIndex(event.dayIndex).length,
     );
-    await _supabaseStorage.addMark(mark);
+    await _storage.addMind(mark);
     _marks.add(mark);
     final newState = MindListState(values: _marks);
     emit.call(newState);
   }
 
-  FutureOr<void> _getMarks(MindGetMinds event, emit) async {
+  FutureOr<void> _getMarks(MindGetList event, emit) async {
     _marks
       ..clear()
-      ..addAll(await _supabaseStorage.getMarks());
+      ..addAll(await _storage.getMindList());
     final state = MindListState(values: _marks);
     emit(state);
   }
