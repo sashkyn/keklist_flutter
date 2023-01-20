@@ -4,23 +4,23 @@ class MyTable extends StatelessWidget {
   const MyTable({
     Key? key,
     required this.widgets,
-    required this.countOfWidgetsInRow,
+    required this.widgetsInRowCount,
   }) : super(key: key);
 
   final List<Widget> widgets;
-  final int countOfWidgetsInRow;
+  final int widgetsInRowCount;
 
   @override
   Widget build(BuildContext context) {
     return Table(
       // border: TableBorder.all(width: 1),
       children: List.generate(
-        (widgets.length / countOfWidgetsInRow).ceil(),
+        (widgets.length / widgetsInRowCount).ceil(),
         (index) => TableRow(
           children: List.generate(
-            countOfWidgetsInRow,
+            widgetsInRowCount,
             (subIndex) {
-              final int itemIndex = index * countOfWidgetsInRow + subIndex;
+              final int itemIndex = index * widgetsInRowCount + subIndex;
               if (itemIndex < widgets.length) {
                 return widgets[itemIndex];
               } else {
