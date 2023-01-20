@@ -1,9 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
-import 'package:zenmode/blocs/mark_bloc/mark_bloc.dart';
+import 'package:zenmode/blocs/mark_bloc/mind_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,7 +41,7 @@ Future<void> main() async {
   final Widget application = MultiBlocProvider(
     providers: [
       BlocProvider(
-        create: (context) => MarkBloc(
+        create: (context) => MindBloc(
           storage: mainContainer.get<IStorage>(),
           searcherCubit: mainContainer.get<MarkSearcherCubit>(),
         ),
@@ -57,7 +58,6 @@ Future<void> main() async {
 }
 
 class ZenmodeApp extends StatefulWidget {
-
   const ZenmodeApp({Key? key}) : super(key: key);
 
   @override
@@ -67,12 +67,15 @@ class ZenmodeApp extends StatefulWidget {
 class ZenmodeAppState extends State<ZenmodeApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Zenmode',
-      home: const MarkCollectionScreen(),
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: MaterialApp(
+        title: 'Zenmode',
+        home: const MindCollectionScreen(),
+        theme: ThemeData(
+          primarySwatch: Colors.grey,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
       ),
     );
   }

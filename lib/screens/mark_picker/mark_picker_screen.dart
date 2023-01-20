@@ -64,7 +64,7 @@ class MarkPickerScreenState extends State<MarkPickerScreen> {
               childrenDelegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final mark = _displayedMarks[index].char;
-                  return MarkWidget(
+                  return MindWidget(
                     item: mark,
                     onTap: () => _pickMark(mark),
                     isHighlighted: true,
