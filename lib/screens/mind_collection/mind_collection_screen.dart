@@ -8,6 +8,7 @@ import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
+import 'package:zenmode/constants.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mind_collection/my_table.dart';
@@ -194,6 +195,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
     ];
   }
 
+  late final random = Random();
+
   Widget _makeBody() {
     final Widget scrollablePositionedList = ScrollablePositionedList.builder(
       padding: const EdgeInsets.only(top: 16.0),
@@ -203,13 +206,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
       itemBuilder: (BuildContext context, int groupIndex) {
         final List<Widget> mindWidgets = [];
         if (_isDemoMode) {
-          final random = Random();
-
           mindWidgets.addAll(
             List.generate(
               15,
               (index) {
-                final randomEmoji = Emoji.all()[random.nextInt(Emoji.all().length - 1)].char;
+                final randomEmoji = ZenConstants.demoEmodjiList[random.nextInt(ZenConstants.demoEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
                   creationDate: 0,
