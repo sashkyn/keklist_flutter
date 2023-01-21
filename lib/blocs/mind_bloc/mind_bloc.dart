@@ -114,6 +114,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) {
+    const count = 9;
     final List<String> suggestions = _minds
         .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
         .map((mark) => mark.emoji)
@@ -123,17 +124,17 @@ class MindBloc extends Bloc<MindEvent, MindState> {
             .where((element) => element.emoji == mind2)
             .length
             .compareTo(_minds.where((e) => e.emoji == mind1).length)) // NOTE: Сортировка очень дорогая
-        .take(9)
+        .take(count)
         .toList();
 
     if (suggestions.isEmpty) {
       if (_minds.isEmpty) {
-        _lastSuggestions = emojies_pub.Emoji.all().take(9).map((emoji) => emoji.char).toList();
+        _lastSuggestions = emojies_pub.Emoji.all().take(count).map((emoji) => emoji.char).toList();
       }
     } else {
       _lastSuggestions = suggestions;
     }
-    emit.call(MindSuggestions(suggestionMarks: _lastSuggestions));
+    emit(MindSuggestions(suggestionMarks: _lastSuggestions));
   }
 
   List<Mind> _findMindsByDayIndex(int index) => _minds
