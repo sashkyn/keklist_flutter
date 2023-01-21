@@ -1,6 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auth_buttons/auth_buttons.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -117,61 +116,13 @@ class AuthScreenState extends State<AuthScreen> {
                 ],
               ),
               const SizedBox(height: 32.0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'By processing you agree',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12.0,
-                        ),
-                      ),
-                      const TextSpan(text: ' '),
-                      TextSpan(
-                        text: 'Terms of use',
-                        style: const TextStyle(
-                          color: Color(0xFF2F80ED),
-                          fontSize: 12.0,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrlString(
-                              'vk.com',
-                              mode: LaunchMode.inAppWebView,
-                            );
-                          },
-                      ),
-                      const TextSpan(text: ' '),
-                      const TextSpan(
-                        text: 'and confirm that you have red',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12.0,
-                        ),
-                      ),
-                      const TextSpan(text: ' '),
-                      TextSpan(
-                        text: 'Privacy policy',
-                        style: const TextStyle(
-                          color: Color(0xFF2F80ED),
-                          fontSize: 12.0,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrlString(
-                              'facebook.com',
-                              mode: LaunchMode.inAppWebView,
-                            );
-                          },
-                      ),
-                    ],
-                  ),
+              TextButton(
+                onPressed: () => launchUrlString('https://vc.ru'), // TODO: поменять на нормальную ссылку
+                child: const Text(
+                  'Terms of use',
+                  style: TextStyle(color: Colors.blue),
                 ),
-              ),
+              )
             ],
           ),
         ),
