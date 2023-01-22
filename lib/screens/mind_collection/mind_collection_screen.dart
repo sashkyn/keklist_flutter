@@ -100,18 +100,25 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
         } else if (state is AuthLogouted) {
           _enableDemoMode();
           _sendToMarkBloc(MindResetStorage());
+          // NOTE: возвращаемся к главному экрану при логауте.
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          _showAuthBottomSheet();
         } else if (state is AuthCurrentStatus && !state.isLoggedIn) {
           _enableDemoMode();
-          await showCupertinoModalBottomSheet(
-            context: context,
-            builder: (context) => const AuthScreen(),
-            isDismissible: false,
-            enableDrag: false,
-          );
+          await _showAuthBottomSheet();
         }
       });
       context.read<AuthBloc>().add(AuthGetStatus());
     });
+  }
+
+  Future<void> _showAuthBottomSheet() async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => const AuthScreen(),
+      isDismissible: false,
+      enableDrag: false,
+    );
   }
 
   @override
