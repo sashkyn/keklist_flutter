@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -32,7 +33,7 @@ class MindCollectionScreen extends StatefulWidget {
   State<MindCollectionScreen> createState() => _MindCollectionScreenState();
 }
 
-class _MindCollectionScreenState extends State<MindCollectionScreen> with TickerProviderStateMixin {
+class _MindCollectionScreenState extends State<MindCollectionScreen> {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
@@ -47,7 +48,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
   bool _createMindBottomBarIsVisible = false;
 
   bool _isDemoMode = false;
-  late AnimationController _demoScrollingAnimationController;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -424,12 +424,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
     _itemScrollController.jumpTo(index: _getNowDayIndex());
   }
 
-  void _scrollToNow() {
-    _scrollToDayIndex(_getNowDayIndex());
-  }
+  FutureOr<void> _scrollToNow() => _scrollToDayIndex(_getNowDayIndex());
 
-  void _scrollToDayIndex(int dayIndex) {
-    _itemScrollController.scrollTo(
+  FutureOr<void> _scrollToDayIndex(int dayIndex) {
+    return _itemScrollController.scrollTo(
       index: dayIndex,
       duration: const Duration(milliseconds: 200),
     );
@@ -454,33 +452,39 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Ticker
 
   // NOTE: Demo режим для авторизации
 
-  void _enableDemoMode() {
+  late Timer _demoAutoScrollingTimer;
+
+  void _enableDemoMode() async {
     setState(() {
       _isDemoMode = true;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
-      int initialIndex = _getNowDayIndex();
-      _demoScrollingAnimationController = AnimationController(
-        duration: const Duration(milliseconds: 4000),
-        vsync: this,
-      )..addStatusListener((status) {
-          if (status == AnimationStatus.completed) {
-            initialIndex++;
-            _itemScrollController.scrollTo(
-              index: initialIndex,
-              alignment: 0.015,
-              duration: const Duration(milliseconds: 4100),
-            );
-            _demoScrollingAnimationController.forward(from: 0);
-          }
-        });
-      _demoScrollingAnimationController.forward();
+      int initialIndex = _getNowDayIndex() + 1;
+      _demoAutoScrollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+        _itemScrollController.scrollTo(
+          index: initialIndex++,
+          alignment: 0.015,
+          duration: const Duration(milliseconds: 4100),
+        );
+      });
     });
   }
 
+  @override
+  void dispose() {
+    _demoAutoScrollingTimer.cancel();
+
+    super.dispose();
+  }
+
   void _disableDemoMode() {
-    _isDemoMode = false;
-    _demoScrollingAnimationController.stop();
-    _demoScrollingAnimationController.dispose();
-    _jumpToNow();
+    _demoAutoScrollingTimer.cancel();
+    setState(() {
+      _isDemoMode = false;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _jumpToNow();
+    });
   }
 }
