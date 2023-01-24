@@ -256,7 +256,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
           children: [
             const SizedBox(height: 18.0),
             _makeMindsTitleWidget(groupIndex),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 4.0),
             MyTable(
               widgets: mindWidgets,
               widgetsInRowCount: countOfWidgetsInRow,
@@ -460,10 +460,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
-      int initialIndex = _getNowDayIndex() + 1;
+      int nextDayIndex = _getNowDayIndex() + 1;
       _demoAutoScrollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
         _itemScrollController.scrollTo(
-          index: initialIndex++,
+          index: nextDayIndex++,
           alignment: 0.015,
           duration: const Duration(milliseconds: 4100),
         );
