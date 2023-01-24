@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
+import 'package:zenmode/constants.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -117,7 +118,7 @@ class AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(height: 32.0),
               TextButton(
-                onPressed: () => launchUrlString('https://vc.ru'), // TODO: поменять на нормальную ссылку
+                onPressed: () => launchUrlString(ZenConstants.termsOfUseURL),
                 child: const Text(
                   'Terms of use',
                   style: TextStyle(color: Colors.blue),
