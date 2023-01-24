@@ -22,9 +22,14 @@ class MyTable extends StatelessWidget {
             (subIndex) {
               final int itemIndex = index * widgetsInRowCount + subIndex;
               if (itemIndex < widgets.length) {
-                return widgets[itemIndex];
+                return AspectRatio(
+                  aspectRatio: 1,
+                  child: widgets[itemIndex],
+                );
               } else {
-                return Container();
+                return TableCell(
+                  child: Container(),
+                );
               }
             },
           ),
