@@ -25,7 +25,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
     on<AuthLoginWithEmail>((event, emit) async {
-      // await _client.auth.signUp(email: '***REMOVED***', password: 'demopassword123');
       await _client.auth.signInWithOtp(
         email: event.email,
         emailRedirectTo: 'io.supabase.zenmode://login-callback/',
