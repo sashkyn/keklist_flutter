@@ -18,7 +18,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(AuthUserGoneFromSession());
       }
     });
+    on<AuthLoginWithEmailAndPassword>((event, emit) async {
+      await _client.auth.signInWithPassword(
+        email: event.email,
+        password: event.password,
+      );
+    });
     on<AuthLoginWithEmail>((event, emit) async {
+      // await _client.auth.signUp(email: 'zenmode-demo-account@mailinator.com', password: 'demopassword123');
       await _client.auth.signInWithOtp(
         email: event.email,
         emailRedirectTo: 'io.supabase.zenmode://login-callback/',

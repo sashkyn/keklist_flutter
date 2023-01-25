@@ -10,6 +10,16 @@ class AuthLoginWithEmail extends AuthEvent {
   const AuthLoginWithEmail(this.email);
 }
 
+class AuthLoginWithEmailAndPassword extends AuthEvent {
+  final String email;
+  final String password;
+
+  AuthLoginWithEmailAndPassword({
+    required this.email,
+    required this.password,
+  });
+}
+
 class AuthLoginWithSocialNetwork extends AuthEvent {
   final SocialNetwork socialNetwork;
 
