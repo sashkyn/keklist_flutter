@@ -217,7 +217,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
             List.generate(
               15,
               (index) {
-                final randomEmoji = ZenConstants.demoEmodjiList[random.nextInt(ZenConstants.demoEmodjiList.length - 1)];
+                final randomEmoji =
+                    ZenConstants.demoModeEmodjiList[random.nextInt(ZenConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
                   creationDate: 0,

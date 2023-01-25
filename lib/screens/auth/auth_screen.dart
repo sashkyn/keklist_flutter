@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
@@ -16,6 +17,8 @@ class AuthScreen extends StatefulWidget {
 
 class AuthScreenState extends State<AuthScreen> {
   final _loginTextEditingController = TextEditingController();
+  final _passwordTextEditingController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -23,7 +26,8 @@ class AuthScreenState extends State<AuthScreen> {
 
     context.read<AuthBloc>().stream.listen((state) {
       if (state is AuthLoggedIn) {
-        Navigator.pop(context);
+        // NOTE: возвращаемся к главному экрану.
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     });
   }
@@ -48,21 +52,45 @@ class AuthScreenState extends State<AuthScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              TextField(
-                controller: _loginTextEditingController,
-                keyboardType: TextInputType.emailAddress,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(8),
-                  border: UnderlineInputBorder(),
-                  hintText: 'Email',
+              Form(
+                key: _formKey,
+                child: TextFormField(
+                  validator: MultiValidator([
+                    EmailValidator(errorText: 'Enter a valid email address'),
+                    MinLengthValidator(4, errorText: 'Please enter email'),
+                  ]),
+                  controller: _loginTextEditingController,
+                  keyboardType: TextInputType.emailAddress,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.all(8),
+                    border: UnderlineInputBorder(),
+                    hintText: 'Email',
+                  ),
                 ),
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
                 onPressed: () async {
+                  if (_loginTextEditingController.text == ZenConstants.demoAccountEmail) {
+                    _displayTextInputDialog(
+                      context,
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                              AuthLoginWithEmailAndPassword(
+                                email: _loginTextEditingController.text,
+                                password: _passwordTextEditingController.text,
+                              ),
+                            );
+                      },
+                    );
+                    return;
+                  }
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
                   context.read<AuthBloc>().add(AuthLoginWithEmail(_loginTextEditingController.text));
                   // TODO: показать алерт на экшен в блоке.
                   showOkAlertDialog(
@@ -129,5 +157,32 @@ class AuthScreenState extends State<AuthScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _displayTextInputDialog(
+    BuildContext context, {
+    required VoidCallback onPressed,
+  }) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Password'),
+            content: TextField(
+              controller: _passwordTextEditingController,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                hintText: "Enter password",
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: onPressed,
+                ),
+              ),
+            ),
+          );
+        });
   }
 }
