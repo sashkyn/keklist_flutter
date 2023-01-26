@@ -78,6 +78,7 @@ class ZenmodeAppState extends State<ZenmodeApp> {
         home: const MindCollectionScreen(),
         theme: ThemeData(
           useMaterial3: true,
+          colorSchemeSeed: Colors.black,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
       ),
