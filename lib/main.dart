@@ -72,7 +72,7 @@ class ZenmodeAppState extends State<ZenmodeApp> {
         title: 'Zenmode',
         home: const MindCollectionScreen(),
         theme: ThemeData(
-          primarySwatch: Colors.grey,
+          useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
       ),
