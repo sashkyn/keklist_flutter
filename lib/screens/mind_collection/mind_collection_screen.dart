@@ -450,7 +450,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
 
   // NOTE: Demo режим для авторизации
 
-  late Timer _demoAutoScrollingTimer;
+  Timer? _demoAutoScrollingTimer;
 
   void _enableDemoMode() async {
     setState(() {
@@ -471,13 +471,13 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
 
   @override
   void dispose() {
-    _demoAutoScrollingTimer.cancel();
+    _demoAutoScrollingTimer?.cancel();
 
     super.dispose();
   }
 
   void _disableDemoMode() {
-    _demoAutoScrollingTimer.cancel();
+    _demoAutoScrollingTimer?.cancel();
     setState(() {
       _isDemoMode = false;
     });
