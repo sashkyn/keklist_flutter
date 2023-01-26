@@ -8,10 +8,13 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final MainService mainService;
-  final SupabaseClient _client = Supabase.instance.client;
+  final SupabaseClient client;
 
-  AuthBloc({required this.mainService}) : super(AuthInitial()) {
-    _client.auth.onAuthStateChange.listen((event) {
+  AuthBloc({
+    required this.mainService,
+    required this.client,
+  }) : super(AuthInitial()) {
+    client.auth.onAuthStateChange.listen((event) {
       if (event.session?.user != null) {
         add(AuthUserAppearedInSession());
       } else {
@@ -19,13 +22,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
     on<AuthLoginWithEmailAndPassword>((event, emit) async {
-      await _client.auth.signInWithPassword(
+      await client.auth.signInWithPassword(
         email: event.email,
         password: event.password,
       );
     });
     on<AuthLoginWithEmail>((event, emit) async {
-      await _client.auth.signInWithOtp(
+      await client.auth.signInWithOtp(
         email: event.email,
         emailRedirectTo: 'io.supabase.zenmode://login-callback/',
       );
@@ -49,14 +52,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(AuthLogout());
       },
     );
-    on<AuthLogout>((event, emit) async => await _client.auth.signOut());
+    on<AuthLogout>((event, emit) async => await client.auth.signOut());
     on<AuthUserAppearedInSession>((event, emit) => emit(AuthLoggedIn()));
     on<AuthUserGoneFromSession>((event, emit) => emit(AuthLogouted()));
-    on<AuthGetStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: _client.auth.currentUser != null)));
+    on<AuthGetStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: client.auth.currentUser != null)));
   }
 
   Future<void> _signInWithWebOAuth(Provider provider) async {
-    final result = await _client.auth.getOAuthSignInUrl(
+    final result = await client.auth.getOAuthSignInUrl(
       provider: provider,
       redirectTo: 'io.supabase.zenmode://login-callback/',
     );
@@ -68,7 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     final uri = Uri.parse(webResult);
-    await _client.auth.getSessionFromUrl(
+    await client.auth.getSessionFromUrl(
       uri,
       storeSession: true,
     );

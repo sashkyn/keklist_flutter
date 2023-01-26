@@ -3,6 +3,7 @@
 A new Flutter project.
 
 ## In Progress:
+-Сделать поддержку Android и зарелизить его
 
 ## TODO:
 
