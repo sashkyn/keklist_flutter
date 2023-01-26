@@ -46,7 +46,12 @@ Future<void> main() async {
         ),
       ),
       BlocProvider(create: (context) => mainContainer.get<MindSearcherCubit>()),
-      BlocProvider(create: (context) => AuthBloc(mainService: mainContainer.get<MainService>())),
+      BlocProvider(
+        create: (context) => AuthBloc(
+          mainService: mainContainer.get<MainService>(),
+          client: Supabase.instance.client,
+        ),
+      ),
       BlocProvider(
         create: (context) => SettingsBloc(mainService: mainContainer.get<MainService>()),
       ),
