@@ -1,6 +1,6 @@
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/typealiases.dart';
-import 'package:zenmode/widgets/mark_widget.dart';
+import 'package:zenmode/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
 
 class CreateMindBar extends StatelessWidget {

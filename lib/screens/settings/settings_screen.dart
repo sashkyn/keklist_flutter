@@ -141,8 +141,8 @@ enum SettingItemType {
 enum SettingItem {
   userTitle(title: 'User', type: SettingItemType.title),
   otherTitle(title: 'Other', type: SettingItemType.title),
-  login(title: 'Login to Supabase', type: SettingItemType.disclosure),
-  logout(title: 'Logout from Supabase', type: SettingItemType.disclosure),
+  login(title: 'Login', type: SettingItemType.disclosure),
+  logout(title: 'Logout', type: SettingItemType.disclosure),
   exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
   interface(title: 'Interface', type: SettingItemType.disclosure),
   deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);

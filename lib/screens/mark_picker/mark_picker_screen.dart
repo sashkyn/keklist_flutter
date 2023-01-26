@@ -1,5 +1,5 @@
 import 'package:zenmode/typealiases.dart';
-import 'package:zenmode/widgets/mark_widget.dart';
+import 'package:zenmode/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
