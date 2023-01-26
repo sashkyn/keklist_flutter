@@ -165,10 +165,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
     } else {
       return GestureDetector(
         onTap: () => _scrollToNow(),
-        child: const Text(
-          'Minds',
-          style: TextStyle(color: Colors.black),
-        ),
+        child: const Text('Minds'),
       );
     }
   }
