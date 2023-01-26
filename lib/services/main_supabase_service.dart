@@ -62,7 +62,7 @@ class MainSupabaseService implements MainService {
   @override
   FutureOr<void> deleteAccount() async {
     // NOTE: защита от дурака.
-    if (_client.auth.currentUser?.email != 'sashkn2@gmail.com') {
+    if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
       return Future.error('Trying to delete admin account!');
     }
     await _client.rpc('deleteUser');

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 enum MindSize {
   small,
@@ -59,8 +59,7 @@ class MindWidget extends StatelessWidget {
   }
 
   // TODO: вернуть использование шрифта noto colored
-  /// https://github.com/material-foundation/google-fonts-flutter/issues?q=is%3Aissue+is%3Aopen+noto
-  /// Мониторить эту issue
+  // https://github.com/material-foundation/google-fonts-flutter/issues/267
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +68,12 @@ class MindWidget extends StatelessWidget {
       onLongPress: onLongPress,
       child: Center(
         child: GrayedOut(
-            grayedOut: !isHighlighted,
-            child: Text(
-              item,
-              style: TextStyle(fontSize: fontSize), //GoogleFonts.notoEmoji(fontSize: fontSize),
-            )),
+          grayedOut: !isHighlighted,
+          child: Text(
+            item,
+            style: GoogleFonts.notoEmoji(fontSize: fontSize),
+          ),
+        ),
       ),
     );
   }
