@@ -76,10 +76,9 @@ packages:
   auth_buttons:
     dependency: "direct main"
     description:
-      name: auth_buttons
-      sha256: "5254571a08863044a05b860cfa3d209807025b14d3990f52f9610d3a09081bf9"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ThirdParty/flutter_auth_buttons"
+      relative: true
+    source: path
     version: "3.0.0"
   bloc:
     dependency: "direct main"
@@ -364,10 +363,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: "8f099045e2f2a30e4d4d0a35f40c6bc941a8f2ca0e10ad9d214ee9edd3f37483"
+      sha256: e70521755a6b08c6bde14ddae27dff5bf21010033888fc61da6c595f8a9f58c1
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "2.3.3"
   gotrue:
     dependency: transitive
     description:

@@ -10,7 +10,8 @@ environment:
 
 dependencies:
   adaptive_dialog: ^1.2.0
-  auth_buttons: ^3.0.0
+  auth_buttons:
+    path: ../ThirdParty/flutter_auth_buttons 
   bloc: ^8.1.0
   blur: ^3.1.0
   collection: ^1.15.0
@@ -28,7 +29,7 @@ dependencies:
   flutter_simple_dependency_injection: ^2.0.0
   flutter_web_auth: ^0.5.0
   form_field_validator: ^1.1.0
-  google_fonts: ^3.0.1
+  google_fonts: ^2.3.3
   intl: ^0.17.0
   material_segmented_control: ^4.0.0
   modal_bottom_sheet: #^2.1.2

@@ -58,9 +58,6 @@ class MindWidget extends StatelessWidget {
     }
   }
 
-  // TODO: вернуть использование шрифта noto colored
-  // https://github.com/material-foundation/google-fonts-flutter/issues/267
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -71,7 +68,7 @@ class MindWidget extends StatelessWidget {
           grayedOut: !isHighlighted,
           child: Text(
             item,
-            style: GoogleFonts.notoEmoji(fontSize: fontSize),
+            style: GoogleFonts.notoColorEmojiCompat(fontSize: fontSize),
           ),
         ),
       ),
