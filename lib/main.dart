@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
+import 'package:zenmode/constants.dart';
 import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/di/containers.dart';
 import 'package:zenmode/services/main_service.dart';
@@ -77,8 +78,8 @@ class ZenmodeAppState extends State<ZenmodeApp> {
         title: 'Zenmode',
         home: const MindCollectionScreen(),
         theme: ThemeData(
+          primarySwatch: Palette.swatch,
           useMaterial3: true,
-          colorSchemeSeed: Colors.black,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
       ),
