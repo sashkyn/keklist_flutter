@@ -6,6 +6,7 @@ import 'package:blur/blur.dart';
 // ignore: unnecessary_import
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
@@ -351,7 +352,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
     return MindWidget(
       item: mind.emoji,
       onTap: () => showOkAlertDialog(
-        title: mind.emoji,
+        title: mind.emoji, // TODO: исправить для Андроида. Сделать кастомное окно показа.
         message: mind.note,
         context: context,
       ),
