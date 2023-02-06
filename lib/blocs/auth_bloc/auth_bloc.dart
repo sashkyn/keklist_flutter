@@ -75,5 +75,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       uri,
       storeSession: true,
     );
+
+    // NOTE: теперь можно делать, но окошко с браузером не закрывается автоматически. Нужно понять почему...
+    // await client.auth.signInWithOAuth(
+    //   provider,
+    //   authScreenLaunchMode: LaunchMode.inAppWebView,
+    //   redirectTo: 'io.supabase.zenmode://login-callback/',
+    // );
   }
 }
