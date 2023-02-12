@@ -31,14 +31,7 @@ dependencies:
   form_field_validator: ^1.1.0
   google_fonts: ^2.3.3
   intl: ^0.17.0
-  material_segmented_control: ^4.0.0
-  modal_bottom_sheet: #^2.1.2
-    # Manually use a fix for Flutter 3.7 until the package has been updated.
-    # See https://github.com/jamesblasco/modal_bottom_sheet/pull/315.
-    git:
-      url: https://github.com/jamesblasco/modal_bottom_sheet.git
-      ref: 38c6f44d0c4205608618a676a907c2d104d00b52
-      path: modal_bottom_sheet
+  modal_bottom_sheet: ^3.0.0-pre
   path_provider: ^2.0.11
   rxdart: ^0.27.3
   scrollable_positioned_list: ^0.3.5
