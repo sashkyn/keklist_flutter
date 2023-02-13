@@ -99,7 +99,7 @@ jobs:
           appId: ${{secrets.FIREBASE_APP_ID}}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
           groups: ios-testers
-          file: *.ipa
+          file: /*.ipa
 
   # Временно закомментил, для того чтобы не тратить ресурсы
   # build_android_app:
