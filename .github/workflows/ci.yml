@@ -70,7 +70,7 @@ jobs:
           apple-id: ${{ secrets.APPLE_ID }}
           apple-id-password: ${{ secrets.APPLE_PASSWORD }}
       
-      - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist --verbose
+      - run: flutter build ipa --release # --export-options-plist=ios/Runner/ExportOptions.plist --verbose
 
       - name: Upload ipa file to GitHub release artifacts
         uses: actions/upload-artifact@v2
