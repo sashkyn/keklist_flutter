@@ -56,14 +56,14 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - name: Decoding exportOptions.plist
+      - name: Decoding ExportOptions.plist
         run: echo "${{ secrets.APPSTORE_EXPORT_OPTIONS_PLIST_BASE64 }}" | base64 --decode > ios/Runner/ExportOptions.plist
 
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
       - run: flutter pub get
-      - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
+      - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist --verbose
 
       - name: Upload ipa file to GitHub release artifacts
         uses: actions/upload-artifact@v2
