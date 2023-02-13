@@ -58,13 +58,13 @@ jobs:
           channel: "stable"
           cache: true
       - run: flutter pub get
-      - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist
+      - run: flutter build ipa --release
 
       - name: Upload ipa file to GitHub release artifacts
         uses: actions/upload-artifact@v2
         with:
-         name: release-ipa
-         path: build/ios/ipa/*.ipa
+          name: release-ipa
+          path: build/ios/ipa/*.ipa
 
       - name: Upload ipa file to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -98,7 +98,7 @@ jobs:
   #         cache: true
   #     - name: Decoding android/keystore.jks
   #       run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
-    
+
   #     - name: Decoding android/key.properties
   #       run: echo "${{ secrets.ANDROID_KEY_PROPERTIES_BASE64 }}" | base64 --decode > android/key.properties
 
