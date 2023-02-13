@@ -63,6 +63,13 @@ jobs:
         with:
           channel: "stable"
       - run: flutter pub get
+
+      - uses: sinoru/actions-setup-xcode@v2
+        with:
+          xcode-version: '14.2'
+          apple-id: ${{ secrets.APPLE_ID }}
+          apple-id-password: ${{ secrets.APPLE_PASSWORD }}
+      
       - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist --verbose
 
       - name: Upload ipa file to GitHub release artifacts
