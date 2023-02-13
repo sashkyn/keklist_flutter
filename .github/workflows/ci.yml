@@ -39,6 +39,7 @@ jobs:
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          
           # import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode --output $PP_PATH
@@ -46,19 +47,24 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          
           # import certificate to keychain
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
+          
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: Decoding exportOptions.plist
+        run: echo "${{ secrets.APPSTORE_EXPORT_OPTIONS_PLIST_BASE64 }}" | base64 --decode > ios/Runner/ExportOptions.plist
 
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
           cache: true
       - run: flutter pub get
-      - run: flutter build ipa --release
+      - run: flutter build ipa — release — export-options-plist=ios/Runner/ExportOptions.plist
 
       - name: Upload ipa file to GitHub release artifacts
         uses: actions/upload-artifact@v2
@@ -66,19 +72,34 @@ jobs:
           name: release-ipa
           path: build/ios/ipa/*.ipa
 
+      - name: Clean up keychain and provisioning profile
+        if: ${{ always() }} # Needed in case build failure
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  release_ios_app_to_firebase:
+    name: Release ipa to Firebase
+    needs: [build_ios_app]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Get release-ipa from artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: release-ipa
+      
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Upload ipa file to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{secrets.FIREBASE_APP_ID}}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
           groups: ios-testers
-          file: build/ios/ipa/*.ipa
-
-      - name: Clean up keychain and provisioning profile
-        if: ${{ always() }} # Needed in case build failure
-        run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
-          rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+          file: *.ipa
 
   # Временно закомментил, для того чтобы не тратить ресурсы
   # build_android_app:
