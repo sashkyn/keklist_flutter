@@ -15,15 +15,7 @@ jobs:
           to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           message: |
-            [CI] Starting CI...
-
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] [STEP-1] Runing Flutter analyze & test ...
+            [CI] [Flutter] Starting CI...
         
       - uses: actions/checkout@v3
 
@@ -33,61 +25,27 @@ jobs:
       
       - run: flutter pub get
       
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] Flutter: ⚙️ Анализ кода...
-      
       - run: flutter analyze
 
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        if: ${{ success() }}
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] Android: ✔️ Success
-
-      - name: Telegram logging
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] Flutter: ⚙️ Тестирование...
-      
       - run: flutter test
 
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        if: ${{ success() }}
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] Android: ✔️ Success
+      # - name: TELEGRAM_LOGGER
+      #   uses: appleboy/telegram-action@master
+      #   if: ${{ success() }}
+      #   with:
+      #     to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+      #     token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+      #     message: |
+      #       [CI] Android: ✔️ Success
 
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        if: ${{ success() }}
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] [STEP-1] Runing Flutter analyze & test ✔️
-
-      - name: TELEGRAM_LOGGER
+      - name: TELEGRAM LOG ERROR MESSAGE IF NEEDED
         uses: appleboy/telegram-action@master
         if: ${{ failure() }}
         with:
           to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           message: |
-            [CI] [STEP-1] ❌ Ошибка
+            [CI] ❌ Ошибка в ```test```
 
   # build_ios_app:
   #   name: Build iOS
@@ -208,14 +166,6 @@ jobs:
       - name: Building Android appbundle
         run: flutter build appbundle --verbose
 
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] [STEP-2] [Android] 🚀 Отправка в Firebase App Distribution ...
-
       - name: Uploading to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
@@ -225,21 +175,22 @@ jobs:
           file: build/app/outputs/bundle/release/app-release.aab
 
       - name: Telegram logging
+        if: ${{ success() }}
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           message: |
-            [CI] [STEP-2] [Android] ✅ Сборка успешно отправлена в Firebase App Distribution!
+            [CI] [Android] ✅ appbundle отправлен в Firebase App Distribution
 
-      - name: TELEGRAM_LOGGER
+      - name: TELEGRAM LOG ERROR MESSAGE IF NEEDED
         uses: appleboy/telegram-action@master
         if: ${{ failure() }}
         with:
           to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           message: |
-            [CI] [STEP-2] [Android] ❌ Ошибка
+            [CI] [Android] ❌ Ошибка в ```build_android_app```
 
       # - name: Upload appbundle to GitHub release artifacts
       #   uses: actions/upload-artifact@v2
