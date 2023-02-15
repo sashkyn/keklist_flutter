@@ -10,8 +10,7 @@ environment:
 
 dependencies:
   adaptive_dialog: ^1.2.0
-  auth_buttons:
-    path: ../ThirdParty/flutter_auth_buttons 
+  auth_buttons: ^2.0.4
   bloc: ^8.1.0
   blur: ^3.1.0
   collection: ^1.15.0
