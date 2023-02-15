@@ -62,12 +62,12 @@ Future<void> main() async {
   runApp(application);
 }
 
-// class ZenmodeApp extends StatefulWidget {
-//   const ZenmodeApp({Key? key}) : super(key: key);
+class ZenmodeApp extends StatefulWidget {
+  const ZenmodeApp({Key? key}) : super(key: key);
 
-//   @override
-//   State<ZenmodeApp> createState() => ZenmodeAppState();
-// }
+  @override
+  State<ZenmodeApp> createState() => ZenmodeAppState();
+}
 
 class ZenmodeAppState extends State<ZenmodeApp> {
   @override
