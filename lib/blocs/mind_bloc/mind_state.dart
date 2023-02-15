@@ -6,19 +6,12 @@ class MindListState extends MindState {
   final Iterable<Mind> values;
 
   MindListState({required this.values});
-
-  // Equatable.
-  @override
-  List<Object?> get props => [values];
 }
 
 class MindError extends MindState {
   final String text;
 
   MindError({required this.text});
-
-  @override
-  List<Object?> get props => [text];
 }
 
 class MindSearching extends MindState {
@@ -31,18 +24,10 @@ class MindSearching extends MindState {
     required this.values,
     required this.filteredValues,
   });
-
-  // Equatable.
-  @override
-  List<Object?> get props => [enabled, values, filteredValues];
 }
 
 class MindSuggestions extends MindState {
   final List<String> suggestionMarks;
 
   MindSuggestions({required this.suggestionMarks});
-
-  // Equatable.
-  @override
-  List<Object?> get props => [suggestionMarks];
 }
