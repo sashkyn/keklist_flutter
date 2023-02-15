@@ -125,7 +125,7 @@ jobs:
           appId: ${{secrets.FIREBASE_APP_ID}}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
           groups: ios-testers
-          file: build/app/outputs/bundle/*.aab
+          file: build/app/outputs/bundle/release/*.aab
 
       # - name: Upload appbundle to GitHub release artifacts
       #   uses: actions/upload-artifact@v2
