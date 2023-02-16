@@ -29,6 +29,15 @@ jobs:
 
       - run: flutter test
 
+      - name: Sending success message to Dev channel
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] ✅ - Analyze & Test
+
       - name: Sending error message to Dev channel if needed
         uses: appleboy/telegram-action@master
         if: ${{ failure() }}
