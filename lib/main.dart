@@ -3,6 +3,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_strategy/url_strategy.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,9 @@ import 'screens/mind_collection/mind_collection_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Удаляет # в пути в начале для web приложений.
+  setPathUrlStrategy();
 
   // Инициализация настроек Supabase.
   await Supabase.initialize(

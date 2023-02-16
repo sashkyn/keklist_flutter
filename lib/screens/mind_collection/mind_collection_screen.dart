@@ -250,7 +250,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           );
         }
 
-        const int countOfWidgetsInRow = 5;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -259,7 +258,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             const SizedBox(height: 4.0),
             MyTable(
               widgets: mindWidgets,
-              widgetsInRowCount: countOfWidgetsInRow,
             )
           ],
         );
