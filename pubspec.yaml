@@ -48,11 +48,15 @@ dev_dependencies:
   mocktail: ^0.3.0
 
 flutter_icons:
-  android: true
-  ios: true
   adaptive_icon_background: "assets/app_icon_2.png"
   adaptive_icon_foreground: "assets/app_icon_2.png"
   image_path: "assets/app_icon_2.png"
+  android: true
+  ios: true
+  macos:
+    generate: true
+  web:
+    generate: true
 
 flutter:
   uses-material-design: true
