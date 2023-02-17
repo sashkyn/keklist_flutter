@@ -109,13 +109,13 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           await _showAuthBottomSheet();
         }
       }).disposed(by: this);
-      
+
       context.read<AuthBloc>().add(AuthGetStatus());
     });
   }
 
   Future<void> _showAuthBottomSheet() async {
-    await showCupertinoModalBottomSheet(
+    return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => const AuthScreen(),
       isDismissible: false,
