@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/constants.dart';
+import 'package:zenmode/helpers/extensions/dispose_bag.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mind_collection/my_table.dart';
@@ -33,7 +34,7 @@ class MindCollectionScreen extends StatefulWidget {
   State<MindCollectionScreen> createState() => _MindCollectionScreenState();
 }
 
-class _MindCollectionScreenState extends State<MindCollectionScreen> {
+class _MindCollectionScreenState extends State<MindCollectionScreen> with DisposeBag {
   static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
@@ -91,7 +92,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
             _suggestionsMarkState = state;
           });
         }
-      });
+      }).disposed(by: this);
 
       context.read<AuthBloc>().stream.listen((state) async {
         if (state is AuthLoggedIn) {
@@ -107,13 +108,14 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
           _enableDemoMode();
           await _showAuthBottomSheet();
         }
-      });
+      }).disposed(by: this);
+
       context.read<AuthBloc>().add(AuthGetStatus());
     });
   }
 
   Future<void> _showAuthBottomSheet() async {
-    await showCupertinoModalBottomSheet(
+    return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => const AuthScreen(),
       isDismissible: false,
@@ -248,7 +250,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
           );
         }
 
-        const int countOfWidgetsInRow = 5;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -257,7 +258,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> {
             const SizedBox(height: 4.0),
             MyTable(
               widgets: mindWidgets,
-              widgetsInRowCount: countOfWidgetsInRow,
             )
           ],
         );

@@ -67,7 +67,7 @@ class CreateMindBar extends StatelessWidget {
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(16.0)),
                       ),
-                      hintText: 'Create new mark with text',
+                      hintText: 'Create a mind with text',
                       suffixIcon: TextButton(
                         style: ButtonStyle(
                           splashFactory: NoSplash.splashFactory,
@@ -81,7 +81,7 @@ class CreateMindBar extends StatelessWidget {
                           onKek(data);
                         },
                         child: const Text(
-                          'KEK',
+                          'DONE',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

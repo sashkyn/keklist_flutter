@@ -1,3 +1,4 @@
+import 'package:zenmode/constants.dart';
 import 'package:zenmode/typealiases.dart';
 import 'package:zenmode/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
@@ -57,21 +58,26 @@ class MarkPickerScreenState extends State<MarkPickerScreen> {
             ),
           ),
           Flexible(
-            child: GridView.custom(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
-              childrenDelegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final mark = _displayedMarks[index].char;
-                  return MindWidget(
-                    item: mark,
-                    onTap: () => _pickMark(mark),
-                    isHighlighted: true,
-                  );
-                },
-                childCount: _displayedMarks.length,
-              ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final widgetsInRowCount = (constraints.maxWidth / LayoutConstants.mindSide).ceil();
+                return GridView.custom(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: widgetsInRowCount),
+                  childrenDelegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final mark = _displayedMarks[index].char;
+                      return MindWidget(
+                        item: mark,
+                        onTap: () => _pickMark(mark),
+                        isHighlighted: true,
+                      );
+                    },
+                    childCount: _displayedMarks.length,
+                  ),
+                );
+              },
             ),
           ),
         ],
