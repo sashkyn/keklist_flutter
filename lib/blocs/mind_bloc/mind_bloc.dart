@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/services/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
