@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/services/main_service.dart';
 
@@ -64,7 +64,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       redirectTo: 'io.supabase.zenmode://login-callback/',
     );
 
-    final webResult = await FlutterWebAuth.authenticate(
+    final webResult = await FlutterWebAuth2.authenticate(
       url: result.url.toString(),
       callbackUrlScheme: 'io.supabase.points',
       preferEphemeral: false,

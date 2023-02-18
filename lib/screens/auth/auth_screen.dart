@@ -7,6 +7,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/constants.dart';
+import 'package:zenmode/helpers/extensions/dispose_bag.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class AuthScreen extends StatefulWidget {
   AuthScreenState createState() => AuthScreenState();
 }
 
-class AuthScreenState extends State<AuthScreen> {
+class AuthScreenState extends State<AuthScreen> with DisposeBag {
   final _loginTextEditingController = TextEditingController();
   final _passwordTextEditingController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -29,7 +30,14 @@ class AuthScreenState extends State<AuthScreen> {
         // NOTE: возвращаемся к главному экрану.
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
-    });
+    }).disposed(by: this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    cancelSubscriptions();
   }
 
   @override
