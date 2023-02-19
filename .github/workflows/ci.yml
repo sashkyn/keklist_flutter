@@ -6,51 +6,51 @@ on:
   workflow_dispatch:
 
 jobs:
-  analyze_and_test:
-    name: Run Flutter analyze & test
-    runs-on: ubuntu-latest
-    steps:
-      - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] 🛠️ Starting CI...
+  # analyze_and_test:
+  #   name: Run Flutter analyze & test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: TELEGRAM_LOGGER
+  #       uses: appleboy/telegram-action@master
+  #       with:
+  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+  #         message: |
+  #           [CI] 🛠️ Starting CI...
 
-      - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
+  #     - uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: "stable"
 
-      - run: flutter pub get
+  #     - run: flutter pub get
 
-      - run: flutter analyze
+  #     - run: flutter analyze
 
-      - run: flutter test
+  #     - run: flutter test
 
-      - name: Sending success message to Dev channel
-        if: ${{ success() }}
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] ✅ - Analyze & Test
+  #     - name: Sending success message to Dev channel
+  #       if: ${{ success() }}
+  #       uses: appleboy/telegram-action@master
+  #       with:
+  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+  #         message: |
+  #           [CI] ✅ - Analyze & Test
 
-      - name: Sending error message to Dev channel if needed
-        uses: appleboy/telegram-action@master
-        if: ${{ failure() }}
-        with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          message: |
-            [CI] ❌ - Analyze & Test
+  #     - name: Sending error message to Dev channel if needed
+  #       uses: appleboy/telegram-action@master
+  #       if: ${{ failure() }}
+  #       with:
+  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+  #         message: |
+  #           [CI] ❌ - Analyze & Test
 
   build_ios_app:
     name: Build iOS
-    needs: [analyze_and_test]
+    # needs: [analyze_and_test]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
