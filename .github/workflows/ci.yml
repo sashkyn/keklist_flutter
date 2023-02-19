@@ -91,7 +91,7 @@ jobs:
           channel: "stable"
       - run: flutter pub get
 
-      - run: flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist --verbose
+      - run: flutter build ipa --release --export-method=ad-hoc --export-options-plist=ios/Runner/ExportOptions.plist --verbose
 
       - name: Upload ipa file to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
