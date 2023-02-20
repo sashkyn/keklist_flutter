@@ -1,25 +1,32 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
 default_platform(:ios)
+
 platform :ios do
-  desc "Push a new beta build to TestFlight"
-  lane :beta do
-    get_certificates
-    get_provisioning_profile
-    build_app(workspace: “Runner.xcworkspace”, scheme: “Runner”)
+  desc "Archive, Build IPA, Signing, Upload to TestFilght"
+  lane :build_and_upload_to_testfilght do
+    api_key = app_store_connect_api_key(
+      key_id: "#{ENV["APPSTORE_KEY_ID"]}",
+      issuer_id: "#{ENV["APPSTORE_ISSUER_ID"]}",
+      key_content: "#{ENV["APPSTORE_API_KEY_CONTENT_BASE_64"]}",
+      is_key_content_base64: true
+    )
+    match(
+      git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
+      git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
+      type: "appstore",
+      api_key: api_key,
+      force_for_new_devices: true, #Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+      readonly: false
+    )
+    build_app(
+      workspace: "Runner.xcworkspace", 
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
+        }
+      }
+    )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )

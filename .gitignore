@@ -119,3 +119,6 @@ app.*.symbols
 
 # Certificates
 *.p8
+
+# Fastlane
+/ios/.env
