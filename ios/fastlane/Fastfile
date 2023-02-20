@@ -12,10 +12,18 @@ platform :ios do
     match(
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
+      type: "development",
+      api_key: api_key,
+      readonly: false,
+      keychain_password: "useless-password-for-enter-it-on-ui",
+    )
+    match(
+      git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
+      git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
       api_key: api_key,
-      force_for_new_devices: true, #Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
-      readonly: false
+      readonly: false,
+      keychain_password: "useless-password-for-enter-it-on-ui",
     )
     build_app(
       workspace: "Runner.xcworkspace", 
