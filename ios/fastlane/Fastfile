@@ -34,6 +34,7 @@ platform :ios do
           "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
         }
       }
+      verbose: true
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
