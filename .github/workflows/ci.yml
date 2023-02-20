@@ -59,6 +59,7 @@ jobs:
         with:
           channel: "stable"
       - run: flutter pub get
+      - run: cd ios && pod install
 
       - uses: ruby/setup-ruby@v1
         with:
