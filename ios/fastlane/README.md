@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane ios build_and_upload_to_testfilght
 ```
 
-Push a new release build to the App Store
+Archive, Build IPA, Signing, Upload to TestFilght
 
 ----
 

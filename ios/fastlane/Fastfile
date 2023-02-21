@@ -1,29 +1,56 @@
 default_platform(:ios)
 
+def delete_temp_keychain(name)
+  delete_keychain(
+    name: name
+  ) if File.exist? File.expand_path("~/Library/Keychains/#{name}-db")
+end
+
+def create_temp_keychain(name, password)
+  create_keychain(
+    name: name,
+    password: password,
+    unlock: false,
+    timeout: 0,
+    default_keychain: true
+  )
+end
+
+def ensure_temp_keychain(name, password)
+  delete_temp_keychain(name)
+  create_temp_keychain(name, password)
+end
+
 platform :ios do
   desc "Archive, Build IPA, Signing, Upload to TestFilght"
   lane :build_and_upload_to_testfilght do
+    keychain_name = ENV["TEMP_KEYCHAIN_NAME"]
+    keychain_password = ENV["TEMP_KEYCHAIN_PASSWORD"]
+    ensure_temp_keychain(keychain_name, keychain_password)
+
     api_key = app_store_connect_api_key(
       key_id: "#{ENV["APPSTORE_KEY_ID"]}",
       issuer_id: "#{ENV["APPSTORE_ISSUER_ID"]}",
       key_content: "#{ENV["APPSTORE_API_KEY_CONTENT_BASE_64"]}",
       is_key_content_base64: true
     )
-    # match(
-    #   git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
-    #   git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
-    #   type: "development",
-    #   api_key: api_key,
-    #   readonly: true,
-    #   keychain_password: "useless-password-for-enter-it-on-ui",
-    # )
+    match(
+      git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
+      git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
+      type: "development",
+      api_key: api_key,
+      readonly: true,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password,
+    )
     match(
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
       api_key: api_key,
       readonly: true,
-      keychain_password: "useless-password-for-enter-it-on-ui",
+      keychain_name: keychain_name,
+      keychain_password: keychain_password,
     )
     build_app(
       workspace: "Runner.xcworkspace", 
@@ -37,7 +64,9 @@ platform :ios do
       verbose: true
     )
     upload_to_testflight(
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      ipa: "./Runner.ipa"
     )
   end
 end
