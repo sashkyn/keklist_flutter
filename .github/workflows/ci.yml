@@ -1,56 +1,56 @@
 name: CI
 on:
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
   workflow_dispatch:
 
 jobs:
-  # analyze_and_test:
-  #   name: Run Flutter analyze & test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: TELEGRAM_LOGGER
-  #       uses: appleboy/telegram-action@master
-  #       with:
-  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-  #         message: |
-  #           [CI] 🛠️ Starting CI...
+  analyze_and_test:
+    name: Run Flutter analyze & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: TELEGRAM_LOGGER
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] 🛠️ Starting CI...
 
-  #     - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-  #     - uses: subosito/flutter-action@v2
-  #       with:
-  #         channel: "stable"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
 
-  #     - run: flutter pub get
+      - run: flutter pub get
 
-  #     - run: flutter analyze
+      - run: flutter analyze
 
-  #     - run: flutter test
+      - run: flutter test
 
-  #     - name: Sending success message to Dev channel
-  #       if: ${{ success() }}
-  #       uses: appleboy/telegram-action@master
-  #       with:
-  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-  #         message: |
-  #           [CI] ✅ - Analyze & Test
+      - name: Sending success message to Dev channel
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] ✅ - Analyze & Test
 
-  #     - name: Sending error message to Dev channel if needed
-  #       uses: appleboy/telegram-action@master
-  #       if: ${{ failure() }}
-  #       with:
-  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-  #         message: |
-  #           [CI] ❌ - Analyze & Test
+      - name: Sending error message to Dev channel if needed
+        uses: appleboy/telegram-action@master
+        if: ${{ failure() }}
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] ❌ - Analyze & Test
 
   build_ios_app:
     name: Build iOS
-    # needs: [analyze_and_test]
+    needs: [analyze_and_test]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -97,83 +97,60 @@ jobs:
       #     message: |
       #       [CI] ❌ - iOS
 
-  # release_ios_app_to_firebase:
-  #   name: Release ipa to Firebase
-  #   needs: [build_ios_app]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
+  build_android_app:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: [analyze_and_test]
+    steps:
+      - name: Checking out to current branch
+        uses: actions/checkout@v3
 
-  #     - name: Get release-ipa from artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: release-ipa
+      - name: Setting up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "12"
 
-  #     - name: Display structure of downloaded files
-  #       run: ls -R
+      - name: Setting up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-  #     - name: Upload ipa file to Firebase App Distribution
-  #       uses: wzieba/Firebase-Distribution-Github-Action@v1
-  #       with:
-  #         appId: ${{secrets.FIREBASE_APP_ID}}
-  #         serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
-  #         groups: ios-testers
-  #         file: /*.ipa
+      - name: Decoding android/keystore.jks
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
 
-  # build_android_app:
-  #   name: Build Android
-  #   runs-on: ubuntu-latest
-  #   needs: [analyze_and_test]
-  #   steps:
-  #     - name: Checking out to current branch
-  #       uses: actions/checkout@v3
+      - name: Decoding android/key.properties
+        run: echo "${{ secrets.ANDROID_KEY_PROPERTIES_BASE64 }}" | base64 --decode > android/key.properties
 
-  #     - name: Setting up Java
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         distribution: "zulu"
-  #         java-version: "12"
+      - name: Getting dependencies
+        run: flutter pub get
 
-  #     - name: Setting up Flutter
-  #       uses: subosito/flutter-action@v2
-  #       with:
-  #         channel: "stable"
-  #         cache: true
+      - name: Building Android appbundle
+        run: flutter build appbundle --verbose
 
-  #     - name: Decoding android/keystore.jks
-  #       run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
+      - name: Uploading to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
+          groups: android-testers
+          file: build/app/outputs/bundle/release/app-release.aab
 
-  #     - name: Decoding android/key.properties
-  #       run: echo "${{ secrets.ANDROID_KEY_PROPERTIES_BASE64 }}" | base64 --decode > android/key.properties
+      - name: Sending success message to Dev channel
+        if: ${{ success() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] ✅ - Android
 
-  #     - name: Getting dependencies
-  #       run: flutter pub get
-
-  #     - name: Building Android appbundle
-  #       run: flutter build appbundle --verbose
-
-  #     - name: Uploading to Firebase App Distribution
-  #       uses: wzieba/Firebase-Distribution-Github-Action@v1
-  #       with:
-  #         appId: ${{secrets.FIREBASE_APP_ID}}
-  #         serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
-  #         groups: android-testers
-  #         file: build/app/outputs/bundle/release/app-release.aab
-
-  #     - name: Sending success message to Dev channel
-  #       if: ${{ success() }}
-  #       uses: appleboy/telegram-action@master
-  #       with:
-  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-  #         message: |
-  #           [CI] ✅ - Android
-
-  #     - name: Sending error message to Dev channel if needed
-  #       uses: appleboy/telegram-action@master
-  #       if: ${{ failure() }}
-  #       with:
-  #         to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-  #         token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-  #         message: |
-  #           [CI] ❌ - Android
+      - name: Sending error message to Dev channel if needed
+        uses: appleboy/telegram-action@master
+        if: ${{ failure() }}
+        with:
+          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          message: |
+            [CI] ❌ - Android
