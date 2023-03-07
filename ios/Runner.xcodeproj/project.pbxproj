@@ -15,11 +15,12 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		DACBBFEB9C59BFCAD82C59C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D071186D07DAC7B72178546 /* Pods_Runner.framework */; };
-		E6D13A4B29B71D2F0045C7FA /* zenwatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* zenwatchApp.swift */; };
+		E6A02AEF29B759250091F915 /* WatchCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */; };
+		E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */; };
 		E6D13A4D29B71D2F0045C7FA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* ContentView.swift */; };
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
 		E6D13A5229B71D300045C7FA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */; };
-		E6D13A5529B71D300045C7FA /* zenwatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* zenwatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,7 +50,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				E6D13A5529B71D300045C7FA /* zenwatch Watch App.app in Embed Watch Content */,
+				E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,8 +77,9 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A364558CF161996DD45C2207 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C6E2913CC35BAB47985CBC4C /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
-		E6D13A4829B71D2F0045C7FA /* zenwatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zenwatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6D13A4A29B71D2F0045C7FA /* zenwatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = zenwatchApp.swift; sourceTree = "<group>"; };
+		E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCommunicationManager.swift; sourceTree = "<group>"; };
+		E6D13A4829B71D2F0045C7FA /* WatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
 		E6D13A4C29B71D2F0045C7FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E6D13A4E29B71D300045C7FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -128,7 +130,7 @@
 			children = (
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
-				E6D13A4929B71D2F0045C7FA /* zenwatch Watch App */,
+				E6D13A4929B71D2F0045C7FA /* WatchApp */,
 				97C146EF1CF9000F007C117D /* Products */,
 				207428DB8E5A8D31DF92F2BC /* Pods */,
 				D8D3D9E75399B16E18B4E504 /* Frameworks */,
@@ -139,7 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
-				E6D13A4829B71D2F0045C7FA /* zenwatch Watch App.app */,
+				E6D13A4829B71D2F0045C7FA /* WatchApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,15 +171,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E6D13A4929B71D2F0045C7FA /* zenwatch Watch App */ = {
+		E6D13A4929B71D2F0045C7FA /* WatchApp */ = {
 			isa = PBXGroup;
 			children = (
-				E6D13A4A29B71D2F0045C7FA /* zenwatchApp.swift */,
+				E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */,
 				E6D13A4C29B71D2F0045C7FA /* ContentView.swift */,
+				E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */,
 				E6D13A4E29B71D300045C7FA /* Assets.xcassets */,
 				E6D13A5029B71D300045C7FA /* Preview Content */,
 			);
-			path = "zenwatch Watch App";
+			path = WatchApp;
 			sourceTree = "<group>";
 		};
 		E6D13A5029B71D300045C7FA /* Preview Content */ = {
@@ -215,9 +218,9 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E6D13A4729B71D2F0045C7FA /* zenwatch Watch App */ = {
+		E6D13A4729B71D2F0045C7FA /* WatchApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "zenwatch Watch App" */;
+			buildConfigurationList = E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "WatchApp" */;
 			buildPhases = (
 				E6D13A4429B71D2F0045C7FA /* Sources */,
 				E6D13A4529B71D2F0045C7FA /* Frameworks */,
@@ -227,9 +230,9 @@
 			);
 			dependencies = (
 			);
-			name = "zenwatch Watch App";
+			name = WatchApp;
 			productName = "zenwatch Watch App";
-			productReference = E6D13A4829B71D2F0045C7FA /* zenwatch Watch App.app */;
+			productReference = E6D13A4829B71D2F0045C7FA /* WatchApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -265,7 +268,7 @@
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
-				E6D13A4729B71D2F0045C7FA /* zenwatch Watch App */,
+				E6D13A4729B71D2F0045C7FA /* WatchApp */,
 			);
 		};
 /* End PBXProject section */
@@ -381,7 +384,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6D13A4D29B71D2F0045C7FA /* ContentView.swift in Sources */,
-				E6D13A4B29B71D2F0045C7FA /* zenwatchApp.swift in Sources */,
+				E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */,
+				E6A02AEF29B759250091F915 /* WatchCommunicationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,7 +394,7 @@
 /* Begin PBXTargetDependency section */
 		E6D13A5429B71D300045C7FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E6D13A4729B71D2F0045C7FA /* zenwatch Watch App */;
+			target = E6D13A4729B71D2F0045C7FA /* WatchApp */;
 			targetProxy = E6D13A5329B71D300045C7FA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -688,7 +692,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"zenwatch Watch App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"WatchApp/Preview Content\"";
 				DEVELOPMENT_TEAM = UABCUKG5HN;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -696,6 +700,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = zenwatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sashkyn.kekable;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -729,7 +734,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"zenwatch Watch App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"WatchApp/Preview Content\"";
 				DEVELOPMENT_TEAM = UABCUKG5HN;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -737,6 +742,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = zenwatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sashkyn.kekable;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -768,7 +774,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"zenwatch Watch App/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"WatchApp/Preview Content\"";
 				DEVELOPMENT_TEAM = UABCUKG5HN;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -776,6 +782,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = zenwatch;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sashkyn.kekable;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -817,7 +824,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "zenwatch Watch App" */ = {
+		E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "WatchApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E6D13A5729B71D300045C7FA /* Debug */,

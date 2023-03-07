@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:collection';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,11 +19,15 @@ import 'package:zenmode/services/main_service.dart';
 
 import 'screens/mind_collection/mind_collection_screen.dart';
 
+final appleWatchCommunicationManager = AppleWatchCommunicationManager();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
+
+  appleWatchCommunicationManager.connect();
 
   // Инициализация настроек Supabase.
   await Supabase.initialize(
@@ -126,4 +132,34 @@ class LoggerBlocObserver extends BlocObserver {
 
   //   print('onTransition: $bloc.state');
   // }
+}
+
+class AppleWatchCommunicationManager {
+  final channel = const MethodChannel('com.sashkyn.kekable');
+
+  void connect() {
+    channel.setMethodCallHandler(
+      (MethodCall call) {
+        final String methodName = call.method;
+        final methodArgs = call.arguments;
+
+        print('flutter - methodName = $methodName');
+        print('flutter - methodArgs = $methodArgs');
+
+        if (methodName == 'print') {
+          final String text = methodArgs['text'];
+          print('heh - $text');
+        }
+
+        channel.invokeMethod(
+          'printOut',
+          [
+            {'text': 'ohohohhohoohohhoohhohohohoh'}
+          ],
+        );
+
+        return Future.value();
+      },
+    );
+  }
 }
