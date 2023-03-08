@@ -11,6 +11,7 @@ import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/constants.dart';
 import 'package:zenmode/helpers/extensions/dispose_bag.dart';
+import 'package:zenmode/helpers/mind_utils.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
 import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
 import 'package:zenmode/screens/mind_collection/my_table.dart';
@@ -35,7 +36,6 @@ class MindCollectionScreen extends StatefulWidget {
 }
 
 class _MindCollectionScreenState extends State<MindCollectionScreen> with DisposeBag {
-  static const int _millisecondsInDay = 1000 * 60 * 60 * 24;
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
   final ItemScrollController _itemScrollController = ItemScrollController();
@@ -336,7 +336,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Text _makeMindsTitleWidget(int groupIndex) {
     return Text(
-      _formatter.format(_getDateFromIndex(groupIndex)),
+      _formatter.format(MindUtils.getDateFromIndex(groupIndex)),
       style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
     );
   }
@@ -413,8 +413,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     }
   }
 
-  DateTime _getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(_millisecondsInDay * index);
-
   List<Mind> _findMarksByDayIndex(int index) =>
       _minds.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
 
@@ -443,10 +441,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
-  int _getNowDayIndex() => _getDayIndex(DateTime.now());
-
-  int _getDayIndex(DateTime date) =>
-      (date.millisecondsSinceEpoch + date.timeZoneOffset.inMilliseconds) ~/ _millisecondsInDay;
+  int _getNowDayIndex() => MindUtils.getDayIndex(from: DateTime.now());
 
   // NOTE: Demo режим для авторизации
 

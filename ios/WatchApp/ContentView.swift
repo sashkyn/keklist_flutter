@@ -10,8 +10,8 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundColor(.accentColor)
             Text("Hello, Flutter!")
-            Button("Print") {
-                manager.handleButton()
+            Button("PING") {
+                manager.obtainTodayMinds()
             }
         }
         .padding()

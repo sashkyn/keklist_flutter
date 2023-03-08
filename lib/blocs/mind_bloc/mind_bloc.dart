@@ -16,7 +16,7 @@ part 'mind_event.dart';
 part 'mind_state.dart';
 
 class MindBloc extends Bloc<MindEvent, MindState> {
-  late final MainService _storage;
+  late final MainService _service;
   late final MindSearcherCubit _searcherCubit;
 
   final Set<Mind> _minds = {};
@@ -25,7 +25,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     required MainService mainService,
     required MindSearcherCubit mindSearcherCubit,
   }) : super(MindListState(values: const [])) {
-    _storage = mainService;
+    _service = mainService;
     _searcherCubit = mindSearcherCubit;
 
     on<MindGetList>(_getMinds);
@@ -39,7 +39,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
     on<MindResetStorage>((event, emit) async {
-      await _storage.reset();
+      await _service.reset();
       _minds.clear();
       final state = MindListState(values: []);
       emit(state);
@@ -47,7 +47,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
-    await _storage.removeMind(event.uuid);
+    await _service.removeMind(event.uuid);
     _minds.removeWhere((item) => item.id == event.uuid);
     emit.call(MindListState(values: _minds));
   }
@@ -61,7 +61,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
-    await _storage.addMind(mark);
+    await _service.addMind(mark);
     _minds.add(mark);
     final newState = MindListState(values: _minds);
     emit.call(newState);
@@ -70,7 +70,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   FutureOr<void> _getMinds(MindGetList event, emit) async {
     _minds
       ..clear()
-      ..addAll(await _storage.getMindList());
+      ..addAll(await _service.getMindList());
     final state = MindListState(values: _minds);
     emit(state);
   }

@@ -38,6 +38,14 @@ class Mind extends Equatable {
         'sort_index': sortIndex,
       };
 
+  Map<String, dynamic> toWatchJson() => {
+        'uuid': id,
+        'emoji': emoji,
+        'note': note,
+        'day_index': dayIndex,
+        'sort_index': sortIndex,
+      };
+
   List<String> toCSVEntry() => [
         id,
         emoji,

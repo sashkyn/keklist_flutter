@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:collection';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,18 +15,14 @@ import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/di/containers.dart';
 import 'package:zenmode/services/main_service.dart';
 
+import 'native/ios/watch_os/watch_communication_manager.dart';
 import 'screens/mind_collection/mind_collection_screen.dart';
-
-final appleWatchCommunicationManager = AppleWatchCommunicationManager();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
-
-  appleWatchCommunicationManager.connect();
-
   // Инициализация настроек Supabase.
   await Supabase.initialize(
     url: 'https://vocsvvwlghhgmphrggre.supabase.co',
@@ -42,6 +36,9 @@ Future<void> main() async {
   // Инициализация DI-контейнера.
   final injector = Injector();
   final mainContainer = MainContainer().initialize(injector);
+
+  // Подключаемся к Apple Watch.
+  mainContainer.get<WatchCommunicationManager>().connect();
 
   if (!kReleaseMode) {
     Bloc.observer = LoggerBlocObserver();
@@ -132,34 +129,4 @@ class LoggerBlocObserver extends BlocObserver {
 
   //   print('onTransition: $bloc.state');
   // }
-}
-
-class AppleWatchCommunicationManager {
-  final channel = const MethodChannel('com.sashkyn.kekable');
-
-  void connect() {
-    channel.setMethodCallHandler(
-      (MethodCall call) {
-        final String methodName = call.method;
-        final methodArgs = call.arguments;
-
-        print('flutter - methodName = $methodName');
-        print('flutter - methodArgs = $methodArgs');
-
-        if (methodName == 'print') {
-          final String text = methodArgs['text'];
-          print('heh - $text');
-        }
-
-        channel.invokeMethod(
-          'printOut',
-          [
-            {'text': 'ohohohhohoohohhoohhohohohoh'}
-          ],
-        );
-
-        return Future.value();
-      },
-    );
-  }
 }

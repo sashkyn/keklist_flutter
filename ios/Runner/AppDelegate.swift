@@ -32,12 +32,10 @@ import WatchConnectivity
         // MARK: Registation method channel
         
         flutterMethodChannel.setMethodCallHandler { [weak self] call, result in
-            let method = call.method
-            let args = call.arguments
+            // TODO: проверить является ли метод поддерживаемым часами через enum
+            //let method = call.method
             
-            guard method == "printOut" else {
-                return
-            }
+            let args = call.arguments
             
             guard let watchSession = self?.watchSession,
                   watchSession.isPaired,
@@ -51,6 +49,7 @@ import WatchConnectivity
                 return
             }
             
+            // TODO: отправлять название метода тоже
             watchSession.sendMessage(messageData, replyHandler: nil)
         }
         
@@ -78,11 +77,11 @@ extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         print("AppDelegate WC: session didReceiveMessage - \(message)")
         
-        guard let methodName = message["method"] as? String,
-              let data = message["data"] as? [String : Any] else {
+        guard let methodName = message["method"] as? String else {
             return
         }
         
-        flutterMethodChannel.invokeMethod(methodName, arguments: data)
+        let arguments = message["data"] as? [String : Any]
+        flutterMethodChannel.invokeMethod(methodName, arguments: arguments)
     }
 }

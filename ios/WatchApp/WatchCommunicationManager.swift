@@ -7,15 +7,16 @@ final class WatchCommunicationManager: NSObject {
     init(session: WCSession = .default) {
         self.session = session
         super.init()
+        
         self.session.delegate = self
         self.session.activate()
     }
     
-    func handleButton() {
+    func obtainTodayMinds() {
         session.sendMessage(
             [
-                "method": "print",
-                "data": ["text": "heheheeheheheheheeheh"]
+                "method": "obtainTodayMinds"
+//                "data": ["text": "heheheeheheheheheeheh"]
             ],
             replyHandler: nil,
             errorHandler: nil
@@ -29,6 +30,7 @@ extension WatchCommunicationManager: WCSessionDelegate {
         print("AppDelegate WC: activationDidCompleteWith - \(activationState)")
     }
 
+    // MARK: чтобы запускалось из VS Code - Flutter
     #if os(iOS)
     func sessionDidBecomeInactive(_ session: WCSession) {
         print("AppDelegate WC: sessionDidBecomeInactive")
