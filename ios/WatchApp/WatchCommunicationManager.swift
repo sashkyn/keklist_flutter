@@ -2,7 +2,7 @@ import Foundation
 import WatchConnectivity
 
 final class WatchCommunicationManager: NSObject {
-    weak var delegate: WatchCommunicationManagerDelegate? = nil
+    var onReceiveMinds: (([Mind]) -> ())?
     
     private let session: WCSession
     
@@ -45,7 +45,7 @@ final class WatchCommunicationManager: NSObject {
             
             do {
                 let minds = try decoder.decode([Mind].self, from: mindsJsonData)
-                print(minds)
+                self.onReceiveMinds?(minds)
             } catch {
                 print("error - \(error)")
             }
@@ -80,9 +80,4 @@ extension WatchCommunicationManager: WCSessionDelegate {
         print("WatchCommunicationManager didReceiveMessage - method - \(message["method"] ?? "nil")")
         handle(message: message)
     }
-}
-
-protocol WatchCommunicationManagerDelegate: AnyObject {
-    
-    func didReceive(minds: [Mind])
 }
