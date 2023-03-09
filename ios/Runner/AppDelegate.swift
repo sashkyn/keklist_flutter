@@ -32,25 +32,30 @@ import WatchConnectivity
         // MARK: Registation method channel
         
         flutterMethodChannel.setMethodCallHandler { [weak self] call, result in
-            // TODO: проверить является ли метод поддерживаемым часами через enum
-            //let method = call.method
-            
-            let args = call.arguments
+            let methodArguments = call.arguments
             
             guard let watchSession = self?.watchSession,
                   watchSession.isPaired,
-                  let messageData = (args as? Array<Any>)?.first as? [String: Any] else {
-                print("watch not paired")
+                  var messageData = (methodArguments as? Array<Any>)?.first as? [String: Any] else {
+//                result("watch not paired")
                 return
             }
             
             guard watchSession.isReachable else {
-                print("watch not reachable")
+//                result("watch not reachable")
                 return
             }
             
-            // TODO: отправлять название метода тоже
-            watchSession.sendMessage(messageData, replyHandler: nil)
+            // INFO: Добавляем название метода в параметры сообщения
+            messageData["method"] = call.method
+            
+            watchSession.sendMessage(
+                messageData,
+                replyHandler: nil,
+                errorHandler: { error in result(error) }
+            )
+            
+//            result(())
         }
         
         return super.application(

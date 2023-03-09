@@ -2,6 +2,8 @@ import Foundation
 import WatchConnectivity
 
 final class WatchCommunicationManager: NSObject {
+    weak var delegate: WatchCommunicationManagerDelegate? = nil
+    
     private let session: WCSession
     
     init(session: WCSession = .default) {
@@ -22,6 +24,39 @@ final class WatchCommunicationManager: NSObject {
             errorHandler: nil
         )
     }
+    
+    func handle(message: [String : Any]) {
+        guard let methodName = message["method"] as? String else {
+            return
+        }
+        
+        switch methodName {
+        case "displayMinds":
+            guard let mindsJsonString = message["minds"] as? String else {
+                return
+            }
+            
+            guard let mindsJsonData = mindsJsonString.data(using: .utf8) else {
+                return
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let minds = try decoder.decode([Mind].self, from: mindsJsonData)
+                print(minds)
+            } catch {
+                print("error - \(error)")
+            }
+        case "showLoading":
+            print(message)
+        case "showError":
+            print(message)
+        default:
+            print(message)
+        }
+    }
 }
 
 extension WatchCommunicationManager: WCSessionDelegate {
@@ -30,7 +65,7 @@ extension WatchCommunicationManager: WCSessionDelegate {
         print("AppDelegate WC: activationDidCompleteWith - \(activationState)")
     }
 
-    // MARK: чтобы запускалось из VS Code - Flutter
+    // MARK: чтобы запускалось из VS Code, запуская Flutter-приложение
     #if os(iOS)
     func sessionDidBecomeInactive(_ session: WCSession) {
         print("AppDelegate WC: sessionDidBecomeInactive")
@@ -42,6 +77,12 @@ extension WatchCommunicationManager: WCSessionDelegate {
     #endif
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        print("WatchCommunicationManager didReceiveMessage - \(message)")
+        print("WatchCommunicationManager didReceiveMessage - method - \(message["method"] ?? "nil")")
+        handle(message: message)
     }
+}
+
+protocol WatchCommunicationManagerDelegate: AnyObject {
+    
+    func didReceive(minds: [Mind])
 }

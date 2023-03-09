@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:zenmode/helpers/extensions/enum_from_string.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
@@ -26,8 +28,8 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _sendToWatch({
-    required _WatchOutputMethod output,
-    required Map<_WatchMethodArgumentKey, dynamic> arguments,
+    required WatchOutputMethod output,
+    required Map<WatchMethodArgumentKey, dynamic> arguments,
   }) async {
     final Map<String, String> methodArguments = arguments.map(
       (key, value) => MapEntry<String, String>(
@@ -52,24 +54,30 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         print('methodName = $methodName');
         print('methodArgs = $methodArgs');
 
-        if (methodName == stringFromEnum(_WatchInputMethod.obtainTodayMinds)) {
-          _sendToWatch(
-            output: _WatchOutputMethod.showLoading,
-            arguments: {},
-          );
+        if (methodName == stringFromEnum(WatchInputMethod.obtainTodayMinds)) {
           final mindList = await mainService.getMindList();
-          final todayMindList = mindList.where(
-            (element) => element.dayIndex == MindUtils.getDayIndex(from: DateTime.now()),
-          );
+          final todayMindList = mindList
+              .where(
+                (element) => element.dayIndex == MindUtils.getDayIndex(from: DateTime.now()),
+              )
+              .toList();
+          // final mindJSONList = todayMindList.map((item) => item.toWatchJson()).toList();
+
+          final List<String> mindJSONList = todayMindList.map((e) {
+            return json.encode(
+              e,
+              toEncodable: (i) => e.toWatchJson(),
+            );
+          }).toList();
           _sendToWatch(
-            output: _WatchOutputMethod.displayMinds,
+            output: WatchOutputMethod.displayMinds,
             arguments: {
-              _WatchMethodArgumentKey.minds: todayMindList.map((e) => e.toWatchJson()),
+              WatchMethodArgumentKey.minds: mindJSONList,
             },
           );
-        } else if (methodName == _WatchInputMethod.createNewMind.toString()) {
+        } else if (methodName == WatchInputMethod.createNewMind.toString()) {
           // TODO: сделать создание mind-а и отправить все на часы
-        } else if (methodName == _WatchInputMethod.deleteMind.toString()) {
+        } else if (methodName == WatchInputMethod.deleteMind.toString()) {
           // TODO: сделать удаление mind-а и отправить все на часы
         }
         // TODO: возвращать на каждый кейс свою Future
@@ -79,19 +87,19 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 }
 
-enum _WatchInputMethod {
+enum WatchInputMethod {
   obtainTodayMinds,
   createNewMind,
   deleteMind,
 }
 
-enum _WatchOutputMethod {
+enum WatchOutputMethod {
   displayMinds,
   displayError,
   showLoading,
 }
 
-enum _WatchMethodArgumentKey {
+enum WatchMethodArgumentKey {
   minds,
   mind,
   mindId,
