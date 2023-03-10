@@ -52,12 +52,12 @@ flutter_icons:
   image_path: "assets/app_icon_3.png"
   # iOS
   ios: true
-  remove_alpha_ios: false
+  remove_alpha_ios: true
   # Android
-  android: true
+  android: false
   min_sdk_android: 21
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "#FFFFFF"
+  # adaptive_icon_background: "#ffffff"
+  # adaptive_icon_foreground: "#ffffff"
   # MacOS
   macos:
     generate: true
