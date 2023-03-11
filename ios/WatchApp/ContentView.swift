@@ -1,5 +1,7 @@
 import SwiftUI
 
+// TODO: переименовать в MainView, наделить ее источниками правды
+// TODO: сделать сервис для отправки и принятия данных во Flutter
 struct ContentView: View {
     
     private var manager = WatchCommunicationManager()
