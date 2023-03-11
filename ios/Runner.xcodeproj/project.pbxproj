@@ -22,6 +22,7 @@
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
 		E6D13A5229B71D300045C7FA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */; };
 		E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E6F7AD8129BB75FD00E7AACF /* MindDetailsScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		E6D13A4C29B71D2F0045C7FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E6D13A4E29B71D300045C7FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindDetailsScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +184,7 @@
 				E675F54A29B87D4A00267A0D /* Mind.swift */,
 				E6D13A4E29B71D300045C7FA /* Assets.xcassets */,
 				E6D13A5029B71D300045C7FA /* Preview Content */,
+				E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */,
 			);
 			path = WatchApp;
 			sourceTree = "<group>";
@@ -390,6 +393,7 @@
 				E675F54B29B87D4A00267A0D /* Mind.swift in Sources */,
 				E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */,
 				E6A02AEF29B759250091F915 /* WatchCommunicationManager.swift in Sources */,
+				E6F7AD8129BB75FD00E7AACF /* MindDetailsScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
