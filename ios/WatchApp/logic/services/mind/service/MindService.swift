@@ -2,13 +2,12 @@ import Foundation
 import Combine
 
 protocol MindService {
-    
     func obtainTodayMinds() -> AnyPublisher<[Mind], Never>
     func createNewMind() -> AnyPublisher<Void, Never>
     func deleteMind(id: String) -> AnyPublisher<Void, Never>
 }
 
-final class MindFlutterChannelService: MindService {
+final class MindMobileChannelService: MindService {
     
     private let mobileCommunicationManager: MobileCommunicationManager
     

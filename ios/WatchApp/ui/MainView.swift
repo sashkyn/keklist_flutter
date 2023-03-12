@@ -6,6 +6,7 @@ import Combine
 // TODO: сделать отправку Emoji
 // TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
 // TODO: сделать аккуратное удаление Эмодзи
+// TODO: сделать ViewModel для каждой View c помощью ObservableObject
 
 struct MainView: View {
     

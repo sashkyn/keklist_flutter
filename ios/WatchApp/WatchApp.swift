@@ -4,7 +4,7 @@ import SwiftUI
 struct WatchApp: App {
     
     // TODO: убрать в DI
-    private let mindService: MindService = MindFlutterChannelService(
+    private let mindService: MindService = MindMobileChannelService(
         mobileCommunicationManager: MobileCommunicationManager()
     )
     
