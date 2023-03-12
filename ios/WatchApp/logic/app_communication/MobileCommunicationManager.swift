@@ -1,8 +1,14 @@
 import Foundation
+import Combine
 import WatchConnectivity
 
-final class WatchCommunicationManager: NSObject {
-    var onReceiveMinds: (([Mind]) -> ())?
+final class MobileCommunicationManager: NSObject {
+    
+    var messages: AnyPublisher<MethodData, Never> {
+        messagesSubject.eraseToAnyPublisher()
+    }
+    
+    private let messagesSubject = PassthroughSubject<MethodData, Never>()
     
     private let session: WCSession
     
@@ -14,12 +20,9 @@ final class WatchCommunicationManager: NSObject {
         self.session.activate()
     }
     
-    func obtainTodayMinds() {
+    func send(message: [String: Any]) {
         session.sendMessage(
-            [
-                "method": "obtainTodayMinds"
-//                "data": ["text": "heheheeheheheheheeheh"]
-            ],
+            message,
             replyHandler: nil,
             errorHandler: nil
         )
@@ -30,36 +33,15 @@ final class WatchCommunicationManager: NSObject {
             return
         }
         
-        switch methodName {
-        case "displayMinds":
-            guard let mindsJsonString = message["minds"] as? String else {
-                return
-            }
-            
-            guard let mindsJsonData = mindsJsonString.data(using: .utf8) else {
-                return
-            }
-            
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            
-            do {
-                let minds = try decoder.decode([Mind].self, from: mindsJsonData)
-                self.onReceiveMinds?(minds)
-            } catch {
-                print("error - \(error)")
-            }
-        case "showLoading":
-            print(message)
-        case "showError":
-            print(message)
-        default:
-            print(message)
-        }
+        var message = message
+        message.removeValue(forKey: "method")
+        
+        let method = MethodData(name: methodName, arguments: message)
+        messagesSubject.send(method)
     }
 }
 
-extension WatchCommunicationManager: WCSessionDelegate {
+extension MobileCommunicationManager: WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         print("AppDelegate WC: activationDidCompleteWith - \(activationState)")
@@ -80,4 +62,9 @@ extension WatchCommunicationManager: WCSessionDelegate {
         print("WatchCommunicationManager didReceiveMessage - method - \(message["method"] ?? "nil")")
         handle(message: message)
     }
+}
+
+struct MethodData {
+    var name: String
+    var arguments: [String: Any]
 }

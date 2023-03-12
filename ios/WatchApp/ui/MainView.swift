@@ -1,10 +1,18 @@
 import SwiftUI
+import Combine
 
-// TODO: переименовать в MainView, наделить ее источниками правды
-// TODO: сделать сервис для отправки и принятия данных во Flutter
-struct ContentView: View {
+// TODO: разделить все на маленькие View
+// TODO: исправить баги с Picker-ом
+// TODO: сделать отправку Emoji
+// TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
+// TODO: сделать аккуратное удаление Эмодзи
+
+struct MainView: View {
     
-    private var manager = WatchCommunicationManager()
+    let service: MindService
+    
+    @State
+    private var cancellable: AnyCancellable?
     
     @State
     private var minds: [Mind] = []
@@ -13,19 +21,25 @@ struct ContentView: View {
     private var isLoading: Bool = true
     
     @State
-    private var textToCreateMind: String = ""
+    private var textToCreateMind: String?
+    
+    private var isOpenedEmojiPicker: Binding<Bool> {
+        Binding<Bool>(
+            get: { textToCreateMind != nil },
+            set: { _ in return }
+        )
+    }
     
     var body: some View {
         NavigationView {
             if isLoading {
-                ProgressView()
-                    .navigationTitle("Loading minds...")
+                MindLoadingView()
                     .onAppear {
-                        manager.onReceiveMinds = { minds in
-                            isLoading = false
-                            self.minds = minds
-                        }
-                        manager.obtainTodayMinds()
+                        self.cancellable = self.service.obtainTodayMinds()
+                            .sink { minds in
+                                self.minds = minds
+                                self.isLoading = false
+                            }
                     }
             } else {
                 ScrollView {
@@ -46,16 +60,25 @@ struct ContentView: View {
                                     withSuggestions: [],
                                     allowedInputMode: .plain
                                 ) { result in
-                                    
-                                    guard let result = result as? [String], let firstElement = result.first else {
+                                    guard let result = result as? [String],
+                                          let resultText = result.first else {
                                         self.textToCreateMind = ""
                                         return
                                     }
                                     
-                                    self.textToCreateMind = firstElement
+                                    self.textToCreateMind = resultText
                                 }
                         }) {
                             Text("+")
+                        }
+                        NavigationLink(
+                            destination: EmojiPickerView(onSelect: { emoji in
+                                self.cancellable = self.service.createNewMind()
+                                    .sink { }
+                            }),
+                            isActive: isOpenedEmojiPicker
+                        ) {
+                            EmptyView()
                         }
                     }
                     .padding()
@@ -71,7 +94,7 @@ struct MindRow: View {
 
     var body: some View {
         Button(action: {}) {
-            NavigationLink(destination: MindDetailsScreenView(mind: mind)) {
+            NavigationLink(destination: MindDetailsView(mind: mind)) {
                 Text(mind.emoji.description)
                     .font(.system(size: 30))
             }
@@ -80,11 +103,11 @@ struct MindRow: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MainView()
+//    }
+//}
 
 // MARK: Generation of minds
 

@@ -15,14 +15,17 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		DACBBFEB9C59BFCAD82C59C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D071186D07DAC7B72178546 /* Pods_Runner.framework */; };
-		E675F54B29B87D4A00267A0D /* Mind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E675F54A29B87D4A00267A0D /* Mind.swift */; };
-		E6A02AEF29B759250091F915 /* WatchCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */; };
+		E63715FA29BCA6C100CD0BB3 /* MindService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63715F929BCA6C100CD0BB3 /* MindService.swift */; };
+		E637160029BCA80300CD0BB3 /* MindDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */; };
+		E637160129BCA80300CD0BB3 /* MindLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63715FE29BCA80300CD0BB3 /* MindLoadingView.swift */; };
+		E637160329BCA94800CD0BB3 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */; };
+		E6A02AEF29B759250091F915 /* MobileCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */; };
 		E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */; };
-		E6D13A4D29B71D2F0045C7FA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* ContentView.swift */; };
+		E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* MainView.swift */; };
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
 		E6D13A5229B71D300045C7FA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */; };
 		E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		E6F7AD8129BB75FD00E7AACF /* MindDetailsScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */; };
+		E6FAD34529BE01720078A43B /* Mind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAD34429BE01720078A43B /* Mind.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,14 +82,17 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A364558CF161996DD45C2207 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C6E2913CC35BAB47985CBC4C /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
-		E675F54A29B87D4A00267A0D /* Mind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mind.swift; sourceTree = "<group>"; };
-		E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCommunicationManager.swift; sourceTree = "<group>"; };
+		E63715F929BCA6C100CD0BB3 /* MindService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindService.swift; sourceTree = "<group>"; };
+		E63715FE29BCA80300CD0BB3 /* MindLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindLoadingView.swift; sourceTree = "<group>"; };
+		E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindDetailsView.swift; sourceTree = "<group>"; };
+		E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
+		E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCommunicationManager.swift; sourceTree = "<group>"; };
 		E6D13A4829B71D2F0045C7FA /* WatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
-		E6D13A4C29B71D2F0045C7FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E6D13A4C29B71D2F0045C7FA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E6D13A4E29B71D300045C7FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindDetailsScreenView.swift; sourceTree = "<group>"; };
+		E6FAD34429BE01720078A43B /* Mind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mind.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,16 +181,51 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E63715F729BCA5CF00CD0BB3 /* logic */ = {
+			isa = PBXGroup;
+			children = (
+				E6FAD34229BCE00B0078A43B /* app_communication */,
+				E63715F829BCA6AC00CD0BB3 /* services */,
+			);
+			path = logic;
+			sourceTree = "<group>";
+		};
+		E63715F829BCA6AC00CD0BB3 /* services */ = {
+			isa = PBXGroup;
+			children = (
+				E63715FB29BCA7B400CD0BB3 /* mind */,
+			);
+			path = services;
+			sourceTree = "<group>";
+		};
+		E63715FB29BCA7B400CD0BB3 /* mind */ = {
+			isa = PBXGroup;
+			children = (
+				E6FAD34629BE01850078A43B /* service */,
+				E6FAD34329BE01720078A43B /* entity */,
+			);
+			path = mind;
+			sourceTree = "<group>";
+		};
+		E63715FD29BCA7FA00CD0BB3 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				E6D13A4C29B71D2F0045C7FA /* MainView.swift */,
+				E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */,
+				E63715FE29BCA80300CD0BB3 /* MindLoadingView.swift */,
+				E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
 		E6D13A4929B71D2F0045C7FA /* WatchApp */ = {
 			isa = PBXGroup;
 			children = (
+				E63715FD29BCA7FA00CD0BB3 /* ui */,
+				E63715F729BCA5CF00CD0BB3 /* logic */,
 				E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */,
-				E6D13A4C29B71D2F0045C7FA /* ContentView.swift */,
-				E6A02AEE29B759250091F915 /* WatchCommunicationManager.swift */,
-				E675F54A29B87D4A00267A0D /* Mind.swift */,
 				E6D13A4E29B71D300045C7FA /* Assets.xcassets */,
 				E6D13A5029B71D300045C7FA /* Preview Content */,
-				E6F7AD8029BB75FD00E7AACF /* MindDetailsScreenView.swift */,
 			);
 			path = WatchApp;
 			sourceTree = "<group>";
@@ -195,6 +236,30 @@
 				E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E6FAD34229BCE00B0078A43B /* app_communication */ = {
+			isa = PBXGroup;
+			children = (
+				E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */,
+			);
+			path = app_communication;
+			sourceTree = "<group>";
+		};
+		E6FAD34329BE01720078A43B /* entity */ = {
+			isa = PBXGroup;
+			children = (
+				E6FAD34429BE01720078A43B /* Mind.swift */,
+			);
+			path = entity;
+			sourceTree = "<group>";
+		};
+		E6FAD34629BE01850078A43B /* service */ = {
+			isa = PBXGroup;
+			children = (
+				E63715F929BCA6C100CD0BB3 /* MindService.swift */,
+			);
+			path = service;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -389,11 +454,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6D13A4D29B71D2F0045C7FA /* ContentView.swift in Sources */,
-				E675F54B29B87D4A00267A0D /* Mind.swift in Sources */,
+				E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */,
 				E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */,
-				E6A02AEF29B759250091F915 /* WatchCommunicationManager.swift in Sources */,
-				E6F7AD8129BB75FD00E7AACF /* MindDetailsScreenView.swift in Sources */,
+				E6A02AEF29B759250091F915 /* MobileCommunicationManager.swift in Sources */,
+				E63715FA29BCA6C100CD0BB3 /* MindService.swift in Sources */,
+				E637160329BCA94800CD0BB3 /* EmojiPickerView.swift in Sources */,
+				E6FAD34529BE01720078A43B /* Mind.swift in Sources */,
+				E637160129BCA80300CD0BB3 /* MindLoadingView.swift in Sources */,
+				E637160029BCA80300CD0BB3 /* MindDetailsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

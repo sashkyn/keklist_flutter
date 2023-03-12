@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MindDetailsScreenView: View {
+struct MindDetailsView: View {
     
     let mind: Mind
     
