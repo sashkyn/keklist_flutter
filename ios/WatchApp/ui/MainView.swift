@@ -1,90 +1,76 @@
 import SwiftUI
 import Combine
 
-// TODO: разделить все на маленькие View
-// TODO: исправить баги с Picker-ом
+// TODO: исправить баги с Picker-ом - сделать свой пикер
 // TODO: сделать отправку Emoji
 // TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
 // TODO: сделать аккуратное удаление Эмодзи
-// TODO: сделать ViewModel для каждой View c помощью ObservableObject
+// TODO: надо чтобы ошибка приходила в ответ вместо Never
+// TODO: сделать переподключения при ошибках соединения с приложением
+
+final class MainViewModel: ObservableObject {
+    
+    @Published
+    var minds: [Mind] = []
+    
+    @Published
+    var isLoading: Bool = true
+    
+    @Published
+    var errorText: String?
+
+    let service: MindService
+    private var cancellable: AnyCancellable?
+    private var errorCancellable: AnyCancellable?
+    
+    init(service: MindService) {
+        self.service = service
+        
+        errorCancellable = service.errors
+            .sink { [weak self] error in
+                self?.errorText = "\(error)"
+            }
+    }
+    
+    func obtainTodayMinds() {
+        self.errorText = nil
+        
+        cancellable?.cancel()
+        cancellable = nil
+        
+        cancellable = service.obtainTodayMinds()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] minds in
+                guard let self else { return }
+                
+                self.minds = minds
+                self.isLoading = false
+            }
+    }
+}
 
 struct MainView: View {
     
-    let service: MindService
-    
-    @State
-    private var cancellable: AnyCancellable?
-    
-    @State
-    private var minds: [Mind] = []
-    
-    @State
-    private var isLoading: Bool = true
-    
-    @State
-    private var textToCreateMind: String?
-    
-    private var isOpenedEmojiPicker: Binding<Bool> {
-        Binding<Bool>(
-            get: { textToCreateMind != nil },
-            set: { _ in return }
-        )
-    }
+    @ObservedObject
+    var viewModel: MainViewModel
     
     var body: some View {
         NavigationView {
-            if isLoading {
-                MindLoadingView()
+            if let errorText = viewModel.errorText {
+                Text(errorText)
+                    .navigationTitle("Error")
+                    .onTapGesture {
+                        viewModel.obtainTodayMinds()
+                    }
+            } else if viewModel.isLoading {
+                ProgressView()
+                    .navigationTitle("Connecting...")
                     .onAppear {
-                        self.cancellable = self.service.obtainTodayMinds()
-                            .sink { minds in
-                                self.minds = minds
-                                self.isLoading = false
-                            }
+                        viewModel.obtainTodayMinds()
                     }
             } else {
-                ScrollView {
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ]
-                    ) {
-                        ForEach($minds, id: \.uuid) { mind in
-                            MindRow(mind: mind.wrappedValue)
-                        }
-                        Button(action: {
-                            WKExtension.shared()
-                                .visibleInterfaceController?
-                                .presentTextInputController(
-                                    withSuggestions: [],
-                                    allowedInputMode: .plain
-                                ) { result in
-                                    guard let result = result as? [String],
-                                          let resultText = result.first else {
-                                        self.textToCreateMind = ""
-                                        return
-                                    }
-                                    
-                                    self.textToCreateMind = resultText
-                                }
-                        }) {
-                            Text("+")
-                        }
-                        NavigationLink(
-                            destination: EmojiPickerView(onSelect: { emoji in
-                                self.cancellable = self.service.createNewMind()
-                                    .sink { }
-                            }),
-                            isActive: isOpenedEmojiPicker
-                        ) {
-                            EmptyView()
-                        }
-                    }
-                    .padding()
-                }
-                .navigationTitle("Minds")
+                MindCollectionView(viewModel: viewModel)
+                    .navigationTitle("Minds")
             }
         }
     }

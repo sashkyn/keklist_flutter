@@ -8,7 +8,12 @@ final class MobileCommunicationManager: NSObject {
         messagesSubject.eraseToAnyPublisher()
     }
     
+    var errors: AnyPublisher<Error, Never> {
+        errorsSubject.eraseToAnyPublisher()
+    }
+    
     private let messagesSubject = PassthroughSubject<MethodData, Never>()
+    private let errorsSubject = PassthroughSubject<Error, Never>()
     
     private let session: WCSession
     
@@ -24,7 +29,9 @@ final class MobileCommunicationManager: NSObject {
         session.sendMessage(
             message,
             replyHandler: nil,
-            errorHandler: nil
+            errorHandler: { [weak self] error in
+                self?.errorsSubject.send(error)
+            }
         )
     }
     

@@ -10,7 +10,9 @@ struct WatchApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView(service: mindService)
+            MainView(
+                viewModel: MainViewModel(service: mindService)
+            )
         }
     }
 }

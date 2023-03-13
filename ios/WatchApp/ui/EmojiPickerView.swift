@@ -4,9 +4,6 @@ private let emojis = (0x1F601...0x1F64F).compactMap { Unicode.Scalar($0) }.map {
 
 struct EmojiPickerView: View {
     
-    @Environment(\.presentationMode)
-    private var presentationMode
-    
     @State
     private var selectedEmoji: String?
     
@@ -18,9 +15,10 @@ struct EmojiPickerView: View {
             selection: $selectedEmoji
         ) {
             ForEach(emojis, id: \.self) { emoji in
-                Text(emoji).font(.largeTitle)
+                Text(emoji).tag(emoji)
             }
         }
+            .frame(width: 148,height: 50)
             .pickerStyle(WheelPickerStyle())
             .onChange(
                 of: selectedEmoji,
@@ -28,7 +26,6 @@ struct EmojiPickerView: View {
                     guard let newValue else { return }
                     
                     onSelect(newValue)
-                    presentationMode.wrappedValue.dismiss()
                 }
             )
     }

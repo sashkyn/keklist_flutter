@@ -1,13 +1,21 @@
 import Foundation
 import Combine
 
+// TODO: передалать во Future
+
 protocol MindService {
+    var errors: AnyPublisher<Error, Never> { get }
+    
     func obtainTodayMinds() -> AnyPublisher<[Mind], Never>
-    func createNewMind() -> AnyPublisher<Void, Never>
+    func createNewMind(text: String, emoji: String) -> AnyPublisher<Void, Never>
     func deleteMind(id: String) -> AnyPublisher<Void, Never>
 }
 
 final class MindMobileChannelService: MindService {
+    
+    var errors: AnyPublisher<Error, Never> {
+        mobileCommunicationManager.errors
+    }
     
     private let mobileCommunicationManager: MobileCommunicationManager
     
@@ -41,8 +49,9 @@ final class MindMobileChannelService: MindService {
             .eraseToAnyPublisher()
     }
     
-    func createNewMind() -> AnyPublisher<Void, Never> {
-        Just(()).eraseToAnyPublisher()
+    func createNewMind(text: String, emoji: String) -> AnyPublisher<Void, Never> {
+        print("mindService createNewMind: \(text) \(emoji)")
+        return Just(()).eraseToAnyPublisher()
     }
     
     func deleteMind(id: String) -> AnyPublisher<Void, Never> {
