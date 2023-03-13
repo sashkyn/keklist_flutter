@@ -7,6 +7,7 @@ import Combine
 // TODO: сделать аккуратное удаление Эмодзи
 // TODO: надо чтобы ошибка приходила в ответ вместо Never
 // TODO: сделать переподключения при ошибках соединения с приложением
+// TODO: сделать в схемах по дефолту Debug
 
 final class MainViewModel: ObservableObject {
     
