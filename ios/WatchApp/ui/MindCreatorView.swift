@@ -13,12 +13,11 @@ final class MindCreatorViewModel: ObservableObject {
     @Published
     var needToDismiss: Bool = false
     
+    let service: MindService
     private var cancellable: AnyCancellable?
     
     init(service: MindService) {
-        self.textToCreateMind = nil
-        self.pickedEmoji = nil
-        self.needToDismiss = false
+        self.service = service
         
         self.cancellable = Publishers.CombineLatest(
             textToCreateMind.publisher,
@@ -27,6 +26,8 @@ final class MindCreatorViewModel: ObservableObject {
             .flatMap { text, emoji in
                 service.createNewMind(text: text, emoji: emoji)
             }
+            .replaceError(with: ()) // TODO: сделать обработку ошибок
+            .receive(on: RunLoop.main)
             .sink { [weak self] in
                 self?.needToDismiss = true
             }
@@ -60,10 +61,14 @@ struct MindCreatorView: View {
     
     var body: some View {
         NavigationView {
-            if viewModel.textToCreateMind != nil {
-                EmojiPickerView { emoji in
-                    viewModel.pickedEmoji = emoji
-                }
+            if let mindText = viewModel.textToCreateMind {
+                EmojiPickerView(
+                    onSelect: { emoji in viewModel.pickedEmoji = emoji },
+                    viewModel: EmojiPickerViewModel(
+                        service: viewModel.service,
+                        mindText: mindText
+                    )
+                )
             }
         }
         .onChange(of: viewModel.needToDismiss) { needToDismiss in

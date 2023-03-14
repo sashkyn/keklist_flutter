@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:zenmode/helpers/extensions/enum_from_string.dart';
@@ -55,26 +56,10 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         print('methodArgs = $methodArgs');
 
         if (methodName == stringFromEnum(WatchInputMethod.obtainTodayMinds)) {
-          final mindList = await mainService.getMindList();
-          final todayMindList = mindList
-              .where(
-                (element) => element.dayIndex == MindUtils.getDayIndex(from: DateTime.now()),
-              )
-              .toList();
-          // final mindJSONList = todayMindList.map((item) => item.toWatchJson()).toList();
-
-          final List<String> mindJSONList = todayMindList.map((e) {
-            return json.encode(
-              e,
-              toEncodable: (i) => e.toWatchJson(),
-            );
-          }).toList();
-          _sendToWatch(
-            output: WatchOutputMethod.displayMinds,
-            arguments: {
-              WatchMethodArgumentKey.minds: mindJSONList,
-            },
-          );
+          return _displayMindList();
+        } else if (methodName == stringFromEnum(WatchInputMethod.obtainPredictedEmojies)) {
+          final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
+          return _displayPredictedEmojies(mindText: mindText);
         } else if (methodName == WatchInputMethod.createNewMind.toString()) {
           // TODO: сделать создание mind-а и отправить все на часы
         } else if (methodName == WatchInputMethod.deleteMind.toString()) {
@@ -85,16 +70,57 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       },
     );
   }
+
+  Future<void> _displayMindList() async {
+    final mindList = await mainService.getMindList();
+    final todayMindList = mindList
+        .where(
+          (element) => element.dayIndex == MindUtils.getDayIndex(from: DateTime.now()),
+        )
+        .toList();
+    final List<String> mindJSONList = todayMindList
+        .map(
+          (mind) => json.encode(
+            mind,
+            toEncodable: (i) => mind.toWatchJson(),
+          ),
+        )
+        .toList();
+    return _sendToWatch(
+      output: WatchOutputMethod.displayMinds,
+      arguments: {
+        WatchMethodArgumentKey.minds: mindJSONList,
+      },
+    );
+  }
+
+  Future<void> _displayPredictedEmojies({required String mindText}) async {
+    // TODO: сделать релевантным введенному тексту с часов
+
+    final mindList = await mainService.getMindList();
+
+    // TODO: отсортировать по частоте
+    final predictedEmojies = mindList.map((e) => e.emoji).toSet().toList();
+    final predictedEmojiesJSON = json.encode(predictedEmojies.toString());
+    return _sendToWatch(
+      output: WatchOutputMethod.displayPredictedEmojies,
+      arguments: {
+        WatchMethodArgumentKey.emojies: predictedEmojiesJSON,
+      },
+    );
+  }
 }
 
 enum WatchInputMethod {
   obtainTodayMinds,
+  obtainPredictedEmojies,
   createNewMind,
   deleteMind,
 }
 
 enum WatchOutputMethod {
   displayMinds,
+  displayPredictedEmojies,
   displayError,
   showLoading,
 }
@@ -103,4 +129,6 @@ enum WatchMethodArgumentKey {
   minds,
   mind,
   mindId,
+  mindText,
+  emojies,
 }

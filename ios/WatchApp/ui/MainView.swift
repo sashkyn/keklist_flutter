@@ -34,19 +34,30 @@ final class MainViewModel: ObservableObject {
     }
     
     func obtainTodayMinds() {
-        self.errorText = nil
-        
         cancellable?.cancel()
         cancellable = nil
         
+        errorText = nil
+        isLoading = true
+        
         cancellable = service.obtainTodayMinds()
             .receive(on: RunLoop.main)
-            .sink { [weak self] minds in
-                guard let self else { return }
-                
-                self.minds = minds
-                self.isLoading = false
-            }
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    switch completion {
+                    case .failure(let error):
+                        self?.errorText = "\(error)"
+                    default:
+                        return
+                    }
+                },
+                receiveValue: { [weak self] minds in
+                    guard let self else { return }
+                    
+                    self.minds = minds
+                    self.isLoading = false
+                }
+            )
     }
 }
 

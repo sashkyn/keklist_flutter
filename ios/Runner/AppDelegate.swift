@@ -82,11 +82,15 @@ extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         print("AppDelegate WC: session didReceiveMessage - \(message)")
         
+        
+        
         guard let methodName = message["method"] as? String else {
             return
         }
         
-        let arguments = message["data"] as? [String : Any]
+        var arguments: [String: Any] = message
+        arguments.removeValue(forKey: "method")
+        
         flutterMethodChannel.invokeMethod(methodName, arguments: arguments)
     }
 }
