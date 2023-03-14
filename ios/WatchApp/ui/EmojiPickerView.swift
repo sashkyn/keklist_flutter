@@ -39,9 +39,11 @@ final class EmojiPickerViewModel: ObservableObject {
                     default:
                         return
                     }
+                    self?.isLoading = false
                 },
                 receiveValue: { [weak self] emojies in
                     self?.emojies = emojies
+                    self?.isLoading = false
                 }
             )
     }
@@ -49,26 +51,27 @@ final class EmojiPickerViewModel: ObservableObject {
 
 struct EmojiPickerView: View {
     
-    @State
-    private var selectedEmoji: String?
-    
     var onSelect: (String) -> Void
     
     @ObservedObject
     var viewModel: EmojiPickerViewModel
 
     var body: some View {
-        LazyVStack {
-            if viewModel.isLoading {
-                ProgressView()
-            } else if let errorText = viewModel.errorText {
-                Text("\(errorText)")
-            } else {
-                ForEach(viewModel.emojies, id: \.self) { emoji in
-                    Text(emoji).font(.largeTitle)
-                        .onTapGesture {
+        ScrollView {
+            LazyVStack {
+                if viewModel.isLoading {
+                    ProgressView()
+                } else if let errorText = viewModel.errorText {
+                    Text("\(errorText)")
+                } else {
+                    ForEach(viewModel.emojies, id: \.self) { emoji in
+                        Button {
                             onSelect(emoji)
+                        } label: {
+                            Text(emoji).font(.headline)
                         }
+                    }
+                        .navigationTitle("Select an emoji")
                 }
             }
         }.onAppear {

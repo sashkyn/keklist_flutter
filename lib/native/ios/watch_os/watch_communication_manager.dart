@@ -100,12 +100,14 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     final mindList = await mainService.getMindList();
 
     // TODO: отсортировать по частоте
-    final predictedEmojies = mindList.map((e) => e.emoji).toSet().toList();
-    final predictedEmojiesJSON = json.encode(predictedEmojies.toString());
+    final predictedEmojies = mindList.map((e) => e.emoji).toSet();
+
+    final List<String> emojiJSONList = predictedEmojies.map((mind) => json.encode(mind)).toList();
+
     return _sendToWatch(
       output: WatchOutputMethod.displayPredictedEmojies,
       arguments: {
-        WatchMethodArgumentKey.emojies: predictedEmojiesJSON,
+        WatchMethodArgumentKey.emojies: emojiJSONList,
       },
     );
   }
