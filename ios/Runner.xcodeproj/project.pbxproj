@@ -26,6 +26,7 @@
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
 		E6D13A5229B71D300045C7FA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */; };
 		E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E6EF527C29C0B9960036AD81 /* NavigationLazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF527B29C0B9960036AD81 /* NavigationLazyView.swift */; };
 		E6FAD34529BE01720078A43B /* Mind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAD34429BE01720078A43B /* Mind.swift */; };
 /* End PBXBuildFile section */
 
@@ -94,6 +95,7 @@
 		E6D13A4C29B71D2F0045C7FA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E6D13A4E29B71D300045C7FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E6EF527B29C0B9960036AD81 /* NavigationLazyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationLazyView.swift; sourceTree = "<group>"; };
 		E6FAD34429BE01720078A43B /* Mind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mind.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -212,6 +214,7 @@
 		E63715FD29BCA7FA00CD0BB3 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				E6EF527A29C0B98B0036AD81 /* helpers */,
 				E6D13A4C29B71D2F0045C7FA /* MainView.swift */,
 				E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */,
 				E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */,
@@ -239,6 +242,14 @@
 				E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E6EF527A29C0B98B0036AD81 /* helpers */ = {
+			isa = PBXGroup;
+			children = (
+				E6EF527B29C0B9960036AD81 /* NavigationLazyView.swift */,
+			);
+			path = helpers;
 			sourceTree = "<group>";
 		};
 		E6FAD34229BCE00B0078A43B /* mobile_communication */ = {
@@ -465,6 +476,7 @@
 				E674EA4B29BF0F7600022300 /* MindCreatorView.swift in Sources */,
 				E6FAD34529BE01720078A43B /* Mind.swift in Sources */,
 				E674EA4929BF0E8C00022300 /* MindCollectionView.swift in Sources */,
+				E6EF527C29C0B9960036AD81 /* NavigationLazyView.swift in Sources */,
 				E637160029BCA80300CD0BB3 /* MindDetailsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

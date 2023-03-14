@@ -74,8 +74,9 @@ struct EmojiPickerView: View {
                         .navigationTitle("Select an emoji")
                 }
             }
-        }.onAppear {
-            viewModel.obtainPredictedEmojies()
         }
+            .onAppear {
+                viewModel.obtainPredictedEmojies()
+            }
     }
 }

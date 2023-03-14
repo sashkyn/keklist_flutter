@@ -20,9 +20,12 @@ struct MindCollectionView: View {
                 }
                 Button(action: {}) {
                     NavigationLink(
-                        destination: MindCreatorView(
-                            viewModel: MindCreatorViewModel(service: viewModel.service)),
-                            label: { Text("+") }
+                        destination: NavigationLazyView(
+                            MindCreatorView(
+                                viewModel: MindCreatorViewModel(service: viewModel.service)
+                            )
+                        ),
+                        label: { Text("+") }
                     )
                 }
             }

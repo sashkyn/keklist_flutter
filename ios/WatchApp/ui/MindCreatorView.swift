@@ -10,21 +10,32 @@ final class MindCreatorViewModel: ObservableObject {
     @Published
     var pickedEmoji: String? = nil
     
-    @Published
     var needToDismiss: Bool = false
     
     let service: MindService
+    
     private var cancellable: AnyCancellable?
     
     init(service: MindService) {
         self.service = service
+    }
+    
+    func subscribeToData() {
+        cancellable?.cancel()
+        cancellable = nil
         
         self.cancellable = Publishers.CombineLatest(
-            textToCreateMind.publisher,
-            pickedEmoji.publisher
+            $textToCreateMind
+                .compactMap { $0 },
+            $pickedEmoji
+                .compactMap { $0 }
+                .filter { !$0.isEmpty }
         )
-            .flatMap { text, emoji in
-                service.createNewMind(text: text, emoji: emoji)
+            .flatMap { [unowned self] text, emoji in
+                self.service.createNewMind(
+                    text: text,
+                    emoji: emoji
+                )
             }
             .replaceError(with: ()) // TODO: сделать обработку ошибок
             .receive(on: RunLoop.main)
@@ -39,14 +50,16 @@ final class MindCreatorViewModel: ObservableObject {
             .presentTextInputController(
                 withSuggestions: [],
                 allowedInputMode: .plain
-            ) { result in
+            ) { [weak self] result in
                 guard let result = result as? [String],
                       let resultText = result.first else {
-                    self.textToCreateMind = ""
+                    self?.textToCreateMind = ""
+                    self?.needToDismiss = true
+                    
                     return
                 }
                 
-                self.textToCreateMind = resultText
+                self?.textToCreateMind = resultText
             }
     }
 }
@@ -63,7 +76,9 @@ struct MindCreatorView: View {
         NavigationView {
             if let mindText = viewModel.textToCreateMind {
                 EmojiPickerView(
-                    onSelect: { emoji in viewModel.pickedEmoji = emoji },
+                    onSelect: { emoji in
+                        viewModel.pickedEmoji = emoji
+                    },
                     viewModel: EmojiPickerViewModel(
                         service: viewModel.service,
                         mindText: mindText
@@ -71,14 +86,15 @@ struct MindCreatorView: View {
                 )
             }
         }
-        .onChange(of: viewModel.needToDismiss) { needToDismiss in
-            if needToDismiss {
-                presentationMode.wrappedValue.dismiss()
+            .onChange(of: viewModel.needToDismiss) { needToDismiss in
+                if needToDismiss {
+                    presentationMode.wrappedValue.dismiss()
+                }
             }
-        }
-        .onAppear {
-            viewModel.showEnterText()
-        }
+            .onAppear {
+                viewModel.showEnterText()
+                viewModel.subscribeToData()
+            }
         
     }
 }
