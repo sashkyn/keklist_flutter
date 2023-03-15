@@ -1,23 +1,20 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zenmode/helpers/extensions/enum_from_string.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
+import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/services/main_service.dart';
-
-// TODO: сделать парсинг моделей в iOS приложении а затем кидать результат в часы
-// TODO: отобразить список эмодзи на экране
-// TODO: сделать создание и удаление эмодзи
 
 abstract class WatchCommunicationManager {
   void connect() {}
 }
 
 class AppleWatchCommunicationManager implements WatchCommunicationManager {
-  final channel = const MethodChannel('com.sashkyn.kekable');
+  final _channel = const MethodChannel('com.sashkyn.kekable');
 
   final MainService mainService;
 
@@ -40,14 +37,14 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     );
 
     final methodName = stringFromEnum(output);
-    await channel.invokeMethod(
+    await _channel.invokeMethod(
       methodName,
       [methodArguments],
     );
   }
 
   void _setupCallBackHandler() {
-    channel.setMethodCallHandler(
+    _channel.setMethodCallHandler(
       (MethodCall call) async {
         final String methodName = call.method;
         final methodArgs = call.arguments;
@@ -60,14 +57,41 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         } else if (methodName == stringFromEnum(WatchInputMethod.obtainPredictedEmojies)) {
           final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
           return _displayPredictedEmojies(mindText: mindText);
-        } else if (methodName == WatchInputMethod.createNewMind.toString()) {
-          // TODO: сделать создание mind-а и отправить все на часы
+        } else if (methodName == WatchInputMethod.createMind.toString()) {
+          final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
+          final emoji = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindEmoji)];
+          return _addMindForToday(
+            mindText: mindText,
+            emoji: emoji,
+          );
         } else if (methodName == WatchInputMethod.deleteMind.toString()) {
-          // TODO: сделать удаление mind-а и отправить все на часы
+          final mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindID)];
+          return _removeMindFromToday(id: mindId);
         }
-        // TODO: возвращать на каждый кейс свою Future
-        return Future.value();
       },
+    );
+  }
+
+  Future<void> _addMindForToday({
+    required String mindText,
+    required String emoji,
+  }) async {
+    final dayIndex = MindUtils.getDayIndex(from: DateTime.now());
+    final mindList = await mainService.getMindList();
+    final sortIndex = mindList.where((element) => element.dayIndex == dayIndex).length;
+
+    final mind = Mind(
+      id: const Uuid().v4(),
+      dayIndex: MindUtils.getDayIndex(from: DateTime.now()),
+      note: mindText,
+      emoji: emoji,
+      creationDate: DateTime.now().millisecondsSinceEpoch,
+      sortIndex: sortIndex,
+    );
+    await mainService.addMind(mind);
+    return _sendToWatch(
+      output: WatchOutputMethod.mindDidCreated,
+      arguments: {},
     );
   }
 
@@ -94,12 +118,17 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     );
   }
 
+  Future<void> _removeMindFromToday({required String id}) async {
+    await mainService.removeMind(id);
+    return _sendToWatch(
+      output: WatchOutputMethod.mindDidDeleted,
+      arguments: {},
+    );
+  }
+
   Future<void> _displayPredictedEmojies({required String mindText}) async {
     // TODO: сделать релевантным введенному тексту с часов
-
     final mindList = await mainService.getMindList();
-
-    // TODO: отсортировать по частоте
     final predictedEmojies = mindList.map((e) => e.emoji).toSet();
 
     final List<String> emojiJSONList = predictedEmojies.map((mind) => json.encode(mind)).toList();
@@ -116,7 +145,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
 enum WatchInputMethod {
   obtainTodayMinds,
   obtainPredictedEmojies,
-  createNewMind,
+  createMind,
   deleteMind,
 }
 
@@ -125,6 +154,8 @@ enum WatchOutputMethod {
   displayPredictedEmojies,
   displayError,
   showLoading,
+  mindDidCreated,
+  mindDidDeleted,
 }
 
 enum WatchMethodArgumentKey {
@@ -132,5 +163,7 @@ enum WatchMethodArgumentKey {
   mind,
   mindId,
   mindText,
+  mindEmoji,
   emojies,
+  mindID,
 }

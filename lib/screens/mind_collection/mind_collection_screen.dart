@@ -295,7 +295,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                     CreateMindBar(
                       focusNode: _createMarkFocusNode,
                       textEditingController: _createMarkEditingController,
-                      onKek: (CreateMindData data) {
+                      onCreate: (CreateMindData data) {
                         setState(() {
                           _suggestionsMarkState = null;
                           _createMarkEditingController.text = '';

@@ -87,12 +87,14 @@ struct MainView: View {
     }
 }
 
+// TODO: как то прокинуть сервис
+
 struct MindRow: View {
     let mind: Mind
 
     var body: some View {
         Button(action: {}) {
-            NavigationLink(destination: MindDetailsView(mind: mind)) {
+            NavigationLink(destination: MindDetailsView(.init(mind: mind, service: viewModel.service))) {
                 Text(mind.emoji.description)
                     .font(.system(size: 30))
             }

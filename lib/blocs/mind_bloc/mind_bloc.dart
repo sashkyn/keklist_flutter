@@ -53,7 +53,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _createMind(MindCreate event, emit) async {
-    final mark = Mind(
+    final mind = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
@@ -61,8 +61,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
-    await _service.addMind(mark);
-    _minds.add(mark);
+    await _service.addMind(mind);
+    _minds.add(mind);
     final newState = MindListState(values: _minds);
     emit.call(newState);
   }

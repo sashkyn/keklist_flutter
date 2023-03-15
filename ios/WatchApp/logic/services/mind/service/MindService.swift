@@ -2,7 +2,6 @@ import Foundation
 import Combine
 
 // TODO: передалать во Future
-// TODO: сделать нормальный парсинг массива предгаданных эмодзи
 
 protocol MindService {
     var errors: AnyPublisher<Error, Never> { get }
@@ -73,19 +72,41 @@ final class MindMobileChannelService: MindService {
                 return Just(jsonData)
                     .decode(type: [String].self, decoder: decoder)
             }
+            .first()
             .eraseToAnyPublisher()
     }
     
     func createNewMind(text: String, emoji: String) -> AnyPublisher<Void, Error> {
-        print("mindService createNewMind: \(text) \(emoji)")
-        return Just(())
+        mobileCommunicationManager.send(
+            message: [
+                "method": "createMind",
+                "mindText": text,
+                "mindEmoji": emoji,
+            ]
+        )
+        
+        return mobileCommunicationManager.messages
+            .filter { $0.name == "mindDidCreated" }
+            .map { _ in }
+            .print("hehehehehe")
             .setFailureType(to: Error.self)
+            .first()
             .eraseToAnyPublisher()
     }
     
     func deleteMind(id: String) -> AnyPublisher<Void, Error> {
-        return Just(())
+        mobileCommunicationManager.send(
+            message: [
+                "method": "deleteMind",
+                "id": id
+            ]
+        )
+        
+        return mobileCommunicationManager.messages
+            .filter { $0.name == "mindDidDeleted" }
+            .map { _ in }
             .setFailureType(to: Error.self)
+            .first()
             .eraseToAnyPublisher()
     }
 }
