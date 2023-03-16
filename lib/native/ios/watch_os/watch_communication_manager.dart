@@ -57,14 +57,14 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         } else if (methodName == stringFromEnum(WatchInputMethod.obtainPredictedEmojies)) {
           final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
           return _displayPredictedEmojies(mindText: mindText);
-        } else if (methodName == WatchInputMethod.createMind.toString()) {
+        } else if (methodName == stringFromEnum(WatchInputMethod.createMind)) {
           final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
           final emoji = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindEmoji)];
-          return _addMindForToday(
+          return _createMindForToday(
             mindText: mindText,
             emoji: emoji,
           );
-        } else if (methodName == WatchInputMethod.deleteMind.toString()) {
+        } else if (methodName == stringFromEnum(WatchInputMethod.deleteMind)) {
           final mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindID)];
           return _removeMindFromToday(id: mindId);
         }
@@ -72,7 +72,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     );
   }
 
-  Future<void> _addMindForToday({
+  Future<void> _createMindForToday({
     required String mindText,
     required String emoji,
   }) async {

@@ -51,6 +51,7 @@ private struct MindRow: View {
     let mind: Mind
 
     var body: some View {
-        Text(mind.emoji.description).font(.system(size: 30))
+        Text(mind.emoji.description)
+            .font(.system(size: 30))
     }
 }

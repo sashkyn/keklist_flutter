@@ -82,8 +82,6 @@ extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         print("AppDelegate WC: session didReceiveMessage - \(message)")
         
-        
-        
         guard let methodName = message["method"] as? String else {
             return
         }
