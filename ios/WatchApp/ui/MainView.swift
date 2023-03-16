@@ -1,11 +1,9 @@
 import SwiftUI
 import Combine
 
-// TODO: исправить баги с Picker-ом - сделать свой пикер
 // TODO: сделать отправку Emoji
 // TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
 // TODO: сделать аккуратное удаление Эмодзи
-// TODO: надо чтобы ошибка приходила в ответ вместо Never
 // TODO: сделать переподключения при ошибках соединения с приложением
 
 final class MainViewModel: ObservableObject {
@@ -27,6 +25,7 @@ final class MainViewModel: ObservableObject {
         self.service = service
         
         errorCancellable = service.errors
+            .receive(on: RunLoop.main)
             .sink { [weak self] error in
                 self?.errorText = "\(error)"
             }
@@ -83,22 +82,6 @@ struct MainView: View {
                 MindCollectionView(viewModel: viewModel)
                     .navigationTitle("Minds")
             }
-        }
-    }
-}
-
-// TODO: как то прокинуть сервис
-
-struct MindRow: View {
-    let mind: Mind
-
-    var body: some View {
-        Button(action: {}) {
-            NavigationLink(destination: MindDetailsView(.init(mind: mind, service: viewModel.service))) {
-                Text(mind.emoji.description)
-                    .font(.system(size: 30))
-            }
-                .buttonStyle(PlainButtonStyle())
         }
     }
 }

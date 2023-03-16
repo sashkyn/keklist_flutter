@@ -16,7 +16,19 @@ struct MindCollectionView: View {
                 ]
             ) {
                 ForEach($viewModel.minds, id: \.uuid) { mind in
-                    MindRow(mind: mind.wrappedValue)
+                    NavigationLink {
+                        NavigationLazyView(
+                            MindDetailsView(
+                                viewModel: MindDetailsViewModel(
+                                    mind: mind.wrappedValue,
+                                    service: viewModel.service
+                                )
+                            )
+                        )
+                    } label: {
+                        MindRow(mind: mind.wrappedValue)
+                    }
+                    .buttonStyle(DefaultButtonStyle())
                 }
                 Button(action: {}) {
                     NavigationLink(
@@ -27,9 +39,18 @@ struct MindCollectionView: View {
                         ),
                         label: { Text("+") }
                     )
+                    .buttonStyle(DefaultButtonStyle())
                 }
             }
             .padding()
         }
+    }
+}
+
+private struct MindRow: View {
+    let mind: Mind
+
+    var body: some View {
+        Text(mind.emoji.description).font(.system(size: 30))
     }
 }

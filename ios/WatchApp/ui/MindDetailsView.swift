@@ -40,6 +40,10 @@ struct MindDetailsView: View {
     @ObservedObject
     private var viewModel: MindDetailsViewModel
     
+    init(viewModel: MindDetailsViewModel) {
+        self.viewModel = viewModel
+    }
+    
     var body: some View {
         ScrollView {
             VStack {

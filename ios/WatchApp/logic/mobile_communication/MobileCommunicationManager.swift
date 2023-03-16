@@ -51,7 +51,7 @@ final class MobileCommunicationManager: NSObject {
 extension MobileCommunicationManager: WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        print("AppDelegate WC: activationDidCompleteWith - \(activationState)")
+        print("WatchCommunicationManager: activationDidCompleteWith - \(activationState)")
     }
 
     // MARK: чтобы запускалось из VS Code, запуская Flutter-приложение
