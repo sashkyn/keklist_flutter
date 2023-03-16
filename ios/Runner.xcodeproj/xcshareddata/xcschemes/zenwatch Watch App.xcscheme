@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E6D13A4729B71D2F0045C7FA"
-               BuildableName = "WatchApp.app"
-               BlueprintName = "WatchApp"
+               BuildableName = "Watch.app"
+               BlueprintName = "Watch"
                ReferencedContainer = "container:Runner.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,7 +45,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -59,8 +59,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6D13A4729B71D2F0045C7FA"
-            BuildableName = "WatchApp.app"
-            BlueprintName = "WatchApp"
+            BuildableName = "Watch.app"
+            BlueprintName = "Watch"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -76,8 +76,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6D13A4729B71D2F0045C7FA"
-            BuildableName = "WatchApp.app"
-            BlueprintName = "WatchApp"
+            BuildableName = "Watch.app"
+            BlueprintName = "Watch"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -25,7 +25,7 @@
 		E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* MainView.swift */; };
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
 		E6D13A5229B71D300045C7FA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A5129B71D300045C7FA /* Preview Assets.xcassets */; };
-		E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E6D13A5529B71D300045C7FA /* Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E6D13A4829B71D2F0045C7FA /* Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E6EF527C29C0B9960036AD81 /* NavigationLazyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF527B29C0B9960036AD81 /* NavigationLazyView.swift */; };
 		E6FAD34529BE01720078A43B /* Mind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAD34429BE01720078A43B /* Mind.swift */; };
 /* End PBXBuildFile section */
@@ -57,7 +57,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				E6D13A5529B71D300045C7FA /* WatchApp.app in Embed Watch Content */,
+				E6D13A5529B71D300045C7FA /* Watch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,7 +90,7 @@
 		E674EA4829BF0E8C00022300 /* MindCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindCollectionView.swift; sourceTree = "<group>"; };
 		E674EA4A29BF0F7600022300 /* MindCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindCreatorView.swift; sourceTree = "<group>"; };
 		E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCommunicationManager.swift; sourceTree = "<group>"; };
-		E6D13A4829B71D2F0045C7FA /* WatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6D13A4829B71D2F0045C7FA /* Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
 		E6D13A4C29B71D2F0045C7FA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E6D13A4E29B71D300045C7FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
-				E6D13A4829B71D2F0045C7FA /* WatchApp.app */,
+				E6D13A4829B71D2F0045C7FA /* Watch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -303,9 +303,9 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E6D13A4729B71D2F0045C7FA /* WatchApp */ = {
+		E6D13A4729B71D2F0045C7FA /* Watch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "WatchApp" */;
+			buildConfigurationList = E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "Watch" */;
 			buildPhases = (
 				E6D13A4429B71D2F0045C7FA /* Sources */,
 				E6D13A4529B71D2F0045C7FA /* Frameworks */,
@@ -315,9 +315,9 @@
 			);
 			dependencies = (
 			);
-			name = WatchApp;
+			name = Watch;
 			productName = "zenwatch Watch App";
-			productReference = E6D13A4829B71D2F0045C7FA /* WatchApp.app */;
+			productReference = E6D13A4829B71D2F0045C7FA /* Watch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -353,7 +353,7 @@
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
-				E6D13A4729B71D2F0045C7FA /* WatchApp */,
+				E6D13A4729B71D2F0045C7FA /* Watch */,
 			);
 		};
 /* End PBXProject section */
@@ -486,7 +486,7 @@
 /* Begin PBXTargetDependency section */
 		E6D13A5429B71D300045C7FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E6D13A4729B71D2F0045C7FA /* WatchApp */;
+			target = E6D13A4729B71D2F0045C7FA /* Watch */;
 			targetProxy = E6D13A5329B71D300045C7FA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -913,7 +913,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "WatchApp" */ = {
+		E6D13A5A29B71D300045C7FA /* Build configuration list for PBXNativeTarget "Watch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E6D13A5729B71D300045C7FA /* Debug */,

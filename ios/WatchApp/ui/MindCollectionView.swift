@@ -31,15 +31,19 @@ struct MindCollectionView: View {
                     .buttonStyle(DefaultButtonStyle())
                 }
                 Button(action: {}) {
-                    NavigationLink(
-                        destination: NavigationLazyView(
+                    NavigationLink {
+                        NavigationLazyView(
                             MindCreatorView(
-                                viewModel: MindCreatorViewModel(service: viewModel.service)
+                                viewModel: MindCreatorViewModel(
+                                    service: viewModel.service,
+                                    onCreate: { mind in
+                                        viewModel.minds.append(mind)
+                                    }
+                                )
                             )
-                        ),
-                        label: { Text("+") }
-                    )
-                    .buttonStyle(DefaultButtonStyle())
+                        )
+                    }
+                    label: { Text("+") }
                 }
             }
             .padding()

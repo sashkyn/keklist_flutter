@@ -8,7 +8,7 @@ protocol MindService {
     
     func obtainTodayMinds() -> AnyPublisher<[Mind], Error>
     func obtainPredictedEmojies(text: String) -> AnyPublisher<[String], Error>
-    func createNewMind(text: String, emoji: String) -> AnyPublisher<Void, Error>
+    func createNewMind(text: String, emoji: String) -> AnyPublisher<Mind, Error>
     func deleteMind(id: String) -> AnyPublisher<Void, Error>
 }
 
@@ -45,7 +45,6 @@ final class MindMobileChannelService: MindService {
                 return Just(jsonData)
                     .decode(type: [Mind].self, decoder: decoder)
             }
-            .first()
             .eraseToAnyPublisher()
     }
     
@@ -76,7 +75,7 @@ final class MindMobileChannelService: MindService {
             .eraseToAnyPublisher()
     }
     
-    func createNewMind(text: String, emoji: String) -> AnyPublisher<Void, Error> {
+    func createNewMind(text: String, emoji: String) -> AnyPublisher<Mind, Error> {
         mobileCommunicationManager.send(
             message: [
                 "method": "createMind",
@@ -87,9 +86,21 @@ final class MindMobileChannelService: MindService {
         
         return mobileCommunicationManager.messages
             .filter { $0.name == "mindDidCreated" }
-            .map { _ in }
-            .print("hehehehehe")
-            .setFailureType(to: Error.self)
+            .map { $0.arguments }
+            .compactMap { arguments in
+                guard let jsonString = arguments["mind"] as? String else {
+                    return nil
+                }
+                let jsonData = jsonString.data(using: .utf8)
+                return jsonData
+            }
+            .flatMap { jsonData in
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                return Just(jsonData)
+                    .decode(type: Mind.self, decoder: decoder)
+            }
+            .print("heheheh")
             .first()
             .eraseToAnyPublisher()
     }
@@ -104,6 +115,7 @@ final class MindMobileChannelService: MindService {
         
         return mobileCommunicationManager.messages
             .filter { $0.name == "mindDidDeleted" }
+            .print("delete delete") // TODO: починить удаление на стороне флаттера
             .map { _ in }
             .setFailureType(to: Error.self)
             .first()

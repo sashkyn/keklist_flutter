@@ -10,21 +10,30 @@ final class MindCreatorViewModel: ObservableObject {
     @Published
     var pickedEmoji: String? = nil
     
+    @Published
+    var isLoading: Bool = false
+    
+    @Published
     var needToDismiss: Bool = false
     
     let service: MindService
+    let onCreate: (Mind) -> Void
     
     private var cancellable: AnyCancellable?
     
-    init(service: MindService) {
+    init(
+        service: MindService,
+        onCreate: @escaping (Mind) -> Void
+    ) {
         self.service = service
+        self.onCreate = onCreate
     }
     
     func subscribeToData() {
         cancellable?.cancel()
         cancellable = nil
         
-        self.cancellable = Publishers.CombineLatest(
+        cancellable = Publishers.CombineLatest(
             $textToCreateMind
                 .compactMap { $0 },
             $pickedEmoji
@@ -32,16 +41,20 @@ final class MindCreatorViewModel: ObservableObject {
                 .filter { !$0.isEmpty }
         )
             .flatMap { [unowned self] text, emoji in
-                self.service.createNewMind(
+                self.isLoading = true
+                return self.service.createNewMind(
                     text: text,
                     emoji: emoji
                 )
             }
-            .replaceError(with: ()) // TODO: сделать обработку ошибок
             .receive(on: RunLoop.main)
-            .sink { [weak self] in
-                self?.needToDismiss = true
-            }
+            .sink(
+                receiveCompletion: { _ in }, // TODO: сделать обработку ошибок
+                receiveValue: { [weak self] mind in
+                    self?.needToDismiss = true
+                    self?.onCreate(mind)
+                }
+            )
     }
     
     func showEnterText() {
@@ -74,7 +87,10 @@ struct MindCreatorView: View {
     
     var body: some View {
         NavigationView {
-            if let mindText = viewModel.textToCreateMind {
+            if viewModel.isLoading {
+                ProgressView()
+                    .navigationTitle("Creating...")
+            } else if let mindText = viewModel.textToCreateMind {
                 EmojiPickerView(
                     onSelect: { emoji in
                         viewModel.pickedEmoji = emoji

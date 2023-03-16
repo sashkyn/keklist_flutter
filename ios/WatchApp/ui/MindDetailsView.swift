@@ -20,13 +20,16 @@ final class MindDetailsViewModel: ObservableObject {
     }
     
     func deleteMind() {
+        cancellable?.cancel()
+        cancellable = nil
+        
+        isLoading = true
+        
         cancellable = service.deleteMind(id: mind.uuid)
             .sink(
-                receiveCompletion: {
-                    print($0)
-                },
+                receiveCompletion: { _ in },
                 receiveValue: { [weak self] _ in
-                    self?.isLoading = false
+                    self?.needToDismiss = true
                 }
             )
     }
@@ -58,7 +61,8 @@ struct MindDetailsView: View {
                         Text("Delete")
                     }
                 }
-            }.onChange(of: viewModel.needToDismiss) { needToDismiss in
+            }
+            .onChange(of: viewModel.needToDismiss) { needToDismiss in
                 if needToDismiss {
                     presentationMode.wrappedValue.dismiss()
                 }
