@@ -18,9 +18,9 @@ final class MindMobileChannelService: MindService {
         mobileCommunicationManager.errors
     }
     
-    private let mobileCommunicationManager: MobileCommunicationManager
+    private let mobileCommunicationManager: MobileAppCommunicationManager
     
-    init(mobileCommunicationManager: MobileCommunicationManager) {
+    init(mobileCommunicationManager: MobileAppCommunicationManager) {
         self.mobileCommunicationManager = mobileCommunicationManager
     }
     

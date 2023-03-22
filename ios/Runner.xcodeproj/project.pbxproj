@@ -15,12 +15,15 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		DACBBFEB9C59BFCAD82C59C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D071186D07DAC7B72178546 /* Pods_Runner.framework */; };
+		E624B0CA29CAC5E600F007B2 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E624B0C929CAC5E600F007B2 /* LoadingView.swift */; };
 		E63715FA29BCA6C100CD0BB3 /* MindService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63715F929BCA6C100CD0BB3 /* MindService.swift */; };
 		E637160029BCA80300CD0BB3 /* MindDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */; };
 		E637160329BCA94800CD0BB3 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */; };
 		E674EA4929BF0E8C00022300 /* MindCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E674EA4829BF0E8C00022300 /* MindCollectionView.swift */; };
 		E674EA4B29BF0F7600022300 /* MindCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E674EA4A29BF0F7600022300 /* MindCreatorView.swift */; };
-		E6A02AEF29B759250091F915 /* MobileCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */; };
+		E691C6C929CABE1D00B6887D /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E691C6C829CABE1C00B6887D /* ErrorView.swift */; };
+		E691C6CB29CAC25D00B6887D /* MethodData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E691C6CA29CAC25D00B6887D /* MethodData.swift */; };
+		E6A02AEF29B759250091F915 /* MobileAppCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* MobileAppCommunicationManager.swift */; };
 		E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */; };
 		E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* MainView.swift */; };
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
@@ -84,12 +87,15 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A364558CF161996DD45C2207 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C6E2913CC35BAB47985CBC4C /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		E624B0C929CAC5E600F007B2 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		E63715F929BCA6C100CD0BB3 /* MindService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindService.swift; sourceTree = "<group>"; };
 		E63715FF29BCA80300CD0BB3 /* MindDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindDetailsView.swift; sourceTree = "<group>"; };
 		E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
 		E674EA4829BF0E8C00022300 /* MindCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindCollectionView.swift; sourceTree = "<group>"; };
 		E674EA4A29BF0F7600022300 /* MindCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindCreatorView.swift; sourceTree = "<group>"; };
-		E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCommunicationManager.swift; sourceTree = "<group>"; };
+		E691C6C829CABE1C00B6887D /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		E691C6CA29CAC25D00B6887D /* MethodData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MethodData.swift; sourceTree = "<group>"; };
+		E6A02AEE29B759250091F915 /* MobileAppCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAppCommunicationManager.swift; sourceTree = "<group>"; };
 		E6D13A4829B71D2F0045C7FA /* Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
 		E6D13A4C29B71D2F0045C7FA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -220,6 +226,8 @@
 				E637160229BCA94800CD0BB3 /* EmojiPickerView.swift */,
 				E674EA4829BF0E8C00022300 /* MindCollectionView.swift */,
 				E674EA4A29BF0F7600022300 /* MindCreatorView.swift */,
+				E691C6C829CABE1C00B6887D /* ErrorView.swift */,
+				E624B0C929CAC5E600F007B2 /* LoadingView.swift */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -255,7 +263,8 @@
 		E6FAD34229BCE00B0078A43B /* mobile_communication */ = {
 			isa = PBXGroup;
 			children = (
-				E6A02AEE29B759250091F915 /* MobileCommunicationManager.swift */,
+				E6A02AEE29B759250091F915 /* MobileAppCommunicationManager.swift */,
+				E691C6CA29CAC25D00B6887D /* MethodData.swift */,
 			);
 			path = mobile_communication;
 			sourceTree = "<group>";
@@ -469,8 +478,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */,
+				E691C6CB29CAC25D00B6887D /* MethodData.swift in Sources */,
 				E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */,
-				E6A02AEF29B759250091F915 /* MobileCommunicationManager.swift in Sources */,
+				E6A02AEF29B759250091F915 /* MobileAppCommunicationManager.swift in Sources */,
 				E63715FA29BCA6C100CD0BB3 /* MindService.swift in Sources */,
 				E637160329BCA94800CD0BB3 /* EmojiPickerView.swift in Sources */,
 				E674EA4B29BF0F7600022300 /* MindCreatorView.swift in Sources */,
@@ -478,6 +488,8 @@
 				E674EA4929BF0E8C00022300 /* MindCollectionView.swift in Sources */,
 				E6EF527C29C0B9960036AD81 /* NavigationLazyView.swift in Sources */,
 				E637160029BCA80300CD0BB3 /* MindDetailsView.swift in Sources */,
+				E624B0CA29CAC5E600F007B2 /* LoadingView.swift in Sources */,
+				E691C6C929CABE1D00B6887D /* ErrorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

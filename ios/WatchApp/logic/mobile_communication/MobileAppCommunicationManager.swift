@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import WatchConnectivity
 
-final class MobileCommunicationManager: NSObject {
+final class MobileAppCommunicationManager: NSObject {
     
     var messages: AnyPublisher<MethodData, Never> {
         messagesSubject.eraseToAnyPublisher()
@@ -25,12 +25,31 @@ final class MobileCommunicationManager: NSObject {
         self.session.activate()
     }
     
+    // TODO: додебажить
+    
+    private lazy var sendsCount: Int = 0
+    
     func send(message: [String: Any]) {
+        print("sendMessage")
         session.sendMessage(
             message,
             replyHandler: nil,
             errorHandler: { [weak self] error in
-                self?.errorsSubject.send(error)
+                guard let strongSelf = self else { return }
+                
+                print("sendMessage. Received error: \(error.localizedDescription)")
+                
+                if strongSelf.sendsCount < 10 {
+                    strongSelf.sendsCount += 1
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                        print("sendMessage. Retrying...")
+                        self?.send(message: message)
+                    }
+                } else {
+                    strongSelf.sendsCount = 0
+                    strongSelf.errorsSubject.send(error)
+                }
             }
         )
     }
@@ -48,7 +67,7 @@ final class MobileCommunicationManager: NSObject {
     }
 }
 
-extension MobileCommunicationManager: WCSessionDelegate {
+extension MobileAppCommunicationManager: WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         print("WatchCommunicationManager: activationDidCompleteWith - \(activationState)")
@@ -69,9 +88,4 @@ extension MobileCommunicationManager: WCSessionDelegate {
         print("WatchCommunicationManager didReceiveMessage - method - \(message["method"] ?? "nil")")
         handle(message: message)
     }
-}
-
-struct MethodData {
-    var name: String
-    var arguments: [String: Any]
 }

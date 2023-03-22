@@ -2,12 +2,17 @@
 
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/helpers/extensions/enum_from_string.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
 import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/services/main_service.dart';
+import 'package:emojis/emoji.dart' as emojies_pub;
+
+// TODO: покрыть тестами
 
 abstract class WatchCommunicationManager {
   void connect() {}
@@ -133,9 +138,20 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _displayPredictedEmojies({required String mindText}) async {
-    // TODO: сделать релевантным введенному тексту с часов
-    final mindList = await mainService.getMindList();
-    final predictedEmojies = mindList.map((e) => e.emoji).toSet();
+    final Iterable<Mind> minds = await mainService.getMindList();
+    List<String> predictedEmojies = minds
+        .map((mind) => mind.emoji)
+        .toList()
+        .distinct()
+        .sorted((emoji1, emoji2) => minds
+            .where((mind) => mind.emoji == emoji2)
+            .length
+            .compareTo(minds.where((mind) => mind.emoji == emoji1).length))
+        .toList();
+
+    if (predictedEmojies.isEmpty) {
+      predictedEmojies = emojies_pub.Emoji.all().map((emoji) => emoji.char).toList();
+    }
 
     final List<String> emojiJSONList = predictedEmojies.map((mind) => json.encode(mind)).toList();
 

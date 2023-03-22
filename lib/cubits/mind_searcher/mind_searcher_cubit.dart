@@ -17,23 +17,21 @@ class MindSearcherCubit extends Cubit<MindSearcherState> {
 
   final _emojiParser = EmojiParser();
 
-  Future<List<Mind>> searchMarkList(String text) async {
+  Future<List<Mind>> searchMindList(String text) async {
     final lowerCasedTrimmedText = text.toLowerCase().trim();
 
-    final marks = await _storage.getMindList();
-    final filteredMarks = marks.where((mark) {
+    final minds = await _storage.getMindList();
+    final filteredMinds = minds.where((mind) {
       // Note condition.
-      final noteCondition = mark.note.trim().toLowerCase().contains(
-            lowerCasedTrimmedText,
-          );
+      final noteCondition = mind.note.trim().toLowerCase().contains(lowerCasedTrimmedText);
 
       // Emoji condition.
       final emojies = _emojiParser.parseEmojis(lowerCasedTrimmedText);
-      final emojiCondintion = emojies.any((emoji) => mark.emoji == emoji);
+      final emojiCondition = emojies.any((emoji) => mind.emoji == emoji);
 
-      return noteCondition || emojiCondintion;
+      return noteCondition || emojiCondition;
     }).toList();
 
-    return filteredMarks;
+    return filteredMinds;
   }
 }

@@ -96,34 +96,33 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
-    final filteredMarks = await _searcherCubit.searchMarkList(event.text);
+    final filteredMinds = await _searcherCubit.searchMindList(event.text);
 
     emit(
       MindSearching(
         enabled: true,
         values: _minds,
-        filteredValues: filteredMarks,
+        filteredValues: filteredMinds,
       ),
     );
   }
 
   List<String> _lastSuggestions = [];
 
-  // TODO: переместить в MindSearcherCubit;
   FutureOr<void> _changeTextOfCreatingMark(
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) {
     const count = 9;
     final List<String> suggestions = _minds
-        .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
-        .map((mark) => mark.emoji)
+        .where((mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
+        .map((mind) => mind.emoji)
         .toList()
         .distinct()
-        .sorted((mind1, mind2) => _minds
-            .where((element) => element.emoji == mind2)
+        .sorted((emoji1, emoji2) => _minds
+            .where((mind) => mind.emoji == emoji2)
             .length
-            .compareTo(_minds.where((e) => e.emoji == mind1).length)) // NOTE: Сортировка очень дорогая
+            .compareTo(_minds.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
         .take(count)
         .toList();
 

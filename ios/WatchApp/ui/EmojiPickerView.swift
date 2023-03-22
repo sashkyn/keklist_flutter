@@ -63,8 +63,10 @@ struct EmojiPickerView: View {
                     ProgressView()
                         .navigationTitle("Analyzing...")
                 } else if let errorText = viewModel.errorText {
-                    Text("\(errorText)")
-                        .navigationTitle("Error")
+                    ErrorView(
+                        retryAction: { viewModel.obtainPredictedEmojies() },
+                        errorLabel: { Text("\(errorText)") }
+                    )
                 } else {
                     ForEach(viewModel.emojies, id: \.self) { emoji in
                         Button {

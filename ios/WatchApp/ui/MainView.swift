@@ -1,7 +1,6 @@
 import SwiftUI
 import Combine
 
-// TODO: сделать отправку Emoji
 // TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
 // TODO: сделать аккуратное удаление Эмодзи
 // TODO: сделать переподключения при ошибках соединения с приложением
@@ -67,11 +66,10 @@ struct MainView: View {
     var body: some View {
         NavigationView {
             if let errorText = viewModel.errorText {
-                Text(errorText)
-                    .navigationTitle("Error")
-                    .onTapGesture {
-                        viewModel.obtainTodayMinds()
-                    }
+                ErrorView(
+                    retryAction: { viewModel.obtainTodayMinds() },
+                    errorLabel: { Text(errorText) }
+                )
             } else if viewModel.isLoading {
                 ProgressView()
                     .navigationTitle("Connecting...")
