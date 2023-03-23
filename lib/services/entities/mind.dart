@@ -52,6 +52,6 @@ class Mind extends Equatable {
         note,
         dayIndex.toString(),
         sortIndex.toString(),
-        creationDate.toString(),
+        //creationDate.toString(),
       ];
 }

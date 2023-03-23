@@ -60,8 +60,7 @@ struct EmojiPickerView: View {
         ScrollView {
             LazyVStack {
                 if viewModel.isLoading {
-                    ProgressView()
-                        .navigationTitle("Analyzing...")
+                    LoadingView(text: "Analyzing text...")
                 } else if let errorText = viewModel.errorText {
                     ErrorView(
                         retryAction: { viewModel.obtainPredictedEmojies() },

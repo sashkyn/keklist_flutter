@@ -1,20 +1,22 @@
 import SwiftUI
 
-// TODO: начать 
-
 struct LoadingView: View {
+    let text: String
+    
     var body: some View {
         ZStack {
             VStack {
-                Text("Loading...")
+                Text(text)
                 ProgressView()
             }
         }
     }
 }
 
+#if DEBUG
 struct LoadingView_Previews: PreviewProvider {
     static var previews: some View {
-        LoadingView()
+        LoadingView(text: "Connecting...")
     }
 }
+#endif

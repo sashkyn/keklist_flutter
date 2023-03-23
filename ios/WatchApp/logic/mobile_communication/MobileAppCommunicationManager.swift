@@ -23,27 +23,31 @@ final class MobileAppCommunicationManager: NSObject {
         
         self.session.delegate = self
         self.session.activate()
+        
+        print("MobileAppCommunicationManager init")
     }
     
-    // TODO: додебажить
+    deinit {
+        print("MobileAppCommunicationManager deinit")
+    }
     
     private lazy var sendsCount: Int = 0
     
     func send(message: [String: Any]) {
-        print("sendMessage")
+        print("MobileAppCommunicationManager. sendMessage - \(message)")
         session.sendMessage(
             message,
             replyHandler: nil,
             errorHandler: { [weak self] error in
                 guard let strongSelf = self else { return }
                 
-                print("sendMessage. Received error: \(error.localizedDescription)")
+                print("MobileAppCommunicationManager. Received error: \(error.localizedDescription)")
                 
                 if strongSelf.sendsCount < 10 {
                     strongSelf.sendsCount += 1
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                        print("sendMessage. Retrying...")
+                        print("MobileAppCommunicationManager. Retrying...")
                         self?.send(message: message)
                     }
                 } else {

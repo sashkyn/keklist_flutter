@@ -71,15 +71,13 @@ struct MainView: View {
                     errorLabel: { Text(errorText) }
                 )
             } else if viewModel.isLoading {
-                ProgressView()
-                    .navigationTitle("Connecting...")
-                    .onAppear {
-                        viewModel.obtainTodayMinds()
-                    }
+                LoadingView(text: "Connecting...")
             } else {
                 MindCollectionView(viewModel: viewModel)
                     .navigationTitle("Minds")
             }
+        }.onAppear {
+            viewModel.obtainTodayMinds()
         }
     }
 }
