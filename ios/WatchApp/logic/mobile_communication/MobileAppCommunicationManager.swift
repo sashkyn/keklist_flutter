@@ -23,12 +23,6 @@ final class MobileAppCommunicationManager: NSObject {
         
         self.session.delegate = self
         self.session.activate()
-        
-        print("MobileAppCommunicationManager init")
-    }
-    
-    deinit {
-        print("MobileAppCommunicationManager deinit")
     }
     
     private lazy var sendsCount: Int = 0

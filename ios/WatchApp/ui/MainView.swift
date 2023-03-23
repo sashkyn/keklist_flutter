@@ -72,12 +72,11 @@ struct MainView: View {
                 )
             } else if viewModel.isLoading {
                 LoadingView(text: "Connecting...")
+                    .onAppear { viewModel.obtainTodayMinds() }
             } else {
                 MindCollectionView(viewModel: viewModel)
                     .navigationTitle("Minds")
             }
-        }.onAppear {
-            viewModel.obtainTodayMinds()
         }
     }
 }
