@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/helpers/extensions/enum_from_string.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
@@ -22,8 +23,12 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   final _channel = const MethodChannel('com.sashkyn.kekable');
 
   final MainService mainService;
+  final SupabaseClient client;
 
-  AppleWatchCommunicationManager({required this.mainService});
+  AppleWatchCommunicationManager({
+    required this.mainService,
+    required this.client,
+  });
 
   @override
   void connect() {
@@ -31,17 +36,17 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _sendToWatch({
-    required WatchOutputMethod output,
+    required WatchOutputMethod outputMethod,
     required Map<WatchMethodArgumentKey, dynamic> arguments,
   }) async {
     final Map<String, String> methodArguments = arguments.map(
       (key, value) => MapEntry<String, String>(
-        stringFromEnum(key.toString()),
+        stringFromEnum(key),
         value.toString(),
       ),
     );
 
-    final methodName = stringFromEnum(output);
+    final methodName = stringFromEnum(outputMethod);
     await _channel.invokeMethod(
       methodName,
       [methodArguments],
@@ -51,6 +56,10 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   void _setupCallBackHandler() {
     _channel.setMethodCallHandler(
       (MethodCall call) async {
+        if (client.auth.currentUser == null) {
+          return _showError(error: WatchError.notAuthorized);
+        }
+
         final String methodName = call.method;
         final methodArgs = call.arguments;
 
@@ -58,10 +67,10 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         print('methodArgs = $methodArgs');
 
         if (methodName == stringFromEnum(WatchInputMethod.obtainTodayMinds)) {
-          return _displayMindList();
+          return _showMindList();
         } else if (methodName == stringFromEnum(WatchInputMethod.obtainPredictedEmojies)) {
           final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
-          return _displayPredictedEmojies(mindText: mindText);
+          return _showPredictedEmojies(mindText: mindText);
         } else if (methodName == stringFromEnum(WatchInputMethod.createMind)) {
           final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
           final emoji = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindEmoji)];
@@ -99,14 +108,14 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       toEncodable: (_) => mind.toWatchJson(),
     );
     return _sendToWatch(
-      output: WatchOutputMethod.mindDidCreated,
+      outputMethod: WatchOutputMethod.mindDidCreated,
       arguments: {
         WatchMethodArgumentKey.mind: mindJSON,
       },
     );
   }
 
-  Future<void> _displayMindList() async {
+  Future<void> _showMindList() async {
     final mindList = await mainService.getMindList();
     final todayMindList = mindList
         .where(
@@ -122,7 +131,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         )
         .toList();
     return _sendToWatch(
-      output: WatchOutputMethod.displayMinds,
+      outputMethod: WatchOutputMethod.showMinds,
       arguments: {
         WatchMethodArgumentKey.minds: mindJSONList,
       },
@@ -132,12 +141,13 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   Future<void> _removeMindFromToday({required String id}) async {
     await mainService.removeMind(id);
     return _sendToWatch(
-      output: WatchOutputMethod.mindDidDeleted,
+      outputMethod: WatchOutputMethod.mindDidDeleted,
       arguments: {},
     );
   }
 
-  Future<void> _displayPredictedEmojies({required String mindText}) async {
+  // TODO: проверить как себя ведет метод возврата всех эмодзи
+  Future<void> _showPredictedEmojies({required String mindText}) async {
     final Iterable<Mind> minds = await mainService.getMindList();
     List<String> predictedEmojies = minds
         .map((mind) => mind.emoji)
@@ -156,12 +166,19 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     final List<String> emojiJSONList = predictedEmojies.map((mind) => json.encode(mind)).toList();
 
     return _sendToWatch(
-      output: WatchOutputMethod.displayPredictedEmojies,
+      outputMethod: WatchOutputMethod.showPredictedEmojies,
       arguments: {
         WatchMethodArgumentKey.emojies: emojiJSONList,
       },
     );
   }
+
+  Future<void> _showError({required WatchError error}) async => _sendToWatch(
+        outputMethod: WatchOutputMethod.showError,
+        arguments: {
+          WatchMethodArgumentKey.error: stringFromEnum(error),
+        },
+      );
 }
 
 enum WatchInputMethod {
@@ -172,10 +189,9 @@ enum WatchInputMethod {
 }
 
 enum WatchOutputMethod {
-  displayMinds,
-  displayPredictedEmojies,
-  displayError,
-  showLoading,
+  showMinds,
+  showPredictedEmojies,
+  showError,
   mindDidCreated,
   mindDidDeleted,
 }
@@ -188,4 +204,9 @@ enum WatchMethodArgumentKey {
   mindEmoji,
   emojies,
   mindID,
+  error,
+}
+
+enum WatchError {
+  notAuthorized
 }

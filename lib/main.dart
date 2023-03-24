@@ -15,7 +15,7 @@ import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/di/containers.dart';
 import 'package:zenmode/services/main_service.dart';
 
-import 'native/ios/watch_os/watch_communication_manager.dart';
+import 'native/ios/watch/watch_communication_manager.dart';
 import 'screens/mind_collection/mind_collection_screen.dart';
 
 Future<void> main() async {

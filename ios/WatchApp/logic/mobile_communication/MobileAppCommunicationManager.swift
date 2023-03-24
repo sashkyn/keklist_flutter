@@ -8,12 +8,12 @@ final class MobileAppCommunicationManager: NSObject {
         messagesSubject.eraseToAnyPublisher()
     }
     
-    var errors: AnyPublisher<Error, Never> {
+    var errors: AnyPublisher<LocalizedError, Never> {
         errorsSubject.eraseToAnyPublisher()
     }
     
     private let messagesSubject = PassthroughSubject<MethodData, Never>()
-    private let errorsSubject = PassthroughSubject<Error, Never>()
+    private let errorsSubject = PassthroughSubject<LocalizedError, Never>()
     
     private let session: WCSession
     
@@ -46,7 +46,7 @@ final class MobileAppCommunicationManager: NSObject {
                     }
                 } else {
                     strongSelf.sendsCount = 0
-                    strongSelf.errorsSubject.send(error)
+                    strongSelf.errorsSubject.send(MethodError.notPaired)
                 }
             }
         )
@@ -57,11 +57,28 @@ final class MobileAppCommunicationManager: NSObject {
             return
         }
         
+        guard !tryHandleError(methodName: methodName, message: message) else {
+            return
+        }
+        
         var message = message
         message.removeValue(forKey: "method")
         
         let method = MethodData(name: methodName, arguments: message)
         messagesSubject.send(method)
+    }
+    
+    func tryHandleError(methodName: String, message: [String: Any]) -> Bool {
+        if methodName == "showError", let error = message["error"] as? String {
+            if error == "notAuthorized" {
+                errorsSubject.send(MethodError.notAuthorized)
+            } else {
+                errorsSubject.send(MethodError.unknown)
+            }
+            return true
+        } else {
+            return false
+        }
     }
 }
 

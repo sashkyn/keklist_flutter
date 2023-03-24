@@ -26,7 +26,7 @@ final class MainViewModel: ObservableObject {
         errorCancellable = service.errors
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorText = "\(error)"
+                self?.errorText = error.errorDescription
             }
     }
     

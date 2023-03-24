@@ -1,10 +1,10 @@
 import Foundation
 import Combine
 
-// TODO: передалать во Future
+// TODO: передалать во Futures
 
 protocol MindService {
-    var errors: AnyPublisher<Error, Never> { get }
+    var errors: AnyPublisher<LocalizedError, Never> { get }
     
     func obtainTodayMinds() -> AnyPublisher<[Mind], Error>
     func obtainPredictedEmojies(text: String) -> AnyPublisher<[String], Error>
@@ -14,7 +14,7 @@ protocol MindService {
 
 final class MindMobileChannelService: MindService {
     
-    var errors: AnyPublisher<Error, Never> {
+    var errors: AnyPublisher<LocalizedError, Never> {
         mobileCommunicationManager.errors
     }
     
@@ -30,7 +30,7 @@ final class MindMobileChannelService: MindService {
         )
         
         return mobileCommunicationManager.messages
-            .filter { $0.name == "displayMinds" }
+            .filter { $0.name == "showMinds" }
             .map { $0.arguments }
             .compactMap { arguments in
                 guard let mindsJSONString = arguments["minds"] as? String else {
@@ -57,7 +57,7 @@ final class MindMobileChannelService: MindService {
         )
         
         return mobileCommunicationManager.messages
-            .filter { $0.name == "displayPredictedEmojies" }
+            .filter { $0.name == "showPredictedEmojies" }
             .map { $0.arguments }
             .compactMap { arguments in
                 guard let jsonString = arguments["emojies"] as? String else {
