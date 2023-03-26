@@ -1,10 +1,6 @@
 import SwiftUI
 import Combine
 
-// TODO: сделать автоопредение эмоджи по тексту, попросить ChatGPT
-// TODO: сделать аккуратное удаление Эмодзи
-// TODO: сделать переподключения при ошибках соединения с приложением
-
 final class MainViewModel: ObservableObject {
     
     @Published
@@ -80,6 +76,8 @@ struct MainView: View {
         }
     }
 }
+
+// TODO: превратить в Preview
 
 //struct ContentView_Previews: PreviewProvider {
 //    static var previews: some View {

@@ -16,42 +16,58 @@ struct MindCollectionView: View {
                 ]
             ) {
                 ForEach($viewModel.minds, id: \.uuid) { mind in
-                    NavigationLink {
-                        NavigationLazyView(
-                            MindDetailsView(
-                                viewModel: MindDetailsViewModel(
-                                    mind: mind.wrappedValue,
-                                    service: viewModel.service
+                    NavigationLink(
+                        destination: {
+                            NavigationLazyView(
+                                MindDetailsView(
+                                    viewModel:
+                                        MindDetailsViewModel(
+                                            mind: mind.wrappedValue,
+                                            service: viewModel.service
+                                        ),
+                                        onDelete: { id in
+                                            viewModel.minds.removeAll(where: { $0.uuid == id })
+                                        }
                                 )
                             )
-                        )
-                    } label: {
-                        MindRow(mind: mind.wrappedValue)
-                    }
-                    .buttonStyle(DefaultButtonStyle())
+                        },
+                        label: {
+                            MindCell(mind: mind.wrappedValue)
+                        }
+                    )
+                        .buttonStyle(DefaultButtonStyle())
                 }
-                Button(action: {}) {
-                    NavigationLink {
+                NavigationLink(
+                    destination: {
                         NavigationLazyView(
                             MindCreatorView(
-                                viewModel: MindCreatorViewModel(
-                                    service: viewModel.service,
-                                    onCreate: { mind in
-                                        viewModel.minds.append(mind)
-                                    }
-                                )
+                                viewModel:
+                                    MindCreatorViewModel(
+                                        service: viewModel.service,
+                                        onCreate: { mind in
+                                            viewModel.minds.append(mind)
+                                        }
+                                    )
                             )
                         )
-                    }
-                    label: { Text("+") }
-                }
+                    },
+                    label: {
+                        Text("+")
+                            .font(.system(size: 30))
+                            .frame(
+                                width: .infinity,
+                                height: .infinity
+                            )
+                        }
+                )
             }
-            .padding()
+                .buttonStyle(DefaultButtonStyle())
+                .padding()
         }
     }
 }
 
-private struct MindRow: View {
+private struct MindCell: View {
     let mind: Mind
 
     var body: some View {

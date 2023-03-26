@@ -4,10 +4,13 @@ import Combine
 final class MindDetailsViewModel: ObservableObject {
     
     @Published
-    var isLoading: Bool = false
+    private(set) var isLoading: Bool = false
     
     @Published
-    var needToDismiss: Bool = false
+    private(set) var needToDismiss: Bool = false
+    
+    @Published
+    private(set) var readyToDelete: Bool = false
     
     let mind: Mind
     private let service: MindService
@@ -26,12 +29,17 @@ final class MindDetailsViewModel: ObservableObject {
         isLoading = true
         
         cancellable = service.deleteMind(id: mind.uuid)
+            .receive(on: RunLoop.main)
             .sink(
                 receiveCompletion: { _ in },
                 receiveValue: { [weak self] _ in
                     self?.needToDismiss = true
                 }
             )
+    }
+    
+    func prepareToDelete() {
+        readyToDelete = true
     }
 }
 
@@ -43,17 +51,29 @@ struct MindDetailsView: View {
     @ObservedObject
     private var viewModel: MindDetailsViewModel
     
-    init(viewModel: MindDetailsViewModel) {
+    private var onDelete: (String) -> Void
+    
+    init(
+        viewModel: MindDetailsViewModel,
+        onDelete: @escaping (String) -> Void
+    ) {
         self.viewModel = viewModel
+        self.onDelete = onDelete
     }
     
     var body: some View {
         ScrollView {
             VStack {
-                Text(viewModel.mind.emoji.description).font(.largeTitle)
-                Text(viewModel.mind.note).font(.body)
+                Text(viewModel.mind.emoji.description)
+                    .font(.largeTitle)
+                Text(viewModel.mind.note)
+                    .font(.body)
                 Button(action: {
-                    viewModel.deleteMind()
+                    if viewModel.readyToDelete {
+                        viewModel.deleteMind()
+                    } else {
+                        viewModel.prepareToDelete()
+                    }
                 }) {
                     if viewModel.isLoading {
                         ProgressView()
@@ -61,12 +81,15 @@ struct MindDetailsView: View {
                         Text("Delete")
                     }
                 }
+                    .background(viewModel.readyToDelete ? Color.red : Color.clear)
+                    .cornerRadius(viewModel.readyToDelete ? 10.0 : 0.0)
             }
-            .onChange(of: viewModel.needToDismiss) { needToDismiss in
-                if needToDismiss {
-                    presentationMode.wrappedValue.dismiss()
+                .onChange(of: viewModel.needToDismiss) { needToDismiss in
+                    onDelete(viewModel.mind.uuid)
+                    if needToDismiss {
+                        presentationMode.wrappedValue.dismiss()
+                    }
                 }
-            }
         }
     }
 }

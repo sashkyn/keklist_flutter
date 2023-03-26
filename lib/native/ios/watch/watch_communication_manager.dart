@@ -79,7 +79,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
             emoji: emoji,
           );
         } else if (methodName == stringFromEnum(WatchInputMethod.deleteMind)) {
-          final mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindID)];
+          final mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindId)];
           return _removeMindFromToday(id: mindId);
         }
       },
@@ -203,7 +203,6 @@ enum WatchMethodArgumentKey {
   mindText,
   mindEmoji,
   emojies,
-  mindID,
   error,
 }
 

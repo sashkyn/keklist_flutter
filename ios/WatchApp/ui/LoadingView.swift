@@ -4,12 +4,19 @@ struct LoadingView: View {
     let text: String
     
     var body: some View {
-        ZStack {
-            VStack {
-                Text(text)
-                ProgressView()
-            }
+        VStack {
+            Text(text).font(.title3)
+            ProgressView()
+                .scaleEffect(1.5)
+                .frame(
+                    width: .infinity,
+                    height: 40.0
+                )
         }
+        .frame(
+            width: .infinity,
+            height: .infinity
+        )
     }
 }
 

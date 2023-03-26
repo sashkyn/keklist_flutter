@@ -1,8 +1,6 @@
 import Foundation
 import Combine
 
-// TODO: передалать во Futures
-
 protocol MindService {
     var errors: AnyPublisher<LocalizedError, Never> { get }
     
@@ -100,7 +98,6 @@ final class MindMobileChannelService: MindService {
                 return Just(jsonData)
                     .decode(type: Mind.self, decoder: decoder)
             }
-            .print("heheheh")
             .first()
             .eraseToAnyPublisher()
     }
@@ -109,13 +106,12 @@ final class MindMobileChannelService: MindService {
         mobileCommunicationManager.send(
             message: [
                 "method": "deleteMind",
-                "id": id
+                "mindId": id
             ]
         )
         
         return mobileCommunicationManager.messages
             .filter { $0.name == "mindDidDeleted" }
-            .print("delete delete") // TODO: починить удаление на стороне флаттера
             .map { _ in }
             .setFailureType(to: Error.self)
             .first()

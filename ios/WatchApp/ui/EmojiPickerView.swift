@@ -10,7 +10,7 @@ final class EmojiPickerViewModel: ObservableObject {
     var errorText: String? = nil
     
     @Published
-    var isLoading: Bool = false
+    var isLoading: Bool = true
     
     private var cancellable: AnyCancellable?
     
@@ -55,31 +55,30 @@ struct EmojiPickerView: View {
     
     @ObservedObject
     var viewModel: EmojiPickerViewModel
-
+    
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                if viewModel.isLoading {
-                    LoadingView(text: "Analyzing text...")
-                } else if let errorText = viewModel.errorText {
-                    ErrorView(
-                        retryAction: { viewModel.obtainPredictedEmojies() },
-                        errorLabel: { Text("\(errorText)") }
-                    )
-                } else {
+        if viewModel.isLoading {
+            LoadingView(text: "Analyzing text...")
+                .onAppear {
+                    viewModel.obtainPredictedEmojies()
+                }
+        } else if let errorText = viewModel.errorText {
+            ErrorView(
+                retryAction: { viewModel.obtainPredictedEmojies() },
+                errorLabel: { Text("\(errorText)") }
+            )
+        } else {
+            ScrollView {
+                LazyVStack {
                     ForEach(viewModel.emojies, id: \.self) { emoji in
-                        Button {
-                            onSelect(emoji)
-                        } label: {
-                            Text(emoji).font(.headline)
-                        }
+                        Button(
+                            action: { onSelect(emoji) },
+                            label: { Text(emoji).font(.headline) }
+                        )
                     }
-                        .navigationTitle("Select an emoji")
                 }
             }
+                .navigationTitle(!viewModel.isLoading ? "Select an emoji" : "") // INFO: какой то баг с висящим Select an emoji
         }
-            .onAppear {
-                viewModel.obtainPredictedEmojies()
-            }
     }
 }
