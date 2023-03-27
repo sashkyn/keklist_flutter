@@ -64,10 +64,8 @@ struct MindDetailsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                Text(viewModel.mind.emoji.description)
-                    .font(.largeTitle)
-                Text(viewModel.mind.note)
-                    .font(.body)
+                Text(viewModel.mind.emoji.description).font(.largeTitle)
+                Text(viewModel.mind.note).font(.body)
                 Button(action: {
                     if viewModel.readyToDelete {
                         viewModel.deleteMind()

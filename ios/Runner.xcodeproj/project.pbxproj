@@ -23,6 +23,7 @@
 		E674EA4B29BF0F7600022300 /* MindCreatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E674EA4A29BF0F7600022300 /* MindCreatorView.swift */; };
 		E691C6C929CABE1D00B6887D /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E691C6C829CABE1C00B6887D /* ErrorView.swift */; };
 		E691C6CB29CAC25D00B6887D /* MethodData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E691C6CA29CAC25D00B6887D /* MethodData.swift */; };
+		E695F47429D1A6B500EB8EC9 /* EmojiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E695F47329D1A6B500EB8EC9 /* EmojiView.swift */; };
 		E6A02AEF29B759250091F915 /* MobileAppCommunicationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A02AEE29B759250091F915 /* MobileAppCommunicationManager.swift */; };
 		E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */; };
 		E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* MainView.swift */; };
@@ -96,6 +97,7 @@
 		E674EA4A29BF0F7600022300 /* MindCreatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindCreatorView.swift; sourceTree = "<group>"; };
 		E691C6C829CABE1C00B6887D /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		E691C6CA29CAC25D00B6887D /* MethodData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MethodData.swift; sourceTree = "<group>"; };
+		E695F47329D1A6B500EB8EC9 /* EmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiView.swift; sourceTree = "<group>"; };
 		E6A02AEE29B759250091F915 /* MobileAppCommunicationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAppCommunicationManager.swift; sourceTree = "<group>"; };
 		E6D13A4829B71D2F0045C7FA /* Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 				E674EA4A29BF0F7600022300 /* MindCreatorView.swift */,
 				E691C6C829CABE1C00B6887D /* ErrorView.swift */,
 				E624B0C929CAC5E600F007B2 /* LoadingView.swift */,
+				E695F47329D1A6B500EB8EC9 /* EmojiView.swift */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -484,6 +487,7 @@
 				E691C6CB29CAC25D00B6887D /* MethodData.swift in Sources */,
 				E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */,
 				E6A02AEF29B759250091F915 /* MobileAppCommunicationManager.swift in Sources */,
+				E695F47429D1A6B500EB8EC9 /* EmojiView.swift in Sources */,
 				E63715FA29BCA6C100CD0BB3 /* MindService.swift in Sources */,
 				E637160329BCA94800CD0BB3 /* EmojiPickerView.swift in Sources */,
 				E674EA4B29BF0F7600022300 /* MindCreatorView.swift in Sources */,

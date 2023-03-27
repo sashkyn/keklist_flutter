@@ -89,6 +89,7 @@ struct MindCreatorView: View {
         NavigationView {
             if viewModel.isLoading {
                 LoadingView(text: "Creating...")
+                    .navigationTitle("")
             } else if let mindText = viewModel.textToCreateMind {
                 EmojiPickerView(
                     onSelect: { emoji in

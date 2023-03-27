@@ -32,7 +32,7 @@ struct MindCollectionView: View {
                             )
                         },
                         label: {
-                            MindCell(mind: mind.wrappedValue)
+                            EmojiView(mind.wrappedValue.emoji.description)
                         }
                     )
                         .buttonStyle(DefaultButtonStyle())
@@ -64,14 +64,5 @@ struct MindCollectionView: View {
                 .buttonStyle(DefaultButtonStyle())
                 .padding()
         }
-    }
-}
-
-private struct MindCell: View {
-    let mind: Mind
-
-    var body: some View {
-        Text(mind.emoji.description)
-            .font(.system(size: 30))
     }
 }

@@ -26,12 +26,14 @@ final class MainViewModel: ObservableObject {
             }
     }
     
-    func obtainTodayMinds() {
+    func obtainTodayMinds(silent: Bool = false) {
         cancellable?.cancel()
         cancellable = nil
         
-        errorText = nil
-        isLoading = true
+        if !silent {
+            errorText = nil
+            isLoading = true
+        }
         
         cancellable = service.obtainTodayMinds()
             .receive(on: RunLoop.main)
@@ -74,6 +76,9 @@ struct MainView: View {
                     .navigationTitle("Minds")
             }
         }
+            .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationDidBecomeActiveNotification)) { _ in
+                viewModel.obtainTodayMinds(silent: true)
+            }
     }
 }
 

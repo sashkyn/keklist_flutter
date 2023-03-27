@@ -59,9 +59,7 @@ struct EmojiPickerView: View {
     var body: some View {
         if viewModel.isLoading {
             LoadingView(text: "Analyzing text...")
-                .onAppear {
-                    viewModel.obtainPredictedEmojies()
-                }
+                .onAppear { viewModel.obtainPredictedEmojies() }
         } else if let errorText = viewModel.errorText {
             ErrorView(
                 retryAction: { viewModel.obtainPredictedEmojies() },
@@ -69,16 +67,22 @@ struct EmojiPickerView: View {
             )
         } else {
             ScrollView {
-                LazyVStack {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ]
+                ) {
                     ForEach(viewModel.emojies, id: \.self) { emoji in
                         Button(
                             action: { onSelect(emoji) },
-                            label: { Text(emoji).font(.headline) }
+                            label: { EmojiView(emoji) }
                         )
                     }
                 }
             }
-                .navigationTitle(!viewModel.isLoading ? "Select an emoji" : "") // INFO: какой то баг с висящим Select an emoji
+                .navigationTitle("Select an emoji")
         }
     }
 }
