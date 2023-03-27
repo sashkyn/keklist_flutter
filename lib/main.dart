@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,7 +40,9 @@ Future<void> main() async {
   final mainContainer = MainContainer().initialize(injector);
 
   // Подключаемся к Apple Watch.
-  mainContainer.get<WatchCommunicationManager>().connect();
+  if (Platform.isIOS) {
+    mainContainer.get<WatchCommunicationManager>().connect();
+  }
 
   if (!kReleaseMode) {
     Bloc.observer = LoggerBlocObserver();

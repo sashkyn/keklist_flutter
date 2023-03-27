@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
@@ -14,14 +16,15 @@ class MainContainer {
     injector.map<MindSearcherCubit>(
       (injector) => MindSearcherCubit(mainService: injector.get<MainService>()),
     );
-    injector.map<WatchCommunicationManager>(
+    if (Platform.isIOS) {
+      injector.map<WatchCommunicationManager>(
       (injector) => (AppleWatchCommunicationManager(
         mainService: injector.get<MainService>(),
         client: Supabase.instance.client,
       )),
       isSingleton: true,
     );
-
+    }
     return injector;
   }
 }
