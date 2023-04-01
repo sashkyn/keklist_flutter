@@ -31,6 +31,14 @@ Create provisioning profiles
 
 Archive, Build IPA, Signing, Upload to TestFilght
 
+### ios build_and_upload_to_testfilght_from_local_machine
+
+```sh
+[bundle exec] fastlane ios build_and_upload_to_testfilght_from_local_machine
+```
+
+Archive, Build IPA, Signing, Upload to TestFilght from Local machine
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
