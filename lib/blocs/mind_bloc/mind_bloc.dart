@@ -16,7 +16,7 @@ part 'mind_event.dart';
 part 'mind_state.dart';
 
 class MindBloc extends Bloc<MindEvent, MindState> {
-  late final MainService _storage;
+  late final MainService _service;
   late final MindSearcherCubit _searcherCubit;
 
   final Set<Mind> _minds = {};
@@ -25,7 +25,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     required MainService mainService,
     required MindSearcherCubit mindSearcherCubit,
   }) : super(MindListState(values: const [])) {
-    _storage = mainService;
+    _service = mainService;
     _searcherCubit = mindSearcherCubit;
 
     on<MindGetList>(_getMinds);
@@ -39,7 +39,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
     on<MindResetStorage>((event, emit) async {
-      await _storage.reset();
+      await _service.reset();
       _minds.clear();
       final state = MindListState(values: []);
       emit(state);
@@ -47,13 +47,13 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
-    await _storage.removeMind(event.uuid);
+    await _service.removeMind(event.uuid);
     _minds.removeWhere((item) => item.id == event.uuid);
     emit.call(MindListState(values: _minds));
   }
 
   FutureOr<void> _createMind(MindCreate event, emit) async {
-    final mark = Mind(
+    final mind = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
@@ -61,8 +61,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
-    await _storage.addMind(mark);
-    _minds.add(mark);
+    await _service.addMind(mind);
+    _minds.add(mind);
     final newState = MindListState(values: _minds);
     emit.call(newState);
   }
@@ -70,7 +70,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   FutureOr<void> _getMinds(MindGetList event, emit) async {
     _minds
       ..clear()
-      ..addAll(await _storage.getMindList());
+      ..addAll(await _service.getMindList());
     final state = MindListState(values: _minds);
     emit(state);
   }
@@ -96,34 +96,33 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
-    final filteredMarks = await _searcherCubit.searchMarkList(event.text);
+    final filteredMinds = await _searcherCubit.searchMindList(event.text);
 
     emit(
       MindSearching(
         enabled: true,
         values: _minds,
-        filteredValues: filteredMarks,
+        filteredValues: filteredMinds,
       ),
     );
   }
 
   List<String> _lastSuggestions = [];
 
-  // TODO: переместить в MindSearcherCubit;
   FutureOr<void> _changeTextOfCreatingMark(
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) {
     const count = 9;
     final List<String> suggestions = _minds
-        .where((mark) => mark.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
-        .map((mark) => mark.emoji)
+        .where((mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
+        .map((mind) => mind.emoji)
         .toList()
         .distinct()
-        .sorted((mind1, mind2) => _minds
-            .where((element) => element.emoji == mind2)
+        .sorted((emoji1, emoji2) => _minds
+            .where((mind) => mind.emoji == emoji2)
             .length
-            .compareTo(_minds.where((e) => e.emoji == mind1).length)) // NOTE: Сортировка очень дорогая
+            .compareTo(_minds.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
         .take(count)
         .toList();
 

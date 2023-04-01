@@ -10,13 +10,13 @@ class CreateMindBar extends StatelessWidget {
   final String selectedEmoji;
   final VoidCallback onSearchEmoji;
   final ArgumentCallback<String> onSelectSuggestionEmoji;
-  final ArgumentCallback<CreateMindData> onKek;
+  final ArgumentCallback<CreateMindData> onCreate;
 
   const CreateMindBar({
     Key? key,
     required this.textEditingController,
     required this.suggestionMinds,
-    required this.onKek,
+    required this.onCreate,
     required this.focusNode,
     required this.selectedEmoji,
     required this.onSelectSuggestionEmoji,
@@ -78,7 +78,7 @@ class CreateMindBar extends StatelessWidget {
                             text: textEditingController.text,
                             emoji: selectedEmoji,
                           );
-                          onKek(data);
+                          onCreate(data);
                         },
                         child: const Text(
                           'DONE',

@@ -15,6 +15,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
+### ios create_provisioning_profiles
+
+```sh
+[bundle exec] fastlane ios create_provisioning_profiles
+```
+
+Create provisioning profiles
+
 ### ios build_and_upload_to_testfilght
 
 ```sh
@@ -22,6 +30,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 ```
 
 Archive, Build IPA, Signing, Upload to TestFilght
+
+### ios build_and_upload_to_testfilght_from_local_machine
+
+```sh
+[bundle exec] fastlane ios build_and_upload_to_testfilght_from_local_machine
+```
+
+Archive, Build IPA, Signing, Upload to TestFilght from Local machine
 
 ----
 

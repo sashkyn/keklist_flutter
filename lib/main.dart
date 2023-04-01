@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,6 +17,7 @@ import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:zenmode/di/containers.dart';
 import 'package:zenmode/services/main_service.dart';
 
+import 'native/ios/watch/watch_communication_manager.dart';
 import 'screens/mind_collection/mind_collection_screen.dart';
 
 Future<void> main() async {
@@ -22,7 +25,6 @@ Future<void> main() async {
 
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
-
   // Инициализация настроек Supabase.
   await Supabase.initialize(
     url: '***REMOVED***',
@@ -36,6 +38,11 @@ Future<void> main() async {
   // Инициализация DI-контейнера.
   final injector = Injector();
   final mainContainer = MainContainer().initialize(injector);
+
+  // Подключаемся к Apple Watch.
+  if (Platform.isIOS) {
+    mainContainer.get<WatchCommunicationManager>().connect();
+  }
 
   if (!kReleaseMode) {
     Bloc.observer = LoggerBlocObserver();
