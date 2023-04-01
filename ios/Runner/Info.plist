@@ -62,5 +62,7 @@
 	<true/>
 	<key>FLTEnableImpeller</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs to access local network resources to discover and connect to nearby devices</string>
 </dict>
 </plist>
