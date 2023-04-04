@@ -3,9 +3,8 @@ import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
-// ignore: unnecessary_import
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
@@ -43,7 +42,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Iterable<Mind> _minds = [];
   MindSearching? _searchingMindState;
-  MindSuggestions? _suggestionsMarkState;
+  MindSuggestions? _mindSuggestions;
 
   late int _dayIndexToCreateMark = _getNowDayIndex();
   bool _createMindBottomBarIsVisible = false;
@@ -89,7 +88,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           setState(() => _searchingMindState = state);
         } else if (state is MindSuggestions) {
           setState(() {
-            _suggestionsMarkState = state;
+            _mindSuggestions = state;
           });
         }
       }).disposed(by: this);
@@ -128,7 +127,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return KeyboardSizeProvider(
       child: Scaffold(
         appBar: _makeAppBar(),
-        body: _makeBody(),
+        body: MindCreatorSlidingPanelWidget(
+          body: _makeBody(),
+        ),
         resizeToAvoidBottomInset: false,
       ),
     );
@@ -297,7 +298,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                       textEditingController: _createMarkEditingController,
                       onCreate: (CreateMindData data) {
                         setState(() {
-                          _suggestionsMarkState = null;
+                          _mindSuggestions = null;
                           _createMarkEditingController.text = '';
                         });
                         _sendToMarkBloc(
@@ -310,7 +311,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                         _hideKeyboard();
                         _createMindBottomBarIsVisible = false;
                       },
-                      suggestionMinds: _suggestionsMarkState?.suggestionMarks ?? [],
+                      suggestionMinds: _mindSuggestions?.suggestionMarks ?? [],
                       selectedEmoji: _selectedEmoji,
                       onSelectSuggestionEmoji: (String suggestionEmoji) {
                         setState(() => _selectedEmoji = suggestionEmoji);
@@ -473,11 +474,52 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _disableDemoMode() {
     _demoAutoScrollingTimer?.cancel();
-    setState(() {
-      _isDemoMode = false;
-    });
+    setState(() => _isDemoMode = false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
     });
+  }
+}
+
+class MindCreatorSlidingPanelWidget extends StatelessWidget {
+  final Widget body;
+  final TextEditingController _textEditingController = TextEditingController();
+
+  MindCreatorSlidingPanelWidget({
+    Key? key,
+    required this.body,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SlidingUpPanel(
+      borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+      minHeight: 130.0,
+      panel: Column(
+        children: [
+          const SizedBox(height: 12.0),
+          const Text(
+            'Create a mind for Today',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          TextField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            textCapitalization: TextCapitalization.sentences,
+            controller: _textEditingController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.all(8),
+              border: InputBorder.none,
+              hintText: 'Text for a mind...',
+            ),
+          ),
+        ],
+      ),
+      body: body,
+    );
   }
 }
