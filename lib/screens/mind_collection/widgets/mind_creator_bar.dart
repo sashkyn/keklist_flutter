@@ -3,7 +3,7 @@ import 'package:zenmode/typealiases.dart';
 import 'package:zenmode/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
 
-class CreateMindBar extends StatelessWidget {
+class MindCreatorBar extends StatelessWidget {
   final TextEditingController textEditingController;
   final List<String> suggestionMinds;
   final FocusNode focusNode;
@@ -12,7 +12,7 @@ class CreateMindBar extends StatelessWidget {
   final ArgumentCallback<String> onSelectSuggestionEmoji;
   final ArgumentCallback<CreateMindData> onCreate;
 
-  const CreateMindBar({
+  const MindCreatorBar({
     Key? key,
     required this.textEditingController,
     required this.suggestionMinds,
@@ -38,7 +38,7 @@ class CreateMindBar extends StatelessWidget {
                   flex: 1,
                   child: MindWidget.sized(
                     item: suggestionMinds[index],
-                    markSize: MindSize.small,
+                    size: MindSize.small,
                     onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
                   ),
                 );
@@ -50,7 +50,7 @@ class CreateMindBar extends StatelessWidget {
                 const SizedBox(width: 8.0),
                 MindWidget.sized(
                   item: selectedEmoji,
-                  markSize: MindSize.medium,
+                  size: MindSize.medium,
                   onTap: onSearchEmoji,
                 ),
                 const SizedBox(width: 8.0),

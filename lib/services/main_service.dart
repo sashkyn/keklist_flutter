@@ -7,6 +7,6 @@ abstract class MainService {
   FutureOr<void> removeMind(String id);
   FutureOr<void> addAll({required List<Mind> list});
   FutureOr<Iterable<Mind>> getMindList();
-  FutureOr<void> reset();
+  FutureOr<void> clearCache();
   FutureOr<void> deleteAccount();
 }

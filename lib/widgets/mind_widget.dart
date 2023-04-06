@@ -25,12 +25,12 @@ class MindWidget extends StatelessWidget {
 
   factory MindWidget.sized({
     required String item,
-    required MindSize markSize,
+    required MindSize size,
     bool isHighlighted = true,
     VoidCallback? onTap,
     VoidCallback? onLongPress,
   }) {
-    switch (markSize) {
+    switch (size) {
       case MindSize.small:
         return MindWidget(
           item: item,

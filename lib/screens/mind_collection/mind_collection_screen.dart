@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
@@ -12,11 +11,12 @@ import 'package:zenmode/constants.dart';
 import 'package:zenmode/helpers/extensions/dispose_bag.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
-import 'package:zenmode/screens/mind_collection/create_mark_bar.dart';
-import 'package:zenmode/screens/mind_collection/my_table.dart';
-import 'package:zenmode/screens/mind_collection/search_bar.dart';
+import 'package:zenmode/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:zenmode/screens/mind_collection/widgets/my_table.dart';
+import 'package:zenmode/screens/mind_collection/widgets/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
+import 'package:zenmode/screens/mind_collection/widgets/mind_creator_sliding_panel.dart';
 import 'package:zenmode/screens/settings/settings_screen.dart';
 import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/typealiases.dart';
@@ -67,16 +67,16 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToMarkBloc(MindGetList());
+      _sendToMindBloc(MindGetList());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
-        _sendToMarkBloc(MindEnterSearchText(text: _searchTextController.text));
+        _sendToMindBloc(MindEnterSearchText(text: _searchTextController.text));
       });
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        _sendToMarkBloc(MindChangeCreateText(text: _createMarkEditingController.text));
+        _sendToMindBloc(MindChangeCreateText(text: _createMarkEditingController.text));
       });
 
       context.read<MindBloc>().stream.listen((state) {
@@ -96,10 +96,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       context.read<AuthBloc>().stream.listen((state) async {
         if (state is AuthLoggedIn) {
           _disableDemoMode();
-          _sendToMarkBloc(MindGetList());
+          _sendToMindBloc(MindGetList());
         } else if (state is AuthLogouted) {
           _enableDemoMode();
-          _sendToMarkBloc(MindResetStorage());
+          _sendToMindBloc(MindResetStorage());
           // NOTE: возвращаемся к главному экрану при логауте.
           Navigator.of(context).popUntil((route) => route.isFirst);
           _showAuthBottomSheet();
@@ -162,7 +162,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         },
         onCancel: () {
           _searchTextController.clear();
-          _sendToMarkBloc(MindStopSearch());
+          _sendToMindBloc(MindStopSearch());
         },
       );
     } else {
@@ -185,7 +185,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         onPressed: () {
           setState(() {
             _createMindBottomBarIsVisible = false;
-            _sendToMarkBloc(MindStartSearch());
+            _sendToMindBloc(MindStartSearch());
           });
         },
       ),
@@ -293,7 +293,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    CreateMindBar(
+                    MindCreatorBar(
                       focusNode: _createMarkFocusNode,
                       textEditingController: _createMarkEditingController,
                       onCreate: (CreateMindData data) {
@@ -301,7 +301,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                           _mindSuggestions = null;
                           _createMarkEditingController.text = '';
                         });
-                        _sendToMarkBloc(
+                        _sendToMindBloc(
                           MindCreate(
                             dayIndex: _dayIndexToCreateMark,
                             note: data.text,
@@ -352,7 +352,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return MindWidget(
       item: mind.emoji,
       onTap: () => showOkAlertDialog(
-        title: mind.emoji, // TODO: исправить для Андроида. Сделать кастомное окно показа.
+        title: mind.emoji,
         message: mind.note,
         context: context,
       ),
@@ -379,7 +379,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       ],
     );
     if (result == 'remove_key') {
-      _sendToMarkBloc(MindDelete(uuid: item.id));
+      _sendToMindBloc(MindDelete(uuid: item.id));
     } else if (result == 'copy_to_now_key') {
       await _copyToNow(item);
     }
@@ -404,7 +404,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       ],
     );
     if (note != null) {
-      _sendToMarkBloc(
+      _sendToMindBloc(
         MindCreate(
           dayIndex: _getNowDayIndex(),
           note: note.first,
@@ -430,7 +430,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  void _sendToMarkBloc(MindEvent event) {
+  void _sendToMindBloc(MindEvent event) {
     context.read<MindBloc>().add(event);
   }
 
@@ -449,9 +449,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Timer? _demoAutoScrollingTimer;
 
   void _enableDemoMode() async {
-    setState(() {
-      _isDemoMode = true;
-    });
+    setState(() => _isDemoMode = true);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
       int nextDayIndex = _getNowDayIndex() + 1;
@@ -478,48 +476,5 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
     });
-  }
-}
-
-class MindCreatorSlidingPanelWidget extends StatelessWidget {
-  final Widget body;
-  final TextEditingController _textEditingController = TextEditingController();
-
-  MindCreatorSlidingPanelWidget({
-    Key? key,
-    required this.body,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SlidingUpPanel(
-      borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-      minHeight: 130.0,
-      panel: Column(
-        children: [
-          const SizedBox(height: 12.0),
-          const Text(
-            'Create a mind for Today',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          TextField(
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            textCapitalization: TextCapitalization.sentences,
-            controller: _textEditingController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              border: InputBorder.none,
-              hintText: 'Text for a mind...',
-            ),
-          ),
-        ],
-      ),
-      body: body,
-    );
   }
 }
