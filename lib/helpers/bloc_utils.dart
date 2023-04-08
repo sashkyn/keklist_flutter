@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // TODO: обойти проблему, чтобы нельзя было вызвать sendToBloc(...) без указания типа B
 
 class BlocUtils {
-  static void sendToBloc<B extends Bloc>({
+  static void sendTo<B extends Bloc>({
     required BuildContext? context,
     required Object event,
   }) {

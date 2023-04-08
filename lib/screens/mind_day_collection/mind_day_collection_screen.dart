@@ -46,7 +46,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        BlocUtils.sendToBloc<MindBloc>(
+        BlocUtils.sendTo<MindBloc>(
           context: context,
           event: MindChangeCreateText(text: _createMarkEditingController.text),
         );
@@ -156,7 +156,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                               _mindSuggestions = null;
                               _createMarkEditingController.text = '';
                             });
-                            BlocUtils.sendToBloc<MindBloc>(
+                            BlocUtils.sendTo<MindBloc>(
                               context: context,
                               event: MindCreate(
                                 dayIndex: widget.dayIndex,
@@ -215,7 +215,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       ],
     );
     if (result == 'remove_key') {
-      BlocUtils.sendToBloc<MindBloc>(
+      BlocUtils.sendTo<MindBloc>(
         context: mountedContext,
         event: MindDelete(uuid: item.id),
       );
