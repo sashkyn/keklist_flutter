@@ -13,10 +13,11 @@ class MyTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constrains) {
-        final widgetsInRowCount = (constrains.maxWidth / LayoutConstants.mindSide).ceil();
+        final int widgetsInRowCount = (constrains.maxWidth / LayoutConstants.mindSide).ceil();
+        final int numberOfRows = (widgets.length / widgetsInRowCount).ceil();
         return Table(
           children: List.generate(
-            (widgets.length / widgetsInRowCount).ceil(),
+            numberOfRows,
             (index) => TableRow(
               children: List.generate(
                 widgetsInRowCount,
@@ -28,9 +29,7 @@ class MyTable extends StatelessWidget {
                       child: widgets[itemIndex],
                     );
                   } else {
-                    return TableCell(
-                      child: Container(),
-                    );
+                    return const TableCell(child: SizedBox());
                   }
                 },
               ),

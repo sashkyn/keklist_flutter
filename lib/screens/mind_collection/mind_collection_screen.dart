@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/constants.dart';
+import 'package:zenmode/helpers/bloc_utils.dart';
 import 'package:zenmode/helpers/extensions/dispose_bag.dart';
 import 'package:zenmode/helpers/mind_utils.dart';
 import 'package:zenmode/screens/auth/auth_screen.dart';
@@ -16,7 +16,7 @@ import 'package:zenmode/screens/mind_collection/widgets/my_table.dart';
 import 'package:zenmode/screens/mind_collection/widgets/search_bar.dart';
 import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
-import 'package:zenmode/screens/mind_collection/widgets/mind_creator_sliding_panel.dart';
+import 'package:zenmode/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:zenmode/screens/settings/settings_screen.dart';
 import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/typealiases.dart';
@@ -42,10 +42,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Iterable<Mind> _minds = [];
   MindSearching? _searchingMindState;
-  MindSuggestions? _mindSuggestions;
 
-  late int _dayIndexToCreateMark = _getNowDayIndex();
-  bool _createMindBottomBarIsVisible = false;
+  late final int _dayIndexToCreateMark = _getNowDayIndex();
 
   bool _isDemoMode = false;
 
@@ -53,10 +51,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
   final FocusNode _createMarkFocusNode = FocusNode();
   String _selectedEmoji = Emoji.all().first.char;
+  MindSuggestions? _mindSuggestions;
+  bool _createMindBottomBarIsVisible = false;
 
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
-
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
   Iterable<Mind> get _searchedMinds => _isSearching ? _searchingMindState!.filteredValues : [];
 
@@ -76,7 +75,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        _sendToMindBloc(MindChangeCreateText(text: _createMarkEditingController.text));
+        BlocUtils.sendToBloc<MindBloc>(
+          context: context,
+          event: MindChangeCreateText(text: _createMarkEditingController.text),
+        );
       });
 
       context.read<MindBloc>().stream.listen((state) {
@@ -127,9 +129,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return KeyboardSizeProvider(
       child: Scaffold(
         appBar: _makeAppBar(),
-        body: MindCreatorSlidingPanelWidget(
-          body: _makeBody(),
-        ),
+        body: _makeBody(),
+        // body: MindCreatorSlidingPanelWidget(
+        //   body: _makeBody(),
+        // ),
         resizeToAvoidBottomInset: false,
       ),
     );
@@ -210,7 +213,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       itemCount: 99999999999,
       itemScrollController: _itemScrollController,
       itemPositionsListener: _itemPositionsListener,
-      itemBuilder: (BuildContext context, int groupIndex) {
+      itemBuilder: (BuildContext context, int groupDayIndex) {
         final List<Widget> mindWidgets = [];
         if (_isDemoMode) {
           mindWidgets.addAll(
@@ -228,37 +231,59 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   sortIndex: 0,
                 );
               },
-            ).map((randomMark) => _makeMindWidget(randomMark)).toList(),
+            )
+                .map(
+                  (randomMark) => _makeMindWidget(randomMark),
+                )
+                .toList(),
           );
         } else {
-          final List<Mind> mindsOfDay = _findMarksByDayIndex(groupIndex);
+          final List<Mind> mindsOfDay = _findMarksByDayIndex(groupDayIndex);
           final List<Widget> realMindWidgets = mindsOfDay.map((mark) => _makeMindWidget(mark)).toList();
           mindWidgets.addAll(realMindWidgets);
-
-          mindWidgets.add(
-            MindWidget(
-              item: '📝',
-              onTap: () {
-                setState(() {
-                  _createMindBottomBarIsVisible = true;
-                  _scrollToDayIndex(groupIndex);
-                  _dayIndexToCreateMark = groupIndex;
-                  _createMarkFocusNode.requestFocus();
-                });
-              },
-              isHighlighted: true,
-            ),
-          );
         }
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 18.0),
-            _makeMindsTitleWidget(groupIndex),
+            _makeMindsTitleWidget(groupDayIndex),
             const SizedBox(height: 4.0),
-            MyTable(
-              widgets: mindWidgets,
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MindDayCollectionScreen(
+                      minds: _findMarksByDayIndex(groupDayIndex),
+                      dayIndex: groupDayIndex,
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    // border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        spreadRadius: 2,
+                        blurRadius: 10.0,
+                        offset: const Offset(1.0, 1.0),
+                      ),
+                    ],
+                  ),
+                  child: mindWidgets.isNotEmpty
+                      ? MyTable(widgets: mindWidgets)
+                      : Container(
+                          height: 128.0,
+                          // child: const Text('Add mind'), // TODO: придумать и добавить empty state
+                        ),
+                ),
+              ),
             )
           ],
         );
@@ -311,7 +336,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                         _hideKeyboard();
                         _createMindBottomBarIsVisible = false;
                       },
-                      suggestionMinds: _mindSuggestions?.suggestionMarks ?? [],
+                      suggestionMinds: _mindSuggestions?.values ?? [],
                       selectedEmoji: _selectedEmoji,
                       onSelectSuggestionEmoji: (String suggestionEmoji) {
                         setState(() => _selectedEmoji = suggestionEmoji);
@@ -351,38 +376,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     }
     return MindWidget(
       item: mind.emoji,
-      onTap: () => showOkAlertDialog(
-        title: mind.emoji,
-        message: mind.note,
-        context: context,
-      ),
-      onLongPress: () async => await _showMarkOptionsActionSheet(mind),
+      // TODO: удалить
+      // onLongPress: () async => await _showMarkOptionsActionSheet(mind), // TODO: удалить
       isHighlighted: isHighlighted,
     );
-  }
-
-  _showMarkOptionsActionSheet(Mind item) async {
-    final result = await showModalActionSheet(
-      context: context,
-      actions: [
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Copy to now',
-          key: 'copy_to_now_key',
-        ),
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Delete',
-          key: 'remove_key',
-          isDestructiveAction: true,
-        ),
-      ],
-    );
-    if (result == 'remove_key') {
-      _sendToMindBloc(MindDelete(uuid: item.id));
-    } else if (result == 'copy_to_now_key') {
-      await _copyToNow(item);
-    }
   }
 
   _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
@@ -390,28 +387,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       context: context,
       builder: (context) => MarkPickerScreen(onSelect: onSelect),
     );
-  }
-
-  _copyToNow(Mind item) async {
-    final note = await showTextInputDialog(
-      context: context,
-      message: item.emoji,
-      textFields: [
-        DialogTextField(
-          initialText: item.note,
-          maxLines: 3,
-        )
-      ],
-    );
-    if (note != null) {
-      _sendToMindBloc(
-        MindCreate(
-          dayIndex: _getNowDayIndex(),
-          note: note.first,
-          emoji: item.emoji,
-        ),
-      );
-    }
   }
 
   List<Mind> _findMarksByDayIndex(int index) =>
