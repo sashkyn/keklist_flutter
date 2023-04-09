@@ -3,6 +3,7 @@ import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:shake/shake.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
 import 'package:zenmode/constants.dart';
 import 'package:zenmode/helpers/bloc_utils.dart';
@@ -13,6 +14,8 @@ import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
 import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
 import 'package:zenmode/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:zenmode/screens/mind_collection/widgets/my_table.dart';
+import 'package:zenmode/widgets/bool_widget.dart';
+import 'package:zenmode/screens/mind_day_collection/widgets/mind_message_widget.dart';
 import 'package:zenmode/services/entities/mind.dart';
 import 'package:zenmode/typealiases.dart';
 import 'package:zenmode/widgets/mind_widget.dart';
@@ -39,6 +42,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   MindSuggestions? _mindSuggestions;
   bool _createMindBottomBarIsVisible = false;
 
+  bool _isLocked = true;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +56,14 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           event: MindChangeCreateText(text: _createMarkEditingController.text),
         );
       });
+
+      // NOTE: По тряске телефона скрываем/показываем текст эмодзи.
+      // final ShakeDetector shakeDetector = ShakeDetector.autoStart(onPhoneShake: () {
+      //   setState(() {
+      //     _isLocked = !_isLocked;
+      //   });
+      // });
+      // shakeDetector.streamSubscription?.disposed(by: this);
     });
 
     context.read<MindBloc>().stream.listen((state) {
@@ -63,10 +76,6 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
             ..clear()
             ..addAll(minds);
         });
-      } else if (state is MindError) {
-        // _showError(text: state.text);
-      } else if (state is MindSearching) {
-        // setState(() => _searchingMindState = state);
       } else if (state is MindSuggestions) {
         setState(() {
           _mindSuggestions = state;
@@ -76,121 +85,127 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   }
 
   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(widget.dayIndex))),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: !_createMindBottomBarIsVisible
+          ? FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _createMindBottomBarIsVisible = true;
+                  _createMarkFocusNode.requestFocus();
+                });
+              },
+              child: const Icon(
+                Icons.emoji_emotions,
+                size: 40.0,
+              ),
+            )
+          : null,
+      body: Stack(
+        children: [
+          GestureDetector(
+            onPanDown: (details) {
+              if (_createMarkFocusNode.hasFocus) {
+                setState(() {
+                  _createMindBottomBarIsVisible = false;
+                  _hideKeyboard();
+                });
+              }
+            },
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 100,
+              ),
+              color: Colors.white,
+              child: BoolWidget(
+                condition: _isLocked,
+                trueChild: MyTable(
+                  widgets: widget.minds
+                      .map(
+                        (mind) => MindWidget.sized(
+                          item: mind.emoji,
+                          size: MindSize.large,
+                          onTap: () => showOkAlertDialog(
+                            title: mind.emoji,
+                            message: mind.note,
+                            context: context,
+                          ),
+                          onLongTap: () {
+                            _showMarkOptionsActionSheet(mind);
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+                falseChild: Column(
+                  children: widget.minds.map((mind) => MindMessageWidget(mind: mind)).toList(),
+                ),
+              ),
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Visibility(
+                visible: _createMindBottomBarIsVisible,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    MindCreatorBar(
+                      focusNode: _createMarkFocusNode,
+                      textEditingController: _createMarkEditingController,
+                      onCreate: (CreateMindData data) {
+                        setState(() {
+                          _mindSuggestions = null;
+                          _createMarkEditingController.text = '';
+                        });
+                        BlocUtils.sendTo<MindBloc>(
+                          context: context,
+                          event: MindCreate(
+                            dayIndex: widget.dayIndex,
+                            note: data.text,
+                            emoji: data.emoji,
+                          ),
+                        );
+                        _hideKeyboard();
+                        _createMindBottomBarIsVisible = false;
+                      },
+                      suggestionMinds: _mindSuggestions?.values ?? [],
+                      selectedEmoji: _selectedEmoji,
+                      onSelectSuggestionEmoji: (String suggestionEmoji) {
+                        setState(() {
+                          _selectedEmoji = suggestionEmoji;
+                        });
+                      },
+                      onSearchEmoji: () {
+                        _showMarkPickerScreen(
+                          onSelect: (String emoji) {
+                            setState(() {
+                              _selectedEmoji = emoji;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   void dispose() {
     cancelSubscriptions();
 
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return KeyboardSizeProvider(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(widget.dayIndex))),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: !_createMindBottomBarIsVisible
-            ? FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    _createMindBottomBarIsVisible = true;
-                    _createMarkFocusNode.requestFocus();
-                  });
-                },
-                child: const Icon(
-                  Icons.emoji_emotions,
-                  size: 40.0,
-                ),
-              )
-            : null,
-        body: Stack(
-          children: [
-            GestureDetector(
-              onPanDown: (details) {
-                if (_createMarkFocusNode.hasFocus) {
-                  setState(() {
-                    _createMindBottomBarIsVisible = false;
-                    _hideKeyboard();
-                  });
-                }
-              },
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 100,
-                ),
-                color: Colors.white,
-                child: MyTable(
-                    widgets: widget.minds
-                        .map(
-                          (mind) => MindWidget.sized(
-                            item: mind.emoji,
-                            size: MindSize.large,
-                            onTap: () => showOkAlertDialog(
-                              title: mind.emoji,
-                              message: mind.note,
-                              context: context,
-                            ),
-                            onLongTap: () {
-                              _showMarkOptionsActionSheet(mind);
-                            },
-                          ),
-                        )
-                        .toList()),
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Visibility(
-                  visible: _createMindBottomBarIsVisible,
-                  child: Consumer<ScreenHeight>(builder: (context, res, child) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        MindCreatorBar(
-                          focusNode: _createMarkFocusNode,
-                          textEditingController: _createMarkEditingController,
-                          onCreate: (CreateMindData data) {
-                            setState(() {
-                              _mindSuggestions = null;
-                              _createMarkEditingController.text = '';
-                            });
-                            BlocUtils.sendTo<MindBloc>(
-                              context: context,
-                              event: MindCreate(
-                                dayIndex: widget.dayIndex,
-                                note: data.text,
-                                emoji: data.emoji,
-                              ),
-                            );
-                            _hideKeyboard();
-                            _createMindBottomBarIsVisible = false;
-                          },
-                          suggestionMinds: _mindSuggestions?.values ?? [],
-                          selectedEmoji: _selectedEmoji,
-                          onSelectSuggestionEmoji: (String suggestionEmoji) {
-                            setState(() => _selectedEmoji = suggestionEmoji);
-                          },
-                          onSearchEmoji: () {
-                            _showMarkPickerScreen(
-                              onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
-                            );
-                          },
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: res.keyboardHeight),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());

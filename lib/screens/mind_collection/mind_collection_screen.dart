@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:zenmode/widgets/bool_widget.dart';
 import 'package:zenmode/widgets/mind_widget.dart';
 
 class MindCollectionScreen extends StatefulWidget {
@@ -276,12 +277,14 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                       ),
                     ],
                   ),
-                  child: mindWidgets.isNotEmpty
-                      ? MyTable(widgets: mindWidgets)
-                      : Container(
-                          height: 128.0,
-                          // child: const Text('Add mind'), // TODO: придумать и добавить empty state
-                        ),
+                  child: BoolWidget(
+                    condition: mindWidgets.isEmpty,
+                    trueChild: Container(
+                      height: 128.0,
+                      // child: const Text('Add mind'), // TODO: придумать и добавить empty state
+                    ),
+                    falseChild: MyTable(widgets: mindWidgets),
+                  ),
                 ),
               ),
             )
@@ -292,23 +295,24 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return Stack(
       children: [
         GestureDetector(
-          onPanDown: (details) {
-            if (_createMarkFocusNode.hasFocus) {
-              setState(() {
-                _createMindBottomBarIsVisible = false;
-                _hideKeyboard();
-              });
-            }
-          },
-          child: _isDemoMode
-              ? Blur(
-                  blur: 3,
-                  blurColor: Colors.transparent,
-                  colorOpacity: 0.2,
-                  child: scrollablePositionedList,
-                )
-              : scrollablePositionedList,
-        ),
+            onPanDown: (details) {
+              if (_createMarkFocusNode.hasFocus) {
+                setState(() {
+                  _createMindBottomBarIsVisible = false;
+                  _hideKeyboard();
+                });
+              }
+            },
+            child: BoolWidget(
+              condition: _isDemoMode,
+              trueChild: Blur(
+                blur: 3,
+                blurColor: Colors.transparent,
+                colorOpacity: 0.2,
+                child: scrollablePositionedList,
+              ),
+              falseChild: scrollablePositionedList,
+            )),
         Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -376,8 +380,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     }
     return MindWidget(
       item: mind.emoji,
-      // TODO: удалить
-      // onLongPress: () async => await _showMarkOptionsActionSheet(mind), // TODO: удалить
       isHighlighted: isHighlighted,
     );
   }

@@ -768,6 +768,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5"
+  sensors:
+    dependency: transitive
+    description:
+      name: sensors
+      sha256: "69c10fe94a63dd7c6f5e6557366e5329a713bf6c45d885d95a56642dd8722e35"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
+  shake:
+    dependency: "direct main"
+    description:
+      name: shake
+      sha256: "48d8265530de7cc1bc7b279702f59d3c10505778b2fbe50314ebf2928eb4e52a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   share_plus:
     dependency: "direct main"
     description:
