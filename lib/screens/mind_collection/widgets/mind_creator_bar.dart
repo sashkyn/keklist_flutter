@@ -31,7 +31,11 @@ class MindCreatorBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Divider(color: Colors.grey),
+            Container(
+              color: Colors.grey,
+              height: 0.3,
+            ),
+            const SizedBox(height: 4.0),
             Row(
               children: List.generate(suggestionMinds.length, (index) {
                 return Flexible(

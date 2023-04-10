@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:blur/blur.dart';
-import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
 import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
@@ -127,15 +127,13 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardSizeProvider(
-      child: Scaffold(
-        appBar: _makeAppBar(),
-        body: _makeBody(),
-        // body: MindCreatorSlidingPanelWidget(
-        //   body: _makeBody(),
-        // ),
-        resizeToAvoidBottomInset: false,
-      ),
+    return Scaffold(
+      appBar: _makeAppBar(),
+      body: _makeBody(),
+      // body: MindCreatorSlidingPanelWidget(
+      //   body: _makeBody(),
+      // ),
+      resizeToAvoidBottomInset: false,
     );
   }
 
@@ -318,45 +316,40 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           children: [
             Visibility(
               visible: _createMindBottomBarIsVisible,
-              child: Consumer<ScreenHeight>(builder: (context, res, child) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    MindCreatorBar(
-                      focusNode: _createMarkFocusNode,
-                      textEditingController: _createMarkEditingController,
-                      onCreate: (CreateMindData data) {
-                        setState(() {
-                          _mindSuggestions = null;
-                          _createMarkEditingController.text = '';
-                        });
-                        _sendToMindBloc(
-                          MindCreate(
-                            dayIndex: _dayIndexToCreateMark,
-                            note: data.text,
-                            emoji: data.emoji,
-                          ),
-                        );
-                        _hideKeyboard();
-                        _createMindBottomBarIsVisible = false;
-                      },
-                      suggestionMinds: _mindSuggestions?.values ?? [],
-                      selectedEmoji: _selectedEmoji,
-                      onSelectSuggestionEmoji: (String suggestionEmoji) {
-                        setState(() => _selectedEmoji = suggestionEmoji);
-                      },
-                      onSearchEmoji: () {
-                        _showMarkPickerScreen(
-                          onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
-                        );
-                      },
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: res.keyboardHeight),
-                    ),
-                  ],
-                );
-              }),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MindCreatorBar(
+                    focusNode: _createMarkFocusNode,
+                    textEditingController: _createMarkEditingController,
+                    onCreate: (CreateMindData data) {
+                      setState(() {
+                        _mindSuggestions = null;
+                        _createMarkEditingController.text = '';
+                      });
+                      _sendToMindBloc(
+                        MindCreate(
+                          dayIndex: _dayIndexToCreateMark,
+                          note: data.text,
+                          emoji: data.emoji,
+                        ),
+                      );
+                      _hideKeyboard();
+                      _createMindBottomBarIsVisible = false;
+                    },
+                    suggestionMinds: _mindSuggestions?.values ?? [],
+                    selectedEmoji: _selectedEmoji,
+                    onSelectSuggestionEmoji: (String suggestionEmoji) {
+                      setState(() => _selectedEmoji = suggestionEmoji);
+                    },
+                    onSearchEmoji: () {
+                      _showMarkPickerScreen(
+                        onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
