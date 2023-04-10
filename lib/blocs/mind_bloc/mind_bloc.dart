@@ -35,15 +35,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(_enterTextSearch);
     on<MindChangeCreateText>(
-      _changeTextOfCreatingMark,
+      _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
-    on<MindResetStorage>((event, emit) async {
-      await _service.reset();
-      _minds.clear();
-      final state = MindListState(values: []);
-      emit(state);
-    });
+    on<MindResetStorage>(_clearCache);
   }
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
@@ -109,7 +104,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
   List<String> _lastSuggestions = [];
 
-  FutureOr<void> _changeTextOfCreatingMark(
+  FutureOr<void> _changeTextOfCreatingMind(
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) {
@@ -133,7 +128,14 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     } else {
       _lastSuggestions = suggestions;
     }
-    emit(MindSuggestions(suggestionMarks: _lastSuggestions));
+    emit(MindSuggestions(values: _lastSuggestions));
+  }
+
+  FutureOr<void> _clearCache(event, emit) async {
+    await _service.clearCache();
+    _minds.clear();
+    final state = MindListState(values: []);
+    emit(state);
   }
 
   List<Mind> _findMindsByDayIndex(int index) => _minds

@@ -27,7 +27,7 @@ class MindSearching extends MindState {
 }
 
 class MindSuggestions extends MindState {
-  final List<String> suggestionMarks;
+  final List<String> values;
 
-  MindSuggestions({required this.suggestionMarks});
+  MindSuggestions({required this.values});
 }

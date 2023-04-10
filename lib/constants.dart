@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Palette {
   static const MaterialColor swatch = MaterialColor(
@@ -20,6 +21,10 @@ class Palette {
 
 class LayoutConstants {
   static double mindSide = 100.0;
+}
+
+class DateFormatters {
+  static DateFormat fullDateFormat = DateFormat('dd.MM.yyyy - EEEE');
 }
 
 class ZenConstants {

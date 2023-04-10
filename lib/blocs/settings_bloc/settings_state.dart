@@ -1,8 +1,9 @@
 part of 'settings_bloc.dart';
 
-class SettingsState extends Equatable {
-  const SettingsState();
+class SettingsState {
+  final bool isMindContentVisible;
 
-  @override
-  List<Object> get props => [];
+  const SettingsState({
+    required this.isMindContentVisible,
+  });
 }

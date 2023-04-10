@@ -7,4 +7,12 @@ abstract class SettingsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ExportMarksToCSVSettingsEvent extends SettingsEvent {}
+class SettingsGet extends SettingsEvent {}
+
+class SettingsExportAllMindsToCSV extends SettingsEvent {}
+
+class SettingsChangeMindContentVisibility extends SettingsEvent {
+  final bool isVisible;
+
+  const SettingsChangeMindContentVisibility({required this.isVisible});
+}
