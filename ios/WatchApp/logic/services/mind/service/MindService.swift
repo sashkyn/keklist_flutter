@@ -30,7 +30,7 @@ final class MindMobileChannelService: MindService {
         return mobileCommunicationManager.messages
             .filter { $0.name == "showMinds" }
             .map { $0.arguments }
-            .compactMap { arguments in
+            .compactMap { arguments -> Data? in
                 guard let mindsJSONString = arguments["minds"] as? String else {
                     return nil
                 }
@@ -57,7 +57,7 @@ final class MindMobileChannelService: MindService {
         return mobileCommunicationManager.messages
             .filter { $0.name == "showPredictedEmojies" }
             .map { $0.arguments }
-            .compactMap { arguments in
+            .compactMap { arguments -> Data? in
                 guard let jsonString = arguments["emojies"] as? String else {
                     return nil
                 }
@@ -85,7 +85,7 @@ final class MindMobileChannelService: MindService {
         return mobileCommunicationManager.messages
             .filter { $0.name == "mindDidCreated" }
             .map { $0.arguments }
-            .compactMap { arguments in
+            .compactMap { arguments -> Data? in
                 guard let jsonString = arguments["mind"] as? String else {
                     return nil
                 }

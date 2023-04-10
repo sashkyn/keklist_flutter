@@ -30,7 +30,6 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
     _textEditingController.addListener(() {
       setState(() {
         _text = _textEditingController.text;
-        // _filteredMarks = _mainMarks.where((mark) => mark.keywords.join().contains(_searchText)).toList();
       });
     });
   }
@@ -60,7 +59,7 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
           ),
           const SizedBox(height: 8),
           TextField(
-            autofocus: true,
+            autofocus: false,
             keyboardType: TextInputType.multiline,
             maxLines: null,
             textCapitalization: TextCapitalization.sentences,
@@ -68,7 +67,7 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: OutlineInputBorder(),
-              hintText: 'Enter text for new mind...',
+              hintText: 'Create new mind...',
             ),
           ),
         ],

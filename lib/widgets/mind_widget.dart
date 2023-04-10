@@ -25,18 +25,18 @@ class MindWidget extends StatelessWidget {
 
   factory MindWidget.sized({
     required String item,
-    required MindSize markSize,
+    required MindSize size,
     bool isHighlighted = true,
     VoidCallback? onTap,
-    VoidCallback? onLongPress,
+    VoidCallback? onLongTap,
   }) {
-    switch (markSize) {
+    switch (size) {
       case MindSize.small:
         return MindWidget(
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
-          onLongPress: onLongPress,
+          onLongPress: onLongTap,
           fontSize: 32,
         );
       case MindSize.medium:
@@ -44,7 +44,7 @@ class MindWidget extends StatelessWidget {
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
-          onLongPress: onLongPress,
+          onLongPress: onLongTap,
           fontSize: 40,
         );
       case MindSize.large:
@@ -52,7 +52,7 @@ class MindWidget extends StatelessWidget {
           item: item,
           isHighlighted: isHighlighted,
           onTap: onTap,
-          onLongPress: onLongPress,
+          onLongPress: onLongTap,
           fontSize: 50,
         );
     }

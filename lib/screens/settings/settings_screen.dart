@@ -92,7 +92,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   onTap: () async {
                     switch (item) {
                       case SettingItem.exportToCSV:
-                        context.read<SettingsBloc>().add(ExportMarksToCSVSettingsEvent());
+                        context.read<SettingsBloc>().add(SettingsExportAllMindsToCSV());
                         break;
                       case SettingItem.login:
                         await showCupertinoModalBottomSheet(

@@ -69,7 +69,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> reset() {
+  FutureOr<void> clearCache() {
     // Очищаем закешированные данные.
     _cachedMinds.clear();
   }
