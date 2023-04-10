@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:zenmode/services/main_service.dart';
