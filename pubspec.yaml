@@ -51,7 +51,7 @@ dev_dependencies:
   mocktail: ^0.3.0
 
 flutter_icons:
-  image_path: "assets/app_icon_3.png"
+  image_path: "assets/app_icon_4.png"
   # iOS
   ios: true
   remove_alpha_ios: true
