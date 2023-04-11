@@ -4,24 +4,24 @@ import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
-class MarkPickerScreen extends StatefulWidget {
+class MindPickerScreen extends StatefulWidget {
   final ArgumentCallback<String> onSelect;
 
-  const MarkPickerScreen({
+  const MindPickerScreen({
     Key? key,
     required this.onSelect,
   }) : super(key: key);
 
   @override
-  MarkPickerScreenState createState() => MarkPickerScreenState();
+  MindPickerScreenState createState() => MindPickerScreenState();
 }
 
-class MarkPickerScreenState extends State<MarkPickerScreen> {
-  final List<Emoji> _marks = Emoji.all();
+class MindPickerScreenState extends State<MindPickerScreen> {
+  final List<Emoji> _emojies = Emoji.all();
   String _searchText = '';
-  List<Emoji> _filteredMarks = [];
-  List<Emoji> get _displayedMarks => _searchText.isEmpty ? _mainMarks : _filteredMarks;
-  List<Emoji> get _mainMarks => _marks;
+  List<Emoji> _filteredMinds = [];
+  List<Emoji> get _displayedMinds => _searchText.isEmpty ? _mainMinds : _filteredMinds;
+  List<Emoji> get _mainMinds => _emojies;
 
   final TextEditingController _textEditingController = TextEditingController();
 
@@ -32,7 +32,7 @@ class MarkPickerScreenState extends State<MarkPickerScreen> {
     _textEditingController.addListener(() {
       setState(() {
         _searchText = _textEditingController.text;
-        _filteredMarks = _mainMarks.where((mark) => mark.keywords.join().contains(_searchText)).toList();
+        _filteredMinds = _mainMinds.where((mind) => mind.keywords.join().contains(_searchText)).toList();
       });
     });
   }
@@ -67,14 +67,14 @@ class MarkPickerScreenState extends State<MarkPickerScreen> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: widgetsInRowCount),
                   childrenDelegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final mark = _displayedMarks[index].char;
+                      final mark = _displayedMinds[index].char;
                       return MindWidget(
                         item: mark,
                         onTap: () => _pickMark(mark),
                         isHighlighted: true,
                       );
                     },
-                    childCount: _displayedMarks.length,
+                    childCount: _displayedMinds.length,
                   ),
                 );
               },

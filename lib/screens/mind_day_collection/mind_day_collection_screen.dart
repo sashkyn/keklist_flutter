@@ -11,8 +11,8 @@ import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mark_creator/mark_creator_screen.dart';
-import 'package:rememoji/screens/mark_picker/mark_picker_screen.dart';
+import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
+import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
@@ -267,7 +267,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   void _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => MarkPickerScreen(onSelect: onSelect),
+      builder: (context) => MindPickerScreen(onSelect: onSelect),
     );
   }
 
