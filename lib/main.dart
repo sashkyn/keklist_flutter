@@ -6,16 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
-import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
+import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
-import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
-import 'package:zenmode/constants.dart';
-import 'package:zenmode/cubits/mind_searcher/mind_searcher_cubit.dart';
-import 'package:zenmode/di/containers.dart';
-import 'package:zenmode/services/main_service.dart';
+import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/constants.dart';
+import 'package:rememoji/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:rememoji/di/containers.dart';
+import 'package:rememoji/services/main_service.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
 import 'screens/mind_collection/mind_collection_screen.dart';
@@ -86,7 +86,7 @@ class ZenmodeAppState extends State<ZenmodeApp> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: MaterialApp(
-        title: 'Zenmode',
+        title: 'Rememoji',
         home: const MindCollectionScreen(),
         theme: ThemeData(
           primarySwatch: Palette.swatch,

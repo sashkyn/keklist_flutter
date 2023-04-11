@@ -37,7 +37,7 @@ Archive, Build IPA, Signing, Upload to TestFilght
 [bundle exec] fastlane ios build_and_upload_to_testfilght_from_local_machine
 ```
 
-Archive, Build IPA, Signing, Upload to TestFilght from Local machine
+Locally: Archive * Build IPA * Signing * Upload to TF
 
 ----
 

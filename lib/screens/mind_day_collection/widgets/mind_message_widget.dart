@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zenmode/services/entities/mind.dart';
+import 'package:rememoji/services/entities/mind.dart';
 
 class MindMessageWidget extends StatelessWidget {
   final Mind mind;

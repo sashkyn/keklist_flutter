@@ -1,6 +1,6 @@
-import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
-import 'package:zenmode/typealiases.dart';
-import 'package:zenmode/widgets/mind_widget.dart';
+import 'package:rememoji/screens/mark_picker/mark_picker_screen.dart';
+import 'package:rememoji/typealiases.dart';
+import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';

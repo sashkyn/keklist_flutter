@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:zenmode/constants.dart';
+import 'package:rememoji/constants.dart';
 
 class MyTable extends StatelessWidget {
   const MyTable({
