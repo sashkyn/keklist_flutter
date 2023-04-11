@@ -1,6 +1,6 @@
-import 'package:zenmode/constants.dart';
-import 'package:zenmode/typealiases.dart';
-import 'package:zenmode/widgets/mind_widget.dart';
+import 'package:rememoji/constants.dart';
+import 'package:rememoji/typealiases.dart';
+import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 

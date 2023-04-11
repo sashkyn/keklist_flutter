@@ -7,7 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zenmode/services/main_service.dart';
+import 'package:rememoji/services/main_service.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';

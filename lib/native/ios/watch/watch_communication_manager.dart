@@ -7,10 +7,10 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:zenmode/helpers/extensions/enum_from_string.dart';
-import 'package:zenmode/helpers/mind_utils.dart';
-import 'package:zenmode/services/entities/mind.dart';
-import 'package:zenmode/services/main_service.dart';
+import 'package:rememoji/helpers/extensions/enum_from_string.dart';
+import 'package:rememoji/helpers/mind_utils.dart';
+import 'package:rememoji/services/entities/mind.dart';
+import 'package:rememoji/services/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 
 // TODO: покрыть тестами
@@ -206,6 +206,4 @@ enum WatchMethodArgumentKey {
   error,
 }
 
-enum WatchError {
-  notAuthorized
-}
+enum WatchError { notAuthorized }

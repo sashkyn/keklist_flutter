@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:zenmode/services/entities/mind.dart';
-import 'package:zenmode/services/main_service.dart';
+import 'package:rememoji/services/entities/mind.dart';
+import 'package:rememoji/services/main_service.dart';
 
 class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;

@@ -2,11 +2,11 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
-import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
-import 'package:zenmode/helpers/extensions/dispose_bag.dart';
-import 'package:zenmode/screens/auth/auth_screen.dart';
-import 'package:zenmode/helpers/extensions/state_extensions.dart';
+import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/helpers/extensions/dispose_bag.dart';
+import 'package:rememoji/screens/auth/auth_screen.dart';
+import 'package:rememoji/helpers/extensions/state_extensions.dart';
 
 // TODO: разобраться с улучшенной навигацией во Flutter: go_router
 
