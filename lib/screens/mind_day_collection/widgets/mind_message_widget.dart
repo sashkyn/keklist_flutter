@@ -23,7 +23,7 @@ class MindMessageWidget extends StatelessWidget {
           const SizedBox(height: 8.0),
           Text(
             mind.note,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyLarge,
             textAlign: TextAlign.center,
           ),
         ],

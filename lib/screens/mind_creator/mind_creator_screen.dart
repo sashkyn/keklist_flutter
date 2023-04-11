@@ -1,4 +1,4 @@
-import 'package:rememoji/screens/mark_picker/mark_picker_screen.dart';
+import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/typealiases.dart';
 import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
@@ -89,7 +89,7 @@ class MarkCreatorScreenState extends State<MarkCreatorScreen> {
   void _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => MarkPickerScreen(onSelect: onSelect),
+      builder: (context) => MindPickerScreen(onSelect: onSelect),
     );
   }
 }

@@ -23,6 +23,8 @@ import 'screens/mind_collection/mind_collection_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  _setupOrientations();
+
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
   // Инициализация настроек Supabase.
@@ -71,6 +73,13 @@ Future<void> main() async {
     child: const ZenmodeApp(),
   );
   runApp(application);
+}
+
+void _setupOrientations() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 }
 
 class ZenmodeApp extends StatefulWidget {

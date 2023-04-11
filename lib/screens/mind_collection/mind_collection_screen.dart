@@ -14,8 +14,8 @@ import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/screens/mind_collection/widgets/search_bar.dart';
-import 'package:rememoji/screens/mark_creator/mark_creator_screen.dart';
-import 'package:rememoji/screens/mark_picker/mark_picker_screen.dart';
+import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
+import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
@@ -277,9 +277,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   ),
                   child: BoolWidget(
                     condition: mindWidgets.isEmpty,
-                    trueChild: Container(
+                    trueChild: SizedBox(
                       height: 128.0,
-                      // child: const Text('Add mind'), // TODO: придумать и добавить empty state
+                      child: Center(
+                        child: MindWidget.sized(
+                          item: '🤔',
+                          size: MindSize.medium,
+                          isHighlighted: false,
+                        ),
+                      ),
                     ),
                     falseChild: MyTable(widgets: mindWidgets),
                   ),
@@ -380,7 +386,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => MarkPickerScreen(onSelect: onSelect),
+      builder: (context) => MindPickerScreen(onSelect: onSelect),
     );
   }
 
