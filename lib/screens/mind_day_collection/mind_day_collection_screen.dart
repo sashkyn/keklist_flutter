@@ -4,22 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shake/shake.dart';
-import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
-import 'package:zenmode/blocs/settings_bloc/settings_bloc.dart';
-import 'package:zenmode/constants.dart';
-import 'package:zenmode/helpers/bloc_utils.dart';
-import 'package:zenmode/helpers/extensions/dispose_bag.dart';
-import 'package:zenmode/helpers/extensions/state_extensions.dart';
-import 'package:zenmode/helpers/mind_utils.dart';
-import 'package:zenmode/screens/mark_creator/mark_creator_screen.dart';
-import 'package:zenmode/screens/mark_picker/mark_picker_screen.dart';
-import 'package:zenmode/screens/mind_collection/widgets/mind_creator_bar.dart';
-import 'package:zenmode/screens/mind_collection/widgets/my_table.dart';
-import 'package:zenmode/widgets/bool_widget.dart';
-import 'package:zenmode/screens/mind_day_collection/widgets/mind_message_widget.dart';
-import 'package:zenmode/services/entities/mind.dart';
-import 'package:zenmode/typealiases.dart';
-import 'package:zenmode/widgets/mind_widget.dart';
+import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/constants.dart';
+import 'package:rememoji/helpers/bloc_utils.dart';
+import 'package:rememoji/helpers/extensions/dispose_bag.dart';
+import 'package:rememoji/helpers/extensions/state_extensions.dart';
+import 'package:rememoji/helpers/mind_utils.dart';
+import 'package:rememoji/screens/mark_creator/mark_creator_screen.dart';
+import 'package:rememoji/screens/mark_picker/mark_picker_screen.dart';
+import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
+import 'package:rememoji/widgets/bool_widget.dart';
+import 'package:rememoji/screens/mind_day_collection/widgets/mind_message_widget.dart';
+import 'package:rememoji/services/entities/mind.dart';
+import 'package:rememoji/typealiases.dart';
+import 'package:rememoji/widgets/mind_widget.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int dayIndex;
@@ -59,6 +59,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
       // NOTE: По тряске телефона скрываем/показываем текст эмодзи.
       final ShakeDetector shakeDetector = ShakeDetector.autoStart(
+        shakeThresholdGravity: 3.0,
+        shakeSlopTimeMS: 2000,
         onPhoneShake: () => _changeContentVisibility(),
       );
       shakeDetector.streamSubscription?.disposed(by: this);

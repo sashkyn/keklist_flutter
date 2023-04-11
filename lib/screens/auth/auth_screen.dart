@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:zenmode/blocs/auth_bloc/auth_bloc.dart';
-import 'package:zenmode/constants.dart';
-import 'package:zenmode/helpers/extensions/dispose_bag.dart';
+import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
+import 'package:rememoji/constants.dart';
+import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);

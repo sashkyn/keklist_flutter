@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zenmode/blocs/mind_bloc/mind_bloc.dart';
-import 'package:zenmode/services/entities/mind.dart';
+import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
+import 'package:rememoji/services/entities/mind.dart';
 
 void main() {
   test(
