@@ -223,7 +223,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               15,
               (index) {
                 final randomEmoji =
-                    ZenConstants.demoModeEmodjiList[random.nextInt(ZenConstants.demoModeEmodjiList.length - 1)];
+                    KekConstants.demoModeEmodjiList[random.nextInt(KekConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
                   creationDate: 0,

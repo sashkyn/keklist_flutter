@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/helpers/extensions/state_extensions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // TODO: разобраться с улучшенной навигацией во Flutter: go_router
 
@@ -27,7 +29,15 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         _isLoggedIn ? SettingItem.deleteAccount : null,
         SettingItem.otherTitle,
         SettingItem.exportToCSV,
-      ].where((element) => element != null).map((nullableItem) => nullableItem!).toList(growable: false);
+        SettingItem.sendFeedback,
+      ]
+          .where((element) => element != null)
+          .map(
+            (nullableItem) => nullableItem!,
+          )
+          .toList(
+            growable: false,
+          );
 
   @override
   void initState() {
@@ -122,6 +132,16 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                             break;
                         }
                         break;
+                      case SettingItem.sendFeedback:
+                        final Uri uri = Uri(
+                          scheme: 'mailto',
+                          path: KekConstants.feedbackEmail,
+                          query: 'subject=Feedback about Rememoji',
+                        );
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
+                        break;
                       default:
                         break;
                     }
@@ -152,7 +172,7 @@ enum SettingItem {
   login(title: 'Login', type: SettingItemType.disclosure),
   logout(title: 'Logout', type: SettingItemType.disclosure),
   exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
-  interface(title: 'Interface', type: SettingItemType.disclosure),
+  sendFeedback(title: 'Send feedback', type: SettingItemType.disclosure),
   deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);
 
   const SettingItem({required this.title, required this.type});
