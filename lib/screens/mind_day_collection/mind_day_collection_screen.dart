@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shake/shake.dart';
@@ -59,8 +60,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
       // NOTE: По тряске телефона скрываем/показываем текст эмодзи.
       final ShakeDetector shakeDetector = ShakeDetector.autoStart(
-        shakeThresholdGravity: 3.0,
-        shakeSlopTimeMS: 2000,
+        shakeThresholdGravity: 5.0,
+        shakeSlopTimeMS: 1300,
         onPhoneShake: () => _changeContentVisibility(),
       );
       shakeDetector.streamSubscription?.disposed(by: this);
@@ -246,6 +247,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   }
 
   void _changeContentVisibility() {
+    HapticFeedback.mediumImpact();
     BlocUtils.sendTo<SettingsBloc>(
       context: context,
       event: SettingsChangeMindContentVisibility(isVisible: !isMindContentVisible),
