@@ -42,7 +42,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
   String _selectedEmoji = Emoji.all().first.char;
   MindSuggestions? _mindSuggestions;
-  bool isMindContentVisible = false;
+  bool _isMindContentVisible = false;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -64,6 +65,15 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         onPhoneShake: () => _changeContentVisibility(),
       );
       shakeDetector.streamSubscription?.disposed(by: this);
+
+      _mindCreatorFocusNode.addListener(() {
+        if (_hasFocus == _mindCreatorFocusNode.hasFocus) {
+          return;
+        }
+        setState(() {
+          _hasFocus = _mindCreatorFocusNode.hasFocus;
+        });
+      });
     });
 
     context.read<MindBloc>().stream.listen((state) {
@@ -85,7 +95,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
     context.read<SettingsBloc>().stream.listen((state) {
       setState(() {
-        isMindContentVisible = state.isMindContentVisible;
+        _isMindContentVisible = state.isMindContentVisible;
       });
     }).disposed(by: this);
 
@@ -103,7 +113,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         actions: [
           IconButton(
             icon: BoolWidget(
-              condition: isMindContentVisible,
+              condition: _isMindContentVisible,
               trueChild: const Icon(Icons.visibility_off_outlined),
               falseChild: const Icon(Icons.visibility),
             ),
@@ -127,7 +137,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                   hasScrollBody: false,
                   fillOverscroll: true, // TODO: разобраться с ошибками в консоли
                   child: BoolWidget(
-                    condition: isMindContentVisible,
+                    condition: _isMindContentVisible,
                     trueChild: MindMonologListWidget(
                       minds: widget.minds,
                       onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
@@ -175,7 +185,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                       );
                       _hideKeyboard();
                     },
-                    suggestionMinds: _mindSuggestions?.values ?? [],
+                    suggestionMinds: _hasFocus ? _mindSuggestions?.values ?? [] : [],
                     selectedEmoji: _selectedEmoji,
                     onSelectSuggestionEmoji: (String suggestionEmoji) {
                       setState(() {
@@ -205,7 +215,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     HapticFeedback.mediumImpact();
     BlocUtils.sendTo<SettingsBloc>(
       context: context,
-      event: SettingsChangeMindContentVisibility(isVisible: !isMindContentVisible),
+      event: SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible),
     );
   }
 
