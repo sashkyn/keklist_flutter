@@ -122,3 +122,5 @@ app.*.symbols
 
 # Fastlane
 /ios/.env
+Runner.app.dSYM.zip
+Runner.ipa
