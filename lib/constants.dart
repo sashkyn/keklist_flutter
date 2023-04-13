@@ -27,9 +27,10 @@ class DateFormatters {
   static DateFormat fullDateFormat = DateFormat('dd.MM.yyyy - EEEE');
 }
 
-class ZenConstants {
+class KekConstants {
   static String demoAccountEmail = 'zenmode-demo-account@mailinator.com';
   static String termsOfUseURL = 'https://sashkyn.notion.site/Zenmode-Terms-of-Use-df179704b2d149b8a5a915296f5cb78f';
+  static String feedbackEmail = 'sashkn2@gmail.com';
 
   static List<String> demoModeEmodjiList = [
     '🤔',
