@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:blur/blur.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
@@ -250,6 +251,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             const SizedBox(height: 4.0),
             GestureDetector(
               onTap: () {
+                HapticFeedback.lightImpact();
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => MindDayCollectionScreen(
@@ -450,7 +452,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     if (!_isDemoMode) {
       return;
     }
-    
+
     _demoAutoScrollingTimer?.cancel();
     setState(() => _isDemoMode = false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
