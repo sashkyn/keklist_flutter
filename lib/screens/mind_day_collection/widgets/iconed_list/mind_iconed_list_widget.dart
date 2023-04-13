@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/widgets/mind_widget.dart';
@@ -28,7 +29,7 @@ class MindIconedListWidget extends StatelessWidget {
                   size: MindSize.large,
                   onTap: () => onTap(mind),
                   onLongTap: () => onLongTap(mind),
-                ),
+                ).animate().fadeIn(),
               )
               .toList(),
         ),

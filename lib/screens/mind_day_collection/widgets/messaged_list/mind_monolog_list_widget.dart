@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
@@ -36,7 +37,7 @@ class MindMonologListWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: MindMessageWidget(mind: mind),
+                      child: MindMessageWidget(mind: mind).animate().fadeIn(),
                     ),
                   ),
                 ),
