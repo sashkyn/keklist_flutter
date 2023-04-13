@@ -15,7 +15,6 @@ class MindMonologListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.max,
       children: minds.map((mind) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
