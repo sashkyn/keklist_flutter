@@ -35,9 +35,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           .map(
             (nullableItem) => nullableItem!,
           )
-          .toList(
-            growable: false,
-          );
+          .toList(growable: false);
 
   @override
   void initState() {
