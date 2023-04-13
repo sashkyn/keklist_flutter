@@ -157,34 +157,32 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    // border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        spreadRadius: 2,
-                                        blurRadius: 10.0,
-                                        offset: const Offset(1.0, 1.0),
-                                      ),
-                                    ],
+                              GestureDetector(
+                                onTap: () => _showMarkOptionsActionSheet(mind),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          spreadRadius: 2,
+                                          blurRadius: 10.0,
+                                          offset: const Offset(1.0, 1.0),
+                                        ),
+                                      ],
+                                    ),
+                                    child: MindMessageWidget(mind: mind),
                                   ),
-                                  child: MindMessageWidget(mind: mind),
                                 ),
                               ),
                             ],
                           );
                         }).toList() +
                         [
-                          Column(
-                            children: const [
-                              SizedBox(height: 160.0),
-                            ],
-                          ),
+                          Column(children: const [SizedBox(height: 160.0)]),
                         ], // TODO: сделать виджет для листа
                   ),
                 ),
