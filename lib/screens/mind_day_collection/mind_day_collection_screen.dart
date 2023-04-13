@@ -131,29 +131,43 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                 _hideKeyboard();
               }
             },
-            child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  fillOverscroll: true, // TODO: разобраться с ошибками в консоли
-                  child: BoolWidget(
-                    condition: _isMindContentVisible,
-                    trueChild: MindMonologListWidget(
-                      minds: widget.minds,
-                      onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
-                    ),
-                    falseChild: MindIconedListWidget(
-                      minds: widget.minds,
-                      onTap: (Mind mind) => showOkAlertDialog(
-                        title: mind.emoji,
-                        message: mind.note,
-                        context: context,
+            child: BoolWidget(
+              condition: _isMindContentVisible,
+              trueChild: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    fillOverscroll: true,
+                    child: BoolWidget(
+                      condition: _isMindContentVisible,
+                      trueChild: MindMonologListWidget(
+                        minds: widget.minds,
+                        onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
                       ),
-                      onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                      falseChild: MindIconedListWidget(
+                        minds: widget.minds,
+                        onTap: (Mind mind) => showOkAlertDialog(
+                          title: mind.emoji,
+                          message: mind.note,
+                          context: context,
+                        ),
+                        onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                      ),
                     ),
                   ),
+                ],
+              ),
+              falseChild: SingleChildScrollView(
+                child: MindIconedListWidget(
+                  minds: widget.minds,
+                  onTap: (Mind mind) => showOkAlertDialog(
+                    title: mind.emoji,
+                    message: mind.note,
+                    context: context,
+                  ),
+                  onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
                 ),
-              ],
+              ),
             ),
           ),
           Stack(
