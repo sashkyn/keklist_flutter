@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
+import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:shake/shake.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
@@ -15,12 +17,9 @@ import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
-import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/mind_message_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/typealiases.dart';
-import 'package:rememoji/widgets/mind_widget.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int dayIndex;
@@ -117,76 +116,33 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       body: Stack(
         children: [
           GestureDetector(
-            onPanDown: (details) {
+            onPanDown: (_) {
               if (_mindCreatorFocusNode.hasFocus) {
                 _hideKeyboard();
               }
             },
-            child: SingleChildScrollView(
-              child: Container(
-                color: Colors.white,
-                child: BoolWidget(
-                  condition: isMindContentVisible,
-                  falseChild: Column(
-                    children: [
-                      const SizedBox(
-                        height: 10.0,
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: BoolWidget(
+                    condition: isMindContentVisible,
+                    trueChild: MindMonologListWidget(
+                      minds: widget.minds,
+                      onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                    ),
+                    falseChild: MindIconedListWidget(
+                      minds: widget.minds,
+                      onTap: (Mind mind) => showOkAlertDialog(
+                        title: mind.emoji,
+                        message: mind.note,
+                        context: context,
                       ),
-                      MyTable(
-                        widgets: widget.minds
-                            .map(
-                              (mind) => MindWidget.sized(
-                                item: mind.emoji,
-                                size: MindSize.large,
-                                onTap: () => showOkAlertDialog(
-                                  title: mind.emoji,
-                                  message: mind.note,
-                                  context: context,
-                                ),
-                                onLongTap: () {
-                                  _showMarkOptionsActionSheet(mind);
-                                },
-                              ),
-                            )
-                            .toList(), // TODO: сделать виджет для листа
-                      ),
-                    ],
-                  ),
-                  trueChild: Column(
-                    children: widget.minds.map((mind) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              GestureDetector(
-                                onTap: () => _showMarkOptionsActionSheet(mind),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          spreadRadius: 2,
-                                          blurRadius: 10.0,
-                                          offset: const Offset(1.0, 1.0),
-                                        ),
-                                      ],
-                                    ),
-                                    child: MindMessageWidget(mind: mind),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList() +
-                        [
-                          Column(children: const [SizedBox(height: 160.0)]),
-                        ], // TODO: сделать виджет для листа
+                      onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
           Stack(
