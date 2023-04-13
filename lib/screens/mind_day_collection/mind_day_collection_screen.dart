@@ -125,6 +125,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
               slivers: [
                 SliverFillRemaining(
                   hasScrollBody: false,
+                  fillOverscroll: true, // TODO: разобраться с ошибками в консоли
                   child: BoolWidget(
                     condition: isMindContentVisible,
                     trueChild: MindMonologListWidget(
