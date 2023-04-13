@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:blur/blur.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -385,7 +386,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return MindWidget(
       item: mind.emoji,
       isHighlighted: isHighlighted,
-    );
+    ).animate().fadeIn();
   }
 
   _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {

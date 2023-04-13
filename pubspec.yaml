@@ -22,6 +22,7 @@ dependencies:
   fast_immutable_collections: ^8.2.0
   flutter:
     sdk: flutter
+  flutter_animate: ^4.1.1+1
   flutter_bloc: ^8.1.2
   flutter_emoji: ^2.4.0
   flutter_simple_dependency_injection: ^2.0.0
