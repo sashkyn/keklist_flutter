@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:blur/blur.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -85,11 +86,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       context.read<MindBloc>().stream.listen((state) {
         if (state is MindListState) {
-          setState(() => _minds = state.values);
+          setState(() {
+            _minds = state.values;
+          });
         } else if (state is MindError) {
           _showError(text: state.text);
         } else if (state is MindSearching) {
-          setState(() => _searchingMindState = state);
+          setState(() {
+            _searchingMindState = state;
+          });
         } else if (state is MindSuggestions) {
           setState(() {
             _mindSuggestions = state;
@@ -131,9 +136,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     return Scaffold(
       appBar: _makeAppBar(),
       body: _makeBody(),
-      // body: MindCreatorSlidingPanelWidget(
-      //   body: _makeBody(),
-      // ),
       resizeToAvoidBottomInset: false,
     );
   }
@@ -279,16 +281,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   ),
                   child: BoolWidget(
                     condition: mindWidgets.isEmpty,
-                    trueChild: SizedBox(
-                      height: 128.0,
-                      child: Center(
-                        child: MindWidget.sized(
-                          item: '🤔',
-                          size: MindSize.medium,
-                          isHighlighted: false,
-                        ),
-                      ),
-                    ),
+                    trueChild: () {
+                      if (groupDayIndex < _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.past();
+                      } else if (groupDayIndex > _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.future();
+                      } else {
+                        return MindCollectionEmptyDayWidget.present();
+                      }
+                    }(),
                     falseChild: MyTable(widgets: mindWidgets),
                   ),
                 ),
@@ -348,7 +349,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                     suggestionMinds: _mindSuggestions?.values ?? [],
                     selectedEmoji: _selectedEmoji,
                     onSelectSuggestionEmoji: (String suggestionEmoji) {
-                      setState(() => _selectedEmoji = suggestionEmoji);
+                      setState(() {
+                        _selectedEmoji = suggestionEmoji;
+                      });
                     },
                     onSearchEmoji: () {
                       _showMarkPickerScreen(
@@ -454,7 +457,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     }
 
     _demoAutoScrollingTimer?.cancel();
-    setState(() => _isDemoMode = false);
+    setState(() {
+      _isDemoMode = false;
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
     });
