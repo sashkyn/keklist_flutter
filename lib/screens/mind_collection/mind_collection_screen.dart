@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:blur/blur.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
+import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -52,7 +52,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
-  Iterable<Mind> get _searchedMinds => _isSearching ? _searchingMindState!.filteredValues : [];
+  List<Mind> get _foundMinds => _isSearching ? _searchingMindState!.resultValues : [];
 
   @override
   void initState() {
@@ -143,8 +143,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   }
 
   Widget _makeAppBarTitle() {
-    if (_isSearching) {
-      return SearchBar(
+    return BoolWidget(
+      condition: _isSearching,
+      trueChild: SearchBar(
         textController: _searchTextController,
         onAddEmotion: () {
           _showMarkPickerScreen(
@@ -157,13 +158,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           _searchTextController.clear();
           _sendToMindBloc(MindStopSearch());
         },
-      );
-    } else {
-      return GestureDetector(
+      ),
+      falseChild: GestureDetector(
         onTap: () => _scrollToNow(),
         child: const Text('Minds'),
-      );
-    }
+      ),
+    );
   }
 
   List<Widget>? _makeAppBarActions() {
@@ -176,9 +176,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         icon: const Icon(Icons.search),
         color: Colors.black,
         onPressed: () {
-          setState(() {
-            _sendToMindBloc(MindStartSearch());
-          });
+          _sendToMindBloc(MindStartSearch());
         },
       ),
       IconButton(
@@ -197,6 +195,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   late final random = Random();
 
   Widget _makeBody() {
+    if (_foundMinds.isNotEmpty) {
+      return MindSearchResultListWidget(results: _foundMinds);
+    }
+
     final Widget scrollablePositionedList = ScrollablePositionedList.builder(
       padding: const EdgeInsets.only(top: 16.0),
       itemCount: 99999999999,
@@ -210,7 +212,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               15,
               (index) {
                 final randomEmoji =
-                    KekConstants.demoModeEmodjiList[random.nextInt(KekConstants.demoModeEmodjiList.length - 1)];
+                    KeklistConstants.demoModeEmodjiList[random.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
                   creationDate: 0,
@@ -286,11 +288,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       },
     );
     return GestureDetector(
-      onPanDown: (_) {
-        setState(() {
-          _hideKeyboard();
-        });
-      },
+      onPanDown: (_) => _hideKeyboard(),
       child: BoolWidget(
         condition: _isDemoMode,
         trueChild: Blur(
