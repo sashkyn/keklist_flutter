@@ -74,8 +74,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(
       MindSearching(
         enabled: true,
-        values: _minds,
-        filteredValues: const [],
+        allValues: _minds,
+        resultValues: const [],
       ),
     );
   }
@@ -84,8 +84,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(
       MindSearching(
         enabled: false,
-        values: _minds,
-        filteredValues: const [],
+        allValues: _minds,
+        resultValues: const [],
       ),
     );
   }
@@ -96,8 +96,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(
       MindSearching(
         enabled: true,
-        values: _minds,
-        filteredValues: filteredMinds,
+        allValues: _minds,
+        resultValues: filteredMinds,
       ),
     );
   }

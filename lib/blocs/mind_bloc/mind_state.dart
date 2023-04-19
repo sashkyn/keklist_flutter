@@ -16,13 +16,13 @@ class MindError extends MindState {
 
 class MindSearching extends MindState {
   final bool enabled;
-  final Iterable<Mind> values;
-  final Iterable<Mind> filteredValues;
+  final Iterable<Mind> allValues;
+  final List<Mind> resultValues;
 
   MindSearching({
     required this.enabled,
-    required this.values,
-    required this.filteredValues,
+    required this.allValues,
+    required this.resultValues,
   });
 }
 
