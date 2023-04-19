@@ -14,16 +14,13 @@ import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/screens/mind_collection/widgets/search_bar.dart';
-import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/typealiases.dart';
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -47,16 +44,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Iterable<Mind> _minds = [];
   MindSearching? _searchingMindState;
 
-  late final int _dayIndexToCreateMark = _getNowDayIndex();
-
   bool _isDemoMode = false;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
-  final FocusNode _createMarkFocusNode = FocusNode();
-  String _selectedEmoji = Emoji.all().first.char;
-  MindSuggestions? _mindSuggestions;
-  bool _createMindBottomBarIsVisible = false;
 
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
@@ -95,10 +86,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         } else if (state is MindSearching) {
           setState(() {
             _searchingMindState = state;
-          });
-        } else if (state is MindSuggestions) {
-          setState(() {
-            _mindSuggestions = state;
           });
         }
       }).disposed(by: this);
@@ -190,7 +177,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         color: Colors.black,
         onPressed: () {
           setState(() {
-            _createMindBottomBarIsVisible = false;
             _sendToMindBloc(MindStartSearch());
           });
         },
@@ -236,13 +222,13 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               },
             )
                 .map(
-                  (randomMark) => _makeMindWidget(randomMark),
+                  (randomMind) => MindWidget(item: randomMind.emoji).animate().fadeIn(),
                 )
                 .toList(),
           );
         } else {
           final List<Mind> mindsOfDay = _findMarksByDayIndex(groupDayIndex);
-          final List<Widget> realMindWidgets = mindsOfDay.map((mark) => _makeMindWidget(mark)).toList();
+          final List<Widget> realMindWidgets = mindsOfDay.map((mind) => MindWidget(item: mind.emoji)).toList();
           mindWidgets.addAll(realMindWidgets);
         }
 
@@ -254,7 +240,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             const SizedBox(height: 4.0),
             GestureDetector(
               onTap: () {
-                HapticFeedback.lightImpact();
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => MindDayCollectionScreen(
@@ -300,72 +285,22 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         );
       },
     );
-    return Stack(
-      children: [
-        GestureDetector(
-            onPanDown: (details) {
-              if (_createMarkFocusNode.hasFocus) {
-                setState(() {
-                  _createMindBottomBarIsVisible = false;
-                  _hideKeyboard();
-                });
-              }
-            },
-            child: BoolWidget(
-              condition: _isDemoMode,
-              trueChild: Blur(
-                blur: 3,
-                blurColor: Colors.transparent,
-                colorOpacity: 0.2,
-                child: scrollablePositionedList,
-              ),
-              falseChild: scrollablePositionedList,
-            )),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Visibility(
-              visible: _createMindBottomBarIsVisible,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  MindCreatorBar(
-                    focusNode: _createMarkFocusNode,
-                    textEditingController: _createMarkEditingController,
-                    onCreate: (CreateMindData data) {
-                      setState(() {
-                        _mindSuggestions = null;
-                        _createMarkEditingController.text = '';
-                      });
-                      _sendToMindBloc(
-                        MindCreate(
-                          dayIndex: _dayIndexToCreateMark,
-                          note: data.text,
-                          emoji: data.emoji,
-                        ),
-                      );
-                      _hideKeyboard();
-                      _createMindBottomBarIsVisible = false;
-                    },
-                    suggestionMinds: _mindSuggestions?.values ?? [],
-                    selectedEmoji: _selectedEmoji,
-                    onSelectSuggestionEmoji: (String suggestionEmoji) {
-                      setState(() {
-                        _selectedEmoji = suggestionEmoji;
-                      });
-                    },
-                    onSearchEmoji: () {
-                      _showMarkPickerScreen(
-                        onSelect: (String emoji) => setState(() => _selectedEmoji = emoji),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
+    return GestureDetector(
+      onPanDown: (_) {
+        setState(() {
+          _hideKeyboard();
+        });
+      },
+      child: BoolWidget(
+        condition: _isDemoMode,
+        trueChild: Blur(
+          blur: 3,
+          blurColor: Colors.transparent,
+          colorOpacity: 0.2,
+          child: scrollablePositionedList,
         ),
-      ],
+        falseChild: scrollablePositionedList,
+      ),
     );
   }
 
@@ -374,19 +309,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       _formatter.format(MindUtils.getDateFromIndex(groupIndex)),
       style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
     );
-  }
-
-  Widget _makeMindWidget(Mind mind) {
-    final bool isHighlighted;
-    if (_isSearching) {
-      isHighlighted = _searchedMinds.map((value) => value.id).contains(mind.id);
-    } else {
-      isHighlighted = true;
-    }
-    return MindWidget(
-      item: mind.emoji,
-      isHighlighted: isHighlighted,
-    ).animate().fadeIn();
   }
 
   _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
