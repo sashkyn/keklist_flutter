@@ -70,7 +70,7 @@ Future<void> main() async {
         create: (context) => SettingsBloc(mainService: mainContainer.get<MainService>()),
       ),
     ],
-    child: const ZenmodeApp(),
+    child: const KeklistApp(),
   );
   runApp(application);
 }
@@ -82,14 +82,14 @@ void _setupOrientations() {
   ]);
 }
 
-class ZenmodeApp extends StatefulWidget {
-  const ZenmodeApp({Key? key}) : super(key: key);
+class KeklistApp extends StatefulWidget {
+  const KeklistApp({Key? key}) : super(key: key);
 
   @override
-  State<ZenmodeApp> createState() => ZenmodeAppState();
+  State<KeklistApp> createState() => KeklistAppState();
 }
 
-class ZenmodeAppState extends State<ZenmodeApp> {
+class KeklistAppState extends State<KeklistApp> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
