@@ -133,7 +133,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                       case SettingItem.sendFeedback:
                         final Uri uri = Uri(
                           scheme: 'mailto',
-                          path: KekConstants.feedbackEmail,
+                          path: KeklistConstants.feedbackEmail,
                           query: 'subject=Feedback about Rememoji',
                         );
                         if (await canLaunchUrl(uri)) {
