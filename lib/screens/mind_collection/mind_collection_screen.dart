@@ -196,7 +196,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Widget _makeBody() {
     if (_foundMinds.isNotEmpty) {
-      return MindSearchResultListWidget(results: _foundMinds);
+      return MindSearchResultListWidget(
+        results: _foundMinds,
+        onPanDown: () => _hideKeyboard(),
+      );
     }
 
     final Widget scrollablePositionedList = ScrollablePositionedList.builder(
