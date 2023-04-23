@@ -30,6 +30,7 @@ class DateFormatters {
 class KeklistConstants {
   static String demoAccountEmail = 'zenmode-demo-account@mailinator.com';
   static String termsOfUseURL = 'https://sashkyn.notion.site/Zenmode-Terms-of-Use-df179704b2d149b8a5a915296f5cb78f';
+  static String whatsNewURL = 'https://sashkyn.notion.site/Rememoji-Mind-Tracker-8548383aede2406bbb8d26c7f58e769c';
   static String feedbackEmail = 'sashkn2@gmail.com';
 
   static List<String> demoModeEmodjiList = [
