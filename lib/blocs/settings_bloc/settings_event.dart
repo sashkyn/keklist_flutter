@@ -16,3 +16,5 @@ class SettingsChangeMindContentVisibility extends SettingsEvent {
 
   const SettingsChangeMindContentVisibility({required this.isVisible});
 }
+
+class SettingsWhatsNewShown extends SettingsEvent {}

@@ -32,6 +32,7 @@ dependencies:
   html: ^0.15.1
   intl: ^0.18.0
   modal_bottom_sheet: ^3.0.0-pre
+  package_info_plus: ^3.1.0
   path_provider: ^2.0.12
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
@@ -43,6 +44,7 @@ dependencies:
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
   uuid: ^3.0.7
+  webview_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.12.0

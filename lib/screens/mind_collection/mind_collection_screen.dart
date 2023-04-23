@@ -4,8 +4,10 @@ import 'dart:math';
 import 'package:blur/blur.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
+import 'package:rememoji/screens/web_page/web_page_screen.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -76,6 +78,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         );
       });
 
+      context.read<SettingsBloc>().stream.listen((state) async {
+        if (state.needToShowWhatsNewOnStart) {
+          await _showWhatsNew();
+          if (context.mounted) {
+            context.read<SettingsBloc>().add(SettingsWhatsNewShown());
+          }
+        }
+      }).disposed(by: this);
+
       context.read<MindBloc>().stream.listen((state) {
         if (state is MindListState) {
           setState(() {
@@ -107,6 +118,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       }).disposed(by: this);
 
       context.read<AuthBloc>().add(AuthGetStatus());
+      context.read<SettingsBloc>().add(SettingsGet());
     });
   }
 
@@ -116,6 +128,18 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       builder: (context) => const AuthScreen(),
       isDismissible: false,
       enableDrag: false,
+    );
+  }
+
+  Future<void> _showWhatsNew() {
+    return showModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return WebPageScreen(
+          title: 'Whats new?',
+          initialUri: Uri.parse(KeklistConstants.whatsNewURL),
+        );
+      },
     );
   }
 
