@@ -54,4 +54,22 @@ class Mind extends Equatable {
         sortIndex.toString(),
         //creationDate.toString(),
       ];
+
+  Mind copyWith({
+    String? id,
+    String? emoji,
+    String? note,
+    int? dayIndex,
+    int? creationDate,
+    int? sortIndex,
+  }) {
+    return Mind(
+      id: id ?? this.id,
+      emoji: emoji ?? this.emoji,
+      note: note ?? this.note,
+      dayIndex: dayIndex ?? this.dayIndex,
+      creationDate: creationDate ?? this.creationDate,
+      sortIndex: sortIndex ?? this.sortIndex,
+    );
+  }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
+import 'package:rememoji/widgets/text_field_alert.dart';
 import 'package:shake/shake.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
@@ -128,7 +129,9 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           GestureDetector(
             onPanDown: (_) {
               if (_mindCreatorFocusNode.hasFocus) {
-                _hideKeyboard();
+                setState(() {
+                  _hideKeyboard();
+                });
               }
             },
             child: BoolWidget(
@@ -197,7 +200,9 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                           emoji: data.emoji,
                         ),
                       );
-                      _hideKeyboard();
+                      setState(() {
+                        _hideKeyboard();
+                      });
                     },
                     suggestionMinds: _hasFocus ? _mindSuggestions?.values ?? [] : [],
                     selectedEmoji: _selectedEmoji,
@@ -241,7 +246,6 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   }
 
   void _hideKeyboard() {
-    setState(() {});
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
@@ -257,6 +261,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       context: context,
       actions: [
         const SheetAction(
+          icon: Icons.edit,
+          label: 'Edit note',
+          key: 'edit_key',
+        ),
+        const SheetAction(
           icon: Icons.delete,
           label: 'Delete',
           key: 'remove_key',
@@ -269,6 +278,17 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         context: mountedContext,
         event: MindDelete(uuid: item.id),
       );
+    } else if (result == 'edit_key') {
+      final newNote = await showEditMindAlert(mind: item);
+      if (newNote != null) {
+        BlocUtils.sendTo<MindBloc>(
+          context: mountedContext,
+          event: MindEditNote(
+            uuid: item.id,
+            newNote: newNote,
+          ),
+        );
+      }
     }
   }
 }
