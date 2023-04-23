@@ -65,7 +65,31 @@ class MainSupabaseService implements MainService {
     if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
       return Future.error('Trying to delete admin account!');
     }
-    await _client.rpc('deleteUser');
+    return await _client.rpc('deleteUser');
+  }
+
+  @override
+  FutureOr<void> editMindNote({
+    required String mindId,
+    required String newNote,
+  }) async {
+    if (_client.auth.currentUser == null) {
+      return Future.error('You did not auth to Supabase');
+    }
+
+    return await _client.from('minds').update({'note': newNote}).eq('uuid', mindId);
+  }
+
+  @override
+  FutureOr<void> editMindEmoji({
+    required String mindId,
+    required String newEmoji,
+  }) async {
+    if (_client.auth.currentUser == null) {
+      return Future.error('You did not auth to Supabase');
+    }
+
+    return await _client.from('minds').update({'emoji': newEmoji}).eq('uuid', mindId);
   }
 
   @override
