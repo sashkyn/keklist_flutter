@@ -29,6 +29,7 @@ class MindIconedListWidget extends StatelessWidget {
                   size: MindSize.large,
                   onTap: () => onTap(mind),
                   onLongTap: () => onLongTap(mind),
+                  isHighlighted: mind.note.isNotEmpty,
                 ).animate().fadeIn(),
               )
               .toList(),

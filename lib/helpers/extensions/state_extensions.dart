@@ -9,3 +9,13 @@ extension MountedContext on State {
     return context;
   }
 }
+
+extension MountedContextInContext on BuildContext {
+
+  BuildContext? get mountedContext {
+    if (!mounted) {
+      return null;
+    }
+    return this;
+  }
+}
