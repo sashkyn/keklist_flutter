@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:rememoji/widgets/bool_widget.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class WebPageScreen extends StatelessWidget {
+// TODO: добавить обработку ошибок
+
+class WebPageScreen extends StatefulWidget {
   final String title;
   final Uri initialUri;
 
@@ -12,11 +15,18 @@ class WebPageScreen extends StatelessWidget {
   });
 
   @override
+  State<WebPageScreen> createState() => _WebPageScreenState();
+}
+
+class _WebPageScreenState extends State<WebPageScreen> {
+  bool isLoading = true;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(title),
+        title: Text(widget.title),
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -24,8 +34,22 @@ class WebPageScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: WebViewWidget(
-        controller: WebViewController()..loadRequest(initialUri),
+      body: BoolWidget(
+        condition: isLoading,
+        trueChild: const LinearProgressIndicator(),
+        falseChild: WebViewWidget(
+          controller: WebViewController()
+            ..loadRequest(widget.initialUri)
+            ..setNavigationDelegate(
+              NavigationDelegate(
+                onPageFinished: (uri) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+              ),
+            ),
+        ),
       ),
     );
   }
