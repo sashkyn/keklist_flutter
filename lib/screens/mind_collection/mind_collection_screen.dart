@@ -54,7 +54,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
-  List<Mind> get _foundMinds => _isSearching ? _searchingMindState!.resultValues : [];
+  List<Mind> get _searchResults => _isSearching ? _searchingMindState!.resultValues : [];
 
   @override
   void initState() {
@@ -181,6 +181,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         onCancel: () {
           _searchTextController.clear();
           _sendToMindBloc(MindStopSearch());
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            _jumpToNow();
+          });
         },
       ),
       falseChild: GestureDetector(
@@ -219,9 +222,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   late final random = Random();
 
   Widget _makeBody() {
-    if (_foundMinds.isNotEmpty) {
+    if (_isSearching) {
       return MindSearchResultListWidget(
-        results: _foundMinds,
+        results: _searchResults,
         onPanDown: () => _hideKeyboard(),
       );
     }
@@ -283,7 +286,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    // border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
