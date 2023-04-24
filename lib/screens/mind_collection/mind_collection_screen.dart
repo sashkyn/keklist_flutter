@@ -132,7 +132,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   }
 
   Future<void> _showWhatsNew() {
-    return showModalBottomSheet(
+    return showCupertinoModalBottomSheet(
       context: context,
       builder: (builder) {
         return WebPageScreen(
