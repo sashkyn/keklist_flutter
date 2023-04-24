@@ -6,6 +6,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/payments/payment_service.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
@@ -56,6 +57,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   final TextEditingController _searchTextController = TextEditingController(text: null);
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
   List<Mind> get _searchResults => _isSearching ? _searchingMindState!.resultValues : [];
+
+  // NOTE: Payments.
+  final PaymentService _payementService = PaymentService();
 
   @override
   void initState() {
@@ -120,6 +124,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       context.read<AuthBloc>().add(AuthGetStatus());
       context.read<SettingsBloc>().add(SettingsGet());
+
+      _payementService.initConnection();
     });
   }
 
