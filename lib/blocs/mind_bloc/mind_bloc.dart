@@ -32,6 +32,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
     on<MindEditNote>(_editMindNote);
+    on<MindEditEmoji>(_editMindEmoji);
     on<MindStartSearch>(_startSearch);
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(_enterTextSearch);
@@ -157,6 +158,18 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     await _service.editMindNote(
       mindId: event.uuid,
       newNote: event.newNote,
+    );
+    emit(MindListState(values: _minds));
+  }
+
+  Future<FutureOr<void>> _editMindEmoji(MindEditEmoji event, Emitter<MindState> emit) async {
+    final Mind oldMind = _minds.firstWhere((mind) => mind.id == event.uuid);
+    _minds.remove(oldMind);
+    final Mind editedMind = oldMind.copyWith(emoji: event.newEmoji);
+    _minds.add(editedMind);
+    await _service.editMindEmoji(
+      mindId: event.uuid,
+      newEmoji: event.newEmoji,
     );
     emit(MindListState(values: _minds));
   }
