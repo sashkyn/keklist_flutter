@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:blur/blur.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
@@ -200,6 +201,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     return [
       IconButton(
+        icon: const Icon(Icons.calendar_month),
+        color: Colors.black,
+        onPressed: () async => await _showDateSwitcher(),
+      ),
+      IconButton(
         icon: const Icon(Icons.search),
         color: Colors.black,
         onPressed: () {
@@ -259,7 +265,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 .toList(),
           );
         } else {
-          final List<Mind> mindsOfDay = _findMarksByDayIndex(groupDayIndex);
+          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex);
           final List<Widget> realMindWidgets = mindsOfDay.map((mind) => MindWidget(item: mind.emoji)).toList();
           mindWidgets.addAll(realMindWidgets);
         }
@@ -275,7 +281,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => MindDayCollectionScreen(
-                      minds: _findMarksByDayIndex(groupDayIndex),
+                      allMinds: _minds,
                       dayIndex: groupDayIndex,
                     ),
                   ),
@@ -345,8 +351,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  List<Mind> _findMarksByDayIndex(int index) =>
-      _minds.where((item) => index == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
+  List<Mind> _findMindsByDayIndex(int index) {
+    return MindUtils.findMindsByDayIndex(dayIndex: index, allMinds: _minds);
+  }
 
   void _jumpToNow() {
     _itemScrollController.jumpTo(index: _getNowDayIndex());
@@ -391,6 +398,25 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           duration: const Duration(milliseconds: 4100),
         );
       });
+    });
+  }
+
+  Future<void> _showDateSwitcher() async {
+    final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
+      context: context,
+      value: [],
+      config: CalendarDatePicker2WithActionButtonsConfig(),
+      dialogSize: const Size(325, 400),
+      borderRadius: BorderRadius.circular(15),
+    );
+
+    if (dates == null || dates.isEmpty || dates.first == null) {
+      return;
+    }
+
+    final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
+    setState(() {
+      _scrollToDayIndex(dayIndex);
     });
   }
 
