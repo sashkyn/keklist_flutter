@@ -8,6 +8,7 @@ import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/helpers/extensions/state_extensions.dart';
+import 'package:rememoji/screens/web_page/web_page_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // TODO: разобраться с улучшенной навигацией во Flutter: go_router
@@ -30,6 +31,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         SettingItem.otherTitle,
         SettingItem.exportToCSV,
         SettingItem.sendFeedback,
+        SettingItem.whatsNew,
       ]
           .where((element) => element != null)
           .map(
@@ -99,6 +101,9 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () async {
                     switch (item) {
+                      case SettingItem.whatsNew:
+                        _showWhatsNew();
+                        break;
                       case SettingItem.exportToCSV:
                         context.read<SettingsBloc>().add(SettingsExportAllMindsToCSV());
                         break;
@@ -150,6 +155,18 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     );
   }
 
+  Future<void> _showWhatsNew() {
+    return showCupertinoModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return WebPageScreen(
+          title: 'Whats new?',
+          initialUri: Uri.parse(KeklistConstants.whatsNewURL),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -170,6 +187,7 @@ enum SettingItem {
   login(title: 'Login', type: SettingItemType.disclosure),
   logout(title: 'Logout', type: SettingItemType.disclosure),
   exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
+  whatsNew(title: 'What\'s new?', type: SettingItemType.disclosure),
   sendFeedback(title: 'Send feedback', type: SettingItemType.disclosure),
   deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);
 
