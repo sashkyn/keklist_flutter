@@ -36,13 +36,26 @@ class MindEditNote extends MindEvent {
   final String uuid;
   final String newNote;
 
+  @override
+  List<Object?> get props => [uuid, newNote];
+
   MindEditNote({
     required this.uuid,
     required this.newNote,
   });
+}
+
+class MindEditEmoji extends MindEvent {
+  final String uuid;
+  final String newEmoji;
 
   @override
-  List<Object?> get props => [uuid, newNote];
+  List<Object?> get props => [uuid, newEmoji];
+
+  MindEditEmoji({
+    required this.uuid,
+    required this.newEmoji,
+  });
 }
 
 class MindMove extends MindEvent {}

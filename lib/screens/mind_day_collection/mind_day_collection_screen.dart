@@ -212,7 +212,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                       });
                     },
                     onSearchEmoji: () {
-                      _showMarkPickerScreen(
+                      _showEmojiPickerScreen(
                         onSelect: (String emoji) {
                           setState(() {
                             _selectedEmoji = emoji;
@@ -249,7 +249,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
+  void _showEmojiPickerScreen({required ArgumentCallback<String> onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
@@ -262,8 +262,13 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       actions: [
         const SheetAction(
           icon: Icons.edit,
+          label: 'Edit emoji',
+          key: 'edit_emoji_key',
+        ),
+        const SheetAction(
+          icon: Icons.edit,
           label: 'Edit note',
-          key: 'edit_key',
+          key: 'edit_note_key',
         ),
         const SheetAction(
           icon: Icons.delete,
@@ -278,7 +283,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         context: mountedContext,
         event: MindDelete(uuid: item.id),
       );
-    } else if (result == 'edit_key') {
+    } else if (result == 'edit_note_key') {
       final newNote = await showEditMindAlert(mind: item);
       if (newNote != null) {
         BlocUtils.sendTo<MindBloc>(
@@ -289,6 +294,18 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           ),
         );
       }
+    } else if (result == 'edit_emoji_key') {
+      _showEmojiPickerScreen(
+        onSelect: (String emoji) {
+          BlocUtils.sendTo<MindBloc>(
+            context: mountedContext,
+            event: MindEditEmoji(
+              uuid: item.id,
+              newEmoji: emoji,
+            ),
+          );
+        },
+      );
     }
   }
 }
