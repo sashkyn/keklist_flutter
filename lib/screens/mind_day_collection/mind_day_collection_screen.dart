@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +8,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:rememoji/widgets/text_field_alert.dart';
-import 'package:shake/shake.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
@@ -24,19 +24,31 @@ import 'package:rememoji/typealiases.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int dayIndex;
-  final List<Mind> minds;
+  final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
     super.key,
-    required this.minds,
+    required this.allMinds,
     required this.dayIndex,
   });
 
   @override
-  State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState();
+  // ignore: no_logic_in_create_state
+  State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState(
+        dayIndex: dayIndex,
+        allMinds: allMinds.toList(),
+      );
 }
 
 class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with DisposeBag {
+  int dayIndex;
+  final List<Mind> allMinds;
+
+  List<Mind> get dayMinds => MindUtils.findMindsByDayIndex(
+        dayIndex: dayIndex,
+        allMinds: allMinds,
+      );
+
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
@@ -45,6 +57,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   MindSuggestions? _mindSuggestions;
   bool _isMindContentVisible = false;
   bool _hasFocus = false;
+
+  _MindDayCollectionScreenState({
+    required this.dayIndex,
+    required this.allMinds,
+  });
 
   @override
   void initState() {
@@ -59,13 +76,14 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         );
       });
 
+      // TODO: сделать чтобы по перевороту работало а не по тряске, а то работает удовлетворительно
       // NOTE: По тряске телефона скрываем/показываем текст эмодзи.
-      final ShakeDetector shakeDetector = ShakeDetector.autoStart(
-        shakeThresholdGravity: 5.0,
-        shakeSlopTimeMS: 1300,
-        onPhoneShake: () => _changeContentVisibility(),
-      );
-      shakeDetector.streamSubscription?.disposed(by: this);
+      // final ShakeDetector shakeDetector = ShakeDetector.autoStart(
+      //   shakeThresholdGravity: 5.0,
+      //   shakeSlopTimeMS: 1300,
+      //   onPhoneShake: () => _changeContentVisibility(),
+      // );
+      // shakeDetector.streamSubscription?.disposed(by: this);
 
       _mindCreatorFocusNode.addListener(() {
         if (_hasFocus == _mindCreatorFocusNode.hasFocus) {
@@ -80,12 +98,9 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     context.read<MindBloc>().stream.listen((state) {
       if (state is MindListState) {
         setState(() {
-          final Iterable<Mind> minds = state.values.where(
-            (element) => element.dayIndex == widget.dayIndex,
-          );
-          widget.minds
+          allMinds
             ..clear()
-            ..addAll(minds);
+            ..addAll(state.values);
         });
       } else if (state is MindSuggestions) {
         setState(() {
@@ -110,17 +125,19 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(widget.dayIndex))),
+        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(dayIndex))),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month),
+            onPressed: () async => await _showDateSwitcher(),
+          ),
           IconButton(
             icon: BoolWidget(
               condition: _isMindContentVisible,
               trueChild: const Icon(Icons.visibility_off_outlined),
               falseChild: const Icon(Icons.visibility),
             ),
-            onPressed: () {
-              _changeContentVisibility();
-            },
+            onPressed: () => _changeContentVisibility(),
           ),
         ],
       ),
@@ -144,11 +161,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                     child: BoolWidget(
                       condition: _isMindContentVisible,
                       trueChild: MindMonologListWidget(
-                        minds: widget.minds,
+                        minds: dayMinds,
                         onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
                       ),
                       falseChild: MindIconedListWidget(
-                        minds: widget.minds,
+                        minds: dayMinds,
                         onTap: (Mind mind) => showOkAlertDialog(
                           title: mind.emoji,
                           message: mind.note,
@@ -162,7 +179,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
               ),
               falseChild: SingleChildScrollView(
                 child: MindIconedListWidget(
-                  minds: widget.minds,
+                  minds: dayMinds,
                   onTap: (Mind mind) => showOkAlertDialog(
                     title: mind.emoji,
                     message: mind.note,
@@ -307,5 +324,26 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         },
       );
     }
+  }
+
+  Future<void> _showDateSwitcher() async {
+    final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
+      context: context,
+      value: [
+        MindUtils.getDateFromIndex(this.dayIndex),
+      ],
+      config: CalendarDatePicker2WithActionButtonsConfig(),
+      dialogSize: const Size(325, 400),
+      borderRadius: BorderRadius.circular(15),
+    );
+
+    if (dates == null || dates.isEmpty || dates.first == null) {
+      return;
+    }
+
+    final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
+    setState(() {
+      this.dayIndex = dayIndex;
+    });
   }
 }

@@ -13,6 +13,7 @@ dependencies:
   auth_buttons: ^2.0.4
   bloc: ^8.1.1
   blur: ^3.1.0
+  calendar_date_picker2: ^0.5.2
   collection: ^1.17.0
   cross_file: ^0.3.3+4
   csv: ^5.0.1
@@ -36,7 +37,7 @@ dependencies:
   path_provider: ^2.0.12
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
-  shake: ^1.0.1
+  # shake: ^1.0.1
   share_plus: ^6.3.1
   shared_preferences: ^2.1.0
   sliding_up_panel: ^2.0.0+1

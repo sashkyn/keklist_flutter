@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rememoji/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:rememoji/services/entities/mind.dart';
@@ -175,11 +176,3 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 }
 
-// NOTE: Sorted by.
-
-extension ListIterable<E> on Iterable<E> {
-  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()
-    ..sort(
-      (a, b) => key(a).compareTo(key(b)),
-    );
-}
