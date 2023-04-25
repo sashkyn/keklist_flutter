@@ -77,7 +77,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        BlocUtils.sendTo<MindBloc>(
+        BlocUtils.sendEventTo<MindBloc>(
           context: context,
           event: MindChangeCreateText(text: _createMarkEditingController.text),
         );

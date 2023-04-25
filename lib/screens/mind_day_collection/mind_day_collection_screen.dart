@@ -70,7 +70,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        BlocUtils.sendTo<MindBloc>(
+        BlocUtils.sendEventTo<MindBloc>(
           context: context,
           event: MindChangeCreateText(text: _createMarkEditingController.text),
         );
@@ -115,7 +115,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       });
     }).disposed(by: this);
 
-    BlocUtils.sendTo<SettingsBloc>(
+    BlocUtils.sendEventTo<SettingsBloc>(
       context: context,
       event: SettingsGet(),
     );
@@ -209,7 +209,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                       setState(() {
                         _createMarkEditingController.text = '';
                       });
-                      BlocUtils.sendTo<MindBloc>(
+                      BlocUtils.sendEventTo<MindBloc>(
                         context: context,
                         event: MindCreate(
                           dayIndex: widget.dayIndex,
@@ -249,7 +249,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
   void _changeContentVisibility() {
     HapticFeedback.mediumImpact();
-    BlocUtils.sendTo<SettingsBloc>(
+    BlocUtils.sendEventTo<SettingsBloc>(
       context: context,
       event: SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible),
     );
@@ -296,14 +296,14 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       ],
     );
     if (result == 'remove_key') {
-      BlocUtils.sendTo<MindBloc>(
+      BlocUtils.sendEventTo<MindBloc>(
         context: mountedContext,
         event: MindDelete(uuid: item.id),
       );
     } else if (result == 'edit_note_key') {
       final newNote = await showEditMindAlert(mind: item);
       if (newNote != null) {
-        BlocUtils.sendTo<MindBloc>(
+        BlocUtils.sendEventTo<MindBloc>(
           context: mountedContext,
           event: MindEditNote(
             uuid: item.id,
@@ -314,7 +314,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     } else if (result == 'edit_emoji_key') {
       _showEmojiPickerScreen(
         onSelect: (String emoji) {
-          BlocUtils.sendTo<MindBloc>(
+          BlocUtils.sendEventTo<MindBloc>(
             context: mountedContext,
             event: MindEditEmoji(
               uuid: item.id,
