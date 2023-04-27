@@ -1,4 +1,3 @@
-import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
 import 'package:rememoji/typealiases.dart';
 import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
@@ -101,4 +100,15 @@ class MindCreatorBar extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class CreateMindData {
+  final String text;
+  final String emoji;
+
+  const CreateMindData({
+    required this.text,
+    required this.emoji,
+  });
 }

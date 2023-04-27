@@ -15,7 +15,7 @@ import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
+import 'package:rememoji/screens/mind_editor/mind_editor_screen.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
@@ -273,10 +273,15 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     );
   }
 
-  void _showMarkOptionsActionSheet(Mind item) async {
+  void _showMarkOptionsActionSheet(Mind mind) async {
     final result = await showModalActionSheet(
       context: context,
       actions: [
+        const SheetAction(
+          icon: Icons.edit,
+          label: 'Edit',
+          key: 'edit_key',
+        ),
         const SheetAction(
           icon: Icons.edit,
           label: 'Edit emoji',
@@ -298,15 +303,15 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     if (result == 'remove_key') {
       BlocUtils.sendEventTo<MindBloc>(
         context: mountedContext,
-        event: MindDelete(uuid: item.id),
+        event: MindDelete(uuid: mind.id),
       );
     } else if (result == 'edit_note_key') {
-      final newNote = await showEditMindAlert(mind: item);
+      final newNote = await showEditMindAlert(mind: mind);
       if (newNote != null) {
         BlocUtils.sendEventTo<MindBloc>(
           context: mountedContext,
           event: MindEditNote(
-            uuid: item.id,
+            uuid: mind.id,
             newNote: newNote,
           ),
         );
@@ -315,13 +320,18 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       _showEmojiPickerScreen(
         onSelect: (String emoji) {
           BlocUtils.sendEventTo<MindBloc>(
-            context: mountedContext,
+            context: context,
             event: MindEditEmoji(
-              uuid: item.id,
+              uuid: mind.id,
               newEmoji: emoji,
             ),
           );
         },
+      );
+    } else if (result == 'edit_key') {
+      showCupertinoModalBottomSheet(
+        context: mountedContext!,
+        builder: (context) => MarkEditorScreen(mind: mind),
       );
     }
   }
