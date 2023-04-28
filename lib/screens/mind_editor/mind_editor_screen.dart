@@ -2,7 +2,6 @@ import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/typealiases.dart';
 import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -97,7 +96,7 @@ class MarkEditorScreenState extends State<MarkEditorScreen> {
     Navigator.of(context).pop();
   }
 
-  void _showMindPickerScreen({required ArgumentCallback<String> onSelect}) async {
+  void _showMindPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),

@@ -24,7 +24,6 @@ import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/typealiases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -352,7 +351,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
+  _showMarkPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
