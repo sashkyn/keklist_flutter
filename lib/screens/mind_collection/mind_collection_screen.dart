@@ -58,7 +58,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   List<Mind> get _searchResults => _isSearching ? _searchingMindState!.resultValues : [];
 
   // NOTE: Payments.
-  final PaymentService _payementService = PaymentService();
+  // final PaymentService _payementService = PaymentService();
 
   @override
   void initState() {
@@ -124,8 +124,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       context.read<AuthBloc>().add(AuthGetStatus());
       context.read<SettingsBloc>().add(SettingsGet());
 
-      _payementService.initConnection();
+      //_payementService.initConnection();
     });
+  }
+
+  @override
+  void dispose() {
+    _demoAutoScrollingTimer?.cancel();
+
+    super.dispose();
   }
 
   Future<void> _showAuthBottomSheet() async {
@@ -289,7 +296,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   MaterialPageRoute(
                     builder: (context) => MindDayCollectionScreen(
                       allMinds: _minds,
-                      dayIndex: groupDayIndex,
+                      initialDayIndex: groupDayIndex,
                     ),
                   ),
                 );
@@ -344,6 +351,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
+  // TODO: вынести в виджет
   Text _makeMindsTitleWidget(int groupIndex) {
     return Text(
       _formatter.format(MindUtils.getDateFromIndex(groupIndex)),
@@ -425,13 +433,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     setState(() {
       _scrollToDayIndex(dayIndex);
     });
-  }
-
-  @override
-  void dispose() {
-    _demoAutoScrollingTimer?.cancel();
-
-    super.dispose();
   }
 
   void _disableDemoMode() {

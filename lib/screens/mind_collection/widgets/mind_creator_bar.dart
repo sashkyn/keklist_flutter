@@ -45,44 +45,44 @@ class _MindCreatorBarState extends State<MindCreatorBar> {
           children: [
             if (widget.editableMind != null) ...[
               const MindCreatorSeparator(),
-              const SizedBox(height: 4.0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Row(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.edit,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 10.0),
-                        Container(
-                          color: Colors.grey,
-                          height: 40,
-                          width: 1,
-                        ),
-                        const SizedBox(width: 12.0),
-                        MindWidget.sized(
-                          item: widget.editableMind!.emoji,
-                          size: MindSize.small,
-                          onTap: widget.onTapEmoji,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          overflow: TextOverflow.ellipsis,
-                          widget.editableMind!.note,
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ],
+              Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Icon(Icons.edit),
+                  ),
+                  Container(
+                    color: Colors.grey,
+                    height: 50,
+                    width: 0.3,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          MindWidget.sized(
+                            item: widget.editableMind!.emoji,
+                            size: MindSize.small,
+                            onTap: widget.onTapEmoji,
+                          ),
+                          const SizedBox(width: 10.0),
+                          const Flexible(
+                            child: Text(
+                              'Your text here asdgasdgasd asdgfasdgfasdgasd',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: widget.onTapCancelEdit,
+                          ),
+                        ],
+                      ),
                     ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: widget.onTapCancelEdit,
-                      child: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
             const MindCreatorSeparator(),
@@ -200,17 +200,20 @@ class MindCreatorSuggestionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(suggestionMinds.length, (index) {
-        return Flexible(
-          flex: 1,
-          child: MindWidget.sized(
-            item: suggestionMinds[index],
-            size: MindSize.small,
-            onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
-          ),
-        );
-      }),
+    return SizedBox(
+      height: 55.0,
+      child: Row(
+        children: List.generate(suggestionMinds.length, (index) {
+          return Flexible(
+            flex: 1,
+            child: MindWidget.sized(
+              item: suggestionMinds[index],
+              size: MindSize.small,
+              onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
+            ),
+          );
+        }),
+      ),
     );
   }
 }

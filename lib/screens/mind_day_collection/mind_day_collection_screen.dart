@@ -23,19 +23,19 @@ import 'package:rememoji/services/entities/mind.dart';
 // TODO: Перетащить стейт в бар
 
 class MindDayCollectionScreen extends StatefulWidget {
-  final int dayIndex;
+  final int initialDayIndex;
   final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
     super.key,
     required this.allMinds,
-    required this.dayIndex,
+    required this.initialDayIndex,
   });
 
   @override
   // ignore: no_logic_in_create_state
   State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState(
-        dayIndex: dayIndex,
+        dayIndex: initialDayIndex,
         allMinds: allMinds.toList(),
       );
 }
@@ -209,7 +209,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                         BlocUtils.sendEventTo<MindBloc>(
                           context: context,
                           event: MindCreate(
-                            dayIndex: widget.dayIndex,
+                            dayIndex: dayIndex,
                             note: data.text,
                             emoji: data.emoji,
                           ),
