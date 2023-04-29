@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
-import 'package:rememoji/screens/main_container_widget/main_container_widget.dart';
+import 'package:rememoji/screens/main/main_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';

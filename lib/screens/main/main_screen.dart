@@ -37,7 +37,10 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _bodyWidgets[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _bodyWidgets
+      ),
       bottomNavigationBar: AdaptiveBottomNavigationBar(
         selectedIndex: _selectedIndex,
         onTap: (index) {
