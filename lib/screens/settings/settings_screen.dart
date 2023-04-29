@@ -66,11 +66,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: const Text('Login'),
                   leading: const Icon(Icons.login),
                   onPressed: (BuildContext context) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AuthScreen(),
-                      ),
-                    );
+                    _showAuthBottomSheet();
                   },
                 ),
               if (_isLoggedIn)
@@ -160,6 +156,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+    cancelSubscriptions();
+  }
+
   Future<void> _showWhatsNew() {
     return showCupertinoModalBottomSheet(
       context: context,
@@ -172,11 +175,11 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
+  Future<void> _showAuthBottomSheet() async {
+    return showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => const AuthScreen(),
+    );
   }
 }
 

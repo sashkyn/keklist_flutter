@@ -6,7 +6,6 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
-import 'package:rememoji/payments/payment_service.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
@@ -22,7 +21,6 @@ import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/screens/mind_collection/widgets/search_bar.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -224,16 +222,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         color: Colors.black,
         onPressed: () {
           _sendToMindBloc(MindStartSearch());
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.settings),
-        color: Colors.black,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsScreen()),
-          );
         },
       ),
     ];
