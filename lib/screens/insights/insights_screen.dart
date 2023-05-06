@@ -6,6 +6,9 @@ import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/insights/widgets/insights_pie_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
+// Добавить рандомный эмозди с текстом как вдохновение
+// Добавить топ эмодзи за все время
+
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
 
@@ -42,12 +45,17 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InsightsPieWidget(
-          minds: _minds,
+    return Scaffold(
+      appBar: AppBar(title: const Text('Insights')),
+      body: SafeArea(
+        child: Column(
+          children: [
+            InsightsPieWidget(
+              allMinds: _minds,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

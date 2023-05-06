@@ -9,6 +9,7 @@ import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
+import 'package:rememoji/widgets/rounded_container.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -290,35 +291,19 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   ),
                 );
               },
-              // TODO: вынести обертку и тень в отдельный виджет, будет топ
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 10.0,
-                        offset: const Offset(1.0, 1.0),
-                      ),
-                    ],
-                  ),
-                  child: BoolWidget(
-                    condition: mindWidgets.isEmpty,
-                    trueChild: () {
-                      if (groupDayIndex < _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.past();
-                      } else if (groupDayIndex > _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.future();
-                      } else {
-                        return MindCollectionEmptyDayWidget.present();
-                      }
-                    }(),
-                    falseChild: MyTable(widgets: mindWidgets),
-                  ),
+              child: RoundedContainer(
+                child: BoolWidget(
+                  condition: mindWidgets.isEmpty,
+                  trueChild: () {
+                    if (groupDayIndex < _getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.past();
+                    } else if (groupDayIndex > _getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.future();
+                    } else {
+                      return MindCollectionEmptyDayWidget.present();
+                    }
+                  }(),
+                  falseChild: MyTable(widgets: mindWidgets),
                 ),
               ),
             )
