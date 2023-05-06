@@ -130,6 +130,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   void dispose() {
     _demoAutoScrollingTimer?.cancel();
 
+    cancelSubscriptions();
     super.dispose();
   }
 
@@ -289,6 +290,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   ),
                 );
               },
+              // TODO: вынести обертку и тень в отдельный виджет, будет топ
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Container(

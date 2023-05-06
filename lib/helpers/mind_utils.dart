@@ -14,6 +14,14 @@ class MindUtils {
   }) {
     return allMinds.where((item) => dayIndex == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
   }
+
+  static List<Mind> findTodayMinds({required List<Mind> allMinds}) {
+    final int todayDayIndex = MindUtils.getDayIndex(from: DateTime.now());
+    return findMindsByDayIndex(
+      dayIndex: todayDayIndex,
+      allMinds: allMinds,
+    );
+  }
 }
 
 // NOTE: Sorted by.

@@ -21,6 +21,7 @@ dependencies:
   emojis: ^0.9.9
   equatable: ^2.0.5
   fast_immutable_collections: ^8.2.0
+  fl_chart: ^0.62.0
   flutter:
     sdk: flutter
   flutter_animate: ^4.1.1+1

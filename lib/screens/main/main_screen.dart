@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rememoji/screens/insights/insights_screen.dart';
 import 'package:rememoji/screens/mind_collection/mind_collection_screen.dart';
 import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/widgets/bottom_navigation_bar.dart';
@@ -13,9 +14,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _bodyWidgets = [
+  static final List<Widget> _mainScreens = [
     const MindCollectionScreen(),
-    Container(color: Colors.white),
+    const InsightsScreen(),
     const SettingsScreen(),
   ];
 
@@ -39,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _bodyWidgets
+        children: _mainScreens
       ),
       bottomNavigationBar: AdaptiveBottomNavigationBar(
         selectedIndex: _selectedIndex,
