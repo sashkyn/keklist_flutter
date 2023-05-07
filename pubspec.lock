@@ -408,14 +408,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.7.0"
-  graphic:
-    dependency: "direct main"
-    description:
-      name: graphic
-      sha256: c511f2994389a7bcaa6e88edea4dc089a21b91894214962e7c9f34379e6c6009
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   hive:
     dependency: transitive
     description:
