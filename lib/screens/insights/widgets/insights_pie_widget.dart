@@ -5,9 +5,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/widgets/mind_widget.dart';
-import 'package:rememoji/widgets/rounded_circle.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
 
 enum InsightsPieWidgetChoice {

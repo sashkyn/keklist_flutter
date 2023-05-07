@@ -4,6 +4,7 @@ import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/insights/widgets/insights_pie_widget.dart';
+import 'package:rememoji/screens/insights/widgets/insights_random_mind_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
 // Добавить рандомный эмозди с текстом как вдохновение
@@ -48,12 +49,16 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
     return Scaffold(
       appBar: AppBar(title: const Text('Insights')),
       body: SafeArea(
-        child: Column(
-          children: [
-            InsightsPieWidget(
-              allMinds: _minds,
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              InsightsRandomMindWidget(
+                allMinds: _minds,
+              ),
+              InsightsPieWidget(allMinds: _minds),
+            ],
+          ),
         ),
       ),
     );
