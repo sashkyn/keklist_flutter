@@ -5,13 +5,6 @@ import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class MindData {
-  MindData(this.emoji, this.count);
-
-  final String emoji;
-  final int count;
-}
-
 class InsightsTopChartWidget extends StatelessWidget {
   final List<Mind> allMinds;
 
@@ -32,9 +25,9 @@ class InsightsTopChartWidget extends StatelessWidget {
       }
       return map;
     });
-    final List<MindData> chartData = data.entries
+    final List<_MindData> chartData = data.entries
         .map(
-          (entry) => MindData(entry.key, entry.value),
+          (entry) => _MindData(entry.key, entry.value),
         )
         .toList()
       ..sort((a, b) => b.count.compareTo(a.count));
@@ -44,7 +37,7 @@ class InsightsTopChartWidget extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
-              'Top 5 minds',
+              'Top minds',
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.w500,
@@ -60,15 +53,15 @@ class InsightsTopChartWidget extends StatelessWidget {
               labelStyle: const TextStyle(fontSize: 32.0),
             ),
             series: <ChartSeries>[
-              ColumnSeries<MindData, String>(
-                dataSource: chartData.take(5).toList(),
+              ColumnSeries<_MindData, String>(
+                dataSource: chartData.take(8).toList(),
                 dataLabelSettings: const DataLabelSettings(
                   isVisible: true,
                   labelPosition: ChartDataLabelPosition.outside,
                   textStyle: TextStyle(fontSize: 16.0),
                 ),
-                xValueMapper: (MindData mind, _) => mind.emoji,
-                yValueMapper: (MindData mind, _) => mind.count,
+                xValueMapper: (_MindData mind, _) => mind.emoji,
+                yValueMapper: (_MindData mind, _) => mind.count,
               )
             ],
           ),
@@ -76,4 +69,11 @@ class InsightsTopChartWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MindData {
+  _MindData(this.emoji, this.count);
+
+  final String emoji;
+  final int count;
 }

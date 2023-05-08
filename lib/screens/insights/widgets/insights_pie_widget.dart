@@ -7,6 +7,12 @@ import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
 
+// Improvements:
+// Переключатель по количеству символов
+// По частоте использования
+// Цвета - более приятно рандомизированные - попросить ChatGPT сгенерить для каждого эмодзика
+// Показывать за конкретный день лучше, а то получается как то много, либо поменять с пая на что нибудь еще
+
 enum InsightsPieWidgetChoice {
   today(localizedTitle: 'Today', filter: MindUtils.findTodayMinds),
   yesterday(localizedTitle: 'Yesterday', filter: MindUtils.findYesterdayMinds),
@@ -22,14 +28,6 @@ enum InsightsPieWidgetChoice {
     required this.filter,
   });
 }
-
-// TODO: Переделать на график
-// По количеству символов
-// По частоте использования
-// Цвета - более приятно рандомизированные
-// Показывать проценты
-// Показывать за конкретный день лучше, а то получается как то много, либо поменять с пая на что нибудь еще
-// Показывать в виде чипов
 
 class InsightsPieWidget extends StatefulWidget {
   final List<Mind> allMinds;
@@ -62,20 +60,21 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
 
     for (final Mind mind in choiceMinds) {
       // Это по длине текста
-      // if (choiceMap.containsKey(mind.emoji)) {
-      //   choiceMap[mind.emoji] = choiceMap[mind.emoji]! + //mind.note.length;
-      // } else {
-      //   choiceMap[mind.emoji] = mind.note.length;
-      // }
+      if (intervalChoiceMap.containsKey(mind.emoji)) {
+        intervalChoiceMap[mind.emoji] = intervalChoiceMap[mind.emoji]! + mind.note.length;
+      } else {
+        intervalChoiceMap[mind.emoji] = mind.note.length;
+      }
 
       // Это по количеству использований
-      if (intervalChoiceMap.containsKey(mind.emoji)) {
-        intervalChoiceMap[mind.emoji] = intervalChoiceMap[mind.emoji]! + 1;
-      } else {
-        intervalChoiceMap[mind.emoji] = 1;
-      }
+      // if (intervalChoiceMap.containsKey(mind.emoji)) {
+      //   intervalChoiceMap[mind.emoji] = intervalChoiceMap[mind.emoji]! + 1;
+      // } else {
+      //   intervalChoiceMap[mind.emoji] = 1;
+      // }
     }
 
+    final List<PieChartSectionData> pieSections = _getPieSections(choiceMap: intervalChoiceMap);
     return RoundedContainer(
       child: Column(
         children: [
@@ -121,7 +120,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             aspectRatio: 1.05,
             child: PieChart(
               PieChartData(
-                sections: _getPieSections(choiceMap: intervalChoiceMap),
+                sections: pieSections,
                 centerSpaceRadius: 0,
                 sectionsSpace: 0,
                 startDegreeOffset: 0,
@@ -161,7 +160,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
   }
 
   List<PieChartSectionData> _getPieSections({required HashMap<String, int> choiceMap}) {
-    final allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
+    final int allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
     return choiceMap.entries.map(
       (entry) {
         final currentValue = choiceMap.entries
@@ -184,7 +183,9 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             ),
             titlePositionPercentageOffset: 0.6);
       },
-    ).toList();
+    )
+        // .where((element) => element.showTitle)
+        .toList();
   }
 
   Color _colorFromEmoji(String emoji) {
