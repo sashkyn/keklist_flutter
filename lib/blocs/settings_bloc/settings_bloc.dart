@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rememoji/services/entities/mind.dart';
+import 'package:rememoji/services/hive/constants.dart';
+import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rememoji/services/main_service.dart';
 
 part 'settings_event.dart';
@@ -32,6 +34,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsGet>(_getSettings);
   }
 
+  final Box<SettingsObject> _settingsBox = Hive.box<SettingsObject>(HiveConstants.settingsBoxName);
+
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
     // Получение minds.
     final Iterable<Mind> minds = await mainService.getMindList();
@@ -46,20 +50,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   FutureOr<void> _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final bool isMindContentVisible = prefs.getBool(_SettingsSharedKeys.mindContentVisible) ?? false;
-    final bool isOfflineMode = prefs.getBool(_SettingsSharedKeys.offlineMode) ?? false;
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
 
-    final String? previousAppVersion = prefs.getString(_SettingsSharedKeys.previousAppVersion);
+    final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
+    final bool isOfflineMode = settingsObject?.isOfflineMode ?? false;
+
+    final String? previousAppVersion = settingsObject?.previousAppVersion;
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
     final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
 
     emit(
       SettingsState(
-          isMindContentVisible: isMindContentVisible,
-          needToShowWhatsNewOnStart: needToShowWhatsNewOnStart,
-          isOfflineMode: isOfflineMode),
+        isMindContentVisible: isMindContentVisible,
+        needToShowWhatsNewOnStart: needToShowWhatsNewOnStart,
+        isOfflineMode: isOfflineMode,
+      ),
     );
   }
 
@@ -67,30 +73,29 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsWhatsNewShown event,
     Emitter<SettingsState> emit,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
-    await prefs.setString(_SettingsSharedKeys.previousAppVersion, appVersion);
+
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.previousAppVersion = appVersion;
+    settingsObject?.save();
   }
 
   FutureOr<void> _changeMindContentVisibility(
     SettingsChangeMindContentVisibility event,
     Emitter<SettingsState> emit,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_SettingsSharedKeys.mindContentVisible, event.isVisible);
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.isMindContentVisible = event.isVisible;
+    _settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, settingsObject!);
+
     emit(state.copyWith(isMindContentVisible: event.isVisible));
   }
 
   FutureOr<void> _changeOfflineMode(SettingsChangeOfflineMode event, Emitter<SettingsState> emit) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_SettingsSharedKeys.offlineMode, event.isOfflineMode);
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.isOfflineMode = event.isOfflineMode;
+    settingsObject?.save();
     emit(state.copyWith(isOfflineMode: event.isOfflineMode));
   }
-}
-
-class _SettingsSharedKeys {
-  static const String mindContentVisible = 'settings_mind_content_visible';
-  static const String offlineMode = 'settings_mind_offline_mode';
-  static const String previousAppVersion = 'settings_previous_app_version';
 }
