@@ -17,4 +17,10 @@ class SettingsChangeMindContentVisibility extends SettingsEvent {
   const SettingsChangeMindContentVisibility({required this.isVisible});
 }
 
+class SettingsChangeOfflineMode extends SettingsEvent {
+  final bool isOfflineMode;
+
+  const SettingsChangeOfflineMode({required this.isOfflineMode});
+}
+
 class SettingsWhatsNewShown extends SettingsEvent {}

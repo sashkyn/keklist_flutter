@@ -19,7 +19,7 @@ class WebPageScreen extends StatefulWidget {
 }
 
 class _WebPageScreenState extends State<WebPageScreen> {
-  bool isLoading = true;
+  bool _isLoading = true;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class _WebPageScreenState extends State<WebPageScreen> {
         ],
       ),
       body: BoolWidget(
-        condition: isLoading,
+        condition: _isLoading,
         trueChild: const LinearProgressIndicator(),
         falseChild: WebViewWidget(
           controller: WebViewController()
@@ -44,7 +44,7 @@ class _WebPageScreenState extends State<WebPageScreen> {
               NavigationDelegate(
                 onPageFinished: (uri) {
                   setState(() {
-                    isLoading = false;
+                    _isLoading = false;
                   });
                 },
               ),
