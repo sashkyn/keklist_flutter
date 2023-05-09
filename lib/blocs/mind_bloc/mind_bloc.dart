@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:hive/hive.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
+import 'package:rememoji/services/hive/constants.dart';
+import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
+import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rememoji/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:rememoji/services/entities/mind.dart';
@@ -21,6 +25,9 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   late final MindSearcherCubit _searcherCubit;
 
   final Set<Mind> _minds = {};
+  final Box<MindObject> _mindBox = Hive.box<MindObject>(HiveConstants.mindBoxName);
+  final SettingsObject? _settings =
+      Hive.box<SettingsObject>(HiveConstants.settingsBoxName).get(HiveConstants.settingsGlobalSettingsIndex);
 
   MindBloc({
     required MainService mainService,
@@ -33,8 +40,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
     on<MindEdit>(_editMind);
-    on<MindEditNote>(_editMindNote);
-    on<MindEditEmoji>(_editMindEmoji);
     on<MindStartSearch>(_startSearch);
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(_enterTextSearch);
@@ -42,17 +47,22 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
-    on<MindResetStorage>(_clearCache);
+    on<MindResetTempStorage>(_clearTempCache);
   }
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
-    await _service.removeMind(event.uuid);
+    await _mindBox.delete(event.uuid);
     _minds.removeWhere((item) => item.id == event.uuid);
     emit.call(MindListState(values: _minds));
+
+    if (!(_settings?.isOfflineMode ?? true)) {
+      // Удаляем на сервере.
+      await _service.deleteMind(event.uuid);
+    }
   }
 
   FutureOr<void> _createMind(MindCreate event, emit) async {
-    final mind = Mind(
+    final Mind mind = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
       note: event.note.trim(),
@@ -60,18 +70,49 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().millisecondsSinceEpoch,
       sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
-    await _service.addMind(mind);
     _minds.add(mind);
-    final newState = MindListState(values: _minds);
+
+    // Добавляем в локальное хранилище.
+    _mindBox.put(
+      mind.id,
+      mind.toObject(),
+    );
+
+    final MindListState newState = MindListState(values: _minds);
     emit.call(newState);
+
+    if (!(_settings?.isOfflineMode ?? true)) {
+      // Добавляем на сервере.
+      await _service.addMind(mind);
+    }
   }
 
   FutureOr<void> _getMinds(MindGetList event, emit) async {
-    _minds
-      ..clear()
-      ..addAll(await _service.getMindList());
-    final state = MindListState(values: _minds);
-    emit(state);
+    // Подмешиваем элементы с локального хранилища.
+    _minds.addAll(_mindBox.values.map((object) => object.toMind()));
+    final MindListState localStorageState = MindListState(values: _minds);
+    emit(localStorageState);
+
+    // Подмешиваем элементы с сервера.
+    if (!(_settings?.isOfflineMode ?? true)) {
+      final Iterable<Mind> serverMinds = await _service.getMindList();
+      _minds.addAll(serverMinds);
+
+      // Обновляем локальное хранилище.
+      _mindBox.putAll(
+        Map.fromEntries(
+          serverMinds.map(
+            (mind) => MapEntry(
+              mind.id,
+              mind.toObject(),
+            ),
+          ),
+        ),
+      );
+
+      final MindListState networkState = MindListState(values: _minds);
+      emit(networkState);
+    }
   }
 
   FutureOr<void> _startSearch(MindStartSearch event, emit) async {
@@ -95,7 +136,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
-    final filteredMinds = await _searcherCubit.searchMindList(event.text);
+    final List<Mind> filteredMinds = await _searcherCubit.searchMindList(event.text);
 
     emit(
       MindSearching(
@@ -135,10 +176,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(MindSuggestions(values: _lastSuggestions));
   }
 
-  FutureOr<void> _clearCache(event, emit) async {
-    await _service.clearCache();
+  FutureOr<void> _clearTempCache(event, emit) async {
+    await _service.clearTempCache();
     _minds.clear();
-    final state = MindListState(values: []);
+    final MindListState state = MindListState(values: []);
     emit(state);
   }
 
@@ -154,38 +195,20 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     Emitter<MindState> emit,
   ) async {
     final Mind oldMind = _minds.firstWhere((mind) => mind.id == event.mind.id);
-    _minds.remove(oldMind);
     final Mind editedMind = event.mind;
-    _minds.add(editedMind);
-    await _service.edit(mind: event.mind);
-    emit(MindListState(values: _minds));
-  }
+    _minds
+      ..remove(oldMind)
+      ..add(editedMind);
 
-  Future<void> _editMindNote(
-    MindEditNote event,
-    Emitter<MindState> emit,
-  ) async {
-    final Mind oldMind = _minds.firstWhere((mind) => mind.id == event.uuid);
-    _minds.remove(oldMind);
-    final Mind editedMind = oldMind.copyWith(note: event.newNote);
-    _minds.add(editedMind);
-    await _service.editMindNote(
-      mindId: event.uuid,
-      newNote: event.newNote,
-    );
-    emit(MindListState(values: _minds));
-  }
+    // Удаляем из локального хранилища.
+    _mindBox.get(event.mind.id)?.delete();
 
-  Future<FutureOr<void>> _editMindEmoji(MindEditEmoji event, Emitter<MindState> emit) async {
-    final Mind oldMind = _minds.firstWhere((mind) => mind.id == event.uuid);
-    _minds.remove(oldMind);
-    final Mind editedMind = oldMind.copyWith(emoji: event.newEmoji);
-    _minds.add(editedMind);
-    await _service.editMindEmoji(
-      mindId: event.uuid,
-      newEmoji: event.newEmoji,
-    );
+    // Обновляем стейт на блоке.
     emit(MindListState(values: _minds));
+
+    if (!(_settings?.isOfflineMode ?? true)) {
+      // Редактируем на сервере.
+      await _service.edit(mind: event.mind);
+    }
   }
 }
-

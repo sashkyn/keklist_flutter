@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
 
 class Mind extends Equatable {
   final String id;
@@ -18,7 +19,14 @@ class Mind extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [
+        id,
+        emoji,
+        note,
+        sortIndex,
+        creationDate,
+        dayIndex,
+      ];
 
   Mind.fromSupabaseJson(Map<String, dynamic> json)
       : id = json['uuid'] ?? 0,
@@ -72,4 +80,12 @@ class Mind extends Equatable {
       sortIndex: sortIndex ?? this.sortIndex,
     );
   }
+
+  MindObject toObject() => MindObject()
+    ..id = id
+    ..emoji = emoji
+    ..note = note
+    ..dayIndex = dayIndex
+    ..creationDate = creationDate
+    ..sortIndex = sortIndex;
 }

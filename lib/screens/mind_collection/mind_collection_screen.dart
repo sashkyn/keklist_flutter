@@ -109,7 +109,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           _sendToMindBloc(MindGetList());
         } else if (state is AuthLogouted) {
           _enableDemoMode();
-          _sendToMindBloc(MindResetStorage());
+          _sendToMindBloc(MindResetTempStorage());
           // NOTE: возвращаемся к главному экрану при логауте.
           Navigator.of(context).popUntil((route) => route.isFirst);
           _showAuthBottomSheet();

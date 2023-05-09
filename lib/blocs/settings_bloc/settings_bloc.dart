@@ -18,6 +18,7 @@ part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final MainService mainService;
+  final Box<SettingsObject> _settingsBox = Hive.box<SettingsObject>(HiveConstants.settingsBoxName);
 
   SettingsBloc({required this.mainService})
       : super(
@@ -33,8 +34,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
   }
-
-  final Box<SettingsObject> _settingsBox = Hive.box<SettingsObject>(HiveConstants.settingsBoxName);
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
     // Получение minds.
@@ -91,6 +90,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     emit(state.copyWith(isMindContentVisible: event.isVisible));
   }
+
+  // TODO: здесь спрашивать, что я хочу сделать с данными:
+  // 1. Заменить их базой из локального хранилища.
+  // 2. Удалить данные из хранилища и заменить их данными из базы.
 
   FutureOr<void> _changeOfflineMode(SettingsChangeOfflineMode event, Emitter<SettingsState> emit) async {
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
