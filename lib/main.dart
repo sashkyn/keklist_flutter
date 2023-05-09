@@ -4,7 +4,10 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rememoji/screens/main/main_screen.dart';
+import 'package:rememoji/services/hive/constants.dart';
+import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
@@ -27,6 +30,10 @@ Future<void> main() async {
 
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
+
+  // Инициализация Hive.
+  await _setupHive();
+
   // Инициализация настроек Supabase.
   await Supabase.initialize(
     url: '***REMOVED***',
@@ -73,6 +80,15 @@ Future<void> main() async {
     child: const KeklistApp(),
   );
   runApp(application);
+}
+
+Future<void> _setupHive() async {
+  Hive.registerAdapter<SettingsObject>(SettingsObjectAdapter());
+  await Hive.initFlutter();
+  final Box<SettingsObject> box = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
+  if (box.get(HiveConstants.settingsGlobalSettingsIndex) == null) {
+    box.put(HiveConstants.settingsGlobalSettingsIndex, SettingsObject.initial());
+  }
 }
 
 void _setupOrientations() {

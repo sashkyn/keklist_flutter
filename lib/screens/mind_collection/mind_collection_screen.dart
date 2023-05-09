@@ -81,12 +81,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         );
       });
 
-      context.read<SettingsBloc>().stream.listen((state) async {
+      context.read<SettingsBloc>().stream.take(1).listen((state) async {
         if (state.needToShowWhatsNewOnStart) {
           await _showWhatsNew();
-          if (context.mounted) {
-            context.read<SettingsBloc>().add(SettingsWhatsNewShown());
-          }
+
+          sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
         }
       }).disposed(by: this);
 
