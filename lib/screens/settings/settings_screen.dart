@@ -96,13 +96,10 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             tiles: [
               SettingsTile.switchTile(
                 initialValue: _offlineMode,
-                leading: const Icon(
-                  Icons.cloud_off,
-                  color: Colors.grey,
-                ),
+                leading: const Icon(Icons.cloud_off, color: Colors.grey),
                 title: const Text('Offline mode'),
-                onToggle: (bool value) {
-                  sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
+                onToggle: (bool value) async {
+                  await _switchOfflineMode(value);
                 },
               ),
               SettingsTile(
@@ -177,6 +174,18 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
       case OkCancelResult.cancel:
         break;
     }
+  }
+
+  Future<void> _switchOfflineMode(bool value) async {
+    // final result = await showDial(
+    //   context: context,
+    //   title: 'Are you sure?',
+    //   message: 'If you switch offline mode on you will not be able to add new minds.',
+    //   cancelLabel: 'Cancel',
+    //   okLabel: 'Switch offline mode',
+    //   isDestructiveAction: true,
+    // );
+    sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
   }
 
   @override

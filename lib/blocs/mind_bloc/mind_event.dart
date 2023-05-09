@@ -93,4 +93,4 @@ class MindChangeCreateText extends MindEvent {
   List<Object?> get props => [text];
 }
 
-class MindResetStorage extends MindEvent {}
+class MindResetTempStorage extends MindEvent {}

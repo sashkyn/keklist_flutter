@@ -42,7 +42,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> removeMind(String id) async {
+  FutureOr<void> deleteMind(String id) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -105,8 +105,18 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> clearCache() {
+  FutureOr<void> clearTempCache() {
     // Очищаем закешированные данные.
+    _cachedMinds.clear();
+  }
+
+  @override
+  FutureOr<void> deleteAllMinds() async {
+    if (_client.auth.currentUser == null) {
+      return Future.error('You did not auth to Supabase');
+    }
+
+    await _client.from('minds').delete().eq('user_id', _client.auth.currentUser!.id);
     _cachedMinds.clear();
   }
 }

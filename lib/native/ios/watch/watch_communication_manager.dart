@@ -139,7 +139,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _removeMindFromToday({required String id}) async {
-    await mainService.removeMind(id);
+    await mainService.deleteMind(id);
     return _sendToWatch(
       outputMethod: WatchOutputMethod.mindDidDeleted,
       arguments: {},
