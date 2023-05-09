@@ -1,11 +1,10 @@
 import 'package:rememoji/constants.dart';
-import 'package:rememoji/typealiases.dart';
 import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
 class MindPickerScreen extends StatefulWidget {
-  final ArgumentCallback<String> onSelect;
+  final Function(String) onSelect;
 
   const MindPickerScreen({
     Key? key,

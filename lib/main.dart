@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
+import 'package:rememoji/screens/main/main_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
@@ -18,7 +19,6 @@ import 'package:rememoji/di/containers.dart';
 import 'package:rememoji/services/main_service.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
-import 'screens/mind_collection/mind_collection_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,7 +96,7 @@ class KeklistAppState extends State<KeklistApp> {
       value: SystemUiOverlayStyle.dark,
       child: MaterialApp(
         title: 'Rememoji',
-        home: const MindCollectionScreen(),
+        home: const MainScreen(),
         theme: ThemeData(
           primarySwatch: Palette.swatch,
           useMaterial3: true,

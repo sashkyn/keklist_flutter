@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: "none"
 
-version: 1.4.0+31
+version: 1.5.0+39
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -20,12 +20,14 @@ dependencies:
   cupertino_icons: ^1.0.5
   emojis: ^0.9.9
   equatable: ^2.0.5
-  fast_immutable_collections: ^8.2.0
+  fast_immutable_collections: ^9.1.1
+  fl_chart: ^0.62.0
   flutter:
     sdk: flutter
   flutter_animate: ^4.1.1+1
   flutter_bloc: ^8.1.2
   flutter_emoji: ^2.4.0
+  flutter_inapp_purchase: ^5.4.1
   flutter_simple_dependency_injection: ^2.0.0
   flutter_web_auth_2: ^2.0.4
   form_field_validator: ^1.1.0
@@ -38,17 +40,19 @@ dependencies:
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
   # shake: ^1.0.1
+  settings_ui: ^2.0.2
   share_plus: ^6.3.1
   shared_preferences: ^2.1.0
   sliding_up_panel: ^2.0.0+1
   supabase_flutter: ^1.5.0
+  syncfusion_flutter_charts: ^21.2.3
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
   uuid: ^3.0.7
   webview_flutter: ^4.1.0
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.12.0
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter

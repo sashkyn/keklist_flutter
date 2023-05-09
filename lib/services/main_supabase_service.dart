@@ -81,6 +81,18 @@ class MainSupabaseService implements MainService {
   }
 
   @override
+  FutureOr<void> edit({required Mind mind}) async {
+    if (_client.auth.currentUser == null) {
+      return Future.error('You did not auth to Supabase');
+    }
+
+    return await _client
+        .from('minds')
+        .update(mind.toSupabaseJson(userId: _client.auth.currentUser!.id))
+        .eq('uuid', mind.id);
+  }
+
+  @override
   FutureOr<void> editMindEmoji({
     required String mindId,
     required String newEmoji,

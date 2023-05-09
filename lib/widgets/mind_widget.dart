@@ -23,6 +23,19 @@ class MindWidget extends StatelessWidget {
     this.fontSize = 50,
   }) : super(key: key);
 
+  factory MindWidget.justEmoji({
+    required String emoji,
+    double? size,
+  }) {
+    return MindWidget(
+      item: emoji,
+      isHighlighted: true,
+      onTap: null,
+      onLongPress: null,
+      fontSize: size ?? 50,
+    );
+  }
+
   factory MindWidget.sized({
     required String item,
     required MindSize size,
