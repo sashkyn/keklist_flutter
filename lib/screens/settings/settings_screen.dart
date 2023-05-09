@@ -23,13 +23,24 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
+  bool _offlineMode = false;
 
   @override
   void initState() {
     super.initState();
 
-    context.read<AuthBloc>().stream.listen((state) async {
-      setState(() {
+    subscribeTo<SettingsBloc>(
+      onNewState: (state) {
+        setState(() {
+          if (state is SettingsState) {
+            _offlineMode = state.isOfflineMode;
+          }
+        });
+      },
+    )?.disposed(by: this);
+
+    subscribeTo<AuthBloc>(
+      onNewState: (state) {
         if (state is AuthCurrentStatus) {
           _isLoggedIn = state.isLoggedIn;
         } else if (state is AuthLoggedIn) {
@@ -37,13 +48,12 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         } else if (state is AuthLogouted) {
           _isLoggedIn = false;
         }
-      });
-    }).disposed(by: this);
+      },
+    )?.disposed(by: this);
 
-    context.read<AuthBloc>().add(AuthGetStatus());
+    sendEventTo<AuthBloc>(AuthGetStatus());
+    sendEventTo<SettingsBloc>(SettingsGet());
   }
-
-  bool state = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +92,17 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           SettingsSection(
             title: Text('Data'.toUpperCase()),
             tiles: [
+              SettingsTile.switchTile(
+                initialValue: _offlineMode,
+                leading: const Icon(
+                  Icons.cloud_off,
+                  color: Colors.grey,
+                ),
+                title: const Text('Offline mode'),
+                onToggle: (bool value) {
+                  sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
+                },
+              ),
               SettingsTile(
                 title: const Text('Export to CSV'),
                 leading: const Icon(Icons.file_download, color: Colors.brown),
@@ -181,10 +202,4 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
       builder: (context) => const AuthScreen(),
     );
   }
-}
-
-enum SettingItemType {
-  title,
-  disclosure,
-  redDisclosure,
 }
