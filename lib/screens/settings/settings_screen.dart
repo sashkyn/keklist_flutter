@@ -41,13 +41,15 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<AuthBloc>(
       onNewState: (state) {
-        if (state is AuthCurrentStatus) {
-          _isLoggedIn = state.isLoggedIn;
-        } else if (state is AuthLoggedIn) {
-          _isLoggedIn = true;
-        } else if (state is AuthLogouted) {
-          _isLoggedIn = false;
-        }
+        setState(() {
+          if (state is AuthCurrentStatus) {
+            _isLoggedIn = state.isLoggedIn;
+          } else if (state is AuthLoggedIn) {
+            _isLoggedIn = true;
+          } else if (state is AuthLogouted) {
+            _isLoggedIn = false;
+          }
+        });
       },
     )?.disposed(by: this);
 
