@@ -9,6 +9,7 @@ import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
+import 'package:rememoji/widgets/rounded_container.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -21,9 +22,7 @@ import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/screens/mind_collection/widgets/search_bar.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:rememoji/screens/settings/settings_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/typealiases.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -57,6 +56,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
   List<Mind> get _searchResults => _isSearching ? _searchingMindState!.resultValues : [];
 
+  // NOTE: Payments.
+  // final PaymentService _payementService = PaymentService();
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +75,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        BlocUtils.sendTo<MindBloc>(
+        BlocUtils.sendEventTo<MindBloc>(
           context: context,
           event: MindChangeCreateText(text: _createMarkEditingController.text),
         );
@@ -120,7 +122,17 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       context.read<AuthBloc>().add(AuthGetStatus());
       context.read<SettingsBloc>().add(SettingsGet());
+
+      //_payementService.initConnection();
     });
+  }
+
+  @override
+  void dispose() {
+    _demoAutoScrollingTimer?.cancel();
+
+    cancelSubscriptions();
+    super.dispose();
   }
 
   Future<void> _showAuthBottomSheet() async {
@@ -214,16 +226,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           _sendToMindBloc(MindStartSearch());
         },
       ),
-      IconButton(
-        icon: const Icon(Icons.settings),
-        color: Colors.black,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsScreen()),
-          );
-        },
-      ),
     ];
   }
 
@@ -284,39 +286,24 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   MaterialPageRoute(
                     builder: (context) => MindDayCollectionScreen(
                       allMinds: _minds,
-                      dayIndex: groupDayIndex,
+                      initialDayIndex: groupDayIndex,
                     ),
                   ),
                 );
               },
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 10.0,
-                        offset: const Offset(1.0, 1.0),
-                      ),
-                    ],
-                  ),
-                  child: BoolWidget(
-                    condition: mindWidgets.isEmpty,
-                    trueChild: () {
-                      if (groupDayIndex < _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.past();
-                      } else if (groupDayIndex > _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.future();
-                      } else {
-                        return MindCollectionEmptyDayWidget.present();
-                      }
-                    }(),
-                    falseChild: MyTable(widgets: mindWidgets),
-                  ),
+              child: RoundedContainer(
+                child: BoolWidget(
+                  condition: mindWidgets.isEmpty,
+                  trueChild: () {
+                    if (groupDayIndex < _getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.past();
+                    } else if (groupDayIndex > _getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.future();
+                    } else {
+                      return MindCollectionEmptyDayWidget.present();
+                    }
+                  }(),
+                  falseChild: MyTable(widgets: mindWidgets),
                 ),
               ),
             )
@@ -339,6 +326,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
+  // TODO: вынести в виджет
   Text _makeMindsTitleWidget(int groupIndex) {
     return Text(
       _formatter.format(MindUtils.getDateFromIndex(groupIndex)),
@@ -346,7 +334,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  _showMarkPickerScreen({required ArgumentCallback<String> onSelect}) async {
+  _showMarkPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
@@ -420,13 +408,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     setState(() {
       _scrollToDayIndex(dayIndex);
     });
-  }
-
-  @override
-  void dispose() {
-    _demoAutoScrollingTimer?.cancel();
-
-    super.dispose();
   }
 
   void _disableDemoMode() {

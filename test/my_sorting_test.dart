@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
+import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
 void main() {

@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
-import 'package:rememoji/widgets/text_field_alert.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
@@ -15,27 +14,28 @@ import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_creator/mind_creator_screen.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/typealiases.dart';
+
+// TODO: Календарь вашей жизни
+// TODO: Перетащить стейт в бар
 
 class MindDayCollectionScreen extends StatefulWidget {
-  final int dayIndex;
+  final int initialDayIndex;
   final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
     super.key,
     required this.allMinds,
-    required this.dayIndex,
+    required this.initialDayIndex,
   });
 
   @override
   // ignore: no_logic_in_create_state
   State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState(
-        dayIndex: dayIndex,
+        dayIndex: initialDayIndex,
         allMinds: allMinds.toList(),
       );
 }
@@ -50,13 +50,13 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       );
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
-  final TextEditingController _createMarkEditingController = TextEditingController(text: null);
+  final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
-
   String _selectedEmoji = Emoji.all().first.char;
   MindSuggestions? _mindSuggestions;
   bool _isMindContentVisible = false;
   bool _hasFocus = false;
+  Mind? _editableMind;
 
   _MindDayCollectionScreenState({
     required this.dayIndex,
@@ -69,10 +69,10 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
-      _createMarkEditingController.addListener(() {
-        BlocUtils.sendTo<MindBloc>(
+      _createMindEditingController.addListener(() {
+        BlocUtils.sendEventTo<MindBloc>(
           context: context,
-          event: MindChangeCreateText(text: _createMarkEditingController.text),
+          event: MindChangeCreateText(text: _createMindEditingController.text),
         );
       });
 
@@ -115,7 +115,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       });
     }).disposed(by: this);
 
-    BlocUtils.sendTo<SettingsBloc>(
+    BlocUtils.sendEventTo<SettingsBloc>(
       context: context,
       event: SettingsGet(),
     );
@@ -146,9 +146,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           GestureDetector(
             onPanDown: (_) {
               if (_mindCreatorFocusNode.hasFocus) {
-                setState(() {
-                  _hideKeyboard();
-                });
+                _hideKeyboard();
               }
             },
             child: BoolWidget(
@@ -162,7 +160,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                       condition: _isMindContentVisible,
                       trueChild: MindMonologListWidget(
                         minds: dayMinds,
-                        onTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                        onTap: (Mind mind) => _showMindOptionsActionSheet(mind),
                       ),
                       falseChild: MindIconedListWidget(
                         minds: dayMinds,
@@ -171,7 +169,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                           message: mind.note,
                           context: context,
                         ),
-                        onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                        onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
                       ),
                     ),
                   ),
@@ -185,7 +183,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                     message: mind.note,
                     context: context,
                   ),
-                  onLongTap: (Mind mind) => _showMarkOptionsActionSheet(mind),
+                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
                 ),
               ),
             ),
@@ -203,32 +201,39 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   MindCreatorBar(
+                    editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
-                    textEditingController: _createMarkEditingController,
-                    onCreate: (CreateMindData data) {
-                      setState(() {
-                        _createMarkEditingController.text = '';
-                      });
-                      BlocUtils.sendTo<MindBloc>(
-                        context: context,
-                        event: MindCreate(
-                          dayIndex: widget.dayIndex,
+                    textEditingController: _createMindEditingController,
+                    onDone: (CreateMindData data) {
+                      if (_editableMind == null) {
+                        BlocUtils.sendEventTo<MindBloc>(
+                          context: context,
+                          event: MindCreate(
+                            dayIndex: dayIndex,
+                            note: data.text,
+                            emoji: data.emoji,
+                          ),
+                        );
+                      } else {
+                        final Mind mindForEdit = _editableMind!.copyWith(
                           note: data.text,
                           emoji: data.emoji,
-                        ),
-                      );
-                      setState(() {
-                        _hideKeyboard();
-                      });
+                        );
+                        BlocUtils.sendEventTo<MindBloc>(
+                          context: context,
+                          event: MindEdit(mind: mindForEdit),
+                        );
+                      }
+                      _resetMindCreator();
                     },
                     suggestionMinds: _hasFocus ? _mindSuggestions?.values ?? [] : [],
                     selectedEmoji: _selectedEmoji,
-                    onSelectSuggestionEmoji: (String suggestionEmoji) {
+                    onTapSuggestionEmoji: (String suggestionEmoji) {
                       setState(() {
                         _selectedEmoji = suggestionEmoji;
                       });
                     },
-                    onSearchEmoji: () {
+                    onTapEmoji: () {
                       _showEmojiPickerScreen(
                         onSelect: (String emoji) {
                           setState(() {
@@ -236,6 +241,10 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                           });
                         },
                       );
+                    },
+                    doneTitle: 'DONE',
+                    onTapCancelEdit: () {
+                      _resetMindCreator();
                     },
                   ),
                 ],
@@ -247,12 +256,12 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     );
   }
 
-  void _changeContentVisibility() {
-    HapticFeedback.mediumImpact();
-    BlocUtils.sendTo<SettingsBloc>(
-      context: context,
-      event: SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible),
-    );
+  void _resetMindCreator() {
+    setState(() {
+      _editableMind = null;
+      _createMindEditingController.text = '';
+      _hideKeyboard();
+    });
   }
 
   @override
@@ -262,30 +271,33 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     super.dispose();
   }
 
+  void _changeContentVisibility() {
+    HapticFeedback.mediumImpact();
+    BlocUtils.sendEventTo<SettingsBloc>(
+      context: context,
+      event: SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible),
+    );
+  }
+
   void _hideKeyboard() {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showEmojiPickerScreen({required ArgumentCallback<String> onSelect}) async {
+  void _showEmojiPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
     );
   }
 
-  void _showMarkOptionsActionSheet(Mind item) async {
-    final result = await showModalActionSheet(
+  void _showMindOptionsActionSheet(Mind mind) async {
+    final String? result = await showModalActionSheet(
       context: context,
       actions: [
         const SheetAction(
           icon: Icons.edit,
-          label: 'Edit emoji',
-          key: 'edit_emoji_key',
-        ),
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Edit note',
-          key: 'edit_note_key',
+          label: 'Edit',
+          key: 'edit_key',
         ),
         const SheetAction(
           icon: Icons.delete,
@@ -296,33 +308,17 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       ],
     );
     if (result == 'remove_key') {
-      BlocUtils.sendTo<MindBloc>(
+      BlocUtils.sendEventTo<MindBloc>(
         context: mountedContext,
-        event: MindDelete(uuid: item.id),
+        event: MindDelete(uuid: mind.id),
       );
-    } else if (result == 'edit_note_key') {
-      final newNote = await showEditMindAlert(mind: item);
-      if (newNote != null) {
-        BlocUtils.sendTo<MindBloc>(
-          context: mountedContext,
-          event: MindEditNote(
-            uuid: item.id,
-            newNote: newNote,
-          ),
-        );
-      }
-    } else if (result == 'edit_emoji_key') {
-      _showEmojiPickerScreen(
-        onSelect: (String emoji) {
-          BlocUtils.sendTo<MindBloc>(
-            context: mountedContext,
-            event: MindEditEmoji(
-              uuid: item.id,
-              newEmoji: emoji,
-            ),
-          );
-        },
-      );
+    } else if (result == 'edit_key') {
+      setState(() {
+        _editableMind = mind;
+        _selectedEmoji = mind.emoji;
+      });
+      _createMindEditingController.text = mind.note;
+      _mindCreatorFocusNode.requestFocus();
     }
   }
 

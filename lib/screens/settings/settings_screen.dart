@@ -5,10 +5,11 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
+import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
-import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
+import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // TODO: разобраться с улучшенной навигацией во Flutter: go_router
@@ -22,22 +23,6 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
-
-  List<SettingItem> get _items => [
-        SettingItem.userTitle,
-        !_isLoggedIn ? SettingItem.login : null,
-        _isLoggedIn ? SettingItem.logout : null,
-        _isLoggedIn ? SettingItem.deleteAccount : null,
-        SettingItem.otherTitle,
-        SettingItem.exportToCSV,
-        SettingItem.sendFeedback,
-        SettingItem.whatsNew,
-      ]
-          .where((element) => element != null)
-          .map(
-            (nullableItem) => nullableItem!,
-          )
-          .toList(growable: false);
 
   @override
   void initState() {
@@ -58,6 +43,8 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     context.read<AuthBloc>().add(AuthGetStatus());
   }
 
+  bool state = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,90 +56,111 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: ListView.builder(
-          padding: const EdgeInsets.only(top: 16.0),
-          itemCount: _items.length,
-          itemBuilder: (context, index) {
-            final item = _items[index];
-
-            switch (item.type) {
-              case SettingItemType.title:
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 12.0,
-                  ),
-                  child: Text(
-                    item.title,
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              case SettingItemType.disclosure:
-              case SettingItemType.redDisclosure:
-                final textColor = item.type == SettingItemType.redDisclosure ? Colors.red : Colors.black;
-                return ListTile(
-                  title: Text(
-                    item.title,
-                    style: TextStyle(color: textColor),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () async {
-                    switch (item) {
-                      case SettingItem.whatsNew:
-                        _showWhatsNew();
-                        break;
-                      case SettingItem.exportToCSV:
-                        context.read<SettingsBloc>().add(SettingsExportAllMindsToCSV());
-                        break;
-                      case SettingItem.login:
-                        await showCupertinoModalBottomSheet(
-                          context: context,
-                          builder: (context) => const AuthScreen(),
-                        );
-                        setState(() {});
-                        break;
-                      case SettingItem.logout:
-                        context.read<AuthBloc>().add(AuthLogout());
-                        setState(() {});
-                        break;
-                      case SettingItem.deleteAccount:
-                        final result = await showOkCancelAlertDialog(
-                          context: context,
-                          title: 'Are you sure?',
-                          message: 'If you delete yourself from system your emotions will be deleted too.',
-                          cancelLabel: 'No',
-                          okLabel: 'Delete me',
-                          isDestructiveAction: true,
-                        );
-                        switch (result) {
-                          case OkCancelResult.ok:
-                            mountedContext?.read<AuthBloc>().add(AuthDeleteAccount());
-                            break;
-                          case OkCancelResult.cancel:
-                            break;
-                        }
-                        break;
-                      case SettingItem.sendFeedback:
-                        final Uri uri = Uri(
-                          scheme: 'mailto',
-                          path: KeklistConstants.feedbackEmail,
-                          query: 'subject=Feedback about Rememoji',
-                        );
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri);
-                        }
-                        break;
-                      default:
-                        break;
-                    }
+      body: SettingsList(
+        sections: [
+          SettingsSection(
+            title: Text('Account'.toUpperCase()),
+            tiles: [
+              if (!_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Login'),
+                  leading: const Icon(Icons.login),
+                  onPressed: (BuildContext context) {
+                    _showAuthBottomSheet();
                   },
-                );
-            }
-          }),
+                ),
+              if (_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Logout'),
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  onPressed: (BuildContext context) {
+                    context.read<AuthBloc>().add(AuthLogout());
+                  },
+                ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Data'.toUpperCase()),
+            tiles: [
+              SettingsTile(
+                title: const Text('Export to CSV'),
+                leading: const Icon(Icons.file_download, color: Colors.brown),
+                onPressed: (BuildContext context) {
+                  sendEventTo<SettingsBloc>(SettingsExportAllMindsToCSV());
+                },
+              ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('About'.toUpperCase()),
+            tiles: [
+              SettingsTile.navigation(
+                title: const Text('Whats new?'),
+                leading: const Icon(Icons.new_releases, color: Colors.purple),
+                onPressed: (BuildContext context) {
+                  _showWhatsNew();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Send feedback'),
+                leading: const Icon(Icons.feedback, color: Colors.blue),
+                onPressed: (BuildContext context) async {
+                  await _sendFeedback();
+                },
+              ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Danger zone'.toUpperCase()),
+            tiles: [
+              SettingsTile(
+                title: const Text('Delete account'),
+                leading: const Icon(Icons.delete, color: Colors.red),
+                onPressed: (BuildContext context) async {
+                  await _deleteAccount(context);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
+  }
+
+  Future<void> _sendFeedback() async {
+    final Uri uri = Uri(
+      scheme: 'mailto',
+      path: KeklistConstants.feedbackEmail,
+      query: 'subject=Feedback about Rememoji',
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    final result = await showOkCancelAlertDialog(
+      context: context,
+      title: 'Are you sure?',
+      message: 'If you delete yourself from system your minds will be deleted too.',
+      cancelLabel: 'Cancel',
+      okLabel: 'Delete me',
+      isDestructiveAction: true,
+    );
+    switch (result) {
+      case OkCancelResult.ok:
+        sendEventTo<AuthBloc>(AuthDeleteAccount());
+        break;
+      case OkCancelResult.cancel:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    cancelSubscriptions();
   }
 
   Future<void> _showWhatsNew() {
@@ -167,11 +175,11 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
+  Future<void> _showAuthBottomSheet() async {
+    return showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => const AuthScreen(),
+    );
   }
 }
 
@@ -179,20 +187,4 @@ enum SettingItemType {
   title,
   disclosure,
   redDisclosure,
-}
-
-enum SettingItem {
-  userTitle(title: 'User', type: SettingItemType.title),
-  otherTitle(title: 'Other', type: SettingItemType.title),
-  login(title: 'Login', type: SettingItemType.disclosure),
-  logout(title: 'Logout', type: SettingItemType.disclosure),
-  exportToCSV(title: 'Export to CSV', type: SettingItemType.disclosure),
-  whatsNew(title: 'What\'s new?', type: SettingItemType.disclosure),
-  sendFeedback(title: 'Send feedback', type: SettingItemType.disclosure),
-  deleteAccount(title: 'Delete your account', type: SettingItemType.redDisclosure);
-
-  const SettingItem({required this.title, required this.type});
-
-  final String title;
-  final SettingItemType type;
 }
