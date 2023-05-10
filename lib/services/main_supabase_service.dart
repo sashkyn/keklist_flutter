@@ -20,12 +20,12 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> addMind(Mind mark) async {
+  FutureOr<void> addMind(Mind mind) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
 
-    await _client.from('minds').insert(mark.toSupabaseJson(userId: _client.auth.currentUser!.id,));
+    await _client.from('minds').insert(mind.toSupabaseJson(userId: _client.auth.currentUser!.id));
   }
 
   @override
