@@ -36,17 +36,20 @@ class Mind with EquatableMixin {
         emoji = json['emoji'],
         dayIndex = json['day_index'],
         note = json['note'],
-        creationDate = DateTime.parse(json['created_at']),
+        creationDate = DateTime.parse(json['created_at']).toUtc(),
         sortIndex = json["sort_index"] ?? 0;
 
-  Map<String, dynamic> toSupabaseJson({required String userId}) => {
-        'user_id': userId,
-        'uuid': id,
-        'emoji': emoji,
-        'note': note,
-        'day_index': dayIndex,
-        'sort_index': sortIndex,
-      };
+  Map<String, dynamic> toSupabaseJson({required String userId}) {
+    return {
+      'user_id': userId,
+      'uuid': id,
+      'emoji': emoji,
+      'note': note,
+      'day_index': dayIndex,
+      'sort_index': sortIndex,
+      'created_at': creationDate.toUtc().toIso8601String(),
+    };
+  }
 
   Map<String, dynamic> toWatchJson() => {
         'uuid': id,
