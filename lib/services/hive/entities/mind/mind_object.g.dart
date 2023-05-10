@@ -21,7 +21,7 @@ class MindObjectAdapter extends TypeAdapter<MindObject> {
       ..emoji = fields[1] as String
       ..note = fields[2] as String
       ..dayIndex = fields[3] as int
-      ..creationDate = fields[4] as int
+      ..creationDate = fields[4] as DateTime
       ..sortIndex = fields[5] as int;
   }
 

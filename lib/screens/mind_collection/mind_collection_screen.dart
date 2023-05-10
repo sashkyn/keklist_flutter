@@ -109,7 +109,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           _sendToMindBloc(MindGetList());
         } else if (state is AuthLogouted) {
           _enableDemoMode();
-          _sendToMindBloc(MindResetTempStorage());
           // NOTE: возвращаемся к главному экрану при логауте.
           Navigator.of(context).popUntil((route) => route.isFirst);
           _showAuthBottomSheet();
@@ -254,7 +253,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                     KeklistConstants.demoModeEmodjiList[random.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
-                  creationDate: 0,
+                  creationDate: DateTime.now(),
                   note: '',
                   dayIndex: 0,
                   id: const Uuid().v4(),

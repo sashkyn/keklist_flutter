@@ -18,7 +18,7 @@ class MindObject extends HiveObject {
   late int dayIndex;
 
   @HiveField(4)
-  late int creationDate;
+  late DateTime creationDate;
 
   @HiveField(5)
   late int sortIndex;
