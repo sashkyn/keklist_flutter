@@ -8,33 +8,33 @@ void main() {
     () {
       final List<Mind> unsortedMinds = [];
       unsortedMinds.add(
-        const Mind(
+        Mind(
           id: '1',
           note: 'Heh1',
           emoji: ' ',
           dayIndex: 0,
           sortIndex: 5,
-          creationDate: 0,
+          creationDate: DateTime.now(),
         ),
       );
       unsortedMinds.add(
-        const Mind(
+        Mind(
           id: '1',
           note: 'Heh3',
           emoji: ' ',
           dayIndex: 0,
           sortIndex: 20,
-          creationDate: 0,
+          creationDate: DateTime.now(),
         ),
       );
       unsortedMinds.add(
-        const Mind(
+        Mind(
           id: '1',
           note: 'Heh2',
           emoji: ' ',
           dayIndex: 0,
           sortIndex: 10,
-          creationDate: 0,
+          creationDate: DateTime.now(),
         ),
       );
 

@@ -47,7 +47,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
-    on<MindResetTempStorage>(_clearTempCache);
   }
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
@@ -67,7 +66,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       dayIndex: event.dayIndex,
       note: event.note.trim(),
       emoji: event.emoji,
-      creationDate: DateTime.now().millisecondsSinceEpoch,
+      creationDate: DateTime.now(),
       sortIndex: _findMindsByDayIndex(event.dayIndex).length,
     );
     _minds.add(mind);
@@ -89,7 +88,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
   FutureOr<void> _getMinds(MindGetList event, emit) async {
     // Подмешиваем элементы с локального хранилища.
-    _minds.addAll(_mindBox.values.map((object) => object.toMind()));
+    final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
+    _minds.addAll(localMinds);
     final MindListState localStorageState = MindListState(values: _minds);
     emit(localStorageState);
 
@@ -174,13 +174,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       _lastSuggestions = suggestions;
     }
     emit(MindSuggestions(values: _lastSuggestions));
-  }
-
-  FutureOr<void> _clearTempCache(event, emit) async {
-    await _service.clearTempCache();
-    _minds.clear();
-    final MindListState state = MindListState(values: []);
-    emit(state);
   }
 
   List<Mind> _findMindsByDayIndex(int index) => _minds

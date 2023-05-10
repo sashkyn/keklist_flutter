@@ -63,8 +63,8 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         final String methodName = call.method;
         final methodArgs = call.arguments;
 
-        print('methodName = $methodName');
-        print('methodArgs = $methodArgs');
+        // print('methodName = $methodName');
+        // print('methodArgs = $methodArgs');
 
         if (methodName == stringFromEnum(WatchInputMethod.obtainTodayMinds)) {
           return _showMindList();
@@ -99,7 +99,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       dayIndex: MindUtils.getDayIndex(from: DateTime.now()),
       note: mindText,
       emoji: emoji,
-      creationDate: DateTime.now().millisecondsSinceEpoch,
+      creationDate: DateTime.now(),
       sortIndex: sortIndex,
     );
     await mainService.addMind(mind);
