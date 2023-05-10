@@ -268,7 +268,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           );
         } else {
           final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex);
-          final List<Widget> realMindWidgets = mindsOfDay.map((mind) => MindWidget(item: mind.emoji)).toList();
+          final List<Widget> realMindWidgets = mindsOfDay
+              .mySortedBy(
+                (e) => e.sortIndex,
+              )
+              .map((mind) => MindWidget(item: mind.emoji))
+              .toList();
           mindWidgets.addAll(realMindWidgets);
         }
 
@@ -332,7 +337,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  _showMarkPickerScreen({required Function(String) onSelect}) async {
+  void _showMarkPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),

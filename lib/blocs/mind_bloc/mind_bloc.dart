@@ -66,8 +66,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       dayIndex: event.dayIndex,
       note: event.note.trim(),
       emoji: event.emoji,
-      creationDate: DateTime.now(),
-      sortIndex: _findMindsByDayIndex(event.dayIndex).length,
+      creationDate: DateTime.now().toUtc(),
+      sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
     );
     _minds.add(mind);
 
