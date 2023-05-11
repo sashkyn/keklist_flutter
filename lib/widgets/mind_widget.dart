@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 enum MindSize {
   small,
@@ -81,7 +80,10 @@ class MindWidget extends StatelessWidget {
           grayedOut: !isHighlighted,
           child: Text(
             item,
-            style: GoogleFonts.notoColorEmojiCompat(fontSize: fontSize),
+            style: TextStyle(
+              fontFamily: 'NotoColorEmoji',
+              fontSize: fontSize,
+            )
           ),
         ),
       ),

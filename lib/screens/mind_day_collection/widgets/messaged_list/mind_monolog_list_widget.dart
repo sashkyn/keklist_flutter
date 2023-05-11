@@ -28,7 +28,7 @@ class MindMonologListWidget extends StatelessWidget {
             );
           }).toList() +
           [
-            Column(children: const [SizedBox(height: 160.0)]),
+            const Column(children: [SizedBox(height: 160.0)]),
           ],
     );
   }

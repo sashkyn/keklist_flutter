@@ -1,9 +1,9 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rememoji/screens/auth/widgets/auth_button.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/constants.dart';
@@ -130,25 +130,19 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AppleAuthButton(
-                    onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.apple)),
-                    style: const AuthButtonStyle(
-                      buttonType: AuthButtonType.icon,
-                    ),
+                  AuthButton(
+                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.apple)),
+                    type: AuthButtonType.apple
                   ),
                   const SizedBox(width: 16.0),
-                  GoogleAuthButton(
-                    onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.google)),
-                    style: const AuthButtonStyle(
-                      buttonType: AuthButtonType.icon,
-                    ),
+                  AuthButton(
+                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.google)),
+                    type: AuthButtonType.google
                   ),
                   const SizedBox(width: 16.0),
-                  FacebookAuthButton(
-                    onPressed: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.facebook)),
-                    style: const AuthButtonStyle(
-                      buttonType: AuthButtonType.icon,
-                    ),
+                  AuthButton(
+                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.facebook)),
+                    type: AuthButtonType.facebook
                   ),
                 ],
               ),
