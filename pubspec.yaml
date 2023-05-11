@@ -9,7 +9,7 @@ environment:
   sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
-  adaptive_dialog: ^1.2.0
+  adaptive_dialog: ^1.9.0-no-macos.2
   bloc: ^8.1.1
   blur: ^3.1.0
   calendar_date_picker2: ^0.5.2
@@ -78,7 +78,9 @@ flutter_icons:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+    - assets/auth_icons/apple.svg
+    - assets/auth_icons/google.svg
+    - assets/auth_icons/facebook.svg
   fonts:
     - family: NotoColorEmoji
       fonts:

@@ -81,7 +81,7 @@ class MindWidget extends StatelessWidget {
           child: Text(
             item,
             style: TextStyle(
-              fontFamily: 'NotoColorEmoji',
+              // fontFamily: 'NotoColorEmoji',
               fontSize: fontSize,
             )
           ),
