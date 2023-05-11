@@ -10,7 +10,6 @@ environment:
 
 dependencies:
   adaptive_dialog: ^1.2.0
-  auth_buttons: ^2.0.4
   bloc: ^8.1.1
   blur: ^3.1.0
   calendar_date_picker2: ^0.5.2
@@ -29,21 +28,21 @@ dependencies:
   flutter_emoji: ^2.4.0
   flutter_inapp_purchase: ^5.4.1
   flutter_simple_dependency_injection: ^2.0.0
+  flutter_svg: ^2.0.5
   flutter_web_auth_2: ^2.0.4
   form_field_validator: ^1.1.0
-  google_fonts: ^2.3.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   html: ^0.15.1
   intl: ^0.18.0
   modal_bottom_sheet: ^3.0.0-pre
-  package_info_plus: ^3.1.0
+  package_info_plus: ^4.0.0
   path_provider: ^2.0.12
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
   # shake: ^1.0.1
   settings_ui: ^2.0.2
-  share_plus: ^6.3.1
+  share_plus: ^7.0.0
   sliding_up_panel: ^2.0.0+1
   supabase_flutter: ^1.5.0
   syncfusion_flutter_charts: ^21.2.3
@@ -78,3 +77,9 @@ flutter_icons:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+  fonts:
+    - family: NotoColorEmoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji.ttf

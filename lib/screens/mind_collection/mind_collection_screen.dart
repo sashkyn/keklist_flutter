@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
+import 'package:rememoji/screens/mind_collection/widgets/mind_search_bar.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
@@ -19,7 +20,6 @@ import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
-import 'package:rememoji/screens/mind_collection/widgets/search_bar.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
@@ -182,7 +182,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Widget _makeAppBarTitle() {
     return BoolWidget(
       condition: _isSearching,
-      trueChild: SearchBar(
+      trueChild: MindSearchBar(
         textController: _searchTextController,
         onAddEmotion: () {
           _showMarkPickerScreen(
