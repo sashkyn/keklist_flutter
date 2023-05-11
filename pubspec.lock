@@ -13,10 +13,10 @@ packages:
     dependency: "direct main"
     description:
       name: adaptive_dialog
-      sha256: "665e90c9eecdbf0aa953a9e1fce5da6c8db3d3357c450262b9c534a54e939119"
+      sha256: "844143591ca5ca38c0e1fd7c736f3c9457fe69420b90140b5d4ac4673a2ea9e4"
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.3"
+    version: "1.9.0-no-macos.2"
   analyzer:
     dependency: transitive
     description:
@@ -616,14 +616,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  macos_ui:
-    dependency: transitive
-    description:
-      name: macos_ui
-      sha256: "57208eec8180656acd379e1c754e9b6d8830f32a020b94571ae2188f8112075b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.12.2"
   matcher:
     dependency: transitive
     description:
@@ -1438,5 +1430,5 @@ packages:
     source: hosted
     version: "1.0.3"
 sdks:
-  dart: ">=3.0.0-417 <4.0.0"
-  flutter: ">=3.7.0"
+  dart: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
