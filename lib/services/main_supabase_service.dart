@@ -11,9 +11,9 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<Iterable<Mind>> getMindList() async {
-    if (_random.nextBool()) {
-      return Future.error('Hehehehehe');
-    }
+    // if (_random.nextBool()) {
+    //   return Future.error('Hehehehehe');
+    // }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
@@ -27,9 +27,9 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addMind(Mind mind) async {
-    if (_random.nextBool()) {
-      return Future.error('Hehehehehe');
-    }
+    // if (_random.nextBool()) {
+    //   return Future.error('Hehehehehe');
+    // }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
@@ -40,9 +40,9 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteMind(String id) async {
-    if (_random.nextBool()) {
-      return Future.error('Hehehehehe');
-    }
+    // if (_random.nextBool()) {
+    //   return Future.error('Hehehehehe');
+    // }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
@@ -73,9 +73,9 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> editMind({required Mind mind}) async {
-    if (_random.nextBool()) {
-      return Future.error('Hehehehehe');
-    }
+    // if (_random.nextBool()) {
+    //   return Future.error('Hehehehehe');
+    // }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
@@ -89,9 +89,9 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAllMinds() async {
-    if (_random.nextBool()) {
-      return Future.error('Hehehehehe');
-    }
+    // if (_random.nextBool()) {
+    //   return Future.error('Hehehehehe');
+    // }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
