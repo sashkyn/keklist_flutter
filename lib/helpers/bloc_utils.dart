@@ -31,7 +31,9 @@ extension SendEventFromState on State {
     );
   }
 
-  StreamSubscription<dynamic>? subscribeTo<B extends Bloc>({required Function(dynamic) onNewState}) {
+  StreamSubscription<dynamic>? subscribeTo<B extends Bloc>({
+    required Function(dynamic) onNewState,
+  }) {
     if (mountedContext == null) {
       return null;
     }

@@ -8,12 +8,6 @@ class MindListState extends MindState {
   MindListState({required this.values});
 }
 
-class MindError extends MindState {
-  final String text;
-
-  MindError({required this.text});
-}
-
 class MindSearching extends MindState {
   final bool enabled;
   final Iterable<Mind> allValues;
@@ -30,4 +24,36 @@ class MindSuggestions extends MindState {
   final List<String> values;
 
   MindSuggestions({required this.values});
+}
+
+// MARK: - Errors
+
+enum MindServerErrorType {
+  notCreated,
+  notEdited,
+  notDeleted,
+  notLoaded,
+}
+
+enum MindServerErrorReason {
+  notAuth,
+  notConnected,
+}
+
+class MindServerError extends MindState with EquatableMixin {
+  final MindServerErrorType type;
+  final List<Mind> values;
+  final MindServerErrorReason reason;
+
+  MindServerError({
+    required this.values,
+    required this.type,
+    required this.reason,
+  });
+  
+  @override
+  List<Object?> get props => [values, type, reason];
+
+  @override
+  bool? get stringify => true;
 }
