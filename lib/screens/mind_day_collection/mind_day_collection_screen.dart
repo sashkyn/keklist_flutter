@@ -3,7 +3,6 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
@@ -12,7 +11,6 @@ import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
@@ -20,7 +18,6 @@ import 'package:rememoji/widgets/bool_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
 // TODO: Календарь вашей жизни
-// TODO: Перетащить стейт в бар
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
@@ -49,6 +46,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         allMinds: allMinds,
       );
 
+  // TODO: Перетащить стейт в бар
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
@@ -70,10 +68,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMindEditingController.addListener(() {
-        BlocUtils.sendEventTo<MindBloc>(
-          context: context,
-          event: MindChangeCreateText(text: _createMindEditingController.text),
-        );
+        sendEventTo<MindBloc>(MindChangeCreateText(text: _createMindEditingController.text));
       });
 
       // TODO: сделать чтобы по перевороту работало а не по тряске, а то работает удовлетворительно
@@ -95,30 +90,52 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       });
     });
 
-    context.read<MindBloc>().stream.listen((state) {
-      if (state is MindListState) {
+    subscribeTo<MindBloc>(onNewState: (state) async {
+      if (state is MindList) {
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values);
+            ..addAll(state.values.mySortedBy((e) => e.sortIndex));
         });
       } else if (state is MindSuggestions) {
         setState(() {
           _mindSuggestions = state;
         });
-      }
-    }).disposed(by: this);
+      } else if (state is MindServerError) {
+        if (state.type == MindServerErrorType.notCreated) {
+          final Mind? notCreatedMind = state.values.firstOrNull;
+          if (notCreatedMind == null) {
+            return;
+          }
 
-    context.read<SettingsBloc>().stream.listen((state) {
+          setState(() {
+            _createMindEditingController.text = notCreatedMind.note;
+            _selectedEmoji = notCreatedMind.emoji;
+            _showKeyboard();
+          });
+        } else if (state.type == MindServerErrorType.notEdited) {
+          final Mind? notEditedMind = state.values.firstOrNull;
+          if (notEditedMind == null) {
+            return;
+          }
+
+          setState(() {
+            _editableMind = notEditedMind;
+            _createMindEditingController.text = notEditedMind.note;
+            _selectedEmoji = notEditedMind.emoji;
+            _showKeyboard();
+          });
+        }
+      }
+    })?.disposed(by: this);
+
+    subscribeTo<SettingsBloc>(onNewState: (state) {
       setState(() {
         _isMindContentVisible = state.isMindContentVisible;
       });
-    }).disposed(by: this);
+    })?.disposed(by: this);
 
-    BlocUtils.sendEventTo<SettingsBloc>(
-      context: context,
-      event: SettingsGet(),
-    );
+    sendEventTo<SettingsBloc>(SettingsGet());
   }
 
   @override
@@ -206,9 +223,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                     textEditingController: _createMindEditingController,
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
-                        BlocUtils.sendEventTo<MindBloc>(
-                          context: context,
-                          event: MindCreate(
+                        sendEventTo<MindBloc>(
+                          MindCreate(
                             dayIndex: dayIndex,
                             note: data.text,
                             emoji: data.emoji,
@@ -219,10 +235,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
                           note: data.text,
                           emoji: data.emoji,
                         );
-                        BlocUtils.sendEventTo<MindBloc>(
-                          context: context,
-                          event: MindEdit(mind: mindForEdit),
-                        );
+                        sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
                       }
                       _resetMindCreator();
                     },
@@ -273,10 +286,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
 
   void _changeContentVisibility() {
     HapticFeedback.mediumImpact();
-    BlocUtils.sendEventTo<SettingsBloc>(
-      context: context,
-      event: SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible),
-    );
+    sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible));
+  }
+
+  void _showKeyboard() {
+    _mindCreatorFocusNode.requestFocus();
   }
 
   void _hideKeyboard() {
@@ -308,10 +322,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       ],
     );
     if (result == 'remove_key') {
-      BlocUtils.sendEventTo<MindBloc>(
-        context: mountedContext,
-        event: MindDelete(uuid: mind.id),
-      );
+      sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
     } else if (result == 'edit_key') {
       setState(() {
         _editableMind = mind;
