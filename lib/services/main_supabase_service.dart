@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rememoji/services/entities/mind.dart';
@@ -6,9 +7,14 @@ import 'package:rememoji/services/main_service.dart';
 
 class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;
+  final _random = Random();
 
   @override
   Future<Iterable<Mind>> getMindList() async {
+    if (_random.nextBool()) {
+      return Future.error('Hehehehehe');
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -21,6 +27,10 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addMind(Mind mind) async {
+    if (_random.nextBool()) {
+      return Future.error('Hehehehehe');
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -30,6 +40,10 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteMind(String id) async {
+    if (_random.nextBool()) {
+      return Future.error('Hehehehehe');
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -58,7 +72,11 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  Future<void> edit({required Mind mind}) async {
+  Future<void> editMind({required Mind mind}) async {
+    if (_random.nextBool()) {
+      return Future.error('Hehehehehe');
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -71,6 +89,10 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAllMinds() async {
+    if (_random.nextBool()) {
+      return Future.error('Hehehehehe');
+    }
+
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }

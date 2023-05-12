@@ -23,7 +23,7 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
     super.initState();
 
     context.read<MindBloc>().stream.listen((state) {
-      if (state is MindListState) {
+      if (state is MindList) {
         setState(() {
           _minds
             ..clear()

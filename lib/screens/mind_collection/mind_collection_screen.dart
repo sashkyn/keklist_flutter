@@ -88,26 +88,37 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
         }
 
+        _isOfflineMode = state.isOfflineMode;
         if (state.isOfflineMode) {
-          _isOfflineMode = true;
           _disableDemoMode();
           sendEventTo<MindBloc>(MindGetList());
-        } else {
-          _isOfflineMode = false;
         }
       })?.disposed(by: this);
 
       subscribeTo<MindBloc>(onNewState: (state) async {
-        if (state is MindListState) {
+        if (state is MindList) {
           setState(() {
             _minds = state.values;
           });
         } else if (state is MindServerError) {
-          // TODO: обработать ошибки
-          // _showError(text: state.text);
           showOkAlertDialog(
             context: context,
-            title: state.toString(),
+            title: 'Server error',
+            message: state.toString(),
+          );
+          // if (state.type == MindServerErrorType.notLoaded) {
+          //   print('Not loaded data from server - ${state.toString()}');
+          // } else {
+          //   showOkAlertDialog(
+          //     context: context,
+          //     title: 'Server error',
+          //     message: state.toString(),
+          //   );
+          // }
+          showOkAlertDialog(
+            context: context,
+            title: 'Server error',
+            message: state.toString(),
           );
         } else if (state is MindSearching) {
           setState(() {
