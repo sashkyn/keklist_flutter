@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:rememoji/widgets/bool_widget.dart';
 
 enum AuthButtonType {
   google(iconAsset: 'assets/auth_icons/google.svg'),
   apple(iconAsset: 'assets/auth_icons/apple.svg'),
-  facebook(iconAsset: 'assets/auth_icons/facebook.svg');
+  facebook(iconAsset: 'assets/auth_icons/facebook.svg'),
+  offline(iconAsset: '');
 
   final String iconAsset;
 
@@ -24,26 +25,23 @@ class AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 66.0,
-        height: 66.0,
-        child: IconButton(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            ),
-            backgroundColor: MaterialStateProperty.all<Color>(
-              Colors.white,
-            ),
-            shadowColor: MaterialStateProperty.all<Color>(
-              Colors.black.withOpacity(0.5),
-            ),
-            elevation: MaterialStateProperty.all<double>(5.0),
+    return SizedBox(
+      width: 66.0,
+      height: 66.0,
+      child: IconButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
-          onPressed: onTap,
-          icon: SvgPicture.asset(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+          shadowColor: MaterialStateProperty.all<Color>(Colors.black.withOpacity(0.5)),
+          elevation: MaterialStateProperty.all<double>(5.0),
+        ),
+        onPressed: onTap,
+        icon: BoolWidget(
+          condition: type == AuthButtonType.offline,
+          trueChild: const Icon(Icons.cloud_off_rounded),
+          falseChild: SvgPicture.asset(
             type.iconAsset,
             width: 35.0,
             height: 35.0,

@@ -8,7 +8,7 @@ class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;
 
   @override
-  FutureOr<Iterable<Mind>> getMindList() async {
+  Future<Iterable<Mind>> getMindList() async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -20,7 +20,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> addMind(Mind mind) async {
+  Future<void> addMind(Mind mind) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -29,7 +29,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> deleteMind(String id) async {
+  Future<void> deleteMind(String id) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -38,7 +38,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> addAllMinds({required List<Mind> list}) async {
+  Future<void> addAllMinds({required List<Mind> list}) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -49,7 +49,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> deleteAccount() async {
+  Future<void> deleteAccount() async {
     // NOTE: защита от дурака.
     if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
       return Future.error('Trying to delete admin account!');
@@ -58,7 +58,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> edit({required Mind mind}) async {
+  Future<void> edit({required Mind mind}) async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
@@ -70,7 +70,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  FutureOr<void> deleteAllMinds() async {
+  Future<void> deleteAllMinds() async {
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }

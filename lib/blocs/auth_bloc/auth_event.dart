@@ -24,6 +24,10 @@ class AuthLoginWithSocialNetwork extends AuthEvent {
   final SocialNetwork socialNetwork;
 
   AuthLoginWithSocialNetwork(this.socialNetwork);
+
+  factory AuthLoginWithSocialNetwork.google() => AuthLoginWithSocialNetwork(SocialNetwork.google);
+  factory AuthLoginWithSocialNetwork.facebook() => AuthLoginWithSocialNetwork(SocialNetwork.facebook);
+  factory AuthLoginWithSocialNetwork.apple() => AuthLoginWithSocialNetwork(SocialNetwork.apple);
 }
 
 class AuthLogout extends AuthEvent {}
@@ -34,7 +38,7 @@ class AuthUserAppearedInSession extends AuthEvent {}
 
 class AuthUserGoneFromSession extends AuthEvent {}
 
-class AuthGetStatus extends AuthEvent {}
+class AuthGetCurrentStatus extends AuthEvent {}
 
 enum SocialNetwork {
   google,

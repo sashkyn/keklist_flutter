@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_bar.dart';
@@ -18,7 +18,6 @@ import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
@@ -47,6 +46,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
+  bool _isOfflineMode = false;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -66,11 +66,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
 
-      _sendToMindBloc(MindGetList());
+      sendEventTo<MindBloc>(MindGetList());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
-        _sendToMindBloc(MindEnterSearchText(text: _searchTextController.text));
+        sendEventTo<MindBloc>(MindEnterSearchText(text: _searchTextController.text));
       });
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
@@ -81,45 +81,54 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         );
       });
 
-      context.read<SettingsBloc>().stream.take(1).listen((state) async {
+      subscribeTo<SettingsBloc>(onNewState: (state) async {
         if (state.needToShowWhatsNewOnStart) {
           await _showWhatsNew();
 
           sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
         }
-      }).disposed(by: this);
 
-      context.read<MindBloc>().stream.listen((state) {
+        if (state.isOfflineMode) {
+          _isOfflineMode = true;
+          _disableDemoMode();
+          sendEventTo<MindBloc>(MindGetList());
+        } else {
+          _isOfflineMode = false;
+        }
+      })?.disposed(by: this);
+
+      subscribeTo<MindBloc>(onNewState: (state) async {
         if (state is MindListState) {
           setState(() {
             _minds = state.values;
           });
-        } else if (state is MindError) {
-          _showError(text: state.text);
+        } else if (state is MindServerError) {
+          // TODO: обработать ошибки
+          // _showError(text: state.text);
+          showOkAlertDialog(
+            context: context,
+            title: state.toString(),
+          );
         } else if (state is MindSearching) {
           setState(() {
             _searchingMindState = state;
           });
         }
-      }).disposed(by: this);
+      })?.disposed(by: this);
 
-      context.read<AuthBloc>().stream.listen((state) async {
+      subscribeTo<AuthBloc>(onNewState: (state) async {
         if (state is AuthLoggedIn) {
           _disableDemoMode();
-          _sendToMindBloc(MindGetList());
-        } else if (state is AuthLogouted) {
+          sendEventTo<MindBloc>(MindGetList());
+        } else if (state is AuthLogouted && !_isOfflineMode) {
           _enableDemoMode();
-          // NOTE: возвращаемся к главному экрану при логауте.
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          _showAuthBottomSheet();
-        } else if (state is AuthCurrentStatus && !state.isLoggedIn) {
+        } else if (state is AuthCurrentStatus && !state.isLoggedIn && !_isOfflineMode) {
           _enableDemoMode();
-          await _showAuthBottomSheet();
         }
-      }).disposed(by: this);
+      })?.disposed(by: this);
 
-      context.read<AuthBloc>().add(AuthGetStatus());
-      context.read<SettingsBloc>().add(SettingsGet());
+      sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+      sendEventTo<SettingsBloc>(SettingsGet());
 
       //_payementService.initConnection();
     });
@@ -131,15 +140,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     cancelSubscriptions();
     super.dispose();
-  }
-
-  Future<void> _showAuthBottomSheet() async {
-    return showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => const AuthScreen(),
-      isDismissible: false,
-      enableDrag: false,
-    );
   }
 
   // TODO: убрать в навигатор!
@@ -185,7 +185,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       trueChild: MindSearchBar(
         textController: _searchTextController,
         onAddEmotion: () {
-          _showMarkPickerScreen(
+          _showMindPickerScreen(
             onSelect: (emoji) {
               _searchTextController.text += emoji;
             },
@@ -193,7 +193,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         },
         onCancel: () {
           _searchTextController.clear();
-          _sendToMindBloc(MindStopSearch());
+          sendEventTo<MindBloc>(MindStopSearch());
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             _jumpToNow();
           });
@@ -221,7 +221,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         icon: const Icon(Icons.search),
         color: Colors.black,
         onPressed: () {
-          _sendToMindBloc(MindStartSearch());
+          sendEventTo<MindBloc>(MindStartSearch());
         },
       ),
     ];
@@ -337,7 +337,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  void _showMarkPickerScreen({required Function(String) onSelect}) async {
+  void _showMindPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
@@ -361,15 +361,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  void _sendToMindBloc(MindEvent event) {
-    context.read<MindBloc>().add(event);
-  }
-
-  void _showError({required String text}) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    final snackBar = SnackBar(content: Text(text));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  // void _showError({required String text}) {
+  //   ScaffoldMessenger.of(context).clearSnackBars();
+  //   final snackBar = SnackBar(content: Text(text));
+  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  // }
 
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
@@ -408,9 +404,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     }
 
     final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
-    setState(() {
-      _scrollToDayIndex(dayIndex);
-    });
+    _scrollToDayIndex(dayIndex);
   }
 
   void _disableDemoMode() {
@@ -418,11 +412,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       return;
     }
 
-    _demoAutoScrollingTimer?.cancel();
     setState(() {
       _isDemoMode = false;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _demoAutoScrollingTimer?.cancel();
       _jumpToNow();
     });
   }
