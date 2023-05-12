@@ -24,6 +24,7 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
+  bool _isAuthShowed = false;
 
   @override
   void initState() {
@@ -34,6 +35,10 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         setState(() {
           if (state is SettingsState) {
             _offlineMode = state.isOfflineMode;
+          }
+
+          if (!_offlineMode && !_isLoggedIn) {
+            _showAuthBottomSheet();
           }
         });
       },
@@ -49,11 +54,15 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           } else if (state is AuthLogouted) {
             _isLoggedIn = false;
           }
+
+          if (!_offlineMode && !_isLoggedIn) {
+            _showAuthBottomSheet();
+          }
         });
       },
     )?.disposed(by: this);
 
-    sendEventTo<AuthBloc>(AuthGetStatus());
+    sendEventTo<AuthBloc>(AuthGetCurrentStatus());
     sendEventTo<SettingsBloc>(SettingsGet());
   }
 
@@ -208,9 +217,17 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   }
 
   Future<void> _showAuthBottomSheet() async {
-    return showCupertinoModalBottomSheet(
+    if (_isAuthShowed) {
+      return;
+    }
+
+    _isAuthShowed = true;
+    await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => const AuthScreen(),
+      isDismissible: false,
+      enableDrag: false,
     );
+    _isAuthShowed = false;
   }
 }

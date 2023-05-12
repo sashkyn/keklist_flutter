@@ -56,7 +56,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     on<AuthLogout>((event, emit) async => await client.auth.signOut());
     on<AuthUserAppearedInSession>((event, emit) => emit(AuthLoggedIn()));
     on<AuthUserGoneFromSession>((event, emit) => emit(AuthLogouted()));
-    on<AuthGetStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: client.auth.currentUser != null)));
+    on<AuthGetCurrentStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: client.auth.currentUser != null)));
   }
 
   Future<void> _signInWithWebOAuth(Provider provider) async {

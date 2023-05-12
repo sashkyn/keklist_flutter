@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/screens/auth/widgets/auth_button.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
@@ -17,27 +19,30 @@ class AuthScreen extends StatefulWidget {
 }
 
 class AuthScreenState extends State<AuthScreen> with DisposeBag {
-  final _loginTextEditingController = TextEditingController();
-  final _passwordTextEditingController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _loginTextEditingController = TextEditingController();
+  final TextEditingController _passwordTextEditingController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
 
-    context.read<AuthBloc>().stream.listen((state) {
+    subscribeTo<AuthBloc>(onNewState: (state) {
       if (state is AuthLoggedIn) {
         // NOTE: возвращаемся к главному экрану.
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        _dismissToFirstScreen();
       }
-    }).disposed(by: this);
+    })?.disposed(by: this);
+
+    subscribeTo<SettingsBloc>(onNewState: (state) {
+      if (state is SettingsState && state.isOfflineMode) {
+        _dismissToFirstScreen();
+      }
+    })?.disposed(by: this);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
+  void _dismissToFirstScreen() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -131,21 +136,34 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   AuthButton(
-                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.apple)),
-                    type: AuthButtonType.apple
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.apple),
+                    type: AuthButtonType.apple,
                   ),
                   const SizedBox(width: 16.0),
                   AuthButton(
-                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.google)),
-                    type: AuthButtonType.google
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.google()),
+                    type: AuthButtonType.google,
                   ),
                   const SizedBox(width: 16.0),
                   AuthButton(
-                    onTap: () => context.read<AuthBloc>().add(AuthLoginWithSocialNetwork(SocialNetwork.facebook)),
-                    type: AuthButtonType.facebook
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.facebook),
+                    type: AuthButtonType.facebook,
+                  ),
+                  const SizedBox(width: 16.0),
+                  AuthButton(
+                    onTap: () => sendEventTo<SettingsBloc>(const SettingsChangeOfflineMode(isOfflineMode: true)),
+                    type: AuthButtonType.offline,
                   ),
                 ],
               ),
+              // const SizedBox(height: 16.0),
+              // TextButton(
+              //   onPressed: () => sendEventTo<SettingsBloc>(const SettingsChangeOfflineMode(isOfflineMode: true)),
+              //   child: const Text(
+              //     'Use offline mode',
+              //     style: TextStyle(color: Colors.blue),
+              //   ),
+              // ),
               const SizedBox(height: 32.0),
               TextButton(
                 onPressed: () => launchUrlString(KeklistConstants.termsOfUseURL),
@@ -159,6 +177,13 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    cancelSubscriptions();
   }
 
   Future<void> _displayTextInputDialog(

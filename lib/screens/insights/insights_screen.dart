@@ -8,9 +8,6 @@ import 'package:rememoji/screens/insights/widgets/insights_random_mind_widget.da
 import 'package:rememoji/screens/insights/widgets/insights_top_chart.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
-// Добавить рандомный эмозди с текстом как вдохновение
-// Добавить топ эмодзи за все время
-
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
 

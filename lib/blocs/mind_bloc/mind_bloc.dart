@@ -82,7 +82,22 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
     if (!(_settings?.isOfflineMode ?? true)) {
       // Добавляем на сервере.
-      await _service.addMind(mind);
+      await _service.addMind(mind).onError((error, _) {
+        // Роллбек
+        _minds.remove(mind);
+        _mindBox.delete(mind.id);
+        final MindListState newState = MindListState(values: _minds);
+        emit(newState);
+
+        // Обработка ошибки
+        emit(
+          MindServerError(
+            values: [mind],
+            type: MindServerErrorType.notCreated,
+            reason: MindServerErrorReason.notAuth,
+          ),
+        );
+      });
     }
   }
 
@@ -95,23 +110,35 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
     // Подмешиваем элементы с сервера.
     if (!(_settings?.isOfflineMode ?? true)) {
-      final Iterable<Mind> serverMinds = await _service.getMindList();
-      _minds.addAll(serverMinds);
+      await _service.getMindList().then(
+        (Iterable<Mind> serverMinds) {
+          _minds.addAll(serverMinds);
 
-      // Обновляем локальное хранилище.
-      _mindBox.putAll(
-        Map.fromEntries(
-          serverMinds.map(
-            (mind) => MapEntry(
-              mind.id,
-              mind.toObject(),
+          // Обновляем локальное хранилище.
+          _mindBox.putAll(
+            Map.fromEntries(
+              serverMinds.map(
+                (mind) => MapEntry(
+                  mind.id,
+                  mind.toObject(),
+                ),
+              ),
             ),
-          ),
-        ),
-      );
+          );
 
-      final MindListState networkState = MindListState(values: _minds);
-      emit(networkState);
+          final MindListState networkState = MindListState(values: _minds);
+          emit(networkState);
+        },
+        onError: (error, _) {
+          emit(
+            MindServerError(
+              values: [],
+              type: MindServerErrorType.notLoaded,
+              reason: MindServerErrorReason.notAuth,
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -201,7 +228,23 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
     if (!(_settings?.isOfflineMode ?? true)) {
       // Редактируем на сервере.
-      await _service.edit(mind: event.mind);
+      await _service.edit(mind: event.mind).onError((error, _) {
+        // Роллбек
+        _minds
+          ..remove(editedMind)
+          ..add(oldMind);
+        final MindListState newState = MindListState(values: _minds);
+        emit(newState);
+
+        // Обработка ошибки
+        emit(
+          MindServerError(
+            values: [event.mind],
+            type: MindServerErrorType.notEdited,
+            reason: MindServerErrorReason.notAuth,
+          ),
+        );
+      });
     }
   }
 }
