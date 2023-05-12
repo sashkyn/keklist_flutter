@@ -32,7 +32,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   MindBloc({
     required MainService mainService,
     required MindSearcherCubit mindSearcherCubit,
-  }) : super(MindListState(values: const [])) {
+  }) : super(MindList(values: const [])) {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
 
@@ -51,12 +51,31 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
   FutureOr<void> _deleteMind(MindDelete event, emit) async {
     await _mindBox.delete(event.uuid);
-    _minds.removeWhere((item) => item.id == event.uuid);
-    emit.call(MindListState(values: _minds));
+    final Mind mindToDelete = _minds.firstWhere((item) => item.id == event.uuid);
+    _minds.remove(mindToDelete);
+    emit.call(MindList(values: _minds));
 
     if (!(_settings?.isOfflineMode ?? true)) {
       // Удаляем на сервере.
-      await _service.deleteMind(event.uuid);
+      await _service.deleteMind(event.uuid).onError((error, _) {
+        // Роллбек
+        _minds.add(mindToDelete);
+        _mindBox.put(
+          mindToDelete.id,
+          mindToDelete.toObject(),
+        );
+        final MindList newState = MindList(values: _minds);
+        emit(newState);
+
+        // Обработка ошибки
+        emit(
+          MindServerError(
+            values: [mindToDelete],
+            type: MindServerErrorType.notDeleted,
+            reason: MindServerErrorReason.notAuth,
+          ),
+        );
+      });
     }
   }
 
@@ -77,7 +96,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       mind.toObject(),
     );
 
-    final MindListState newState = MindListState(values: _minds);
+    final MindList newState = MindList(values: _minds);
     emit.call(newState);
 
     if (!(_settings?.isOfflineMode ?? true)) {
@@ -86,7 +105,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         // Роллбек
         _minds.remove(mind);
         _mindBox.delete(mind.id);
-        final MindListState newState = MindListState(values: _minds);
+        final MindList newState = MindList(values: _minds);
         emit(newState);
 
         // Обработка ошибки
@@ -105,7 +124,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     // Подмешиваем элементы с локального хранилища.
     final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
     _minds.addAll(localMinds);
-    final MindListState localStorageState = MindListState(values: _minds);
+    final MindList localStorageState = MindList(values: _minds);
     emit(localStorageState);
 
     // Подмешиваем элементы с сервера.
@@ -126,7 +145,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
             ),
           );
 
-          final MindListState networkState = MindListState(values: _minds);
+          final MindList networkState = MindList(values: _minds);
           emit(networkState);
         },
         onError: (error, _) {
@@ -224,16 +243,16 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     _mindBox.get(event.mind.id)?.delete();
 
     // Обновляем стейт на блоке.
-    emit(MindListState(values: _minds));
+    emit(MindList(values: _minds));
 
     if (!(_settings?.isOfflineMode ?? true)) {
       // Редактируем на сервере.
-      await _service.edit(mind: event.mind).onError((error, _) {
+      await _service.editMind(mind: event.mind).onError((error, _) {
         // Роллбек
         _minds
           ..remove(editedMind)
           ..add(oldMind);
-        final MindListState newState = MindListState(values: _minds);
+        final MindList newState = MindList(values: _minds);
         emit(newState);
 
         // Обработка ошибки

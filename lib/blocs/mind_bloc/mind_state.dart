@@ -2,10 +2,10 @@ part of 'mind_bloc.dart';
 
 abstract class MindState {}
 
-class MindListState extends MindState {
+class MindList extends MindState {
   final Iterable<Mind> values;
 
-  MindListState({required this.values});
+  MindList({required this.values});
 }
 
 class MindSearching extends MindState {
@@ -50,7 +50,7 @@ class MindServerError extends MindState with EquatableMixin {
     required this.type,
     required this.reason,
   });
-  
+
   @override
   List<Object?> get props => [values, type, reason];
 
