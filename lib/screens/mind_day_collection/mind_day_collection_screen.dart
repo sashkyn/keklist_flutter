@@ -21,12 +21,14 @@ import 'package:rememoji/services/entities/mind.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
+  final MindServerError? initialError;
   final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
     super.key,
     required this.allMinds,
     required this.initialDayIndex,
+    this.initialError,
   });
 
   @override
@@ -66,6 +68,10 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.initialError != null) {
+        _handleError(widget.initialError!);
+      }
+
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMindEditingController.addListener(() {
         sendEventTo<MindBloc>(MindChangeCreateText(text: _createMindEditingController.text));
@@ -102,30 +108,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           _mindSuggestions = state;
         });
       } else if (state is MindServerError) {
-        if (state.type == MindServerErrorType.notCreated) {
-          final Mind? notCreatedMind = state.values.firstOrNull;
-          if (notCreatedMind == null) {
-            return;
-          }
-
-          setState(() {
-            _createMindEditingController.text = notCreatedMind.note;
-            _selectedEmoji = notCreatedMind.emoji;
-            _showKeyboard();
-          });
-        } else if (state.type == MindServerErrorType.notEdited) {
-          final Mind? notEditedMind = state.values.firstOrNull;
-          if (notEditedMind == null) {
-            return;
-          }
-
-          setState(() {
-            _editableMind = notEditedMind;
-            _createMindEditingController.text = notEditedMind.note;
-            _selectedEmoji = notEditedMind.emoji;
-            _showKeyboard();
-          });
-        }
+        _handleError(state);
       }
     })?.disposed(by: this);
 
@@ -330,6 +313,33 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       });
       _createMindEditingController.text = mind.note;
       _mindCreatorFocusNode.requestFocus();
+    }
+  }
+
+  void _handleError(MindServerError error) {
+    if (error.type == MindServerErrorType.notCreated) {
+      final Mind? notCreatedMind = error.values.firstOrNull;
+      if (notCreatedMind == null) {
+        return;
+      }
+
+      setState(() {
+        _createMindEditingController.text = notCreatedMind.note;
+        _selectedEmoji = notCreatedMind.emoji;
+        _showKeyboard();
+      });
+    } else if (error.type == MindServerErrorType.notEdited) {
+      final Mind? notEditedMind = error.values.firstOrNull;
+      if (notEditedMind == null) {
+        return;
+      }
+
+      setState(() {
+        _editableMind = notEditedMind;
+        _createMindEditingController.text = notEditedMind.note;
+        _selectedEmoji = notEditedMind.emoji;
+        _showKeyboard();
+      });
     }
   }
 

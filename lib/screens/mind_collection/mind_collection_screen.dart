@@ -106,6 +106,17 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             title: 'Server error',
             message: state.toString(),
           );
+          if (ModalRoute.of(context)?.isCurrent ?? false) {
+            if ([MindServerErrorType.notCreated, MindServerErrorType.notEdited].contains(state.type)) {
+              if (state.values.firstOrNull == null) {
+                return;
+              }
+              _showDayCollectionScreen(
+                groupDayIndex: state.values.firstOrNull!.dayIndex,
+                initialError: state,
+              );
+            }
+          }
           // if (state.type == MindServerErrorType.notLoaded) {
           //   print('Not loaded data from server - ${state.toString()}');
           // } else {
@@ -296,13 +307,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             const SizedBox(height: 4.0),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => MindDayCollectionScreen(
-                      allMinds: _minds,
-                      initialDayIndex: groupDayIndex,
-                    ),
-                  ),
+                _showDayCollectionScreen(
+                  groupDayIndex: groupDayIndex,
+                  initialError: null,
                 );
               },
               child: RoundedContainer(
@@ -336,6 +343,21 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           child: scrollablePositionedList,
         ),
         falseChild: scrollablePositionedList,
+      ),
+    );
+  }
+
+  void _showDayCollectionScreen({
+    required int groupDayIndex,
+    required MindServerError? initialError,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MindDayCollectionScreen(
+          allMinds: _minds,
+          initialDayIndex: groupDayIndex,
+          initialError: initialError,
+        ),
       ),
     );
   }
