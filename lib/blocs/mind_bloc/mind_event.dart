@@ -1,7 +1,7 @@
 part of 'mind_bloc.dart';
 
 @immutable
-abstract class MindEvent extends Equatable {
+abstract class MindEvent with EquatableMixin {
   @override
   List<Object?> get props => [];
 }
@@ -91,4 +91,13 @@ class MindChangeCreateText extends MindEvent {
 
   @override
   List<Object?> get props => [text];
+}
+
+class MindUploadCachedMinds extends MindEvent {
+  final Iterable<Mind> minds;
+
+  MindUploadCachedMinds({required this.minds});
+
+  @override
+  List<Object?> get props => [minds];
 }

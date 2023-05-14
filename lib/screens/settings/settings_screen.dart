@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
+import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
+import 'package:rememoji/services/entities/mind.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,38 +27,71 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
   bool _isAuthShowed = false;
+  Iterable<Mind> _cachedMindsToUpload = [];
 
   @override
   void initState() {
     super.initState();
 
+    subscribeTo<MindBloc>(onNewState: (state) {
+      if (state is MindUploadCachedMinds) {
+        setState(() {
+          _cachedMindsToUpload = [];
+        });
+      } else if (state is MindOperationNotCompleted) {
+        if (state.not == MindOperationCompletedType.uploadedCachedData) {
+          showOkAlertDialog(
+            context: context,
+            title: 'Error',
+            message: state.toString(), // TODO: локализовать ошибку для пользователя
+          );
+        }
+      } else if (state is MindServerOperationCompleted) {
+        if (state.type == MindOperationCompletedType.uploadedCachedData) {
+          setState(() {
+            _cachedMindsToUpload = [];
+          });
+
+          showOkAlertDialog(
+            context: context,
+            title: 'Success',
+            message: 'Offline data uploaded successfully',
+          );
+        }
+      }
+    })?.disposed(by: this);
+
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
-        setState(() {
-          if (state is SettingsState) {
-            _offlineMode = state.isOfflineMode;
-          }
+        if (!_offlineMode && !_isLoggedIn) {
+          _showAuthBottomSheet();
+        }
 
-          if (!_offlineMode && !_isLoggedIn) {
-            _showAuthBottomSheet();
-          }
-        });
+        if (state is SettingsState) {
+          setState(() {
+            _offlineMode = state.isOfflineMode;
+
+            if (_isLoggedIn && !_offlineMode) {
+              _cachedMindsToUpload = state.cachedMindsToUpload;
+            }
+          });
+        }
       },
     )?.disposed(by: this);
 
     subscribeTo<AuthBloc>(
       onNewState: (state) {
+        if (!_offlineMode && !_isLoggedIn) {
+          _showAuthBottomSheet();
+        }
         setState(() {
           if (state is AuthCurrentStatus) {
             _isLoggedIn = state.isLoggedIn;
           } else if (state is AuthLoggedIn) {
             _isLoggedIn = true;
+            sendEventTo<SettingsBloc>(SettingsGet());
           } else if (state is AuthLogouted) {
             _isLoggedIn = false;
-          }
-
-          if (!_offlineMode && !_isLoggedIn) {
-            _showAuthBottomSheet();
           }
         });
       },
@@ -111,6 +146,15 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   await _switchOfflineMode(value);
                 },
               ),
+              if (_cachedMindsToUpload.isNotEmpty && !_offlineMode && _isLoggedIn) ...{
+                SettingsTile(
+                  title: Text('Upload ${_cachedMindsToUpload.length} minds'),
+                  leading: const Icon(Icons.cloud_upload, color: Colors.green),
+                  onPressed: (BuildContext context) {
+                    sendEventTo<MindBloc>(MindUploadCachedMinds(minds: _cachedMindsToUpload));
+                  },
+                ),
+              },
               SettingsTile(
                 title: const Text('Export to CSV'),
                 leading: const Icon(Icons.file_download, color: Colors.brown),

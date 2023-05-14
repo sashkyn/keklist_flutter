@@ -318,8 +318,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   }
 
   void _handleError(MindOperationNotCompleted error) {
-    if (error.type == MindOperationNotCompletedType.notCreated) {
-      final Mind? notCreatedMind = error.mind;
+    if (error.not == MindOperationCompletedType.created) {
+      final Mind? notCreatedMind = error.minds.firstOrNull;
       if (notCreatedMind == null) {
         return;
       }
@@ -329,8 +329,8 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         _selectedEmoji = notCreatedMind.emoji;
         _showKeyboard();
       });
-    } else if (error.type == MindOperationNotCompletedType.notEdited) {
-      final Mind? notEditedMind = error.mind;
+    } else if (error.not == MindOperationCompletedType.edited) {
+      final Mind? notEditedMind = error.minds.firstOrNull;
       if (notEditedMind == null) {
         return;
       }
