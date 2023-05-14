@@ -10,9 +10,7 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<Iterable<Mind>> getMindList() async {
-    if (_client.auth.currentUser == null) {
-      throw KeklistError.nonAuthorized();
-    }
+    _validateUserAuthorization();
 
     final List<dynamic> listOfEntities = await _client.from('minds').select();
     final List<Mind> minds = listOfEntities.map((e) => Mind.fromSupabaseJson(e)).toList();
@@ -22,27 +20,21 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addMind(Mind mind) async {
-    if (_client.auth.currentUser == null) {
-      throw KeklistError.nonAuthorized();
-    }
+    _validateUserAuthorization();
 
     await _client.from('minds').insert(mind.toSupabaseJson(userId: _client.auth.currentUser!.id));
   }
 
   @override
   Future<void> deleteMind(String id) async {
-    if (_client.auth.currentUser == null) {
-      throw KeklistError.nonAuthorized();
-    }
+    _validateUserAuthorization();
 
     await _client.from('minds').delete().eq('uuid', id);
   }
 
   @override
   Future<void> addAllMinds({required List<Mind> list}) async {
-    if (_client.auth.currentUser == null) {
-      throw KeklistError.nonAuthorized();
-    }
+    _validateUserAuthorization();
 
     final Iterable<Map<String, dynamic>> listOfEntries =
         list.map((e) => e.toSupabaseJson(userId: _client.auth.currentUser!.id));
@@ -55,15 +47,6 @@ class MainSupabaseService implements MainService {
       throw KeklistError.dumbProtection();
     }
     return await _client.rpc('deleteUser');
-  }
-
-  Future _generateError() {
-    return Future.delayed(
-      const Duration(seconds: 2),
-      () {
-        throw KeklistError.randomError();
-      },
-    );
   }
 
   @override
@@ -82,4 +65,19 @@ class MainSupabaseService implements MainService {
 
     await _client.from('minds').delete().eq('user_id', _client.auth.currentUser!.id);
   }
+
+  void _validateUserAuthorization() {
+    if (_client.auth.currentUser == null) {
+      throw KeklistError.nonAuthorized();
+    }
+  }
+
+  // Future _generateError() {
+  //   return Future.delayed(
+  //     const Duration(seconds: 2),
+  //     () {
+  //       throw KeklistError.randomError();
+  //     },
+  //   );
+  // }
 }
