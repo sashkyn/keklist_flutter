@@ -28,24 +28,25 @@ class MindSuggestions extends MindState {
 
 // MARK: - Errors
 
-enum MindOperationNotCompletedType {
-  notCreated,
-  notEdited,
-  notDeleted,
-  notLoaded,
+enum MindOperationCompletedType {
+  created,
+  edited,
+  deleted,
+  loaded,
+  uploadedCachedData,
 }
 
 class MindOperationNotCompleted extends MindState with EquatableMixin {
-  final Mind? mind;
-  final MindOperationNotCompletedType type;
+  final Iterable<Mind> minds;
+  final MindOperationCompletedType not;
 
   MindOperationNotCompleted({
-    required this.mind,
-    required this.type,
+    required this.minds,
+    required this.not,
   });
 
   @override
-  List<Object?> get props => [type, mind];
+  List<Object?> get props => [not, minds];
 
   @override
   bool? get stringify => true;
@@ -64,12 +65,16 @@ class MindServerOperationStarted extends MindState with EquatableMixin {
 }
 
 class MindServerOperationCompleted extends MindState with EquatableMixin {
-  final Mind? mind;
+  final Iterable<Mind> minds;
+  final MindOperationCompletedType type;
 
-  MindServerOperationCompleted({required this.mind});
+  MindServerOperationCompleted({
+    required this.minds,
+    required this.type,
+  });
 
   @override
-  List<Object?> get props => [mind];
+  List<Object?> get props => [minds];
 
   @override
   bool? get stringify => true;
