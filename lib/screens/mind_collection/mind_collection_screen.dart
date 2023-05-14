@@ -59,6 +59,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   // NOTE: Payments.
   // final PaymentService _payementService = PaymentService();
 
+  // NOTE: Состояния обновления с сервером.
+  bool _synchronizationInProgress = false;
+
   @override
   void initState() {
     super.initState();
@@ -100,41 +103,21 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           setState(() {
             _minds = state.values;
           });
-        } else if (state is MindServerError) {
-          showOkAlertDialog(
-            context: context,
-            title: 'Server error',
-            message: state.toString(),
-          );
+        } else if (state is MindOperationNotCompleted) {
           if (ModalRoute.of(context)?.isCurrent ?? false) {
-            if ([MindServerErrorType.notCreated, MindServerErrorType.notEdited].contains(state.type)) {
-              if (state.values.firstOrNull == null) {
-                return;
-              }
-              _showDayCollectionScreen(
-                groupDayIndex: state.values.firstOrNull!.dayIndex,
-                initialError: state,
-              );
-            }
+            _showDayCollectionAndHandleError(state: state);
           }
-          // if (state.type == MindServerErrorType.notLoaded) {
-          //   print('Not loaded data from server - ${state.toString()}');
-          // } else {
-          //   showOkAlertDialog(
-          //     context: context,
-          //     title: 'Server error',
-          //     message: state.toString(),
-          //   );
-          // }
           showOkAlertDialog(
             context: context,
-            title: 'Server error',
-            message: state.toString(),
+            title: 'Error',
+            message: state.toString(), // TODO: локализовать ошибку для пользователя
           );
         } else if (state is MindSearching) {
-          setState(() {
-            _searchingMindState = state;
-          });
+          setState(() => _searchingMindState = state);
+        } else if (state is MindSyncronizationStarted) {
+          setState(() => _synchronizationInProgress = true);
+        } else if (state is MindSyncronizationComplete) {
+          setState(() => _synchronizationInProgress = false);
         }
       })?.disposed(by: this);
 
@@ -154,6 +137,21 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       //_payementService.initConnection();
     });
+  }
+
+  void _showDayCollectionAndHandleError({required MindOperationNotCompleted state}) {
+    if ([
+      MindOperationNotCompletedType.notCreated,
+      MindOperationNotCompletedType.notEdited,
+    ].contains(state.type)) {
+      if (state.mind == null) {
+        return;
+      }
+      _showDayCollectionScreen(
+        groupDayIndex: state.mind!.dayIndex,
+        initialError: state,
+      );
+    }
   }
 
   @override
@@ -192,13 +190,32 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       return null;
     }
 
-    return AppBar(
-      centerTitle: true,
-      automaticallyImplyLeading: true,
-      actions: _makeAppBarActions(),
-      title: _makeAppBarTitle(),
-      backgroundColor: Colors.white,
-    );
+    if (_synchronizationInProgress) {
+      return AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+        title: GestureDetector(
+          onTap: () => _scrollToNow(),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Updating'),
+              SizedBox(width: 4),
+              CircularProgressIndicator.adaptive(),
+            ],
+          ),
+        ),
+        backgroundColor: Colors.white,
+      );
+    } else {
+      return AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+        actions: _makeAppBarActions(),
+        title: _makeAppBarTitle(),
+        backgroundColor: Colors.white,
+      );
+    }
   }
 
   Widget _makeAppBarTitle() {
@@ -242,14 +259,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       IconButton(
         icon: const Icon(Icons.search),
         color: Colors.black,
-        onPressed: () {
-          sendEventTo<MindBloc>(MindStartSearch());
-        },
+        onPressed: () => sendEventTo<MindBloc>(MindStartSearch()),
       ),
     ];
   }
 
-  late final random = Random();
+  late final _demoModeRandom = Random();
 
   Widget _makeBody() {
     if (_isSearching) {
@@ -271,8 +286,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             List.generate(
               15,
               (index) {
-                final randomEmoji =
-                    KeklistConstants.demoModeEmodjiList[random.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
+                final randomEmoji = KeklistConstants
+                    .demoModeEmodjiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
                   creationDate: DateTime.now(),
@@ -303,7 +318,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 18.0),
-            _makeMindsTitleWidget(groupDayIndex),
+            Text(
+              _formatter.format(MindUtils.getDateFromIndex(groupDayIndex)),
+              style: TextStyle(fontWeight: groupDayIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+            ),
             const SizedBox(height: 4.0),
             GestureDetector(
               onTap: () {
@@ -349,7 +367,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _showDayCollectionScreen({
     required int groupDayIndex,
-    required MindServerError? initialError,
+    required MindOperationNotCompleted? initialError,
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -359,14 +377,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           initialError: initialError,
         ),
       ),
-    );
-  }
-
-  // TODO: вынести в виджет
-  Text _makeMindsTitleWidget(int groupIndex) {
-    return Text(
-      _formatter.format(MindUtils.getDateFromIndex(groupIndex)),
-      style: TextStyle(fontWeight: groupIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
     );
   }
 
@@ -394,12 +404,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     );
   }
 
-  // void _showError({required String text}) {
-  //   ScaffoldMessenger.of(context).clearSnackBars();
-  //   final snackBar = SnackBar(content: Text(text));
-  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  // }
-
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
   int _getNowDayIndex() => MindUtils.getDayIndex(from: DateTime.now());
@@ -409,6 +413,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Timer? _demoAutoScrollingTimer;
 
   void _enableDemoMode() async {
+    if (_isDemoMode) {
+      return;
+    }
+
     setState(() => _isDemoMode = true);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
@@ -445,9 +453,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       return;
     }
 
-    setState(() {
-      _isDemoMode = false;
-    });
+    _demoAutoScrollingTimer?.cancel();
+    setState(() => _isDemoMode = false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _demoAutoScrollingTimer?.cancel();
       _jumpToNow();

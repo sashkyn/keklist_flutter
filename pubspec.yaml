@@ -61,7 +61,7 @@ dev_dependencies:
   build_runner: ^2.3.3 #flutter packages pub run build_runner build --delete-conflicting-outputs
 
 flutter_icons:
-  image_path: "assets/app_icon_4.png"
+  image_path: "assets/app_icons/app_icon_4.png"
   # iOS
   ios: true
   remove_alpha_ios: true
@@ -73,14 +73,12 @@ flutter_icons:
   # MacOS
   macos:
     generate: true
-    image_path: "assets/app_icon_3_mac.png"
+    image_path: "assets/app_icons/app_icon_3_mac.png"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/auth_icons/apple.svg
-    - assets/auth_icons/google.svg
-    - assets/auth_icons/facebook.svg
+    - assets/auth_icons
   fonts:
     - family: NotoColorEmoji
       fonts:
