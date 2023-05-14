@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:rememoji/services/keklist_error.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/services/main_service.dart';
@@ -11,12 +12,8 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<Iterable<Mind>> getMindList() async {
-    // if (_random.nextBool()) {
-    //   return Future.error('Hehehehehe');
-    // }
-
     if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
+      throw KeklistError.nonAuthorized();
     }
 
     final List<dynamic> listOfEntities = await _client.from('minds').select();
@@ -27,12 +24,13 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addMind(Mind mind) async {
-    // if (_random.nextBool()) {
-    //   return Future.error('Hehehehehe');
-    // }
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
+    }
 
     if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
+      throw KeklistError.nonAuthorized();
     }
 
     await _client.from('minds').insert(mind.toSupabaseJson(userId: _client.auth.currentUser!.id));
@@ -40,12 +38,13 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteMind(String id) async {
-    // if (_random.nextBool()) {
-    //   return Future.error('Hehehehehe');
-    // }
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
+    }
 
     if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
+      throw KeklistError.nonAuthorized();
     }
 
     await _client.from('minds').delete().eq('uuid', id);
@@ -53,8 +52,13 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addAllMinds({required List<Mind> list}) async {
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
+    }
+
     if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
+      throw KeklistError.nonAuthorized();
     }
 
     final Iterable<Map<String, dynamic>> listOfEntries =
@@ -64,21 +68,31 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAccount() async {
-    // NOTE: защита от дурака.
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
+    }
+
     if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
-      return Future.error('Trying to delete admin account!');
+      throw KeklistError.dumbProtection();
     }
     return await _client.rpc('deleteUser');
   }
 
+  Future? _generateRandomError() {
+    return Future.delayed(
+      const Duration(seconds: 2),
+      () {
+        throw KeklistError.randomError();
+      },
+    );
+  }
+
   @override
   Future<void> editMind({required Mind mind}) async {
-    // if (_random.nextBool()) {
-    //   return Future.error('Hehehehehe');
-    // }
-
-    if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
     }
 
     return await _client
@@ -89,9 +103,10 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAllMinds() async {
-    // if (_random.nextBool()) {
-    //   return Future.error('Hehehehehe');
-    // }
+    var randomError = _generateRandomError();
+    if (randomError != null) {
+      return randomError;
+    }
 
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');

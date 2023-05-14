@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:collection/collection.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,7 @@ import 'package:rememoji/services/entities/mind.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
-  final MindServerError? initialError;
+  final MindOperationNotCompleted? initialError;
   final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
@@ -107,7 +108,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         setState(() {
           _mindSuggestions = state;
         });
-      } else if (state is MindServerError) {
+      } else if (state is MindOperationNotCompleted) {
         _handleError(state);
       }
     })?.disposed(by: this);
@@ -316,9 +317,9 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     }
   }
 
-  void _handleError(MindServerError error) {
-    if (error.type == MindServerErrorType.notCreated) {
-      final Mind? notCreatedMind = error.values.firstOrNull;
+  void _handleError(MindOperationNotCompleted error) {
+    if (error.type == MindOperationNotCompletedType.notCreated) {
+      final Mind? notCreatedMind = error.mind;
       if (notCreatedMind == null) {
         return;
       }
@@ -328,14 +329,18 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         _selectedEmoji = notCreatedMind.emoji;
         _showKeyboard();
       });
-    } else if (error.type == MindServerErrorType.notEdited) {
-      final Mind? notEditedMind = error.values.firstOrNull;
+    } else if (error.type == MindOperationNotCompletedType.notEdited) {
+      final Mind? notEditedMind = error.mind;
       if (notEditedMind == null) {
         return;
       }
 
+      final Mind? oldMind = allMinds.firstWhereOrNull((Mind mind) => mind.id == notEditedMind.id);
+      if (oldMind == null) {
+        return;
+      }
       setState(() {
-        _editableMind = notEditedMind;
+        _editableMind = oldMind;
         _createMindEditingController.text = notEditedMind.note;
         _selectedEmoji = notEditedMind.emoji;
         _showKeyboard();
@@ -354,11 +359,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       borderRadius: BorderRadius.circular(15),
     );
 
-    if (dates == null || dates.isEmpty || dates.first == null) {
+    if (dates?.firstOrNull == null) {
       return;
     }
 
-    final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
+    final int dayIndex = MindUtils.getDayIndex(from: dates!.first!);
     setState(() {
       this.dayIndex = dayIndex;
     });

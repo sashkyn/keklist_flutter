@@ -28,32 +28,59 @@ class MindSuggestions extends MindState {
 
 // MARK: - Errors
 
-enum MindServerErrorType {
+enum MindOperationNotCompletedType {
   notCreated,
   notEdited,
   notDeleted,
   notLoaded,
 }
 
-enum MindServerErrorReason {
-  notAuth,
-  notConnected,
-}
+class MindOperationNotCompleted extends MindState with EquatableMixin {
+  final Mind? mind;
+  final MindOperationNotCompletedType type;
 
-class MindServerError extends MindState with EquatableMixin {
-  final MindServerErrorType type;
-  final List<Mind> values;
-  final MindServerErrorReason reason;
-
-  MindServerError({
-    required this.values,
+  MindOperationNotCompleted({
+    required this.mind,
     required this.type,
-    required this.reason,
   });
 
   @override
-  List<Object?> get props => [values, type, reason];
+  List<Object?> get props => [type, mind];
 
   @override
   bool? get stringify => true;
+}
+
+class MindServerOperationStarted extends MindState with EquatableMixin {
+  final Mind mind;
+
+  MindServerOperationStarted({required this.mind});
+
+  @override
+  List<Object?> get props => [mind];
+
+  @override
+  bool? get stringify => true;
+}
+
+class MindServerOperationCompleted extends MindState with EquatableMixin {
+  final Mind? mind;
+
+  MindServerOperationCompleted({required this.mind});
+
+  @override
+  List<Object?> get props => [mind];
+
+  @override
+  bool? get stringify => true;
+}
+
+class MindSyncronizationStarted extends MindState with EquatableMixin {
+  @override
+  List<Object?> get props => [];
+}
+
+class MindSyncronizationComplete extends MindState with EquatableMixin {
+  @override
+  List<Object?> get props => [];
 }
