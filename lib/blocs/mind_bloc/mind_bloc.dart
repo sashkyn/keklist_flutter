@@ -43,6 +43,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindStartSearch>(_startSearch);
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(_enterTextSearch);
+    on<MindUploadCachedMinds>(_uploadCachedMinds);
     on<MindChangeCreateText>(
       _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
@@ -82,8 +83,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         emit(MindSyncronizationComplete());
         emit(
           MindOperationNotCompleted(
-            mind: null,
-            type: MindOperationNotCompletedType.notLoaded,
+            minds: [],
+            not: MindOperationCompletedType.loaded,
           ),
         );
       });
@@ -123,8 +124,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         // Обработка ошибки
         emit(
           MindOperationNotCompleted(
-            mind: mind,
-            type: MindOperationNotCompletedType.notCreated,
+            minds: [mind],
+            not: MindOperationCompletedType.created,
           ),
         );
       });
@@ -141,7 +142,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       emit(MindServerOperationStarted(mind: mindToDelete));
       // Удаляем на сервере.
       await _service.deleteMind(event.uuid).then((_) {
-        emit(MindServerOperationCompleted(mind: mindToDelete));
+        emit(MindServerOperationCompleted(
+          minds: [mindToDelete],
+          type: MindOperationCompletedType.deleted,
+        ));
       }).onError((error, _) {
         // Роллбек
         _minds.add(mindToDelete);
@@ -155,8 +159,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         // Обработка ошибки
         emit(
           MindOperationNotCompleted(
-            mind: mindToDelete,
-            type: MindOperationNotCompletedType.notDeleted,
+            minds: [mindToDelete],
+            not: MindOperationCompletedType.deleted,
           ),
         );
       });
@@ -254,7 +258,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       await _service
           .editMind(mind: event.mind)
           .then(
-            (_) => emit(MindServerOperationCompleted(mind: event.mind)),
+            (_) => emit(MindServerOperationCompleted(
+              minds: [event.mind],
+              type: MindOperationCompletedType.edited,
+            )),
           )
           .onError(
         (error, _) {
@@ -268,12 +275,36 @@ class MindBloc extends Bloc<MindEvent, MindState> {
           // Обработка ошибки
           emit(
             MindOperationNotCompleted(
-              mind: editedMind,
-              type: MindOperationNotCompletedType.notEdited,
+              minds: [editedMind],
+              not: MindOperationCompletedType.edited,
             ),
           );
         },
       );
     }
+  }
+
+  Future<void> _uploadCachedMinds(MindUploadCachedMinds event, Emitter<MindState> emit) {
+    final Iterable<Mind> cachedMinds = event.minds;
+    emit(MindServerOperationStarted(mind: cachedMinds.first));
+    return _service
+        .addAllMinds(list: cachedMinds)
+        .then(
+          (_) => emit(MindServerOperationCompleted(
+            minds: cachedMinds,
+            type: MindOperationCompletedType.uploadedCachedData,
+          )),
+        )
+        .onError(
+      (error, _) {
+        // Обработка ошибки
+        emit(
+          MindOperationNotCompleted(
+            minds: cachedMinds,
+            not: MindOperationCompletedType.uploadedCachedData,
+          ),
+        );
+      },
+    );
   }
 }

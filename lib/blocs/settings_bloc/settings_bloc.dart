@@ -3,12 +3,12 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
-import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/services/hive/constants.dart';
+import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
 import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:rememoji/services/main_service.dart';
@@ -18,7 +18,8 @@ part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final MainService mainService;
-  final Box<SettingsObject> _settingsBox = Hive.box<SettingsObject>(HiveConstants.settingsBoxName);
+  final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
+  final Box<SettingsObject> _settingsBox = Hive.box(HiveConstants.settingsBoxName);
 
   SettingsBloc({required this.mainService})
       : super(
@@ -26,6 +27,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             isMindContentVisible: false,
             needToShowWhatsNewOnStart: false,
             isOfflineMode: false,
+            cachedMindsToUpload: [],
           ),
         ) {
     on<SettingsExportAllMindsToCSV>(_shareCSVFileWithMinds);
@@ -64,8 +66,23 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         isMindContentVisible: isMindContentVisible,
         needToShowWhatsNewOnStart: needToShowWhatsNewOnStart,
         isOfflineMode: isOfflineMode,
+        cachedMindsToUpload: [],
       ),
     );
+
+    final Iterable<MindObject> cachedMinds = _mindsBox.values;
+    if (cachedMinds.isEmpty) {
+      return;
+    }
+
+    final Iterable<Mind> serverMinds = await mainService.getMindList();
+    final Iterable<Mind> mindsServerDoesNotHave = cachedMinds
+        .where((final MindObject cachedMind) => !serverMinds.any((serverMind) => serverMind.id == cachedMind.id))
+        .map(
+          (cachedMind) => cachedMind.toMind(),
+        );
+
+    emit(state.copyWith(cachedMindsToUpload: mindsServerDoesNotHave));
   }
 
   FutureOr<void> _disableShowingWhatsNewUntillNewVersion(
@@ -90,11 +107,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     emit(state.copyWith(isMindContentVisible: event.isVisible));
   }
-
-  // TODO: здесь спрашивать, что я хочу сделать с данными:
-  // 1. Заменить их базой из локального хранилища.
-  // 2. Удалить данные из хранилища и заменить их данными из базы.
-
+  
   FutureOr<void> _changeOfflineMode(SettingsChangeOfflineMode event, Emitter<SettingsState> emit) async {
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
     settingsObject?.isOfflineMode = event.isOfflineMode;

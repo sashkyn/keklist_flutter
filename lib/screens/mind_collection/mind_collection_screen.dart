@@ -107,11 +107,16 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           if (ModalRoute.of(context)?.isCurrent ?? false) {
             _showDayCollectionAndHandleError(state: state);
           }
-          showOkAlertDialog(
-            context: context,
-            title: 'Error',
-            message: state.toString(), // TODO: локализовать ошибку для пользователя
-          );
+
+          if (MindOperationCompletedType.values
+              .where((element) => element != MindOperationCompletedType.uploadedCachedData)
+              .contains(state.not)) {
+            showOkAlertDialog(
+              context: context,
+              title: 'Error',
+              message: state.toString(), // TODO: локализовать ошибку для пользователя
+            );
+          }
         } else if (state is MindSearching) {
           setState(() => _searchingMindState = state);
         } else if (state is MindSyncronizationStarted) {
@@ -141,14 +146,14 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _showDayCollectionAndHandleError({required MindOperationNotCompleted state}) {
     if ([
-      MindOperationNotCompletedType.notCreated,
-      MindOperationNotCompletedType.notEdited,
-    ].contains(state.type)) {
-      if (state.mind == null) {
+      MindOperationCompletedType.created,
+      MindOperationCompletedType.edited,
+    ].contains(state.not)) {
+      if (state.minds.isEmpty) {
         return;
       }
       _showDayCollectionScreen(
-        groupDayIndex: state.mind!.dayIndex,
+        groupDayIndex: state.minds.first.dayIndex,
         initialError: state,
       );
     }

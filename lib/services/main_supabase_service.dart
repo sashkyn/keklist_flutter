@@ -6,7 +6,7 @@ import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/services/main_service.dart';
 
 class MainSupabaseService implements MainService {
-  final _client = Supabase.instance.client;
+  final SupabaseClient _client = Supabase.instance.client;
 
   @override
   Future<Iterable<Mind>> getMindList() async {
@@ -33,37 +33,42 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  Future<void> addAllMinds({required List<Mind> list}) async {
+  Future<void> addAllMinds({required Iterable<Mind> list}) async {
     _validateUserAuthorization();
 
     final Iterable<Map<String, dynamic>> listOfEntries =
-        list.map((e) => e.toSupabaseJson(userId: _client.auth.currentUser!.id));
-    await _client.from('minds').insert(listOfEntries);
-  }
+        list.map((e) => e.toSupabaseJson(userId: _client.auth.currentUser!.id)).toList();
 
-  @override
-  Future<void> deleteAccount() async {
-    if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
-      throw KeklistError.dumbProtection();
-    }
-    return await _client.rpc('deleteUser');
+    await _client.from('minds').upsert(listOfEntries);
   }
 
   @override
   Future<void> editMind({required Mind mind}) async {
-    return await _client
-        .from('minds')
-        .update(mind.toSupabaseJson(userId: _client.auth.currentUser!.id))
-        .eq('uuid', mind.id);
+    _validateUserAuthorization();
+
+    await _client.from('minds').update(mind.toSupabaseJson(userId: _client.auth.currentUser!.id)).eq('uuid', mind.id);
   }
 
   @override
   Future<void> deleteAllMinds() async {
-    if (_client.auth.currentUser == null) {
-      return Future.error('You did not auth to Supabase');
-    }
+    _validateAreYouDumb();
+    _validateUserAuthorization();
 
     await _client.from('minds').delete().eq('user_id', _client.auth.currentUser!.id);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    _validateAreYouDumb();
+    _validateUserAuthorization();
+
+    await _client.rpc('deleteUser');
+  }
+
+  void _validateAreYouDumb() {
+    if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
+      throw KeklistError.dumbProtection();
+    }
   }
 
   void _validateUserAuthorization() {
