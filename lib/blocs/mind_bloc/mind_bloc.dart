@@ -49,37 +49,48 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     );
   }
 
-  FutureOr<void> _deleteMind(MindDelete event, emit) async {
-    await _mindBox.delete(event.uuid);
-    final Mind mindToDelete = _minds.firstWhere((item) => item.id == event.uuid);
-    _minds.remove(mindToDelete);
-    emit.call(MindList(values: _minds));
+  Future<void> _getMinds(MindGetList event, Emitter<MindState> emit) async {
+    // Подмешиваем элементы с локального хранилища.
+    final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
+    _minds.addAll(localMinds);
+    final MindList localStorageState = MindList(values: _minds);
+    emit(localStorageState);
 
+    // Подмешиваем элементы с сервера.
     if (!(_settings?.isOfflineMode ?? true)) {
-      // Удаляем на сервере.
-      await _service.deleteMind(event.uuid).onError((error, _) {
-        // Роллбек
-        _minds.add(mindToDelete);
-        _mindBox.put(
-          mindToDelete.id,
-          mindToDelete.toObject(),
-        );
-        final MindList newState = MindList(values: _minds);
-        emit(newState);
+      emit(MindSyncronizationStarted());
+      await _service.getMindList().then((final Iterable<Mind> serverMinds) {
+        _minds.addAll(serverMinds);
 
-        // Обработка ошибки
+        // Обновляем локальное хранилище.
+        _mindBox.putAll(
+          Map.fromEntries(
+            serverMinds.map(
+              (mind) => MapEntry(
+                mind.id,
+                mind.toObject(),
+              ),
+            ),
+          ),
+        );
+
+        final MindList networkState = MindList(values: _minds);
+        emit(networkState);
+
+        emit(MindSyncronizationComplete());
+      }).onError((error, _) {
+        emit(MindSyncronizationComplete());
         emit(
-          MindServerError(
-            values: [mindToDelete],
-            type: MindServerErrorType.notDeleted,
-            reason: MindServerErrorReason.notAuth,
+          MindOperationNotCompleted(
+            mind: null,
+            type: MindOperationNotCompletedType.notLoaded,
           ),
         );
       });
     }
   }
 
-  FutureOr<void> _createMind(MindCreate event, emit) async {
+  Future<void> _createMind(MindCreate event, Emitter<MindState> emit) async {
     final Mind mind = Mind(
       id: const Uuid().v4(),
       dayIndex: event.dayIndex,
@@ -100,6 +111,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit.call(newState);
 
     if (!(_settings?.isOfflineMode ?? true)) {
+      emit(MindServerOperationStarted(mind: mind));
       // Добавляем на сервере.
       await _service.addMind(mind).onError((error, _) {
         // Роллбек
@@ -110,54 +122,44 @@ class MindBloc extends Bloc<MindEvent, MindState> {
 
         // Обработка ошибки
         emit(
-          MindServerError(
-            values: [mind],
-            type: MindServerErrorType.notCreated,
-            reason: MindServerErrorReason.notAuth,
+          MindOperationNotCompleted(
+            mind: mind,
+            type: MindOperationNotCompletedType.notCreated,
           ),
         );
       });
     }
   }
 
-  FutureOr<void> _getMinds(MindGetList event, emit) async {
-    // Подмешиваем элементы с локального хранилища.
-    final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
-    _minds.addAll(localMinds);
-    final MindList localStorageState = MindList(values: _minds);
-    emit(localStorageState);
+  Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
+    await _mindBox.delete(event.uuid);
+    final Mind mindToDelete = _minds.firstWhere((item) => item.id == event.uuid);
+    _minds.remove(mindToDelete);
+    emit.call(MindList(values: _minds));
 
-    // Подмешиваем элементы с сервера.
     if (!(_settings?.isOfflineMode ?? true)) {
-      await _service.getMindList().then(
-        (Iterable<Mind> serverMinds) {
-          _minds.addAll(serverMinds);
+      emit(MindServerOperationStarted(mind: mindToDelete));
+      // Удаляем на сервере.
+      await _service.deleteMind(event.uuid).then((_) {
+        emit(MindServerOperationCompleted(mind: mindToDelete));
+      }).onError((error, _) {
+        // Роллбек
+        _minds.add(mindToDelete);
+        _mindBox.put(
+          mindToDelete.id,
+          mindToDelete.toObject(),
+        );
+        final MindList newState = MindList(values: _minds);
+        emit(newState);
 
-          // Обновляем локальное хранилище.
-          _mindBox.putAll(
-            Map.fromEntries(
-              serverMinds.map(
-                (mind) => MapEntry(
-                  mind.id,
-                  mind.toObject(),
-                ),
-              ),
-            ),
-          );
-
-          final MindList networkState = MindList(values: _minds);
-          emit(networkState);
-        },
-        onError: (error, _) {
-          emit(
-            MindServerError(
-              values: [],
-              type: MindServerErrorType.notLoaded,
-              reason: MindServerErrorReason.notAuth,
-            ),
-          );
-        },
-      );
+        // Обработка ошибки
+        emit(
+          MindOperationNotCompleted(
+            mind: mindToDelete,
+            type: MindOperationNotCompletedType.notDeleted,
+          ),
+        );
+      });
     }
   }
 
@@ -246,24 +248,32 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(MindList(values: _minds));
 
     if (!(_settings?.isOfflineMode ?? true)) {
-      // Редактируем на сервере.
-      await _service.editMind(mind: event.mind).onError((error, _) {
-        // Роллбек
-        _minds
-          ..remove(editedMind)
-          ..add(oldMind);
-        final MindList newState = MindList(values: _minds);
-        emit(newState);
+      emit(MindServerOperationStarted(mind: event.mind));
 
-        // Обработка ошибки
-        emit(
-          MindServerError(
-            values: [event.mind],
-            type: MindServerErrorType.notEdited,
-            reason: MindServerErrorReason.notAuth,
-          ),
-        );
-      });
+      // Редактируем на сервере.
+      await _service
+          .editMind(mind: event.mind)
+          .then(
+            (_) => emit(MindServerOperationCompleted(mind: event.mind)),
+          )
+          .onError(
+        (error, _) {
+          // Роллбек
+          _minds
+            ..remove(editedMind)
+            ..add(oldMind);
+          final MindList newState = MindList(values: _minds);
+          emit(newState);
+
+          // Обработка ошибки
+          emit(
+            MindOperationNotCompleted(
+              mind: editedMind,
+              type: MindOperationNotCompletedType.notEdited,
+            ),
+          );
+        },
+      );
     }
   }
 }
