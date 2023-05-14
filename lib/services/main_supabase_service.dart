@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:rememoji/services/keklist_error.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,7 +7,6 @@ import 'package:rememoji/services/main_service.dart';
 
 class MainSupabaseService implements MainService {
   final _client = Supabase.instance.client;
-  final _random = Random();
 
   @override
   Future<Iterable<Mind>> getMindList() async {
@@ -24,11 +22,6 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addMind(Mind mind) async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     if (_client.auth.currentUser == null) {
       throw KeklistError.nonAuthorized();
     }
@@ -38,11 +31,6 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteMind(String id) async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     if (_client.auth.currentUser == null) {
       throw KeklistError.nonAuthorized();
     }
@@ -52,11 +40,6 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> addAllMinds({required List<Mind> list}) async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     if (_client.auth.currentUser == null) {
       throw KeklistError.nonAuthorized();
     }
@@ -68,18 +51,13 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAccount() async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     if (_client.auth.currentUser?.email == 'sashkn2@gmail.com') {
       throw KeklistError.dumbProtection();
     }
     return await _client.rpc('deleteUser');
   }
 
-  Future? _generateRandomError() {
+  Future _generateError() {
     return Future.delayed(
       const Duration(seconds: 2),
       () {
@@ -90,11 +68,6 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> editMind({required Mind mind}) async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     return await _client
         .from('minds')
         .update(mind.toSupabaseJson(userId: _client.auth.currentUser!.id))
@@ -103,11 +76,6 @@ class MainSupabaseService implements MainService {
 
   @override
   Future<void> deleteAllMinds() async {
-    var randomError = _generateRandomError();
-    if (randomError != null) {
-      return randomError;
-    }
-
     if (_client.auth.currentUser == null) {
       return Future.error('You did not auth to Supabase');
     }
