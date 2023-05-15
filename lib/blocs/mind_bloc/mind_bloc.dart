@@ -161,10 +161,12 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       );
       // Удаляем на сервере.
       await _service.deleteMind(event.uuid).then((_) {
-        emit(MindOperationCompleted(
-          minds: [mindToDelete],
-          type: MindOperationType.delete,
-        ));
+        emit(
+          MindOperationCompleted(
+            minds: [mindToDelete],
+            type: MindOperationType.delete,
+          ),
+        );
       }).onError((error, _) {
         // Роллбек
         _minds.add(mindToDelete);

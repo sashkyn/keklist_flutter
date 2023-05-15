@@ -78,7 +78,7 @@ class MindOperationCompleted extends MindState with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [minds];
+  List<Object?> get props => [minds, type];
 
   @override
   bool? get stringify => true;
