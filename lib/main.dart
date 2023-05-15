@@ -75,7 +75,10 @@ Future<void> main() async {
         ),
       ),
       BlocProvider(
-        create: (context) => SettingsBloc(mainService: mainContainer.get<MainService>()),
+        create: (context) => SettingsBloc(
+          mainService: mainContainer.get<MainService>(),
+          client: Supabase.instance.client,
+        ),
       ),
     ],
     child: const KeklistApp(),
