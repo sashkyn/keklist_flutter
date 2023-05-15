@@ -30,7 +30,7 @@ Future<void> main() async {
 
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 10000)
-    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..indicatorType = EasyLoadingIndicatorType.circle
     ..loadingStyle = EasyLoadingStyle.light
     ..indicatorSize = 45.0
     ..radius = 10.0
