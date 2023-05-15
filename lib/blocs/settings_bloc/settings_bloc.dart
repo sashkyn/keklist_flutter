@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,6 +13,7 @@ import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
 import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:rememoji/services/main_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
@@ -20,21 +22,28 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final MainService mainService;
   final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
   final Box<SettingsObject> _settingsBox = Hive.box(HiveConstants.settingsBoxName);
+  final SupabaseClient client;
 
-  SettingsBloc({required this.mainService})
-      : super(
-          const SettingsState(
+  late SettingsDataState _lastSettingsState;
+
+  SettingsBloc({
+    required this.mainService,
+    required this.client,
+  }) : super(
+          SettingsDataState(
             isMindContentVisible: false,
-            needToShowWhatsNewOnStart: false,
             isOfflineMode: false,
             cachedMindsToUpload: [],
           ),
         ) {
+    _lastSettingsState = state as SettingsDataState;
+
     on<SettingsExportAllMindsToCSV>(_shareCSVFileWithMinds);
     on<SettingsChangeMindContentVisibility>(_changeMindContentVisibility);
     on<SettingsChangeOfflineMode>(_changeOfflineMode);
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
+    on<SettingsNeedToShowAuth>(_showAuth);
   }
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
@@ -51,30 +60,31 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   FutureOr<void> _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
+    // Cбор и отправка стейта с настройками.
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
-
     final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
     final bool isOfflineMode = settingsObject?.isOfflineMode ?? false;
-
-    final String? previousAppVersion = settingsObject?.previousAppVersion;
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
-    final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
-
-    emit(
-      SettingsState(
+    _emitDataState(
+      emit,
+      SettingsDataState(
         isMindContentVisible: isMindContentVisible,
-        needToShowWhatsNewOnStart: needToShowWhatsNewOnStart,
         isOfflineMode: isOfflineMode,
         cachedMindsToUpload: [],
       ),
     );
 
+    // Cбор и отправка стейта Whats new.
+    final String? previousAppVersion = settingsObject?.previousAppVersion;
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
+    final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
+    emit(SettingsWhatsNewState(needToShowWhatsNewOnStart));
+
+    // Cбор и отправка стейта Cached Minds.
     final Iterable<MindObject> cachedMinds = _mindsBox.values;
     if (cachedMinds.isEmpty) {
       return;
     }
-
     final Iterable<Mind> serverMinds = await mainService.getMindList();
     final Iterable<Mind> mindsServerDoesNotHave = cachedMinds
         .where((final MindObject cachedMind) => !serverMinds.any((serverMind) => serverMind.id == cachedMind.id))
@@ -82,7 +92,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           (cachedMind) => cachedMind.toMind(),
         );
 
-    emit(state.copyWith(cachedMindsToUpload: mindsServerDoesNotHave));
+    _emitDataState(
+      emit,
+      _lastSettingsState.copyWith(cachedMindsToUpload: mindsServerDoesNotHave),
+    );
+
+    // Cбор и отправка стейта показа Auth.
+    final bool needToShowAuth = !isOfflineMode && client.auth.currentUser == null;
+    emit(SettingsAuthState(needToShowAuth));
   }
 
   FutureOr<void> _disableShowingWhatsNewUntillNewVersion(
@@ -105,13 +122,36 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     settingsObject?.isMindContentVisible = event.isVisible;
     _settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, settingsObject!);
 
-    emit(state.copyWith(isMindContentVisible: event.isVisible));
+    _emitDataState(
+      emit,
+      _lastSettingsState.copyWith(isMindContentVisible: event.isVisible),
+    );
   }
-  
-  FutureOr<void> _changeOfflineMode(SettingsChangeOfflineMode event, Emitter<SettingsState> emit) async {
+
+  FutureOr<void> _changeOfflineMode(
+    SettingsChangeOfflineMode event,
+    Emitter<SettingsState> emit,
+  ) async {
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
     settingsObject?.isOfflineMode = event.isOfflineMode;
     settingsObject?.save();
-    emit(state.copyWith(isOfflineMode: event.isOfflineMode));
+
+    _emitDataState(
+      emit,
+      _lastSettingsState.copyWith(isOfflineMode: event.isOfflineMode),
+    );
+
+    // Cбор и отправка стейта показа Auth.
+    final bool needToShowAuth = !_lastSettingsState.isOfflineMode && client.auth.currentUser == null;
+    emit(SettingsAuthState(needToShowAuth));
+  }
+
+  void _showAuth(SettingsNeedToShowAuth event, Emitter<SettingsState> emit) {
+    emit(SettingsAuthState(true));
+  }
+
+  void _emitDataState(Emitter<SettingsState> emit, SettingsDataState state) {
+    _lastSettingsState = state;
+    emit(state);
   }
 }

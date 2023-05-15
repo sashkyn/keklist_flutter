@@ -114,9 +114,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     })?.disposed(by: this);
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
-      setState(() {
-        _isMindContentVisible = state.isMindContentVisible;
-      });
+      if (state is SettingsDataState) {
+        setState(() {
+          _isMindContentVisible = state.isMindContentVisible;
+        });
+      }
     })?.disposed(by: this);
 
     sendEventTo<SettingsBloc>(SettingsGet());
@@ -318,7 +320,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
   }
 
   void _handleError(MindOperationNotCompleted error) {
-    if (error.not == MindOperationCompletedType.created) {
+    if (error.notCompleted == MindOperationType.create) {
       final Mind? notCreatedMind = error.minds.firstOrNull;
       if (notCreatedMind == null) {
         return;
@@ -329,7 +331,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         _selectedEmoji = notCreatedMind.emoji;
         _showKeyboard();
       });
-    } else if (error.not == MindOperationCompletedType.edited) {
+    } else if (error.notCompleted == MindOperationType.edit) {
       final Mind? notEditedMind = error.minds.firstOrNull;
       if (notEditedMind == null) {
         return;

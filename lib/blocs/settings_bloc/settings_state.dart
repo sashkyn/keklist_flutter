@@ -1,29 +1,49 @@
 part of 'settings_bloc.dart';
 
-class SettingsState {
+abstract class SettingsState {}
+
+class SettingsDataState extends SettingsState {
   final bool isMindContentVisible;
-  final bool needToShowWhatsNewOnStart;
   final bool isOfflineMode;
   final Iterable<Mind> cachedMindsToUpload;
 
-  const SettingsState({
+  SettingsDataState({
     required this.isMindContentVisible,
-    required this.needToShowWhatsNewOnStart,
     required this.isOfflineMode,
     required this.cachedMindsToUpload,
   });
 
-  SettingsState copyWith({
+  SettingsDataState copyWith({
     bool? isMindContentVisible,
     bool? needToShowWhatsNewOnStart,
     bool? isOfflineMode,
     Iterable<Mind>? cachedMindsToUpload,
   }) {
-    return SettingsState(
+    return SettingsDataState(
       isMindContentVisible: isMindContentVisible ?? this.isMindContentVisible,
-      needToShowWhatsNewOnStart: needToShowWhatsNewOnStart ?? this.needToShowWhatsNewOnStart,
       isOfflineMode: isOfflineMode ?? this.isOfflineMode,
       cachedMindsToUpload: cachedMindsToUpload ?? this.cachedMindsToUpload,
     );
   }
+}
+
+class SettingsWhatsNewState extends SettingsState with EquatableMixin {
+  final bool needToShowWhatsNewOnStart;
+
+  SettingsWhatsNewState(this.needToShowWhatsNewOnStart);
+  
+  @override
+  List<Object?> get props => [needToShowWhatsNewOnStart];
+}
+
+class SettingsAuthState extends SettingsState with EquatableMixin {
+  final bool needToShowAuth;
+
+  SettingsAuthState(this.needToShowAuth);
+  
+  @override
+  List<Object?> get props => [needToShowAuth];
+
+  @override
+  bool? get stringify => true;
 }
