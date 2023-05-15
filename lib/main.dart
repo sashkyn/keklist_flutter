@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rememoji/screens/main/main_screen.dart';
@@ -26,6 +27,20 @@ import 'native/ios/watch/watch_communication_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 10000)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.light
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.white
+    ..backgroundColor = null
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.black
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = true;
 
   _setupOrientations();
 
@@ -126,6 +141,7 @@ class KeklistAppState extends State<KeklistApp> {
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
+        builder: EasyLoading.init(),
       ),
     );
   }
