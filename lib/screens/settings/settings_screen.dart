@@ -8,7 +8,6 @@ import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -26,7 +25,6 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
-  bool _isAuthShowed = false;
   Iterable<Mind> _cachedMindsToUpload = [];
 
   @override
@@ -39,15 +37,15 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           _cachedMindsToUpload = [];
         });
       } else if (state is MindOperationNotCompleted) {
-        if (state.not == MindOperationCompletedType.uploadedCachedData) {
+        if (state.notCompleted == MindOperationType.uploadCachedData) {
           showOkAlertDialog(
             context: context,
             title: 'Error',
             message: state.toString(), // TODO: локализовать ошибку для пользователя
           );
         }
-      } else if (state is MindServerOperationCompleted) {
-        if (state.type == MindOperationCompletedType.uploadedCachedData) {
+      } else if (state is MindOperationCompleted) {
+        if (state.type == MindOperationType.uploadCachedData) {
           setState(() {
             _cachedMindsToUpload = [];
           });
@@ -63,16 +61,14 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
-        if (!_offlineMode && !_isLoggedIn) {
-          _showAuthBottomSheet();
-        }
-
-        if (state is SettingsState) {
+        if (state is SettingsDataState) {
           setState(() {
             _offlineMode = state.isOfflineMode;
 
-            if (_isLoggedIn && !_offlineMode) {
+            if (!_isLoggedIn && !_offlineMode) {
               _cachedMindsToUpload = state.cachedMindsToUpload;
+            } else {
+              _cachedMindsToUpload = [];
             }
           });
         }
@@ -81,9 +77,6 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<AuthBloc>(
       onNewState: (state) {
-        if (!_offlineMode && !_isLoggedIn) {
-          _showAuthBottomSheet();
-        }
         setState(() {
           if (state is AuthCurrentStatus) {
             _isLoggedIn = state.isLoggedIn;
@@ -122,7 +115,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: const Text('Login'),
                   leading: const Icon(Icons.login),
                   onPressed: (BuildContext context) {
-                    _showAuthBottomSheet();
+                    sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
                   },
                 ),
               if (_isLoggedIn)
@@ -200,6 +193,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     );
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+    cancelSubscriptions();
+  }
+
   Future<void> _sendFeedback() async {
     final Uri uri = Uri(
       scheme: 'mailto',
@@ -230,22 +230,8 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   }
 
   Future<void> _switchOfflineMode(bool value) async {
-    // final result = await showDial(
-    //   context: context,
-    //   title: 'Are you sure?',
-    //   message: 'If you switch offline mode on you will not be able to add new minds.',
-    //   cancelLabel: 'Cancel',
-    //   okLabel: 'Switch offline mode',
-    //   isDestructiveAction: true,
-    // );
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
+    sendEventTo<MindBloc>(MindGetList());
   }
 
   Future<void> _showWhatsNew() {
@@ -258,20 +244,5 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         );
       },
     );
-  }
-
-  Future<void> _showAuthBottomSheet() async {
-    if (_isAuthShowed) {
-      return;
-    }
-
-    _isAuthShowed = true;
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => const AuthScreen(),
-      isDismissible: false,
-      enableDrag: false,
-    );
-    _isAuthShowed = false;
   }
 }

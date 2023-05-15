@@ -28,47 +28,51 @@ class MindSuggestions extends MindState {
 
 // MARK: - Errors
 
-enum MindOperationCompletedType {
-  created,
-  edited,
-  deleted,
-  loaded,
-  uploadedCachedData,
+enum MindOperationType {
+  create,
+  edit,
+  delete,
+  fetch,
+  uploadCachedData,
 }
 
 class MindOperationNotCompleted extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
-  final MindOperationCompletedType not;
+  final MindOperationType notCompleted;
 
   MindOperationNotCompleted({
     required this.minds,
-    required this.not,
+    required this.notCompleted,
   });
 
   @override
-  List<Object?> get props => [not, minds];
+  List<Object?> get props => [notCompleted, minds];
 
   @override
   bool? get stringify => true;
 }
 
 class MindServerOperationStarted extends MindState with EquatableMixin {
-  final Mind mind;
+  final Iterable<Mind> minds;
+  final MindOperationType type;
 
-  MindServerOperationStarted({required this.mind});
+  MindServerOperationStarted({
+    required this.minds,
+    required this.type,
+  });
 
   @override
-  List<Object?> get props => [mind];
+  List<Object?> get props => [minds, type];
 
   @override
   bool? get stringify => true;
 }
 
-class MindServerOperationCompleted extends MindState with EquatableMixin {
+class MindOperationCompleted extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
-  final MindOperationCompletedType type;
+  final MindOperationType type;
 
-  MindServerOperationCompleted({
+  MindOperationCompleted({
     required this.minds,
     required this.type,
   });
@@ -78,14 +82,4 @@ class MindServerOperationCompleted extends MindState with EquatableMixin {
 
   @override
   bool? get stringify => true;
-}
-
-class MindSyncronizationStarted extends MindState with EquatableMixin {
-  @override
-  List<Object?> get props => [];
-}
-
-class MindSyncronizationComplete extends MindState with EquatableMixin {
-  @override
-  List<Object?> get props => [];
 }

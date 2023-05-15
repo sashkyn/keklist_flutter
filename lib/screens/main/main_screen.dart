@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
+import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
+import 'package:rememoji/helpers/bloc_utils.dart';
+import 'package:rememoji/helpers/extensions/dispose_bag.dart';
+import 'package:rememoji/screens/auth/auth_screen.dart';
 import 'package:rememoji/screens/insights/insights_screen.dart';
 import 'package:rememoji/screens/mind_collection/mind_collection_screen.dart';
 import 'package:rememoji/screens/settings/settings_screen.dart';
@@ -11,14 +17,26 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+class _MainScreenState extends State<MainScreen> with DisposeBag {
+  bool _isAuthShowed = false;
+  int _tabSelectedIndex = 0;
 
   static final List<Widget> _mainScreens = [
     const MindCollectionScreen(),
     const InsightsScreen(),
     const SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    subscribeTo<SettingsBloc>(onNewState: (state) {
+      if (state is SettingsAuthState && state.needToShowAuth) {
+        _showAuthBottomSheet();
+      }
+    })?.disposed(by: this);
+  }
 
   static const List<BottomNavigationBarItem> _items = [
     BottomNavigationBarItem(
@@ -38,17 +56,29 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _mainScreens
-      ),
+      body: IndexedStack(index: _tabSelectedIndex, children: _mainScreens),
       bottomNavigationBar: AdaptiveBottomNavigationBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: _tabSelectedIndex,
         onTap: (index) {
-          setState(() => _selectedIndex = index);
+          setState(() => _tabSelectedIndex = index);
         },
         items: _items,
       ),
     );
+  }
+
+  Future<void> _showAuthBottomSheet() async {
+    if (_isAuthShowed) {
+      return;
+    }
+
+    _isAuthShowed = true;
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => const AuthScreen(),
+      isDismissible: false,
+      enableDrag: false,
+    );
+    _isAuthShowed = false;
   }
 }

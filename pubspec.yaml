@@ -78,7 +78,7 @@ flutter_icons:
 flutter:
   uses-material-design: true
   assets:
-    - assets/auth_icons
+    - assets/auth_icons/
   fonts:
     - family: NotoColorEmoji
       fonts:

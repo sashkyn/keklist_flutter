@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
@@ -60,7 +61,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   // final PaymentService _payementService = PaymentService();
 
   // NOTE: Состояния обновления с сервером.
-  bool _synchronizationInProgress = false;
+  bool _updating = false;
 
   @override
   void initState() {
@@ -85,16 +86,17 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       });
 
       subscribeTo<SettingsBloc>(onNewState: (state) async {
-        if (state.needToShowWhatsNewOnStart) {
+        if (state is SettingsDataState) {
+          _isOfflineMode = state.isOfflineMode;
+          if (state.isOfflineMode) {
+            setState(() {
+              _updating = false;
+            });
+          }
+          sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+        } else if (state is SettingsWhatsNewState && state.needToShowWhatsNewOnStart) {
           await _showWhatsNew();
-
           sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
-        }
-
-        _isOfflineMode = state.isOfflineMode;
-        if (state.isOfflineMode) {
-          _disableDemoMode();
-          sendEventTo<MindBloc>(MindGetList());
         }
       })?.disposed(by: this);
 
@@ -103,37 +105,53 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           setState(() {
             _minds = state.values;
           });
+        } else if (state is MindServerOperationStarted) {
+          if (state.type == MindOperationType.fetch) {
+            setState(() => _updating = true);
+          }
+        } else if (state is MindOperationCompleted) {
+          if (state.type == MindOperationType.fetch) {
+            setState(() => _updating = false);
+          }
         } else if (state is MindOperationNotCompleted) {
           if (ModalRoute.of(context)?.isCurrent ?? false) {
             _showDayCollectionAndHandleError(state: state);
           }
 
-          if (MindOperationCompletedType.values
-              .where((element) => element != MindOperationCompletedType.uploadedCachedData)
-              .contains(state.not)) {
+          if (state.notCompleted == MindOperationType.fetch) {
+            setState(() {
+              _updating = false;
+            });
+          }
+
+          // Показ ошибки.
+          if (MindOperationType.values
+              .where(
+                (element) => element != MindOperationType.uploadCachedData && element != MindOperationType.fetch,
+              )
+              .contains(state.notCompleted)) {
             showOkAlertDialog(
               context: context,
               title: 'Error',
               message: state.toString(), // TODO: локализовать ошибку для пользователя
             );
+          } else {
+            // TODO: remove print
+            print('MindOperationNotCompleted: ${state.toString()}');
           }
         } else if (state is MindSearching) {
           setState(() => _searchingMindState = state);
-        } else if (state is MindSyncronizationStarted) {
-          setState(() => _synchronizationInProgress = true);
-        } else if (state is MindSyncronizationComplete) {
-          setState(() => _synchronizationInProgress = false);
         }
       })?.disposed(by: this);
 
       subscribeTo<AuthBloc>(onNewState: (state) async {
-        if (state is AuthLoggedIn) {
+        if (state is AuthLoggedIn || !_isOfflineMode) {
           _disableDemoMode();
           sendEventTo<MindBloc>(MindGetList());
-        } else if (state is AuthLogouted && !_isOfflineMode) {
+        } else if (state is AuthLogouted && !_isOfflineMode ||
+            state is AuthCurrentStatus && !state.isLoggedIn && !_isOfflineMode) {
           _enableDemoMode();
-        } else if (state is AuthCurrentStatus && !state.isLoggedIn && !_isOfflineMode) {
-          _enableDemoMode();
+          sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
         }
       })?.disposed(by: this);
 
@@ -146,9 +164,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _showDayCollectionAndHandleError({required MindOperationNotCompleted state}) {
     if ([
-      MindOperationCompletedType.created,
-      MindOperationCompletedType.edited,
-    ].contains(state.not)) {
+      MindOperationType.create,
+      MindOperationType.edit,
+    ].contains(state.notCompleted)) {
       if (state.minds.isEmpty) {
         return;
       }
@@ -195,7 +213,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       return null;
     }
 
-    if (_synchronizationInProgress) {
+    if (_updating) {
       return AppBar(
         centerTitle: true,
         automaticallyImplyLeading: true,
