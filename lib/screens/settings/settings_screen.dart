@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -31,13 +32,30 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   void initState() {
     super.initState();
 
+    subscribeTo<SettingsBloc>(
+      onNewState: (state) {
+        if (state is SettingsDataState) {
+          setState(() {
+            _offlineMode = state.isOfflineMode;
+
+            if (_isLoggedIn && !_offlineMode) {
+              _cachedMindsToUpload = state.cachedMindsToUpload;
+            } else {
+              _cachedMindsToUpload = [];
+            }
+          });
+        }
+      },
+    )?.disposed(by: this);
+
     subscribeTo<MindBloc>(onNewState: (state) {
-      if (state is MindUploadCachedMinds) {
-        setState(() {
-          _cachedMindsToUpload = [];
-        });
+      if (state is MindServerOperationStarted) {
+        if (state.type == MindOperationType.uploadCachedData) {
+          EasyLoading.show(status: 'Loading...');
+        }
       } else if (state is MindOperationNotCompleted) {
         if (state.notCompleted == MindOperationType.uploadCachedData) {
+          EasyLoading.dismiss();
           showOkAlertDialog(
             context: context,
             title: 'Error',
@@ -46,6 +64,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         }
       } else if (state is MindOperationCompleted) {
         if (state.type == MindOperationType.uploadCachedData) {
+          EasyLoading.dismiss();
           setState(() {
             _cachedMindsToUpload = [];
           });
@@ -58,22 +77,6 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         }
       }
     })?.disposed(by: this);
-
-    subscribeTo<SettingsBloc>(
-      onNewState: (state) {
-        if (state is SettingsDataState) {
-          setState(() {
-            _offlineMode = state.isOfflineMode;
-
-            if (!_isLoggedIn && !_offlineMode) {
-              _cachedMindsToUpload = state.cachedMindsToUpload;
-            } else {
-              _cachedMindsToUpload = [];
-            }
-          });
-        }
-      },
-    )?.disposed(by: this);
 
     subscribeTo<AuthBloc>(
       onNewState: (state) {

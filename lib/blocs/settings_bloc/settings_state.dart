@@ -15,7 +15,6 @@ class SettingsDataState extends SettingsState {
 
   SettingsDataState copyWith({
     bool? isMindContentVisible,
-    bool? needToShowWhatsNewOnStart,
     bool? isOfflineMode,
     Iterable<Mind>? cachedMindsToUpload,
   }) {
