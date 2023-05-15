@@ -308,15 +308,20 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   Future<void> _uploadCachedMinds(MindUploadCachedMinds event, Emitter<MindState> emit) {
     final Iterable<Mind> cachedMinds = event.minds;
     emit(
-      MindServerOperationStarted(minds: cachedMinds, type: MindOperationType.uploadCachedData),
+      MindServerOperationStarted(
+        minds: cachedMinds,
+        type: MindOperationType.uploadCachedData,
+      ),
     );
     return _service
         .addAllMinds(list: cachedMinds)
         .then(
-          (_) => emit(MindOperationCompleted(
-            minds: cachedMinds,
-            type: MindOperationType.uploadCachedData,
-          )),
+          (_) => emit(
+            MindOperationCompleted(
+              minds: cachedMinds,
+              type: MindOperationType.uploadCachedData,
+            ),
+          ),
         )
         .onError(
       (error, _) {

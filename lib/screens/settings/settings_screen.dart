@@ -51,7 +51,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     subscribeTo<MindBloc>(onNewState: (state) {
       if (state is MindServerOperationStarted) {
         if (state.type == MindOperationType.uploadCachedData) {
-          EasyLoading.show(status: 'Loading...');
+          EasyLoading.show();
         }
       } else if (state is MindOperationNotCompleted) {
         if (state.notCompleted == MindOperationType.uploadCachedData) {
@@ -72,8 +72,9 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           showOkAlertDialog(
             context: context,
             title: 'Success',
-            message: 'Offline data uploaded successfully',
+            message: 'Minds have uploaded successfully',
           );
+          sendEventTo<SettingsBloc>(SettingsGet());
         }
       }
     })?.disposed(by: this);
