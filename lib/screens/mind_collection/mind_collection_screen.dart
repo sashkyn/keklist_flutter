@@ -74,14 +74,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
-        sendEventTo<MindBloc>(MindEnterSearchText(text: _searchTextController.text));
+        sendEventTo<MindBloc>(
+          MindEnterSearchText(text: _searchTextController.text),
+        );
       });
 
       // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
       _createMarkEditingController.addListener(() {
-        BlocUtils.sendEventTo<MindBloc>(
-          context: context,
-          event: MindChangeCreateText(text: _createMarkEditingController.text),
+        sendEventTo<MindBloc>(
+          MindChangeCreateText(text: _createMarkEditingController.text),
         );
       });
 
@@ -93,7 +94,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               _updating = false;
             });
           }
-          sendEventTo<AuthBloc>(AuthGetCurrentStatus());
         } else if (state is SettingsWhatsNewState && state.needToShowWhatsNewOnStart) {
           await _showWhatsNew();
           sendEventTo<SettingsBloc>(SettingsWhatsNewShown());

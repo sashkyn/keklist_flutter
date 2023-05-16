@@ -19,10 +19,10 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
+  final SupabaseClient client;
   final MainService mainService;
   final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
   final Box<SettingsObject> _settingsBox = Hive.box(HiveConstants.settingsBoxName);
-  final SupabaseClient client;
 
   late SettingsDataState _lastSettingsState;
 
@@ -33,7 +33,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           SettingsDataState(
             isMindContentVisible: false,
             isOfflineMode: false,
-            cachedMindsToUpload: [],
           ),
         ) {
     _lastSettingsState = state as SettingsDataState;
@@ -43,6 +42,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsChangeOfflineMode>(_changeOfflineMode);
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
+    on<SettingsGetUploadCandidates>(_getUploadCandidates);
     on<SettingsNeedToShowAuth>(_showAuth);
   }
 
@@ -64,12 +64,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
     final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
     final bool isOfflineMode = settingsObject?.isOfflineMode ?? false;
-    _emitDataState(
+    _emitAndSaveDataState(
       emit,
       SettingsDataState(
         isMindContentVisible: isMindContentVisible,
         isOfflineMode: isOfflineMode,
-        cachedMindsToUpload: [],
       ),
     );
 
@@ -79,23 +78,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
     final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
     emit(SettingsWhatsNewState(needToShowWhatsNewOnStart));
-
-    // Cбор и отправка стейта Cached Minds.
-    final Iterable<MindObject> cachedMinds = _mindsBox.values;
-    if (cachedMinds.isEmpty) {
-      return;
-    }
-    final Iterable<Mind> serverMinds = await mainService.getMindList();
-    final Iterable<Mind> mindsServerDoesNotHave = cachedMinds
-        .where((final MindObject cachedMind) => !serverMinds.any((serverMind) => serverMind.id == cachedMind.id))
-        .map(
-          (cachedMind) => cachedMind.toMind(),
-        );
-
-    _emitDataState(
-      emit,
-      _lastSettingsState.copyWith(cachedMindsToUpload: mindsServerDoesNotHave),
-    );
 
     // Cбор и отправка стейта показа Auth.
     final bool needToShowAuth = !isOfflineMode && client.auth.currentUser == null;
@@ -122,7 +104,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     settingsObject?.isMindContentVisible = event.isVisible;
     _settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, settingsObject!);
 
-    _emitDataState(
+    _emitAndSaveDataState(
       emit,
       _lastSettingsState.copyWith(isMindContentVisible: event.isVisible),
     );
@@ -136,7 +118,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     settingsObject?.isOfflineMode = event.isOfflineMode;
     settingsObject?.save();
 
-    _emitDataState(
+    _emitAndSaveDataState(
       emit,
       _lastSettingsState.copyWith(isOfflineMode: event.isOfflineMode),
     );
@@ -150,8 +132,30 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(SettingsAuthState(true));
   }
 
-  void _emitDataState(Emitter<SettingsState> emit, SettingsDataState state) {
+  void _emitAndSaveDataState(Emitter<SettingsState> emit, SettingsDataState state) {
     _lastSettingsState = state;
     emit(state);
+  }
+
+  Future<void> _getUploadCandidates(
+    SettingsGetUploadCandidates event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final Iterable<MindObject> cachedMinds = _mindsBox.values;
+    if (cachedMinds.isEmpty) {
+      emit(SettingsOfflineUploadCandidates([]));
+      return;
+    }
+
+    final Iterable<Mind> serverMinds = await mainService.getMindList();
+    final Iterable<Mind> mindsServerDoesNotHave = cachedMinds
+        .where((final MindObject cachedMind) => !serverMinds.any((serverMind) => serverMind.id == cachedMind.id))
+        .map(
+          (cachedMind) => cachedMind.toMind(),
+        );
+
+    emit(
+      SettingsOfflineUploadCandidates(mindsServerDoesNotHave),
+    );
   }
 }
