@@ -106,6 +106,9 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
           } else if (state is AuthLogouted) {
             _isLoggedIn = false;
+            if (!_offlineMode) {
+              sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
+            }
           }
         });
       },
@@ -246,7 +249,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   }
 
   Future<void> _deleteAccount() async {
-    final result = await showOkCancelAlertDialog(
+    final OkCancelResult result = await showOkCancelAlertDialog(
       context: context,
       title: 'Are you sure?',
       message: 'If you delete yourself from system your minds will be deleted too.',
