@@ -65,7 +65,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             showOkAlertDialog(
               context: context,
               title: 'Error',
-              message: state.toString(), // TODO: локализовать ошибку для пользователя
+              message: state.localizedString,
             );
           }
         case MindOperationCompleted:

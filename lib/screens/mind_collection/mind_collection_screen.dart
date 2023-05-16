@@ -134,11 +134,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             showOkAlertDialog(
               context: context,
               title: 'Error',
-              message: state.toString(), // TODO: локализовать ошибку для пользователя
+              message: state.localizedString,
             );
-          } else {
-            // TODO: remove print
-            print('MindOperationNotCompleted: ${state.toString()}');
           }
         } else if (state is MindSearching) {
           setState(() => _searchingMindState = state);
