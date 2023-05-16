@@ -48,7 +48,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
     // Получение minds.
-    final Iterable<Mind> minds = await mainService.getMindList();
+    final Iterable<Mind> minds = _mindsBox.values.map((mindObject) => mindObject.toMind());
     // Конвертация в CSV и шаринг.
     final List<List<String>> csvEntryList = minds.map((entry) => entry.toCSVEntry()).toList(growable: false);
     final String csv = const ListToCsvConverter().convert(csvEntryList);

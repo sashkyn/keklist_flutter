@@ -9,10 +9,10 @@ import 'package:rememoji/services/main_service.dart';
 part 'mind_searcher_state.dart';
 
 class MindSearcherCubit extends Cubit<MindSearcherState> {
-  late final MainService _storage;
+  late final MainService service;
 
   MindSearcherCubit({required MainService mainService}) : super(MindSearcherInitial()) {
-    _storage = mainService;
+    service = mainService;
   }
 
   final _emojiParser = EmojiParser();
@@ -20,7 +20,7 @@ class MindSearcherCubit extends Cubit<MindSearcherState> {
   Future<List<Mind>> searchMindList(String text) async {
     final lowerCasedTrimmedText = text.toLowerCase().trim();
 
-    final minds = await _storage.getMindList();
+    final minds = await service.getMindList();
     final filteredMinds = minds.where((mind) {
       // Note condition.
       final noteCondition = mind.note.trim().toLowerCase().contains(lowerCasedTrimmedText);

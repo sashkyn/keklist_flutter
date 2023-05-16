@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
@@ -46,6 +45,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Iterable<Mind> _minds = [];
   MindSearching? _searchingMindState;
 
+  bool _isLoggedIn = false;
   bool _isDemoMode = false;
   bool _isOfflineMode = false;
 
@@ -94,6 +94,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               _updating = false;
             });
           }
+          sendEventTo<AuthBloc>(AuthGetCurrentStatus());
         } else if (state is SettingsWhatsNewState && state.needToShowWhatsNewOnStart) {
           await _showWhatsNew();
           sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
@@ -145,13 +146,23 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       })?.disposed(by: this);
 
       subscribeTo<AuthBloc>(onNewState: (state) async {
-        if (state is AuthLoggedIn || !_isOfflineMode) {
-          _disableDemoMode();
-          sendEventTo<MindBloc>(MindGetList());
-        } else if (state is AuthLogouted && !_isOfflineMode ||
-            state is AuthCurrentStatus && !state.isLoggedIn && !_isOfflineMode) {
-          _enableDemoMode();
-          sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
+        switch (state.runtimeType) {
+          case AuthLoggedIn:
+            _isLoggedIn = true;
+            _disableDemoMode();
+          case AuthLogouted:
+            if (!_isOfflineMode) {
+              _enableDemoMode();
+            } else {
+              _disableDemoMode();
+            }
+          case AuthCurrentStatus:
+            _isLoggedIn = state.isLoggedIn;
+            if (!state.isLoggedIn && !_isOfflineMode) {
+              _enableDemoMode();
+            } else {
+              _disableDemoMode();
+            }
         }
       })?.disposed(by: this);
 
