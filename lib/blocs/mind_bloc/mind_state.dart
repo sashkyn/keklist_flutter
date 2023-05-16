@@ -52,6 +52,25 @@ class MindOperationNotCompleted extends MindState with EquatableMixin {
 
   @override
   bool? get stringify => true;
+
+  String get localizedString {
+    switch (notCompleted) {
+      case MindOperationType.create:
+        return 'Mind was not created';
+      case MindOperationType.edit:
+        return 'Mind was not edited';
+      case MindOperationType.delete:
+        return 'Mind was not deleted';
+      case MindOperationType.deleteAll:
+        return 'Minds were not deleted';
+      case MindOperationType.fetch:
+        return 'Minds were not fetched';
+      case MindOperationType.uploadCachedData:
+        return 'Mind were not upload';
+      case MindOperationType.clearCache:
+        return 'Could not clear cache';
+    }
+  }
 }
 
 class MindServerOperationStarted extends MindState with EquatableMixin {
