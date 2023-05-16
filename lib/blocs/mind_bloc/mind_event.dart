@@ -101,3 +101,7 @@ class MindUploadCachedMinds extends MindEvent {
   @override
   List<Object?> get props => [minds];
 }
+
+class MindDeleteAllMinds extends MindEvent {}
+
+class MindClearCache extends MindEvent {}

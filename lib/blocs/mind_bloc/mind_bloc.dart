@@ -39,6 +39,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindGetList>(_getMinds);
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
+    on<MindDeleteAllMinds>(_deleteAllMinds);
+    on<MindClearCache>(_clearCache);
     on<MindEdit>(_editMind);
     on<MindStartSearch>(_startSearch);
     on<MindStopSearch>(_stopSearch);
@@ -336,5 +338,58 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         );
       },
     );
+  }
+
+  Future<void> _deleteAllMinds(
+    MindDeleteAllMinds event,
+    Emitter<MindState> emit,
+  ) {
+    return _service.deleteAllMinds().then(
+      (_) {
+        emit(
+          MindOperationCompleted(
+            minds: [],
+            type: MindOperationType.deleteAll,
+          ),
+        );
+
+        _minds.clear();
+        final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
+        _minds.addAll(localMinds);
+        final MindList localStorageState = MindList(values: _minds);
+        emit(localStorageState);
+      },
+    ).onError(
+      (error, _) {
+        // Обработка ошибки
+        emit(
+          MindOperationNotCompleted(
+            minds: [],
+            notCompleted: MindOperationType.deleteAll,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _clearCache(MindClearCache event, Emitter<MindState> emit) async {
+    _mindBox
+        .clear()
+        .then(
+          (value) => emit(
+            MindOperationCompleted(
+              minds: [],
+              type: MindOperationType.clearCache,
+            ),
+          ),
+        )
+        .onError(
+          (error, stackTrace) => emit(
+            MindOperationNotCompleted(
+              minds: [],
+              notCompleted: MindOperationType.clearCache,
+            ),
+          ),
+        );
   }
 }

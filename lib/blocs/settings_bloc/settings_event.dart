@@ -25,3 +25,5 @@ class SettingsWhatsNewShown extends SettingsEvent {}
 class SettingsUploadMindsFromCacheToServer extends SettingsEvent {}
 
 class SettingsNeedToShowAuth extends SettingsEvent {}
+
+class SettingsGetUploadCandidates extends SettingsEvent {}
