@@ -32,8 +32,10 @@ enum MindOperationType {
   create,
   edit,
   delete,
+  deleteAll,
   fetch,
   uploadCachedData,
+  clearCache,
 }
 
 class MindOperationNotCompleted extends MindState with EquatableMixin {

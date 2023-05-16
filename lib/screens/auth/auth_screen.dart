@@ -156,14 +156,6 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                   ),
                 ],
               ),
-              // const SizedBox(height: 16.0),
-              // TextButton(
-              //   onPressed: () => sendEventTo<SettingsBloc>(const SettingsChangeOfflineMode(isOfflineMode: true)),
-              //   child: const Text(
-              //     'Use offline mode',
-              //     style: TextStyle(color: Colors.blue),
-              //   ),
-              // ),
               const SizedBox(height: 32.0),
               TextButton(
                 onPressed: () => launchUrlString(KeklistConstants.termsOfUseURL),

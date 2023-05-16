@@ -34,48 +34,65 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
-        if (state is SettingsDataState) {
-          setState(() {
-            _offlineMode = state.isOfflineMode;
-
-            if (_isLoggedIn && !_offlineMode) {
-              _cachedMindsToUpload = state.cachedMindsToUpload;
-            } else {
-              _cachedMindsToUpload = [];
-            }
-          });
+        switch (state.runtimeType) {
+          case SettingsDataState:
+            setState(() {
+              _offlineMode = state.isOfflineMode;
+            });
+          case SettingsOfflineUploadCandidates:
+            setState(() {
+              if (_isLoggedIn && !_offlineMode) {
+                _cachedMindsToUpload = state.cachedMindsToUpload;
+              } else {
+                _cachedMindsToUpload = [];
+              }
+            });
         }
       },
     )?.disposed(by: this);
 
     subscribeTo<MindBloc>(onNewState: (state) {
-      if (state is MindServerOperationStarted) {
-        if (state.type == MindOperationType.uploadCachedData) {
-          EasyLoading.show();
-        }
-      } else if (state is MindOperationNotCompleted) {
-        if (state.notCompleted == MindOperationType.uploadCachedData) {
-          EasyLoading.dismiss();
-          showOkAlertDialog(
-            context: context,
-            title: 'Error',
-            message: state.toString(), // TODO: локализовать ошибку для пользователя
-          );
-        }
-      } else if (state is MindOperationCompleted) {
-        if (state.type == MindOperationType.uploadCachedData) {
-          EasyLoading.dismiss();
-          setState(() {
-            _cachedMindsToUpload = [];
-          });
+      switch (state.runtimeType) {
+        case MindServerOperationStarted:
+          if (state.type == MindOperationType.uploadCachedData || state.type == MindOperationType.deleteAll) {
+            EasyLoading.show();
+          }
+        case MindOperationNotCompleted:
+          if (state.notCompleted == MindOperationType.uploadCachedData ||
+              state.notCompleted == MindOperationType.clearCache ||
+              state.notCompleted == MindOperationType.deleteAll) {
+            EasyLoading.dismiss();
+            showOkAlertDialog(
+              context: context,
+              title: 'Error',
+              message: state.toString(), // TODO: локализовать ошибку для пользователя
+            );
+          }
+        case MindOperationCompleted:
+          switch (state.type) {
+            case MindOperationType.uploadCachedData:
+              EasyLoading.dismiss();
+              setState(() {
+                _cachedMindsToUpload = [];
+              });
 
-          showOkAlertDialog(
-            context: context,
-            title: 'Success',
-            message: 'Minds have uploaded successfully',
-          );
-          sendEventTo<SettingsBloc>(SettingsGet());
-        }
+              showOkAlertDialog(
+                context: context,
+                title: 'Success',
+                message: 'Minds have uploaded successfully',
+              );
+              sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
+            case MindOperationType.deleteAll:
+              EasyLoading.dismiss();
+              setState(() {
+                _cachedMindsToUpload = [];
+              });
+              showOkAlertDialog(
+                context: context,
+                title: 'Success',
+                message: '`Your mind was cleared on server',
+              );
+          }
       }
     })?.disposed(by: this);
 
@@ -86,7 +103,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             _isLoggedIn = state.isLoggedIn;
           } else if (state is AuthLoggedIn) {
             _isLoggedIn = true;
-            sendEventTo<SettingsBloc>(SettingsGet());
+            sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
           } else if (state is AuthLogouted) {
             _isLoggedIn = false;
           }
@@ -96,6 +113,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     sendEventTo<AuthBloc>(AuthGetCurrentStatus());
     sendEventTo<SettingsBloc>(SettingsGet());
+    sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
   }
 
   @override
@@ -183,13 +201,25 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           SettingsSection(
             title: Text('Danger zone'.toUpperCase()),
             tiles: [
+              if (_isLoggedIn) ...{
+                SettingsTile(
+                  title: const Text('Delete all data from server'),
+                  leading: const Icon(Icons.delete_forever, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
+                ),
+              },
               SettingsTile(
-                title: const Text('Delete account'),
-                leading: const Icon(Icons.delete, color: Colors.red),
-                onPressed: (BuildContext context) async {
-                  await _deleteAccount(context);
-                },
+                title: const Text('Clear cache'),
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: (BuildContext context) async => await _clearCache(),
               ),
+              if (_isLoggedIn) ...{
+                SettingsTile(
+                  title: const Text('Delete account'),
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _deleteAccount(),
+                ),
+              },
             ],
           ),
         ],
@@ -215,7 +245,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     }
   }
 
-  Future<void> _deleteAccount(BuildContext context) async {
+  Future<void> _deleteAccount() async {
     final result = await showOkCancelAlertDialog(
       context: context,
       title: 'Are you sure?',
@@ -235,7 +265,9 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
   Future<void> _switchOfflineMode(bool value) async {
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
-    sendEventTo<MindBloc>(MindGetList());
+    if (!value) {
+      sendEventTo<MindBloc>(MindGetList());
+    }
   }
 
   Future<void> _showWhatsNew() {
@@ -248,5 +280,42 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         );
       },
     );
+  }
+
+  Future<void> _deleteAllMindsFromServer() async {
+    final OkCancelResult result = await showOkCancelAlertDialog(
+      context: context,
+      title: 'Are you sure?',
+      message:
+          'All your data will be deleted from server. Make sure that you have already exported it. Your offline minds will be saved only on your device.',
+      cancelLabel: 'Cancel',
+      okLabel: 'Delete all minds',
+      isDestructiveAction: true,
+    );
+    switch (result) {
+      case OkCancelResult.ok:
+        sendEventTo<MindBloc>(MindDeleteAllMinds());
+        break;
+      case OkCancelResult.cancel:
+        break;
+    }
+  }
+
+  Future<void> _clearCache() async {
+    final OkCancelResult result = await showOkCancelAlertDialog(
+      context: context,
+      title: 'Are you sure?',
+      message: 'All your offline data will be deleted. Make sure that you have already exported it.',
+      cancelLabel: 'Cancel',
+      okLabel: 'Clear cache',
+      isDestructiveAction: true,
+    );
+    switch (result) {
+      case OkCancelResult.ok:
+        sendEventTo<MindBloc>(MindClearCache());
+        break;
+      case OkCancelResult.cancel:
+        break;
+    }
   }
 }
