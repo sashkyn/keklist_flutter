@@ -121,7 +121,7 @@ app.*.symbols
 *.p8
 
 # Fastlane
-/ios/.env
+**/ios/.env
+**/ios/fastlane/report.xml
 Runner.app.dSYM.zip
 Runner.ipa
-/ios/fastlane/report.xml
