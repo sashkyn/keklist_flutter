@@ -38,11 +38,11 @@ enum MindOperationType {
   clearCache,
 }
 
-class MindOperationNotCompleted extends MindState with EquatableMixin {
+class MindOperationError extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
   final MindOperationType notCompleted;
 
-  MindOperationNotCompleted({
+  MindOperationError({
     required this.minds,
     required this.notCompleted,
   });
@@ -103,4 +103,13 @@ class MindOperationCompleted extends MindState with EquatableMixin {
 
   @override
   bool? get stringify => true;
+}
+
+class MindCandidatesForUpload extends MindState with EquatableMixin {
+  final Iterable<Mind> values;
+
+  MindCandidatesForUpload({required this.values});
+
+  @override
+  List<Object?> get props => [values];
 }
