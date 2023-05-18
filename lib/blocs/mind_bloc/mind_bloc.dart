@@ -425,9 +425,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     }
 
     final Iterable<Mind> uploadCandidates = _localMinds.difference(_serverMinds).map(
-          (mind) => mind.copyWith(
-            id: const Uuid().v4(),
-          ),
+          (mind) => mind.copyWith(id: const Uuid().v4()),
         );
     if (uploadCandidates.isEmpty) {
       emit(MindCandidatesForUpload(values: []));
