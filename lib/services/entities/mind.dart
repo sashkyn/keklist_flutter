@@ -86,11 +86,12 @@ class Mind with EquatableMixin {
     );
   }
 
-  MindObject toObject() => MindObject()
+  MindObject toObject({required bool isUploadedToServer}) => MindObject()
     ..id = id
     ..emoji = emoji
     ..note = note
     ..dayIndex = dayIndex
     ..creationDate = creationDate
+    ..isUploadedToServer = isUploadedToServer
     ..sortIndex = sortIndex;
 }

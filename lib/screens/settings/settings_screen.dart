@@ -10,7 +10,6 @@ import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
-import 'package:rememoji/services/entities/mind.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -26,7 +25,8 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
-  Iterable<Mind> _cachedMindsToUpload = [];
+  int _cachedMindCountToUpload = 0;
+  bool _clearCacheVisible = false;
 
   @override
   void initState() {
@@ -46,13 +46,18 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     subscribeTo<MindBloc>(onNewState: (state) {
       switch (state.runtimeType) {
         case MindList:
-          sendEventTo<MindBloc>(MindGetUploadCandidates());
+          setState(() {
+            _clearCacheVisible = state.values.isNotEmpty;
+          });
+          if (!_offlineMode) {
+            sendEventTo<MindBloc>(MindGetUploadCandidates());
+          }
         case MindCandidatesForUpload:
           setState(() {
             if (_isLoggedIn && !_offlineMode) {
-              _cachedMindsToUpload = state.values;
+              _cachedMindCountToUpload = state.values.length;
             } else {
-              _cachedMindsToUpload = [];
+              _cachedMindCountToUpload = 0;
             }
           });
         case MindServerOperationStarted:
@@ -74,18 +79,21 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           }
         case MindOperationCompleted:
           switch (state.type) {
+            case MindOperationType.clearCache:
+              EasyLoading.dismiss();
+              setState(() {
+                _clearCacheVisible = false;
+              });
             case MindOperationType.uploadCachedData:
               EasyLoading.dismiss();
               setState(() {
-                _cachedMindsToUpload = [];
+                _cachedMindCountToUpload = 0;
               });
-
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
                 message: 'Minds have uploaded successfully',
               );
-              sendEventTo<MindBloc>(MindGetUploadCandidates());
             case MindOperationType.deleteAll:
               EasyLoading.dismiss();
               sendEventTo<MindBloc>(MindGetUploadCandidates());
@@ -165,12 +173,12 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   await _switchOfflineMode(value);
                 },
               ),
-              if (_cachedMindsToUpload.isNotEmpty && !_offlineMode && _isLoggedIn) ...{
+              if (_cachedMindCountToUpload > 0 && !_offlineMode && _isLoggedIn) ...{
                 SettingsTile(
-                  title: Text('Upload ${_cachedMindsToUpload.length} minds'),
+                  title: Text('Upload $_cachedMindCountToUpload minds'),
                   leading: const Icon(Icons.cloud_upload, color: Colors.green),
                   onPressed: (BuildContext context) {
-                    sendEventTo<MindBloc>(MindUploadCandidates(minds: _cachedMindsToUpload));
+                    sendEventTo<MindBloc>(MindUploadCandidates());
                   },
                 ),
               },
@@ -212,11 +220,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
                 ),
               },
-              SettingsTile(
-                title: const Text('Clear cache'),
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: (BuildContext context) async => await _clearCache(),
-              ),
+              if (_clearCacheVisible) ...{
+                SettingsTile(
+                  title: const Text('Clear cache'),
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _clearCache(),
+                )
+              },
               if (_isLoggedIn) ...{
                 SettingsTile(
                   title: const Text('Delete account'),

@@ -6,7 +6,7 @@ abstract class MainService {
   Future<void> editMind({required Mind mind});
   Future<void> addMind(Mind mind);
   Future<void> deleteMind(String id);
-  Future<void> addAllMinds({required Iterable<Mind> list});
+  Future<void> addAllMinds({required Iterable<Mind> values});
   Future<Iterable<Mind>> getMindList();
   Future<void> deleteAccount();
   Future<void> deleteAllMinds();
