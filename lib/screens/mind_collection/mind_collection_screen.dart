@@ -114,7 +114,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           if (state.type == MindOperationType.fetch) {
             setState(() => _updating = false);
           }
-        } else if (state is MindOperationNotCompleted) {
+        } else if (state is MindOperationError) {
           if (ModalRoute.of(context)?.isCurrent ?? false) {
             _showDayCollectionAndHandleError(state: state);
           }
@@ -170,7 +170,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     });
   }
 
-  void _showDayCollectionAndHandleError({required MindOperationNotCompleted state}) {
+  void _showDayCollectionAndHandleError({required MindOperationError state}) {
     if ([
       MindOperationType.create,
       MindOperationType.edit,
@@ -398,7 +398,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   void _showDayCollectionScreen({
     required int groupDayIndex,
-    required MindOperationNotCompleted? initialError,
+    required MindOperationError? initialError,
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(

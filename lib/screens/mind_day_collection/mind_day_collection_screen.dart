@@ -22,7 +22,7 @@ import 'package:rememoji/services/entities/mind.dart';
 
 class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
-  final MindOperationNotCompleted? initialError;
+  final MindOperationError? initialError;
   final Iterable<Mind> allMinds;
 
   const MindDayCollectionScreen({
@@ -108,7 +108,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         setState(() {
           _mindSuggestions = state;
         });
-      } else if (state is MindOperationNotCompleted) {
+      } else if (state is MindOperationError) {
         _handleError(state);
       }
     })?.disposed(by: this);
@@ -319,7 +319,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     }
   }
 
-  void _handleError(MindOperationNotCompleted error) {
+  void _handleError(MindOperationError error) {
     if (error.notCompleted == MindOperationType.create) {
       final Mind? notCreatedMind = error.minds.firstOrNull;
       if (notCreatedMind == null) {
