@@ -66,7 +66,7 @@ class MindOperationError extends MindState with EquatableMixin {
       case MindOperationType.fetch:
         return 'Minds were not fetched';
       case MindOperationType.uploadCachedData:
-        return 'Mind were not upload';
+        return 'Minds were not upload';
       case MindOperationType.clearCache:
         return 'Could not clear cache';
     }
