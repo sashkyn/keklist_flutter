@@ -188,8 +188,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   @override
   void dispose() {
     _demoAutoScrollingTimer?.cancel();
-
     cancelSubscriptions();
+    
     super.dispose();
   }
 

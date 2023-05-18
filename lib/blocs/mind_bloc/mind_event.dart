@@ -93,14 +93,7 @@ class MindChangeCreateText extends MindEvent {
   List<Object?> get props => [text];
 }
 
-class MindUploadCandidates extends MindEvent {
-  final Iterable<Mind> minds;
-
-  MindUploadCandidates({required this.minds});
-
-  @override
-  List<Object?> get props => [minds];
-}
+class MindUploadCandidates extends MindEvent {}
 
 class MindDeleteAllMinds extends MindEvent {}
 

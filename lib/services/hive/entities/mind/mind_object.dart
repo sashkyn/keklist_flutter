@@ -23,6 +23,9 @@ class MindObject extends HiveObject {
   @HiveField(5)
   late int sortIndex;
 
+  @HiveField(6)
+  late bool isUploadedToServer;
+
   MindObject();
 
   Mind toMind() => Mind(
