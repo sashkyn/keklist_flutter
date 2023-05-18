@@ -28,20 +28,7 @@ import 'native/ios/watch/watch_communication_manager.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  EasyLoading.instance
-    ..displayDuration = const Duration(milliseconds: 10000)
-    ..indicatorType = EasyLoadingIndicatorType.circle
-    ..loadingStyle = EasyLoadingStyle.light
-    ..indicatorSize = 45.0
-    ..radius = 10.0
-    ..progressColor = Colors.white
-    ..backgroundColor = null
-    ..indicatorColor = Colors.white
-    ..textColor = Colors.black
-    ..maskColor = Colors.blue.withOpacity(0.5)
-    ..userInteractions = true
-    ..dismissOnTap = true;
-
+  _setupBlockingLoadingWidget();
   _setupOrientations();
 
   // Удаляет # в пути в начале для web приложений.
@@ -61,12 +48,12 @@ Future<void> main() async {
   );
 
   // Инициализация DI-контейнера.
-  final injector = Injector();
-  final mainContainer = MainContainer().initialize(injector);
+  final Injector injector = Injector();
+  final Injector mainInjector = MainContainer().initialize(injector);
 
   // Подключаемся к Apple Watch.
   if (Platform.isIOS) {
-    mainContainer.get<WatchCommunicationManager>().connect();
+    mainInjector.get<WatchCommunicationManager>().connect();
   }
 
   if (!kReleaseMode) {
@@ -78,20 +65,20 @@ Future<void> main() async {
     providers: [
       BlocProvider(
         create: (context) => MindBloc(
-          mainService: mainContainer.get<MainService>(),
-          mindSearcherCubit: mainContainer.get<MindSearcherCubit>(),
+          mainService: mainInjector.get<MainService>(),
+          mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
         ),
       ),
-      BlocProvider(create: (context) => mainContainer.get<MindSearcherCubit>()),
+      BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
       BlocProvider(
         create: (context) => AuthBloc(
-          mainService: mainContainer.get<MainService>(),
+          mainService: mainInjector.get<MainService>(),
           client: Supabase.instance.client,
         ),
       ),
       BlocProvider(
         create: (context) => SettingsBloc(
-          mainService: mainContainer.get<MainService>(),
+          mainService: mainInjector.get<MainService>(),
           client: Supabase.instance.client,
         ),
       ),
@@ -99,6 +86,22 @@ Future<void> main() async {
     child: const KeklistApp(),
   );
   runApp(application);
+}
+
+void _setupBlockingLoadingWidget() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 10000)
+    ..indicatorType = EasyLoadingIndicatorType.doubleBounce
+    ..loadingStyle = EasyLoadingStyle.light
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.white
+    ..backgroundColor = Colors.black.withAlpha(200)
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.black
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = false
+    ..dismissOnTap = false;
 }
 
 Future<void> _setupHive() async {

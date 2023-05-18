@@ -42,7 +42,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsChangeOfflineMode>(_changeOfflineMode);
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
-    on<SettingsGetUploadCandidates>(_getUploadCandidates);
     on<SettingsNeedToShowAuth>(_showAuth);
   }
 
@@ -135,27 +134,5 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   void _emitAndSaveDataState(Emitter<SettingsState> emit, SettingsDataState state) {
     _lastSettingsState = state;
     emit(state);
-  }
-
-  Future<void> _getUploadCandidates(
-    SettingsGetUploadCandidates event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final Iterable<MindObject> cachedMinds = _mindsBox.values;
-    if (cachedMinds.isEmpty) {
-      emit(SettingsOfflineUploadCandidates([]));
-      return;
-    }
-
-    final Iterable<Mind> serverMinds = await mainService.getMindList();
-    final Iterable<Mind> mindsServerDoesNotHave = cachedMinds
-        .where((final MindObject cachedMind) => !serverMinds.any((serverMind) => serverMind.id == cachedMind.id))
-        .map(
-          (cachedMind) => cachedMind.toMind(),
-        );
-
-    emit(
-      SettingsOfflineUploadCandidates(mindsServerDoesNotHave),
-    );
   }
 }

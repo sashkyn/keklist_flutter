@@ -42,15 +42,3 @@ class SettingsAuthState extends SettingsState with EquatableMixin {
   @override
   bool? get stringify => true;
 }
-
-class SettingsOfflineUploadCandidates extends SettingsState with EquatableMixin {
-  final Iterable<Mind> cachedMindsToUpload;
-
-  SettingsOfflineUploadCandidates(this.cachedMindsToUpload);
-
-  @override
-  List<Object?> get props => [cachedMindsToUpload];
-
-  @override
-  bool? get stringify => true;
-}

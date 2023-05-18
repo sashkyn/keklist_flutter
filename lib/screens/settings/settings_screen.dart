@@ -39,25 +39,29 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             setState(() {
               _offlineMode = state.isOfflineMode;
             });
-          case SettingsOfflineUploadCandidates:
-            setState(() {
-              if (_isLoggedIn && !_offlineMode) {
-                _cachedMindsToUpload = state.cachedMindsToUpload;
-              } else {
-                _cachedMindsToUpload = [];
-              }
-            });
         }
       },
     )?.disposed(by: this);
 
     subscribeTo<MindBloc>(onNewState: (state) {
       switch (state.runtimeType) {
+        case MindList:
+          sendEventTo<MindBloc>(MindGetUploadCandidates());
+        case MindCandidatesForUpload:
+          setState(() {
+            if (_isLoggedIn && !_offlineMode) {
+              _cachedMindsToUpload = state.values;
+            } else {
+              _cachedMindsToUpload = [];
+            }
+          });
         case MindServerOperationStarted:
-          if (state.type == MindOperationType.uploadCachedData || state.type == MindOperationType.deleteAll) {
+          if (state.type == MindOperationType.uploadCachedData ||
+              state.type == MindOperationType.deleteAll ||
+              state.type == MindOperationType.clearCache) {
             EasyLoading.show();
           }
-        case MindOperationNotCompleted:
+        case MindOperationError:
           if (state.notCompleted == MindOperationType.uploadCachedData ||
               state.notCompleted == MindOperationType.clearCache ||
               state.notCompleted == MindOperationType.deleteAll) {
@@ -81,12 +85,10 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                 title: 'Success',
                 message: 'Minds have uploaded successfully',
               );
-              sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
+              sendEventTo<MindBloc>(MindGetUploadCandidates());
             case MindOperationType.deleteAll:
               EasyLoading.dismiss();
-              setState(() {
-                _cachedMindsToUpload = [];
-              });
+              sendEventTo<MindBloc>(MindGetUploadCandidates());
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
@@ -103,7 +105,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             _isLoggedIn = state.isLoggedIn;
           } else if (state is AuthLoggedIn) {
             _isLoggedIn = true;
-            sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
+            sendEventTo<MindBloc>(MindGetUploadCandidates());
           } else if (state is AuthLogouted) {
             _isLoggedIn = false;
             if (!_offlineMode) {
@@ -116,7 +118,6 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     sendEventTo<AuthBloc>(AuthGetCurrentStatus());
     sendEventTo<SettingsBloc>(SettingsGet());
-    sendEventTo<SettingsBloc>(SettingsGetUploadCandidates());
   }
 
   @override
@@ -169,7 +170,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: Text('Upload ${_cachedMindsToUpload.length} minds'),
                   leading: const Icon(Icons.cloud_upload, color: Colors.green),
                   onPressed: (BuildContext context) {
-                    sendEventTo<MindBloc>(MindUploadCachedMinds(minds: _cachedMindsToUpload));
+                    sendEventTo<MindBloc>(MindUploadCandidates(minds: _cachedMindsToUpload));
                   },
                 ),
               },
