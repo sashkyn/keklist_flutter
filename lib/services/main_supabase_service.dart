@@ -33,11 +33,11 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  Future<void> addAllMinds({required Iterable<Mind> list}) async {
+  Future<void> addAllMinds({required Iterable<Mind> values}) async {
     _validateUserAuthorization();
 
     final Iterable<Map<String, dynamic>> listOfEntries =
-        list.map((e) => e.toSupabaseJson(userId: _client.auth.currentUser!.id)).toList();
+        values.map((e) => e.toSupabaseJson(userId: _client.auth.currentUser!.id)).toList();
 
     await _client.from('minds').upsert(listOfEntries);
   }

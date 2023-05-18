@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:hive/hive.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/hive/constants.dart';
@@ -15,7 +16,6 @@ import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
 part 'mind_event.dart';
 part 'mind_state.dart';
@@ -24,12 +24,11 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   late final MainService _service;
   late final MindSearcherCubit _searcherCubit;
 
-  final Set<Mind> _serverMinds = {};
-  final Set<Mind> _localMinds = {};
-
   final Box<MindObject> _mindBox = Hive.box<MindObject>(HiveConstants.mindBoxName);
   final SettingsObject? _settings =
       Hive.box<SettingsObject>(HiveConstants.settingsBoxName).get(HiveConstants.settingsGlobalSettingsIndex);
+
+  Iterable<MindObject> get _mindObjects => _mindBox.values;
 
   MindBloc({
     required MainService mainService,
@@ -59,11 +58,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   Future<void> _getMinds(MindGetList event, Emitter<MindState> emit) async {
-    final Iterable<Mind> localMinds = _mindBox.values.map((object) => object.toMind());
-    _localMinds.addAll(localMinds);
     _emitMindList(emit);
 
-    // Подмешиваем элементы с сервера.
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
         MindServerOperationStarted(
@@ -72,21 +68,17 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         ),
       );
       await _service.getMindList().then((final Iterable<Mind> serverMinds) {
-        _serverMinds.addAll(serverMinds);
-
         // Обновляем локальное хранилище.
         _mindBox.putAll(
           Map.fromEntries(
             serverMinds.map(
               (mind) => MapEntry(
                 mind.id,
-                mind.toObject(),
+                mind.toObject(isUploadedToServer: true),
               ),
             ),
           ),
         );
-        _localMinds.addAll(serverMinds);
-
         _emitMindList(emit);
 
         emit(
@@ -117,16 +109,11 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       creationDate: DateTime.now().toUtc(),
       sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
     );
-    _serverMinds.add(mind);
 
     // Добавляем в локальное хранилище.
-    _mindBox.put(
-      mind.id,
-      mind.toObject(),
-    );
-
-    final MindList newState = MindList(values: _serverMinds);
-    emit.call(newState);
+    final MindObject object = mind.toObject(isUploadedToServer: false);
+    _mindBox.put(mind.id, object);
+    _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
@@ -136,10 +123,18 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         ),
       );
       // Добавляем на сервере.
-      await _service.addMind(mind).onError((error, _) {
+      await _service.addMind(mind).then((value) {
+        object
+          ..isUploadedToServer = true
+          ..save();
+        _emitMindList(emit);
+        MindOperationCompleted(
+          minds: [mind],
+          type: MindOperationType.create,
+        );
+      }).onError((error, _) {
         // Роллбек
-        _serverMinds.remove(mind);
-        _mindBox.delete(mind.id);
+        object.delete();
         _emitMindList(emit);
 
         // Обработка ошибки
@@ -154,13 +149,15 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
-    await _mindBox.delete(event.uuid);
-    final Mind mindToDelete = _serverMinds.firstWhere((item) => item.id == event.uuid);
-    _serverMinds.remove(mindToDelete);
-    _localMinds.remove(mindToDelete);
+    final MindObject? object = _mindBox.get(event.uuid);
+    if (object == null) {
+      return;
+    }
+    object.delete();
     _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
+      final Mind mindToDelete = object.toMind();
       emit(
         MindServerOperationStarted(
           minds: [mindToDelete],
@@ -177,11 +174,9 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         );
       }).onError((error, _) {
         // Роллбек
-        _localMinds.add(mindToDelete);
-        _serverMinds.add(mindToDelete);
         _mindBox.put(
           mindToDelete.id,
-          mindToDelete.toObject(),
+          object,
         );
         _emitMindList(emit);
 
@@ -200,7 +195,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(
       MindSearching(
         enabled: true,
-        allValues: _serverMinds,
+        allValues: _mindObjects.map((e) => e.toMind()),
         resultValues: const [],
       ),
     );
@@ -210,7 +205,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(
       MindSearching(
         enabled: false,
-        allValues: _serverMinds,
+        allValues: _mindObjects.map((e) => e.toMind()),
         resultValues: const [],
       ),
     );
@@ -222,7 +217,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(
       MindSearching(
         enabled: true,
-        allValues: _serverMinds,
+        allValues: _mindObjects.map((e) => e.toMind()),
         resultValues: filteredMinds,
       ),
     );
@@ -235,20 +230,20 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     Emitter<MindState> emit,
   ) {
     const count = 9;
-    final List<String> suggestions = _serverMinds
-        .where((mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
-        .map((mind) => mind.emoji)
+    final List<String> suggestions = _mindObjects
+        .where((MindObject mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
+        .map((MindObject mind) => mind.emoji)
         .toList()
         .distinct()
-        .sorted((emoji1, emoji2) => _serverMinds
-            .where((mind) => mind.emoji == emoji2)
+        .sorted((String emoji1, String emoji2) => _mindObjects
+            .where((MindObject mind) => mind.emoji == emoji2)
             .length
-            .compareTo(_serverMinds.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
+            .compareTo(_mindObjects.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
         .take(count)
         .toList();
 
     if (suggestions.isEmpty) {
-      if (_serverMinds.isEmpty) {
+      if (_mindObjects.isEmpty) {
         _lastSuggestions = emojies_pub.Emoji.all().take(count).map((emoji) => emoji.char).toList();
       }
     } else {
@@ -257,10 +252,13 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     emit(MindSuggestions(values: _lastSuggestions));
   }
 
-  List<Mind> _findMindsByDayIndex(int index) => _serverMinds
+  List<Mind> _findMindsByDayIndex(int index) => _mindBox.values
       .where((item) => index == item.dayIndex)
       .mySortedBy(
         (it) => it.sortIndex,
+      )
+      .map(
+        (e) => e.toMind(),
       )
       .toList();
 
@@ -268,18 +266,23 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     MindEdit event,
     Emitter<MindState> emit,
   ) async {
-    final Mind oldMind = _serverMinds.firstWhere((mind) => mind.id == event.mind.id);
     final Mind editedMind = event.mind;
-    _serverMinds
-      ..remove(oldMind)
-      ..add(editedMind);
-    _localMinds
-      ..remove(oldMind)
-      ..add(editedMind);
 
-    // Удаляем из локального хранилища.
-    _mindBox.get(event.mind.id)?.delete();
+    final MindObject? oldMind = _mindBox.get(event.mind.id);
+    if (oldMind == null) {
+      emit(
+        MindOperationError(
+          minds: [editedMind],
+          notCompleted: MindOperationType.edit,
+        ),
+      );
+      return;
+    }
 
+    _mindBox.get(event.mind.id)
+      ?..note = editedMind.note
+      ..emoji = editedMind.emoji
+      ..save();
     _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
@@ -299,14 +302,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
           .onError(
         (error, _) {
           // Роллбек
-          _serverMinds
-            ..remove(editedMind)
-            ..add(oldMind);
-          _localMinds
-            ..remove(editedMind)
-            ..add(oldMind);
-          _mindBox.add(editedMind.toObject());
-
+          editedMind.toObject(isUploadedToServer: true).save();
           _emitMindList(emit);
 
           // Обработка ошибки
@@ -322,9 +318,9 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   void _emitMindList(Emitter<MindState> emit) {
-    final Set<Mind> unionedMinds = _serverMinds.union(_localMinds);
+    final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
     emit(
-      MindList(values: unionedMinds),
+      MindList(values: minds),
     );
   }
 
@@ -339,9 +335,10 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       ),
     );
     return _service.deleteAllMinds().then(
-      (_) {
-        _serverMinds.clear();
-        _emitMindList(emit);
+      (_) async {
+        _mindBox.values.map((object) => object
+          ..isUploadedToServer = false
+          ..save());
         emit(
           MindOperationCompleted(
             minds: [],
@@ -362,9 +359,14 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }
 
   Future<void> _clearCache(MindClearCache event, Emitter<MindState> emit) async {
+    emit(
+      MindServerOperationStarted(
+        minds: [],
+        type: MindOperationType.clearCache,
+      ),
+    );
     await _mindBox.clear().then(
       (int countOfDeletedItems) {
-        _localMinds.clear();
         _emitMindList(emit);
         return emit(
           MindOperationCompleted(
@@ -386,19 +388,36 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   Future<void> _uploadCandidates(
     MindUploadCandidates event,
     Emitter<MindState> emit,
-  ) {
-    final Iterable<Mind> localMinds = event.minds;
+  ) async {
+    // INFO: здесь листы потому что видимо в листах присутствуют ссылки на объекты а он не создает новых,
+    // хз надо разобраться
+    final Iterable<MindObject> objects =
+        _mindBox.values.where((MindObject mind) => !mind.isUploadedToServer).toList(growable: false);
+    final Iterable<Mind> uploadCandidates = objects.map((MindObject mind) => mind.toMind()).toList(growable: false);
     emit(
       MindServerOperationStarted(
-        minds: localMinds,
+        minds: uploadCandidates,
         type: MindOperationType.uploadCachedData,
       ),
     );
-    return _service.addAllMinds(list: localMinds).then(
-      (_) {
+
+    final Iterable<Mind> refreshedUploadCandidates =
+        uploadCandidates.map((Mind mind) => mind.copyWith(id: const Uuid().v4())).toList();
+
+    await _service.addAllMinds(values: refreshedUploadCandidates).then(
+      (_) async {
+        await _mindBox.deleteAll(uploadCandidates.map((Mind mind) => mind.id));
+        
+        final Map<String, MindObject> refreshedCandidateObjects = refreshedUploadCandidates.fold({}, (map, mind) {
+          map[mind.id] = mind.toObject(isUploadedToServer: true);
+          return map;
+        });
+        await _mindBox.putAll(refreshedCandidateObjects);
+        _emitMindList(emit);
+
         emit(
           MindOperationCompleted(
-            minds: localMinds,
+            minds: refreshedUploadCandidates,
             type: MindOperationType.uploadCachedData,
           ),
         );
@@ -407,7 +426,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       (error, _) {
         emit(
           MindOperationError(
-            minds: localMinds,
+            minds: uploadCandidates,
             notCompleted: MindOperationType.uploadCachedData,
           ),
         );
@@ -419,14 +438,13 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     MindGetUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    if (_localMinds.isEmpty) {
+    if (_mindObjects.isEmpty) {
       emit(MindCandidatesForUpload(values: []));
       return;
     }
 
-    final Iterable<Mind> uploadCandidates = _localMinds.difference(_serverMinds).map(
-          (mind) => mind.copyWith(id: const Uuid().v4()),
-        );
+    final Iterable<Mind> uploadCandidates =
+        _mindObjects.where((MindObject object) => !object.isUploadedToServer).map((MindObject mind) => mind.toMind());
     if (uploadCandidates.isEmpty) {
       emit(MindCandidatesForUpload(values: []));
       return;
