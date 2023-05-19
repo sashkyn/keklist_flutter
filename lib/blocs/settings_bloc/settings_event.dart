@@ -1,6 +1,6 @@
 part of 'settings_bloc.dart';
 
-abstract class SettingsEvent {
+sealed class SettingsEvent {
   const SettingsEvent();
 }
 
@@ -25,3 +25,5 @@ class SettingsWhatsNewShown extends SettingsEvent {}
 class SettingsUploadMindsFromCacheToServer extends SettingsEvent {}
 
 class SettingsNeedToShowAuth extends SettingsEvent {}
+
+class SettingGetWhatsNew extends SettingsEvent {}

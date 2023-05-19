@@ -45,7 +45,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   Iterable<Mind> _minds = [];
   MindSearching? _searchingMindState;
 
-  bool _isLoggedIn = false;
   bool _isDemoMode = false;
   bool _isOfflineMode = false;
 
@@ -60,7 +59,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   // NOTE: Payments.
   // final PaymentService _payementService = PaymentService();
 
-  // NOTE: Состояния обновления с сервером.
+  // NOTE: Состояние обновления с сервером.
   bool _updating = false;
 
   @override
@@ -69,8 +68,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
-
-      sendEventTo<MindBloc>(MindGetList());
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
       _searchTextController.addListener(() {
@@ -87,17 +84,18 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       });
 
       subscribeTo<SettingsBloc>(onNewState: (state) async {
-        if (state is SettingsDataState) {
-          _isOfflineMode = state.isOfflineMode;
-          if (state.isOfflineMode) {
-            setState(() {
-              _updating = false;
-            });
-          }
-          sendEventTo<AuthBloc>(AuthGetCurrentStatus());
-        } else if (state is SettingsWhatsNewState && state.needToShowWhatsNewOnStart) {
-          await _showWhatsNew();
-          sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
+        switch (state) {
+          case SettingsDataState settings:
+            _isOfflineMode = state.isOfflineMode;
+            if (settings.isOfflineMode) {
+              setState(() {
+                _updating = false;
+              });
+            }
+            sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+          case SettingsNeedToShowWhatsNew _:
+            _showWhatsNew();
+            sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
         }
       })?.disposed(by: this);
 
@@ -120,9 +118,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           }
 
           if (state.notCompleted == MindOperationType.fetch) {
-            setState(() {
-              _updating = false;
-            });
+            setState(() => _updating = false);
           }
 
           // Показ ошибки.
@@ -145,19 +141,20 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       subscribeTo<AuthBloc>(onNewState: (state) async {
         switch (state.runtimeType) {
           case AuthLoggedIn:
-            _isLoggedIn = true;
+            sendEventTo<MindBloc>(MindGetList());
             _disableDemoMode();
           case AuthLogouted:
             if (!_isOfflineMode) {
               _enableDemoMode();
             } else {
+              sendEventTo<MindBloc>(MindGetList());
               _disableDemoMode();
             }
           case AuthCurrentStatus:
-            _isLoggedIn = state.isLoggedIn;
             if (!state.isLoggedIn && !_isOfflineMode) {
               _enableDemoMode();
             } else {
+              sendEventTo<MindBloc>(MindGetList());
               _disableDemoMode();
             }
         }
@@ -165,7 +162,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       sendEventTo<AuthBloc>(AuthGetCurrentStatus());
       sendEventTo<SettingsBloc>(SettingsGet());
-
+      sendEventTo<SettingsBloc>(SettingGetWhatsNew());
       //_payementService.initConnection();
     });
   }
@@ -189,7 +186,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   void dispose() {
     _demoAutoScrollingTimer?.cancel();
     cancelSubscriptions();
-    
+
     super.dispose();
   }
 
@@ -315,7 +312,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         if (_isDemoMode) {
           mindWidgets.addAll(
             List.generate(
-              15,
+              16,
               (index) {
                 final randomEmoji = KeklistConstants
                     .demoModeEmodjiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];

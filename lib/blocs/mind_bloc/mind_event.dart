@@ -100,3 +100,5 @@ class MindDeleteAllMinds extends MindEvent {}
 class MindClearCache extends MindEvent {}
 
 class MindGetUploadCandidates extends MindEvent {}
+
+class MindInternalGetListFromCache extends MindEvent {}

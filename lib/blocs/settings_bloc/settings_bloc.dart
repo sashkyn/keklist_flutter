@@ -43,6 +43,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
     on<SettingsNeedToShowAuth>(_showAuth);
+    on<SettingGetWhatsNew>(_sendWhatsNewIfNeeded);
   }
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
@@ -70,13 +71,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         isOfflineMode: isOfflineMode,
       ),
     );
-
-    // Cбор и отправка стейта Whats new.
-    final String? previousAppVersion = settingsObject?.previousAppVersion;
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
-    final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
-    emit(SettingsWhatsNewState(needToShowWhatsNewOnStart));
 
     // Cбор и отправка стейта показа Auth.
     final bool needToShowAuth = !isOfflineMode && client.auth.currentUser == null;
@@ -134,5 +128,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   void _emitAndSaveDataState(Emitter<SettingsState> emit, SettingsDataState state) {
     _lastSettingsState = state;
     emit(state);
+  }
+
+  Future<void> _sendWhatsNewIfNeeded(SettingGetWhatsNew event, Emitter<SettingsState> emit) async {
+    // Cбор и отправка стейта Whats new.
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    final String? previousAppVersion = settingsObject?.previousAppVersion;
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
+    final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
+    if (needToShowWhatsNewOnStart) {
+      emit(SettingsNeedToShowWhatsNew());
+    }
   }
 }

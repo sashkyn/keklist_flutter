@@ -22,20 +22,13 @@ class SettingsDataState extends SettingsState {
   }
 }
 
-class SettingsWhatsNewState extends SettingsState with EquatableMixin {
-  final bool needToShowWhatsNewOnStart;
-
-  SettingsWhatsNewState(this.needToShowWhatsNewOnStart);
-  
-  @override
-  List<Object?> get props => [needToShowWhatsNewOnStart];
-}
+class SettingsNeedToShowWhatsNew extends SettingsState { }
 
 class SettingsAuthState extends SettingsState with EquatableMixin {
   final bool needToShowAuth;
 
   SettingsAuthState(this.needToShowAuth);
-  
+
   @override
   List<Object?> get props => [needToShowAuth];
 

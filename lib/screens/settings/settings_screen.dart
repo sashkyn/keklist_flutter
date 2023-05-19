@@ -210,32 +210,34 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               ),
             ],
           ),
-          SettingsSection(
-            title: Text('Danger zone'.toUpperCase()),
-            tiles: [
-              if (_isLoggedIn) ...{
-                SettingsTile(
-                  title: const Text('Delete all data from server'),
-                  leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
-                ),
-              },
-              if (_clearCacheVisible) ...{
-                SettingsTile(
-                  title: const Text('Clear cache'),
-                  leading: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: (BuildContext context) async => await _clearCache(),
-                )
-              },
-              if (_isLoggedIn) ...{
-                SettingsTile(
-                  title: const Text('Delete account'),
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: (BuildContext context) async => await _deleteAccount(),
-                ),
-              },
-            ],
-          ),
+          if (_isLoggedIn || _clearCacheVisible) ...{
+            SettingsSection(
+              title: Text('Danger zone'.toUpperCase()),
+              tiles: [
+                if (_isLoggedIn) ...{
+                  SettingsTile(
+                    title: const Text('Delete all data from server'),
+                    leading: const Icon(Icons.delete_forever, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
+                  ),
+                },
+                if (_clearCacheVisible) ...{
+                  SettingsTile(
+                    title: const Text('Clear cache'),
+                    leading: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _clearCache(),
+                  )
+                },
+                if (_isLoggedIn) ...{
+                  SettingsTile(
+                    title: const Text('Delete account'),
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _deleteAccount(),
+                  ),
+                },
+              ],
+            )
+          }
         ],
       ),
     );
