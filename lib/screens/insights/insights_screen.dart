@@ -31,8 +31,6 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
         });
       }
     }).disposed(by: this);
-
-    sendEventTo<MindBloc>(MindGetList());
   }
 
   @override

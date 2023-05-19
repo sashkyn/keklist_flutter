@@ -4,6 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/hive/constants.dart';
 import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
@@ -20,7 +22,7 @@ import 'package:uuid/uuid.dart';
 part 'mind_event.dart';
 part 'mind_state.dart';
 
-class MindBloc extends Bloc<MindEvent, MindState> {
+class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   late final MainService _service;
   late final MindSearcherCubit _searcherCubit;
 
@@ -29,6 +31,8 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       Hive.box<SettingsObject>(HiveConstants.settingsBoxName).get(HiveConstants.settingsGlobalSettingsIndex);
 
   Iterable<MindObject> get _mindObjects => _mindBox.values;
+  Stream<dynamic> get _mindStream =>
+      _mindBox.watch().map((event) => event.value).debounceTime(const Duration(milliseconds: 100));
 
   MindBloc({
     required MainService mainService,
@@ -36,7 +40,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
   }) : super(MindList(values: const [])) {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
-
     on<MindGetList>(_getMinds);
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
@@ -47,14 +50,30 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(
       _enterTextSearch,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 200)).asyncExpand(mapper),
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
     );
     on<MindUploadCandidates>(_uploadCandidates);
     on<MindChangeCreateText>(
       _changeTextOfCreatingMind,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 200)).asyncExpand(mapper),
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
     );
     on<MindGetUploadCandidates>(_getUploadCandidates);
+    on<MindInternalGetListFromCache>(
+      (event, emit) {
+        _emitMindList(emit);
+      },
+    );
+
+    _mindStream.listen((event) {
+      add(MindInternalGetListFromCache());
+    }).disposed(by: this);
+  }
+
+  @override
+  Future<void> close() {
+    cancelSubscriptions();
+
+    return super.close();
   }
 
   Future<void> _getMinds(MindGetList event, Emitter<MindState> emit) async {
@@ -67,7 +86,7 @@ class MindBloc extends Bloc<MindEvent, MindState> {
           type: MindOperationType.fetch,
         ),
       );
-      await _service.getMindList().then((final Iterable<Mind> serverMinds) {
+      await _service.getMindList().then((Iterable<Mind> serverMinds) {
         // Обновляем локальное хранилище.
         _mindBox.putAll(
           Map.fromEntries(
@@ -79,7 +98,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
             ),
           ),
         );
-        _emitMindList(emit);
 
         emit(
           MindOperationCompleted(
@@ -113,7 +131,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     // Добавляем в локальное хранилище.
     final MindObject object = mind.toObject(isUploadedToServer: false);
     _mindBox.put(mind.id, object);
-    _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
@@ -127,7 +144,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         object
           ..isUploadedToServer = true
           ..save();
-        _emitMindList(emit);
         MindOperationCompleted(
           minds: [mind],
           type: MindOperationType.create,
@@ -135,7 +151,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       }).onError((error, _) {
         // Роллбек
         object.delete();
-        _emitMindList(emit);
 
         // Обработка ошибки
         emit(
@@ -154,7 +169,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       return;
     }
     object.delete();
-    _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       final Mind mindToDelete = object.toMind();
@@ -178,7 +192,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
           mindToDelete.id,
           object,
         );
-        _emitMindList(emit);
 
         // Обработка ошибки
         emit(
@@ -283,7 +296,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
       ?..note = editedMind.note
       ..emoji = editedMind.emoji
       ..save();
-    _emitMindList(emit);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
@@ -303,7 +315,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
         (error, _) {
           // Роллбек
           editedMind.toObject(isUploadedToServer: true).save();
-          _emitMindList(emit);
 
           // Обработка ошибки
           emit(
@@ -367,7 +378,6 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     );
     await _mindBox.clear().then(
       (int countOfDeletedItems) {
-        _emitMindList(emit);
         return emit(
           MindOperationCompleted(
             minds: [],
@@ -402,18 +412,20 @@ class MindBloc extends Bloc<MindEvent, MindState> {
     );
 
     final Iterable<Mind> refreshedUploadCandidates =
-        uploadCandidates.map((Mind mind) => mind.copyWith(id: const Uuid().v4())).toList();
+        uploadCandidates.map((Mind mind) => mind.copyWith(id: const Uuid().v4())).toList(growable: false);
 
     await _service.addAllMinds(values: refreshedUploadCandidates).then(
       (_) async {
         await _mindBox.deleteAll(uploadCandidates.map((Mind mind) => mind.id));
-        
-        final Map<String, MindObject> refreshedCandidateObjects = refreshedUploadCandidates.fold({}, (map, mind) {
+
+        final Map<String, MindObject> refreshedCandidateObjects = refreshedUploadCandidates.fold({}, (
+          Map<String, MindObject> map,
+          Mind mind,
+        ) {
           map[mind.id] = mind.toObject(isUploadedToServer: true);
           return map;
         });
         await _mindBox.putAll(refreshedCandidateObjects);
-        _emitMindList(emit);
 
         emit(
           MindOperationCompleted(
