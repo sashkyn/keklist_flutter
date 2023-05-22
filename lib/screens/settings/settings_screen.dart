@@ -286,15 +286,14 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     }
   }
 
-  Future<void> _showWhatsNew() {
-    return showCupertinoModalBottomSheet(
-      context: context,
-      builder: (builder) {
-        return WebPageScreen(
+  void _showWhatsNew() {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => WebPageScreen(
           title: 'Whats new?',
           initialUri: Uri.parse(KeklistConstants.whatsNewURL),
-        );
-      },
+        ),
+      ),
     );
   }
 

@@ -22,6 +22,7 @@ class InsightsRandomMindWidget extends StatefulWidget {
 
 class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
   final Random _random = Random();
+  late int nextInt = _random.nextInt(widget.allMinds.length);
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +31,12 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
       return Container();
     }
 
-    int nextInt = _random.nextInt(listLenght);
     final Mind randomMind = widget.allMinds[nextInt];
     return GestureDetector(
       onDoubleTap: () {
-        setState(() {});
+        setState(() {
+          nextInt = _random.nextInt(listLenght);
+        });
       },
       child: BoolWidget(
         condition: widget.allMinds.isNotEmpty,

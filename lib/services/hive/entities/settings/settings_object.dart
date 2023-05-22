@@ -4,7 +4,7 @@ part 'settings_object.g.dart';
 
 @HiveType(typeId: 0)
 class SettingsObject extends HiveObject {
-  @HiveField(0, defaultValue: false)
+  @HiveField(0, defaultValue: true)
   late bool isMindContentVisible;
 
   @HiveField(1, defaultValue: null)
@@ -16,7 +16,7 @@ class SettingsObject extends HiveObject {
   SettingsObject();
 
   factory SettingsObject.initial() => SettingsObject()
-      ..isMindContentVisible = false
+      ..isMindContentVisible = true
       ..previousAppVersion = null
       ..isOfflineMode = false;
 }
