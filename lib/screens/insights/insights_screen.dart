@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/screens/insights/widgets/insights_pie_widget.dart';
 import 'package:rememoji/screens/insights/widgets/insights_random_mind_widget.dart';
