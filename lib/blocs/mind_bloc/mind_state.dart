@@ -1,6 +1,6 @@
 part of 'mind_bloc.dart';
 
-abstract class MindState {}
+sealed class MindState {}
 
 class MindList extends MindState {
   final Iterable<Mind> values;
@@ -56,11 +56,11 @@ class MindOperationError extends MindState with EquatableMixin {
   String get localizedString {
     switch (notCompleted) {
       case MindOperationType.create:
-        return 'Mind was not created';
+        return 'The mind was not created';
       case MindOperationType.edit:
-        return 'Mind was not edited';
+        return 'The mind was not edited';
       case MindOperationType.delete:
-        return 'Mind was not deleted';
+        return 'The mind was not deleted';
       case MindOperationType.deleteAll:
         return 'Minds were not deleted';
       case MindOperationType.fetch:

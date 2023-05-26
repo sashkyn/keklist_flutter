@@ -1,8 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
@@ -109,22 +107,21 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     subscribeTo<AuthBloc>(
       onNewState: (state) {
         setState(() {
-          if (state is AuthCurrentStatus) {
-            _isLoggedIn = state.isLoggedIn;
-          } else if (state is AuthLoggedIn) {
-            _isLoggedIn = true;
-            sendEventTo<MindBloc>(MindGetUploadCandidates());
-          } else if (state is AuthLogouted) {
-            _isLoggedIn = false;
-            if (!_offlineMode) {
-              sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
-            }
+          switch (state) {
+            case AuthCurrentState state when state.isLoggedIn:
+              _isLoggedIn = true;
+              sendEventTo<MindBloc>(MindGetUploadCandidates());
+            case AuthCurrentState state when !state.isLoggedIn:
+              _isLoggedIn = false;
+              if (!_offlineMode) {
+                sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
+              }
           }
         });
       },
     )?.disposed(by: this);
 
-    sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+    sendEventTo<AuthBloc>(AuthGetStatus());
     sendEventTo<SettingsBloc>(SettingsGet());
   }
 
@@ -157,7 +154,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: const Text('Logout'),
                   leading: const Icon(Icons.logout, color: Colors.red),
                   onPressed: (BuildContext context) {
-                    context.read<AuthBloc>().add(AuthLogout());
+                    sendEventTo<AuthBloc>(AuthLogout());
                   },
                 ),
             ],

@@ -31,7 +31,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     required this.client,
   }) : super(
           SettingsDataState(
-            isMindContentVisible: false,
+            isMindContentVisible: true,
             isOfflineMode: false,
           ),
         ) {
@@ -59,7 +59,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     await Share.shareXFiles([fileToShare]);
   }
 
-  FutureOr<void> _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
+  void _getSettings(SettingsGet event, Emitter<SettingsState> emit) {
     // Cбор и отправка стейта с настройками.
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
     final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
@@ -71,7 +71,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         isOfflineMode: isOfflineMode,
       ),
     );
-
+    
+    // TODO: низя - побочное действие
+    // TODO: почитать про взаимодействие с несколькими блоками
     // Cбор и отправка стейта показа Auth.
     final bool needToShowAuth = !isOfflineMode && client.auth.currentUser == null;
     emit(SettingsAuthState(needToShowAuth));
@@ -126,6 +128,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   void _emitAndSaveDataState(Emitter<SettingsState> emit, SettingsDataState state) {
+    if (_lastSettingsState == state) {
+      return;
+    }
+
     _lastSettingsState = state;
     emit(state);
   }

@@ -1,10 +1,21 @@
 part of 'settings_bloc.dart';
 
-abstract class SettingsState {}
+// Слишком много завязано на SettingsState
+
+abstract class SettingsState {
+  // @override
+  // List<Object?> get props => [];
+
+  // @override
+  // bool? get stringify => true;
+}
 
 class SettingsDataState extends SettingsState {
   final bool isMindContentVisible;
   final bool isOfflineMode;
+
+  // @override
+  // List<Object?> get props => [isMindContentVisible, isOfflineMode];
 
   SettingsDataState({
     required this.isMindContentVisible,
@@ -24,14 +35,11 @@ class SettingsDataState extends SettingsState {
 
 class SettingsNeedToShowWhatsNew extends SettingsState { }
 
-class SettingsAuthState extends SettingsState with EquatableMixin {
+class SettingsAuthState extends SettingsState {
   final bool needToShowAuth;
 
   SettingsAuthState(this.needToShowAuth);
 
-  @override
-  List<Object?> get props => [needToShowAuth];
-
-  @override
-  bool? get stringify => true;
+  // @override
+  // List<Object?> get props => [needToShowAuth];
 }
