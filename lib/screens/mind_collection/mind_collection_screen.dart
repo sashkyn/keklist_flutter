@@ -451,8 +451,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     setState(() => _isDemoMode = false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _jumpToNow();
       _demoAutoScrollingTimer?.cancel();
+      _jumpToNow();
     });
   }
 
