@@ -179,10 +179,10 @@ class LoggerBlocObserver extends BlocObserver {
     print('onClose: ${bloc.runtimeType}');
   }
 
-  // @override
-  // void onTransition(Bloc bloc, Transition transition) {
-  //   super.onTransition(bloc, transition);
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
 
-  //   print('onTransition: $bloc.state');
-  // }
+    print('onTransition: $bloc.state');
+  }
 }

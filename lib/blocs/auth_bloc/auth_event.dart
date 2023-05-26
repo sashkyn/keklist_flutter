@@ -1,6 +1,6 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthEvent {
+sealed class AuthEvent {
   const AuthEvent();
 }
 
@@ -34,11 +34,11 @@ class AuthLogout extends AuthEvent {}
 
 class AuthDeleteAccount extends AuthEvent {}
 
-class AuthUserAppearedInSession extends AuthEvent {}
+class AuthInternalUserAppearedInSession extends AuthEvent {}
 
-class AuthUserGoneFromSession extends AuthEvent {}
+class AuthInternalUserGoneFromSession extends AuthEvent {}
 
-class AuthGetCurrentStatus extends AuthEvent {}
+class AuthGetStatus extends AuthEvent {}
 
 enum SocialNetwork {
   google,

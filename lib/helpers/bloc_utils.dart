@@ -8,9 +8,9 @@ import 'package:rememoji/helpers/extensions/state_extensions.dart';
 // TODO: обойти проблему, чтобы нельзя было вызвать sendToBloc(...) без указания типа B
 
 class BlocUtils {
-  static StreamSubscription<dynamic>? subscribeTo<B extends Bloc>({
+  static StreamSubscription<dynamic> subscribeTo<B extends Bloc>({
     required BuildContext context,
-    required Function(dynamic) onState,
+    Function(dynamic)? onState,
   }) {
     return context.read<B>().stream.listen(onState);
   }
@@ -23,7 +23,7 @@ class BlocUtils {
   }
 }
 
-extension SendEventFromState on State {
+extension StatebleBlocs on State {
   void sendEventTo<B extends Bloc>(Object event) {
     BlocUtils.sendEventTo<B>(
       context: mountedContext,
