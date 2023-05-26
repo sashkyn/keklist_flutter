@@ -28,20 +28,20 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
     super.initState();
 
     subscribeTo<AuthBloc>(onNewState: (state) {
-      if (state is AuthLoggedIn) {
-        // NOTE: возвращаемся к главному экрану.
-        _dismissToFirstScreen();
+      switch (state) {
+        case AuthCurrentState status when status.isLoggedIn:
+          _dismiss();
       }
     })?.disposed(by: this);
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
       if (state is SettingsDataState && state.isOfflineMode) {
-        _dismissToFirstScreen();
+        _dismiss();
       }
     })?.disposed(by: this);
   }
 
-  void _dismissToFirstScreen() {
+  void _dismiss() {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
@@ -151,7 +151,10 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                   ),
                   const SizedBox(width: 16.0),
                   AuthButton(
-                    onTap: () => sendEventTo<SettingsBloc>(const SettingsChangeOfflineMode(isOfflineMode: true)),
+                    onTap: () {
+                      sendEventTo<SettingsBloc>(const SettingsChangeOfflineMode(isOfflineMode: true));
+                      _dismiss();
+                    },
                     type: AuthButtonType.offline,
                   ),
                 ],

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
@@ -15,63 +16,87 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     required this.mainService,
     required this.client,
   }) : super(AuthInitial()) {
+    on<AuthLoginWithEmailAndPassword>(_authWithEmailAndPassword);
+    on<AuthLoginWithEmail>(_authWithEmail);
+    on<AuthLoginWithSocialNetwork>(_authWithSocialNetwork);
+    on<AuthDeleteAccount>(_deleteAccount);
+    on<AuthLogout>(_logout);
+    on<AuthGetStatus>(_getStatus);
+    on<AuthInternalUserAppearedInSession>((event, emit) => emit(AuthCurrentState(true)));
+    on<AuthInternalUserGoneFromSession>((event, emit) => emit(AuthCurrentState(false)));
     client.auth.onAuthStateChange.listen((event) {
       if (event.session?.user != null) {
-        add(AuthUserAppearedInSession());
+        add(AuthInternalUserAppearedInSession());
       } else {
-        add(AuthUserGoneFromSession());
+        add(AuthInternalUserGoneFromSession());
       }
     }).disposed(by: this);
-    on<AuthLoginWithEmailAndPassword>((event, emit) async {
-      await client.auth.signInWithPassword(
-        email: event.email,
-        password: event.password,
-      );
-    });
-    on<AuthLoginWithEmail>((event, emit) async {
-      await client.auth.signInWithOtp(
-        email: event.email,
-        emailRedirectTo: 'io.supabase.zenmode://login-callback/',
-      );
-    });
-    on<AuthLoginWithSocialNetwork>((event, emit) async {
-      switch (event.socialNetwork) {
-        case SocialNetwork.google:
-          await _signInWithWebOAuth(Provider.google);
-          break;
-        case SocialNetwork.facebook:
-          await _signInWithWebOAuth(Provider.facebook);
-          break;
-        case SocialNetwork.apple:
-          await _signInWithWebOAuth(Provider.apple);
-          break;
-      }
-    });
-    on<AuthDeleteAccount>(
-      (event, emit) async {
-        await mainService.deleteAccount();
-        add(AuthLogout());
-      },
-    );
-    on<AuthLogout>((event, emit) async => await client.auth.signOut());
-    on<AuthUserAppearedInSession>((event, emit) => emit(AuthLoggedIn()));
-    on<AuthUserGoneFromSession>((event, emit) => emit(AuthLogouted()));
-    on<AuthGetCurrentStatus>((event, emit) => emit(AuthCurrentStatus(isLoggedIn: client.auth.currentUser != null)));
   }
 
+  void _getStatus(event, emit) {
+    if (client.auth.currentUser != null) {
+      emit(AuthCurrentState(true));
+    } else {
+      emit(AuthCurrentState(false));
+    }
+  }
+
+  Future<void> _logout(event, emit) async => await client.auth.signOut();
+
+  Future<void> _deleteAccount(event, emit) async {
+    await mainService.deleteAccount();
+    add(AuthLogout());
+  }
+
+  Future<void> _authWithEmailAndPassword(event, emit) {
+    return client.auth.signInWithPassword(
+      email: event.email,
+      password: event.password,
+    );
+  }
+
+  Future<void> _authWithEmail(event, emit) {
+    return client.auth.signInWithOtp(
+      email: event.email,
+      emailRedirectTo: 'io.supabase.zenmode://login-callback/',
+    );
+  }
+
+  Future<void> _authWithSocialNetwork(event, emit) async {
+    switch (event.socialNetwork) {
+      case SocialNetwork.google:
+        return _signInWithWebOAuth(Provider.google);
+      case SocialNetwork.facebook:
+        return _signInWithWebOAuth(Provider.facebook);
+      case SocialNetwork.apple:
+        return _signInWithWebOAuth(Provider.apple);
+    }
+  }
+
+  // @override
+  // void emit(AuthState state) {
+  //   print('----------');
+  //   print('emit old state ${this.state}');
+  //   print('emit new state ${state}');
+  //   print('emit ${this.state == state}');
+
+  //   // ignore: invalid_use_of_visible_for_testing_member
+  //   super.emit(state);
+  // }
+
   Future<void> _signInWithWebOAuth(Provider provider) async {
-    final result = await client.auth.getOAuthSignInUrl(
+    final OAuthResponse result = await client.auth.getOAuthSignInUrl(
       provider: provider,
       redirectTo: 'io.supabase.zenmode://login-callback/',
     );
 
-    final webResult = await FlutterWebAuth2.authenticate(
+    final String webResult = await FlutterWebAuth2.authenticate(
       url: result.url.toString(),
       callbackUrlScheme: 'io.supabase.points',
       preferEphemeral: false,
     );
 
-    final uri = Uri.parse(webResult);
+    final Uri uri = Uri.parse(webResult);
     await client.auth.getSessionFromUrl(
       uri,
       storeSession: true,
@@ -88,6 +113,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   @override
   Future<void> close() {
     cancelSubscriptions();
+
     return super.close();
   }
 }

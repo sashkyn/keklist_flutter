@@ -43,10 +43,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   Iterable<Mind> _minds = [];
+  SettingsDataState? _settings;
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
-  bool _isOfflineMode = false;
+  bool get _isOfflineMode => _settings?.isOfflineMode ?? false;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -66,7 +67,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _jumpToNow();
 
       // NOTE: Слежение за полем ввода поиска при изменении его значения.
@@ -83,27 +84,23 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         );
       });
 
-      subscribeTo<SettingsBloc>(onNewState: (state) async {
+      subscribeTo<SettingsBloc>(onNewState: (state) {
         switch (state) {
           case SettingsDataState settings:
-            _isOfflineMode = state.isOfflineMode;
+            _settings = settings;
             if (settings.isOfflineMode) {
-              setState(() {
-                _updating = false;
-              });
+              setState(() => _updating = false);
             }
-            sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+            sendEventTo<AuthBloc>(AuthGetStatus());
           case SettingsNeedToShowWhatsNew _:
             _showWhatsNew();
             sendEventTo<SettingsBloc>(SettingsWhatsNewShown());
         }
       })?.disposed(by: this);
 
-      subscribeTo<MindBloc>(onNewState: (state) async {
+      subscribeTo<MindBloc>(onNewState: (state) {
         if (state is MindList) {
-          setState(() {
-            _minds = state.values;
-          });
+          setState(() => _minds = state.values);
         } else if (state is MindServerOperationStarted) {
           if (state.type == MindOperationType.fetch) {
             setState(() => _updating = true);
@@ -138,29 +135,17 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         }
       })?.disposed(by: this);
 
-      subscribeTo<AuthBloc>(onNewState: (state) async {
-        switch (state.runtimeType) {
-          case AuthLoggedIn:
-            sendEventTo<MindBloc>(MindGetList());
+      subscribeTo<AuthBloc>(onNewState: (state) {
+        switch (state) {
+          case AuthCurrentState state when (state.isLoggedIn || _isOfflineMode):
             _disableDemoMode();
-          case AuthLogouted:
-            if (!_isOfflineMode) {
-              _enableDemoMode();
-            } else {
-              sendEventTo<MindBloc>(MindGetList());
-              _disableDemoMode();
-            }
-          case AuthCurrentStatus:
-            if (!state.isLoggedIn && !_isOfflineMode) {
-              _enableDemoMode();
-            } else {
-              sendEventTo<MindBloc>(MindGetList());
-              _disableDemoMode();
-            }
+            sendEventTo<MindBloc>(MindGetList());
+          case AuthCurrentState state when !state.isLoggedIn:
+            _enableDemoMode();
         }
       })?.disposed(by: this);
 
-      sendEventTo<AuthBloc>(AuthGetCurrentStatus());
+      sendEventTo<AuthBloc>(AuthGetStatus());
       sendEventTo<SettingsBloc>(SettingsGet());
       sendEventTo<SettingsBloc>(SettingGetWhatsNew());
       //_payementService.initConnection();
@@ -314,7 +299,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             List.generate(
               16,
               (index) {
-                final randomEmoji = KeklistConstants
+                final String randomEmoji = KeklistConstants
                     .demoModeEmodjiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
                   emoji: randomEmoji,
@@ -423,9 +408,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     _itemScrollController.jumpTo(index: _getNowDayIndex());
   }
 
-  FutureOr<void> _scrollToNow() => _scrollToDayIndex(_getNowDayIndex());
+  Future<void> _scrollToNow() => _scrollToDayIndex(_getNowDayIndex());
 
-  FutureOr<void> _scrollToDayIndex(int dayIndex) {
+  Future<void> _scrollToDayIndex(int dayIndex) {
     return _itemScrollController.scrollTo(
       index: dayIndex,
       duration: const Duration(milliseconds: 200),
@@ -440,7 +425,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Timer? _demoAutoScrollingTimer;
 
-  void _enableDemoMode() async {
+  void _enableDemoMode() {
     if (_isDemoMode) {
       return;
     }
@@ -459,6 +444,18 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     });
   }
 
+  void _disableDemoMode() {
+    if (!_isDemoMode) {
+      return;
+    }
+
+    setState(() => _isDemoMode = false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _jumpToNow();
+      _demoAutoScrollingTimer?.cancel();
+    });
+  }
+
   Future<void> _showDateSwitcher() async {
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
@@ -474,18 +471,5 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
     _scrollToDayIndex(dayIndex);
-  }
-
-  void _disableDemoMode() {
-    if (!_isDemoMode) {
-      return;
-    }
-
-    _demoAutoScrollingTimer?.cancel();
-    setState(() => _isDemoMode = false);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _demoAutoScrollingTimer?.cancel();
-      _jumpToNow();
-    });
   }
 }
