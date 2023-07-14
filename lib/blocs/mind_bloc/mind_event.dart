@@ -6,9 +6,9 @@ abstract class MindEvent with EquatableMixin {
   List<Object?> get props => [];
 }
 
-class MindGetList extends MindEvent {}
+final class MindGetList extends MindEvent {}
 
-class MindCreate extends MindEvent {
+final class MindCreate extends MindEvent {
   final int dayIndex;
   final String note;
   final String emoji;
@@ -23,7 +23,7 @@ class MindCreate extends MindEvent {
   List<Object?> get props => [dayIndex, note, emoji];
 }
 
-class MindDelete extends MindEvent {
+final class MindDelete extends MindEvent {
   final String uuid;
 
   MindDelete({required this.uuid});
@@ -32,7 +32,7 @@ class MindDelete extends MindEvent {
   List<Object?> get props => [uuid];
 }
 
-class MindEdit extends MindEvent {
+final class MindEdit extends MindEvent {
   final Mind mind;
 
   @override
@@ -41,7 +41,7 @@ class MindEdit extends MindEvent {
   MindEdit({required this.mind});
 }
 
-class MindEditNote extends MindEvent {
+final class MindEditNote extends MindEvent {
   final String uuid;
   final String newNote;
 
@@ -54,7 +54,7 @@ class MindEditNote extends MindEvent {
   });
 }
 
-class MindEditEmoji extends MindEvent {
+final class MindEditEmoji extends MindEvent {
   final String uuid;
   final String newEmoji;
 
@@ -67,13 +67,13 @@ class MindEditEmoji extends MindEvent {
   });
 }
 
-class MindMove extends MindEvent {}
+final class MindMove extends MindEvent {}
 
-class MindCopyToNow extends MindEvent {}
+final class MindCopyToNow extends MindEvent {}
 
-class MindStartSearch extends MindEvent {}
+final class MindStartSearch extends MindEvent {}
 
-class MindEnterSearchText extends MindEvent {
+final class MindEnterSearchText extends MindEvent {
   final String text;
 
   MindEnterSearchText({required this.text});
@@ -82,9 +82,9 @@ class MindEnterSearchText extends MindEvent {
   List<Object?> get props => [text];
 }
 
-class MindStopSearch extends MindEvent {}
+final class MindStopSearch extends MindEvent {}
 
-class MindChangeCreateText extends MindEvent {
+final class MindChangeCreateText extends MindEvent {
   final String text;
 
   MindChangeCreateText({required this.text});
@@ -93,12 +93,14 @@ class MindChangeCreateText extends MindEvent {
   List<Object?> get props => [text];
 }
 
-class MindUploadCandidates extends MindEvent {}
+final class MindUploadCandidates extends MindEvent {}
 
-class MindDeleteAllMinds extends MindEvent {}
+final class MindDeleteAllMinds extends MindEvent {}
 
-class MindClearCache extends MindEvent {}
+final class MindClearCache extends MindEvent {}
 
-class MindGetUploadCandidates extends MindEvent {}
+final class MindGetUploadCandidates extends MindEvent {}
 
-class MindInternalGetListFromCache extends MindEvent {}
+final class MindInternalGetListFromCache extends MindEvent {}
+
+final class MindGetTransactionList extends MindEvent {}

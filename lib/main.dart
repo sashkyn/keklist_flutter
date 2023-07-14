@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rememoji/screens/main/main_screen.dart';
 import 'package:rememoji/services/hive/constants.dart';
 import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
+import 'package:rememoji/services/hive/entities/queue_transaction/queue_transaction_object.dart';
 import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -107,14 +108,18 @@ void _setupBlockingLoadingWidget() {
 Future<void> _setupHive() async {
   Hive.registerAdapter<SettingsObject>(SettingsObjectAdapter());
   Hive.registerAdapter<MindObject>(MindObjectAdapter());
+  Hive.registerAdapter<QueueTransactionObject>(QueueTransactionObjectAdapter());
   await Hive.initFlutter();
-  final Box<SettingsObject> box = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
+  final Box<SettingsObject> settingsBox = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
   // Открываем SettingBox и сохраняем дефолтные настройки.
-  if (box.get(HiveConstants.settingsGlobalSettingsIndex) == null) {
-    box.put(HiveConstants.settingsGlobalSettingsIndex, SettingsObject.initial());
+  if (settingsBox.get(HiveConstants.settingsGlobalSettingsIndex) == null) {
+    settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, SettingsObject.initial());
   }
   // Открываем MindBox.
   await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
+
+  // Открываем MindQueueTransactionsBox.
+  await Hive.openBox<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
 }
 
 void _setupOrientations() {
