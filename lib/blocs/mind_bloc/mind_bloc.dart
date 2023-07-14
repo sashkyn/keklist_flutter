@@ -32,7 +32,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
 
   final Box<MindObject> _mindBox = Hive.box<MindObject>(HiveConstants.mindBoxName);
   Iterable<MindObject> get _mindObjects => _mindBox.values;
-  Stream<MindObject?> get _mindStream => _mindBox
+  Stream<MindObject?> get _mindObjectsStream => _mindBox
       .watch()
       .map((BoxEvent event) => event.value as MindObject?)
       .debounceTime(const Duration(milliseconds: 100));
@@ -76,7 +76,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       },
     );
 
-    _mindStream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
+    _mindObjectsStream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
     _mindQueueStream.listen((event) => add(MindGetTransactionList())).disposed(by: this);
   }
 
@@ -128,7 +128,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         },
       );
 
-      _addTransactionToQueue(
+      await _addTransactionToQueue(
         QueueTransactionObject(
           debugName: 'getMindList',
           transaction: transaction,
@@ -180,7 +180,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       });
 
-      _addTransactionToQueue(
+      await _addTransactionToQueue(
         QueueTransactionObject(
           debugName: 'createMind',
           transaction: transaction,
@@ -228,7 +228,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       });
 
-      _addTransactionToQueue(
+      await _addTransactionToQueue(
         QueueTransactionObject(
           debugName: 'deleteMind',
           transaction: transaction,
@@ -328,6 +328,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     _mindBox.get(event.mind.id)
       ?..note = editedMind.note
       ..emoji = editedMind.emoji
+      ..sortIndex = editedMind.sortIndex
+      ..dayIndex = editedMind.dayIndex
       ..save();
 
     if (!(_settings?.isOfflineMode ?? true)) {
@@ -338,12 +340,14 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       // Редактируем на сервере.
       final Future<void> transaction = _service
           .editMind(mind: event.mind)
-          .then((_) => emit(
+          .then((_) {
+            emit(
                 MindOperationCompleted(
                   minds: [event.mind],
                   type: MindOperationType.edit,
                 ),
-              ))
+              );
+          })
           .onError(
         (error, _) {
           // Роллбек
@@ -359,7 +363,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         },
       );
 
-      _addTransactionToQueue(
+      await _addTransactionToQueue(
         QueueTransactionObject(
           debugName: 'editMind',
           transaction: transaction,
@@ -375,10 +379,10 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  void _deleteAllMindsFromServer(
+  Future<void> _deleteAllMindsFromServer(
     MindDeleteAllMinds event,
     Emitter<MindState> emit,
-  ) {
+  ) async {
     emit(
       MindServerOperationStarted(
         minds: [],
@@ -407,7 +411,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       },
     );
-    _addTransactionToQueue(
+    await _addTransactionToQueue(
       QueueTransactionObject(
         debugName: 'deleteAllMinds',
         transaction: transaction,
@@ -520,7 +524,10 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  void _addTransactionToQueue(QueueTransactionObject transaction) {
-    _mindQueueTransactionsBox.add(transaction);
+  Future<void> _addTransactionToQueue(QueueTransactionObject transaction) async {
+    // TODO: выполнять транзакции в очереди в MindTransactionBloc.
+    await transaction.transaction;
+
+    // _mindQueueTransactionsBox.add(transaction);
   }
 }
