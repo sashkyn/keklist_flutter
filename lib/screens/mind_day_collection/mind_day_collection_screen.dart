@@ -40,7 +40,7 @@ class MindDayCollectionScreen extends StatefulWidget {
       );
 }
 
-class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with DisposeBag {
+final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with DisposeBag {
   int dayIndex;
   final List<Mind> allMinds;
 
@@ -132,7 +132,15 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),
-            onPressed: () async => await _showDateSwitcher(),
+            onPressed: () async {
+              final int? changedDay = await _showDateSwitcherToNewDay();
+              if (changedDay == null) {
+                return;
+              }
+              setState(() {
+                dayIndex = changedDay;
+              });
+            },
           ),
           IconButton(
             icon: BoolWidget(
@@ -255,19 +263,19 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     );
   }
 
+  @override
+  void dispose() {
+    cancelSubscriptions();
+
+    super.dispose();
+  }
+
   void _resetMindCreator() {
     setState(() {
       _editableMind = null;
       _createMindEditingController.text = '';
       _hideKeyboard();
     });
-  }
-
-  @override
-  void dispose() {
-    cancelSubscriptions();
-
-    super.dispose();
   }
 
   void _changeContentVisibility() {
@@ -300,6 +308,11 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
           key: 'edit_key',
         ),
         const SheetAction(
+          icon: Icons.date_range,
+          label: 'Switch day',
+          key: 'switch_day_key',
+        ),
+        const SheetAction(
           icon: Icons.delete,
           label: 'Delete',
           key: 'remove_key',
@@ -316,6 +329,17 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
       });
       _createMindEditingController.text = mind.note;
       _mindCreatorFocusNode.requestFocus();
+    } else if (result == 'switch_day_key') {
+      final int? switchedDay = await _showDateSwitcherToNewDay();
+      if (switchedDay != null) {
+        final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
+          dayIndex: switchedDay,
+          allMinds: allMinds,
+        );
+        final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
+        final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
+        sendEventTo<MindBloc>(MindEdit(mind: newMind));
+      }
     }
   }
 
@@ -350,7 +374,7 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     }
   }
 
-  Future<void> _showDateSwitcher() async {
+  Future<int?> _showDateSwitcherToNewDay() async {
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
       value: [
@@ -362,12 +386,10 @@ class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with 
     );
 
     if (dates?.firstOrNull == null) {
-      return;
+      return null;
     }
 
     final int dayIndex = MindUtils.getDayIndex(from: dates!.first!);
-    setState(() {
-      this.dayIndex = dayIndex;
-    });
+    return dayIndex;
   }
 }
