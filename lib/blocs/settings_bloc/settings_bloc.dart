@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
-import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -71,7 +70,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         isOfflineMode: isOfflineMode,
       ),
     );
-    
+
     // TODO: низя - побочное действие
     // TODO: почитать про взаимодействие с несколькими блоками
     // Cбор и отправка стейта показа Auth.

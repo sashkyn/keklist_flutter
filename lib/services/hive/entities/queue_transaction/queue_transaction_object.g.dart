@@ -1,37 +1,36 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'settings_object.dart';
+part of 'queue_transaction_object.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SettingsObjectAdapter extends TypeAdapter<SettingsObject> {
+class QueueTransactionObjectAdapter
+    extends TypeAdapter<QueueTransactionObject> {
   @override
-  final int typeId = 0;
+  final int typeId = 2;
 
   @override
-  SettingsObject read(BinaryReader reader) {
+  QueueTransactionObject read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SettingsObject()
-      ..isMindContentVisible = fields[0] == null ? true : fields[0] as bool
-      ..previousAppVersion = fields[1] as String?
-      ..isOfflineMode = fields[2] == null ? false : fields[2] as bool;
+    return QueueTransactionObject(
+      transaction: fields[0] as Future<dynamic>,
+      debugName: fields[1] as String,
+    );
   }
 
   @override
-  void write(BinaryWriter writer, SettingsObject obj) {
+  void write(BinaryWriter writer, QueueTransactionObject obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.isMindContentVisible)
-      ..writeByte(1)
-      ..write(obj.previousAppVersion)
       ..writeByte(2)
-      ..write(obj.isOfflineMode);
+      ..writeByte(0)
+      ..write(obj.transaction)
+      ..writeByte(1)
+      ..write(obj.debugName);
   }
 
   @override
@@ -40,7 +39,7 @@ class SettingsObjectAdapter extends TypeAdapter<SettingsObject> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SettingsObjectAdapter &&
+      other is QueueTransactionObjectAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

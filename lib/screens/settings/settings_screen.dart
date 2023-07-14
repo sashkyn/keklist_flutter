@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
+import 'package:rememoji/screens/debug/transaction_queue/debug_transaction_screen.dart';
 import 'package:rememoji/screens/web_page/web_page_screen.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -234,6 +236,27 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                 },
               ],
             )
+          },
+          if (kDebugMode) ...{
+            SettingsSection(
+              title: const Text('Debug'),
+              tiles: [
+                SettingsTile(
+                  title: const Text('Transactions queue'),
+                  leading: const Icon(
+                    Icons.queue,
+                    color: Colors.brown,
+                  ),
+                  onPressed: (BuildContext context) async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const DebugTransactionsScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           }
         ],
       ),

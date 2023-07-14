@@ -102,7 +102,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       creationDate: DateTime.now(),
       sortIndex: sortIndex,
     );
-    await mainService.addMind(mind);
+    await mainService.createMind(mind);
     final mindJSON = json.encode(
       mind,
       toEncodable: (_) => mind.toWatchJson(),
