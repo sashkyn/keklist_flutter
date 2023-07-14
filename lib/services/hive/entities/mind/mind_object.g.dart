@@ -23,7 +23,7 @@ class MindObjectAdapter extends TypeAdapter<MindObject> {
       ..dayIndex = fields[3] as int
       ..creationDate = fields[4] as DateTime
       ..sortIndex = fields[5] as int
-      ..isUploadedToServer = fields[6] as bool;
+      ..isUploadedToServer = fields[6] == null ? false : fields[6] as bool;
   }
 
   @override

@@ -19,7 +19,7 @@ class MainSupabaseService implements MainService {
   }
 
   @override
-  Future<void> addMind(Mind mind) async {
+  Future<void> createMind(Mind mind) async {
     _validateUserAuthorization();
 
     await _client.from('minds').insert(mind.toSupabaseJson(userId: _client.auth.currentUser!.id));
