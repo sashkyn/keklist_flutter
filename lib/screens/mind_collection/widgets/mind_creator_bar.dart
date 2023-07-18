@@ -3,7 +3,6 @@ import 'package:rememoji/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
 
 // TODO: превратить suggestions в миничипсы и убрать эмодзик слева как нибудь
-// TODO: убрать магический отступ сверху
 
 class MindCreatorBar extends StatefulWidget {
   final Mind? editableMind;
@@ -65,7 +64,7 @@ class _MindCreatorBarState extends State<MindCreatorBar> {
               focusNode: widget.focusNode,
               textEditingController: widget.textEditingController,
               onDone: () {
-                widget.onDone.call(
+                widget.onDone(
                   CreateMindData(
                     emoji: widget.selectedEmoji,
                     text: widget.textEditingController.text,
@@ -103,7 +102,7 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
         ),
         Container(
           color: Colors.grey,
-          height: 55,
+          height: 55.0,
           width: 0.3,
         ),
         Expanded(
@@ -175,30 +174,33 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
           size: MindSize.medium,
           onTap: onSearchEmoji,
         ),
-        const SizedBox(width: 6.0),
+        const SizedBox(width: 5.0),
         Flexible(
           flex: 1,
-          child: TextField(
-            focusNode: focusNode,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            textCapitalization: TextCapitalization.sentences,
-            controller: textEditingController,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(12.0),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16.0)),
-              ),
-              hintText: 'Create a mind...',
-              suffixIcon: TextButton(
-                style: ButtonStyle(
-                  splashFactory: NoSplash.splashFactory,
-                  foregroundColor: MaterialStateProperty.all(Colors.blueAccent),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
+            child: TextField(
+              focusNode: focusNode,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              textCapitalization: TextCapitalization.sentences,
+              controller: textEditingController,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.all(12.0),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16.0)),
                 ),
-                onPressed: onDone,
-                child: const Text(
-                  'DONE',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                hintText: 'Create a mind...',
+                suffixIcon: TextButton(
+                  style: ButtonStyle(
+                    splashFactory: NoSplash.splashFactory,
+                    foregroundColor: MaterialStateProperty.all(Colors.blueAccent),
+                  ),
+                  onPressed: onDone,
+                  child: const Text(
+                    'DONE',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
