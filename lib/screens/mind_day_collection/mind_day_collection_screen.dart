@@ -201,11 +201,12 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           ),
           Stack(
             children: [
+              // NOTE: Подложка для скрытия текста эмодзи.
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   color: Colors.white,
-                  height: 100,
+                  height: 90,
                 ),
               ),
               Column(
