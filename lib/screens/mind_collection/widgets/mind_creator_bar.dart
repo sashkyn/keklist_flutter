@@ -119,8 +119,9 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
                 const SizedBox(width: 10.0),
                 Flexible(
                   child: Text(
-                    editableMind.note,
+                    editableMind.note.replaceAll('\n', ' '),
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 IconButton(
