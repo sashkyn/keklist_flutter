@@ -13,6 +13,7 @@ class MindMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RoundedContainer(
+      border: null,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

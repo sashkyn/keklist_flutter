@@ -98,42 +98,44 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         }
       })?.disposed(by: this);
 
-      subscribeTo<MindBloc>(onNewState: (state) {
-        if (state is MindList) {
-          setState(() => _minds = state.values);
-        } else if (state is MindServerOperationStarted) {
-          if (state.type == MindOperationType.fetch) {
-            setState(() => _updating = true);
-          }
-        } else if (state is MindOperationCompleted) {
-          if (state.type == MindOperationType.fetch) {
-            setState(() => _updating = false);
-          }
-        } else if (state is MindOperationError) {
-          if (ModalRoute.of(context)?.isCurrent ?? false) {
-            _showDayCollectionAndHandleError(state: state);
-          }
+      subscribeTo<MindBloc>(
+        onNewState: (state) {
+          if (state is MindList) {
+            setState(() => _minds = state.values);
+          } else if (state is MindServerOperationStarted) {
+            if (state.type == MindOperationType.fetch) {
+              setState(() => _updating = true);
+            }
+          } else if (state is MindOperationCompleted) {
+            if (state.type == MindOperationType.fetch) {
+              setState(() => _updating = false);
+            }
+          } else if (state is MindOperationError) {
+            if (ModalRoute.of(context)?.isCurrent ?? false) {
+              _showDayCollectionAndHandleError(state: state);
+            }
 
-          if (state.notCompleted == MindOperationType.fetch) {
-            setState(() => _updating = false);
-          }
+            if (state.notCompleted == MindOperationType.fetch) {
+              setState(() => _updating = false);
+            }
 
-          // Показ ошибки.
-          if (MindOperationType.values
-              .where(
-                (element) => element != MindOperationType.uploadCachedData && element != MindOperationType.fetch,
-              )
-              .contains(state.notCompleted)) {
-            showOkAlertDialog(
-              context: context,
-              title: 'Error',
-              message: state.localizedString,
-            );
+            // Показ ошибки.
+            if (MindOperationType.values
+                .where(
+                  (element) => element != MindOperationType.uploadCachedData && element != MindOperationType.fetch,
+                )
+                .contains(state.notCompleted)) {
+              showOkAlertDialog(
+                context: context,
+                title: 'Error',
+                message: state.localizedString,
+              );
+            }
+          } else if (state is MindSearching) {
+            setState(() => _searchingMindState = state);
           }
-        } else if (state is MindSearching) {
-          setState(() => _searchingMindState = state);
-        }
-      })?.disposed(by: this);
+        },
+      )?.disposed(by: this);
 
       subscribeTo<AuthBloc>(onNewState: (state) {
         switch (state) {
@@ -246,9 +248,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         onCancel: () {
           _searchTextController.clear();
           sendEventTo<MindBloc>(MindStopSearch());
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            _jumpToNow();
-          });
+          WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
         },
       ),
       falseChild: GestureDetector(
@@ -327,13 +327,14 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           mindWidgets.addAll(realMindWidgets);
         }
 
+        final bool isToday = groupDayIndex == _getNowDayIndex();
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 18.0),
             Text(
               _formatter.format(MindUtils.getDateFromIndex(groupDayIndex)),
-              style: TextStyle(fontWeight: groupDayIndex == _getNowDayIndex() ? FontWeight.bold : FontWeight.normal),
+              style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
             ),
             const SizedBox(height: 4.0),
             GestureDetector(
@@ -344,6 +345,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 );
               },
               child: RoundedContainer(
+                border: isToday
+                    ? Border.all(
+                        color: Colors.black.withOpacity(0.3),
+                        width: 2.0,
+                      )
+                    : null,
                 child: BoolWidget(
                   condition: mindWidgets.isEmpty,
                   trueChild: () {
@@ -434,13 +441,16 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _jumpToNow();
       int nextDayIndex = _getNowDayIndex() + 1;
-      _demoAutoScrollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-        _itemScrollController.scrollTo(
-          index: nextDayIndex++,
-          alignment: 0.015,
-          duration: const Duration(milliseconds: 4100),
-        );
-      });
+      _demoAutoScrollingTimer = Timer.periodic(
+        const Duration(seconds: 4),
+        (timer) {
+          _itemScrollController.scrollTo(
+            index: nextDayIndex++,
+            alignment: 0.015,
+            duration: const Duration(milliseconds: 4100),
+          );
+        },
+      );
     });
   }
 

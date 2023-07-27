@@ -6,19 +6,18 @@ class MindUtils {
   static int getDayIndex({required DateTime from}) =>
       (from.millisecondsSinceEpoch + from.timeZoneOffset.inMilliseconds) ~/ millisecondsInDay;
 
+  static int getTodayIndex() => MindUtils.getDayIndex(from: DateTime.now());
+
   static DateTime getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(millisecondsInDay * index);
 
   static List<Mind> findMindsByDayIndex({
     required int dayIndex,
     required Iterable<Mind> allMinds,
-  }) {
-    return allMinds.where((item) => dayIndex == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
-  }
+  }) => allMinds.where((item) => dayIndex == item.dayIndex).mySortedBy((it) => it.sortIndex).toList();
 
   static List<Mind> findTodayMinds({required List<Mind> allMinds}) {
-    final int todayIndex = MindUtils.getDayIndex(from: DateTime.now());
     return findMindsByDayIndex(
-      dayIndex: todayIndex,
+      dayIndex: getTodayIndex(),
       allMinds: allMinds,
     );
   }
@@ -54,6 +53,11 @@ class MindUtils {
         .where((item) => item.dayIndex >= yearAgoIndex && item.dayIndex <= todayIndex)
         .toList();
   }
+
+  static List<Mind> findMindsByEmoji({
+    required String emoji,
+    required Iterable<Mind> allMinds,
+  }) => allMinds.where((item) => emoji == item.emoji).mySortedBy((it) => it.sortIndex).toList();
 }
 
 // NOTE: Sorted by.
