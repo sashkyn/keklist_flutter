@@ -5,6 +5,7 @@ import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rememoji/helpers/extensions/state_extensions.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
+import 'package:rememoji/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
@@ -20,7 +22,7 @@ import 'package:rememoji/services/entities/mind.dart';
 
 // TODO: Календарь вашей жизни
 
-class MindDayCollectionScreen extends StatefulWidget {
+final class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
   final MindOperationError? initialError;
   final Iterable<Mind> allMinds;
@@ -314,6 +316,11 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           key: 'switch_day_key',
         ),
         const SheetAction(
+          icon: Icons.emoji_emotions,
+          label: 'Show all',
+          key: 'show_all_key',
+        ),
+        const SheetAction(
           icon: Icons.delete,
           label: 'Delete',
           key: 'remove_key',
@@ -341,6 +348,19 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
         sendEventTo<MindBloc>(MindEdit(mind: newMind));
       }
+    } else if (result == 'show_all_key') {
+      if (mountedContext == null) {
+        return;
+      }
+
+      Navigator.of(mountedContext!).push(
+        MaterialPageRoute(
+          builder: (_) => MindOneEmojiCollectionScreen(
+            emoji: mind.emoji,
+            allMinds: allMinds,
+          ),
+        ),
+      );
     }
   }
 
