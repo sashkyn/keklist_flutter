@@ -26,6 +26,9 @@ class MindObject extends HiveObject {
   @HiveField(6, defaultValue: false)
   late bool isUploadedToServer;
 
+  @HiveField(7, defaultValue: null)
+  late String? rootId;
+
   MindObject();
 
   Mind toMind() => Mind(
@@ -35,5 +38,6 @@ class MindObject extends HiveObject {
         dayIndex: dayIndex,
         creationDate: creationDate,
         sortIndex: sortIndex,
+        rootId: rootId,
       );
 }

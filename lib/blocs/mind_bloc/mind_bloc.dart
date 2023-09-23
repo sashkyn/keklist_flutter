@@ -145,6 +145,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       emoji: event.emoji,
       creationDate: DateTime.now().toUtc(),
       sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
+      rootId: event.rootId
     );
 
     // Добавляем в локальное хранилище.
@@ -189,6 +190,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     }
   }
 
+  // TODO: удалить каскадно все остальное
   Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
     final MindObject? object = _mindBox.get(event.uuid);
     if (object == null) {
@@ -300,6 +302,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
 
   List<Mind> _findMindsByDayIndex(int index) => _mindBox.values
       .where((item) => index == item.dayIndex)
+      .where((item) => item.rootId == null)
       .mySortedBy(
         (it) => it.sortIndex,
       )
@@ -330,6 +333,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       ..emoji = editedMind.emoji
       ..sortIndex = editedMind.sortIndex
       ..dayIndex = editedMind.dayIndex
+      ..rootId = editedMind.rootId
       ..save();
 
     if (!(_settings?.isOfflineMode ?? true)) {

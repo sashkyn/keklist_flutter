@@ -101,6 +101,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       emoji: emoji,
       creationDate: DateTime.now(),
       sortIndex: sortIndex,
+      rootId: null,
     );
     await mainService.createMind(mind);
     final mindJSON = json.encode(

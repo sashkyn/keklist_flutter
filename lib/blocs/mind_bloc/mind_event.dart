@@ -12,15 +12,17 @@ final class MindCreate extends MindEvent {
   final int dayIndex;
   final String note;
   final String emoji;
+  final String? rootId;
 
   MindCreate({
     required this.dayIndex,
     required this.note,
     required this.emoji,
+    required this.rootId,
   });
 
   @override
-  List<Object?> get props => [dayIndex, note, emoji];
+  List<Object?> get props => [dayIndex, note, emoji, rootId];
 }
 
 final class MindDelete extends MindEvent {

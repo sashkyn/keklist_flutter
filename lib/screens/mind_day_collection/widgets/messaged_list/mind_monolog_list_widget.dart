@@ -6,11 +6,13 @@ import 'package:rememoji/services/entities/mind.dart';
 class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
   final Function(Mind) onTap;
+  final Function(Mind) onLongPress;
 
   const MindMonologListWidget({
     super.key,
     required this.minds,
     required this.onTap,
+    required this.onLongPress,
   });
 
   @override
@@ -21,9 +23,9 @@ class MindMonologListWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 GestureDetector(
-                  onTap: () => onTap(mind),
-                  child: MindMessageWidget(mind: mind).animate().fadeIn()
-                ),
+                    onTap: () => onTap(mind),
+                    onLongPress: () => onLongPress(mind),
+                    child: MindMessageWidget(mind: mind).animate().fadeIn()),
               ],
             );
           }).toList() +
