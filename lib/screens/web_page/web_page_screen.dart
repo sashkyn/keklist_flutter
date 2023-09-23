@@ -43,6 +43,10 @@ class _WebPageScreenState extends State<WebPageScreen> {
             ..setNavigationDelegate(
               NavigationDelegate(
                 onPageFinished: (uri) {
+                  if (!_isLoading) {
+                    return;
+                  }
+
                   setState(() {
                     _isLoading = false;
                   });
