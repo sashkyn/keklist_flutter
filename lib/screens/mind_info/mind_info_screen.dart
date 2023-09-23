@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
@@ -56,7 +57,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((e) => e.sortIndex));
+            ..addAll(state.values.mySortedBy((e) => e.creationDate));
         });
       }
     })?.disposed(by: this);
@@ -81,10 +82,24 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   fillOverscroll: true,
-                  child: MindMonologListWidget(
-                    minds: [rootMind] + childMinds,
-                    onTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                    onLongPress: (Mind mind) => () {},
+                  child: Column(
+                    children: [
+                      MindMessageWidget(mind: rootMind),
+                      if (childMinds.isNotEmpty) ...{
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        const Text(
+                          'Reflections:',
+                          textAlign: TextAlign.center,
+                        ),
+                        MindMonologListWidget(
+                          minds: childMinds,
+                          onTap: (Mind mind) => _showMindOptionsActionSheet(mind),
+                          onLongPress: (Mind mind) => () {},
+                        ),
+                      }
+                    ],
                   ),
                 ),
               ],
@@ -107,6 +122,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
+                    placeholder: 'Reflect about mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(

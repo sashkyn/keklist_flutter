@@ -12,6 +12,7 @@ class MindCreatorBar extends StatefulWidget {
   final String selectedEmoji;
   final VoidCallback onTapEmoji;
   final String doneTitle;
+  final String placeholder;
   final Function(String) onTapSuggestionEmoji;
   final Function() onTapCancelEdit;
   final Function(CreateMindData) onDone;
@@ -26,6 +27,7 @@ class MindCreatorBar extends StatefulWidget {
     required this.onDone,
     required this.onTapEmoji,
     required this.onTapSuggestionEmoji,
+    required this.placeholder,
     this.editableMind,
     required this.onTapCancelEdit,
   }) : super(key: key);
@@ -61,6 +63,7 @@ class _MindCreatorBarState extends State<MindCreatorBar> {
             MindCreatorTextFieldWidget(
               selectedEmoji: widget.selectedEmoji,
               onSearchEmoji: widget.onTapEmoji,
+              placeholder: widget.placeholder,
               focusNode: widget.focusNode,
               textEditingController: widget.textEditingController,
               onDone: () {
@@ -153,6 +156,7 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
   const MindCreatorTextFieldWidget({
     super.key,
     required this.selectedEmoji,
+    required this.placeholder,
     required this.onSearchEmoji,
     required this.focusNode,
     required this.textEditingController,
@@ -163,6 +167,7 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
   final VoidCallback onSearchEmoji;
   final FocusNode focusNode;
   final TextEditingController textEditingController;
+  final String placeholder;
   final Function() onDone;
 
   @override
@@ -191,7 +196,7 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16.0)),
                 ),
-                hintText: 'Create a mind...',
+                hintText: placeholder,
                 suffixIcon: TextButton(
                   style: ButtonStyle(
                     splashFactory: NoSplash.splashFactory,
