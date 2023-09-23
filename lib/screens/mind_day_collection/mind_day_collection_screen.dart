@@ -14,13 +14,12 @@ import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
+import 'package:rememoji/screens/mind_info/mind_info_screen.dart';
 import 'package:rememoji/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
-
-// TODO: Календарь вашей жизни
 
 final class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
@@ -173,7 +172,8 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                       condition: _isMindContentVisible,
                       trueChild: MindMonologListWidget(
                         minds: dayMinds,
-                        onTap: (Mind mind) => _showMindOptionsActionSheet(mind),
+                        onTap: (Mind mind) => _showMindInfo(mind),
+                        onLongPress: (Mind mind) => _showMindOptionsActionSheet(mind),
                       ),
                       falseChild: MindIconedListWidget(
                         minds: dayMinds,
@@ -225,6 +225,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                             dayIndex: dayIndex,
                             note: data.text,
                             emoji: data.emoji,
+                            rootId: null,
                           ),
                         );
                       } else {
@@ -412,5 +413,20 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
 
     final int dayIndex = MindUtils.getDayIndex(from: dates!.first!);
     return dayIndex;
+  }
+
+  void _showMindInfo(Mind mind) {
+    if (mountedContext == null) {
+      return;
+    }
+
+    Navigator.of(mountedContext!).push(
+      MaterialPageRoute(
+        builder: (_) => MindInfoScreen(
+          rootMind: mind,
+          allMinds: allMinds,
+        ),
+      ),
+    );
   }
 }

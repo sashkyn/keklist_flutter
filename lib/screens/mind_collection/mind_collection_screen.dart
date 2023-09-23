@@ -308,6 +308,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                   dayIndex: 0,
                   id: const Uuid().v4(),
                   sortIndex: 0,
+                  rootId: null
                 );
               },
             )

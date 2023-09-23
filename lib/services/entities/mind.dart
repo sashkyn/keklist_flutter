@@ -8,14 +8,16 @@ class Mind with EquatableMixin {
   final int dayIndex;
   final DateTime creationDate;
   final int sortIndex;
+  final String? rootId;
 
-  const Mind({
+  Mind({
     required this.id,
     required this.note,
     required this.emoji,
     required this.dayIndex,
     required this.creationDate,
     required this.sortIndex,
+    required this.rootId,
   });
 
   @override
@@ -32,12 +34,13 @@ class Mind with EquatableMixin {
       ];
 
   Mind.fromSupabaseJson(Map<String, dynamic> json)
-      : id = json['uuid'] ?? 0,
+      : id = json['uuid'] ?? 'heheh',
         emoji = json['emoji'],
         dayIndex = json['day_index'],
         note = json['note'],
         creationDate = DateTime.parse(json['created_at']).toUtc(),
-        sortIndex = json["sort_index"] ?? 0;
+        sortIndex = json["sort_index"] ?? 0,
+        rootId = json["root_id"];
 
   Map<String, dynamic> toSupabaseJson({required String userId}) {
     return {
@@ -48,6 +51,7 @@ class Mind with EquatableMixin {
       'day_index': dayIndex,
       'sort_index': sortIndex,
       'created_at': creationDate.toUtc().toIso8601String(),
+      'root_id': rootId,
     };
   }
 
@@ -75,6 +79,7 @@ class Mind with EquatableMixin {
     int? dayIndex,
     DateTime? creationDate,
     int? sortIndex,
+    String? rootId,
   }) {
     return Mind(
       id: id ?? this.id,
@@ -83,6 +88,7 @@ class Mind with EquatableMixin {
       dayIndex: dayIndex ?? this.dayIndex,
       creationDate: creationDate ?? this.creationDate,
       sortIndex: sortIndex ?? this.sortIndex,
+      rootId: rootId ?? this.rootId,
     );
   }
 
@@ -93,5 +99,6 @@ class Mind with EquatableMixin {
     ..dayIndex = dayIndex
     ..creationDate = creationDate
     ..isUploadedToServer = isUploadedToServer
-    ..sortIndex = sortIndex;
+    ..sortIndex = sortIndex
+    ..rootId = rootId;
 }
