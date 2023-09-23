@@ -132,6 +132,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
+                    placeholder: 'Append a mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(

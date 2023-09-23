@@ -218,6 +218,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
+                    placeholder: 'Create a mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(
