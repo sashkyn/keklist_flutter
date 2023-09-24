@@ -136,7 +136,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   AuthButton(
-                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.apple),
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.apple()),
                     type: AuthButtonType.apple,
                   ),
                   const SizedBox(width: 16.0),
@@ -146,7 +146,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                   ),
                   const SizedBox(width: 16.0),
                   AuthButton(
-                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.facebook),
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.facebook()),
                     type: AuthButtonType.facebook,
                   ),
                   const SizedBox(width: 16.0),
