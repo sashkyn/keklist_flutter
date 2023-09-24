@@ -39,7 +39,11 @@ class MindSearchResultListWidget extends StatelessWidget {
               return const SizedBox.shrink();
             } else {
               final Mind mind = results[index - 1];
-              return MindMessageWidget(mind: mind);
+              return MindMessageWidget(
+                mind: mind,
+                onOptions: null, 
+                childCount: null,
+              );
             }
           }
         },

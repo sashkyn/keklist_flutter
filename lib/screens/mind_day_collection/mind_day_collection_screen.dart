@@ -45,10 +45,12 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   int dayIndex;
   final List<Mind> allMinds;
 
-  List<Mind> get dayMinds => MindUtils.findMindsByDayIndex(
+  List<Mind> get _dayMinds => MindUtils.findMindsByDayIndex(
         dayIndex: dayIndex,
         allMinds: allMinds,
       );
+
+  Map<String, int> get _mindIdsToChildCount => MindUtils.convertToMindCountMap(minds: allMinds);
 
   // TODO: Перетащить стейт в бар
   // NOTE: Состояние CreateMarkBar с вводом текста.
@@ -171,12 +173,13 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                     child: BoolWidget(
                       condition: _isMindContentVisible,
                       trueChild: MindMonologListWidget(
-                        minds: dayMinds,
+                        minds: _dayMinds,
                         onTap: (Mind mind) => _showMindInfo(mind),
-                        onLongPress: (Mind mind) => _showMindOptionsActionSheet(mind),
+                        onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                        mindIdsToChildCount: _mindIdsToChildCount,
                       ),
                       falseChild: MindIconedListWidget(
-                        minds: dayMinds,
+                        minds: _dayMinds,
                         onTap: (Mind mind) => showOkAlertDialog(
                           title: mind.emoji,
                           message: mind.note,
@@ -190,12 +193,8 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               ),
               falseChild: SingleChildScrollView(
                 child: MindIconedListWidget(
-                  minds: dayMinds,
-                  onTap: (Mind mind) => showOkAlertDialog(
-                    title: mind.emoji,
-                    message: mind.note,
-                    context: context,
-                  ),
+                  minds: _dayMinds,
+                  onTap: (Mind mind) => _showMindInfo(mind),
                   onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
                 ),
               ),

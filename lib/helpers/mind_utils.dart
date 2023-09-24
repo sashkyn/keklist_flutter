@@ -64,6 +64,31 @@ class MindUtils {
     required Iterable<Mind> allMinds,
   }) =>
       allMinds.where((item) => emoji == item.emoji).mySortedBy((it) => it.sortIndex).toList();
+
+  static Map<String, int> convertToMindCountMap({required List<Mind> minds}) {
+    Map<String, int> mindCountMap = {};
+    Map<String, int> childCountMap = {};
+
+    for (Mind mind in minds.where(
+      (element) => element.rootId != null,
+    )) {
+      final String parentId = mind.rootId!;
+
+      if (childCountMap.containsKey(parentId)) {
+        childCountMap[parentId] = childCountMap[parentId]! + 1;
+      } else {
+        childCountMap[parentId] = 1;
+      }
+    }
+
+    for (Mind mind in minds) {
+      final mindId = mind.id;
+      final count = childCountMap[mindId] ?? 0;
+      mindCountMap[mindId] = count;
+    }
+
+    return mindCountMap;
+  }
 }
 
 // NOTE: Sorted by.

@@ -14,7 +14,7 @@ class MindCreatorBar extends StatefulWidget {
   final String doneTitle;
   final String placeholder;
   final Function(String) onTapSuggestionEmoji;
-  final Function() onTapCancelEdit;
+  final VoidCallback onTapCancelEdit;
   final Function(CreateMindData) onDone;
 
   const MindCreatorBar({

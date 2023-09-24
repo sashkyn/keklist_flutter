@@ -5,14 +5,16 @@ import 'package:rememoji/services/entities/mind.dart';
 
 class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
+  final Map<String, int>? mindIdsToChildCount;
   final Function(Mind) onTap;
-  final Function(Mind) onLongPress;
+  final Function(Mind) onOptions;
 
   const MindMonologListWidget({
     super.key,
     required this.minds,
     required this.onTap,
-    required this.onLongPress,
+    required this.onOptions,
+    required this.mindIdsToChildCount,
   });
 
   @override
@@ -24,8 +26,11 @@ class MindMonologListWidget extends StatelessWidget {
               children: [
                 GestureDetector(
                     onTap: () => onTap(mind),
-                    onLongPress: () => onLongPress(mind),
-                    child: MindMessageWidget(mind: mind).animate().fadeIn()),
+                    child: MindMessageWidget(
+                      mind: mind,
+                      childCount: mindIdsToChildCount?[mind.id],
+                      onOptions: () => onOptions(mind),
+                    ).animate().fadeIn()),
               ],
             );
           }).toList() +
