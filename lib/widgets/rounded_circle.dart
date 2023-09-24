@@ -2,26 +2,32 @@ import 'package:flutter/material.dart';
 
 class RoundedCircle extends StatelessWidget {
   final Widget child;
+  final Color backgroundColor;
+  final Color borderColor;
+  final double borderWidth;
 
   const RoundedCircle({
     super.key,
     required this.child,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.borderWidth,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 70.0,
-      height: 70.0,
+      height: 35,
+      width: 35,
       decoration: BoxDecoration(
-        color: Colors.white,
         shape: BoxShape.circle,
+        color: backgroundColor,
         border: Border.all(
-          color: Colors.black,
-          width: 2.0,
+          color: borderColor,
+          width: borderWidth,
         ),
       ),
-      child: child,
+      child: Center(child: child),
     );
   }
 }

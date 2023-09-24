@@ -109,7 +109,8 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
                   child: MindMonologListWidget(
                     minds: emojiMinds,
                     onTap: (Mind mind) => _showMindInfo(mind),
-                    onLongPress: (Mind mind) => _showMindOptionsActionSheet(mind),
+                    onOptions: (Mind mind) => _showMindOptionsActionSheet(mind), 
+                    mindIdsToChildCount: null,
                   ),
                 ),
               ],

@@ -57,7 +57,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((e) => e.creationDate));
+            ..addAll(state.values.mySortedBy((mind) => mind.creationDate));
         });
       }
     })?.disposed(by: this);
@@ -67,7 +67,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reflections'),
+        title: const Text('Mind'),
       ),
       body: Stack(
         children: [
@@ -87,7 +87,11 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          MindMessageWidget(mind: rootMind),
+                          MindMessageWidget(
+                            mind: rootMind,
+                            onOptions: null,
+                            childCount: null,
+                          ),
                         ],
                       ),
                       if (childMinds.isNotEmpty) ...{
@@ -95,13 +99,14 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                           height: 16,
                         ),
                         const Text(
-                          'Reflections:',
+                          'Comments',
                           textAlign: TextAlign.center,
                         ),
                         MindMonologListWidget(
                           minds: childMinds,
-                          onTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                          onLongPress: (Mind mind) => () {},
+                          onTap: (Mind mind) => () {},
+                          onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                          mindIdsToChildCount: null,
                         ),
                       }
                     ],
