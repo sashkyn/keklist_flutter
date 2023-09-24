@@ -84,7 +84,12 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                   fillOverscroll: true,
                   child: Column(
                     children: [
-                      MindMessageWidget(mind: rootMind),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          MindMessageWidget(mind: rootMind),
+                        ],
+                      ),
                       if (childMinds.isNotEmpty) ...{
                         const SizedBox(
                           height: 16,
