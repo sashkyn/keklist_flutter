@@ -14,7 +14,8 @@ void main() {
           emoji: ' ',
           dayIndex: 0,
           sortIndex: 5,
-          creationDate: DateTime.now(),
+          creationDate: DateTime.now(), 
+          rootId: null,
         ),
       );
       unsortedMinds.add(
@@ -25,6 +26,7 @@ void main() {
           dayIndex: 0,
           sortIndex: 20,
           creationDate: DateTime.now(),
+          rootId: null,
         ),
       );
       unsortedMinds.add(
@@ -35,6 +37,7 @@ void main() {
           dayIndex: 0,
           sortIndex: 10,
           creationDate: DateTime.now(),
+          rootId: null,
         ),
       );
 
