@@ -6,6 +6,7 @@ import 'package:rememoji/widgets/mind_widget.dart';
 
 class MindIconedListWidget extends StatelessWidget {
   final List<Mind> minds;
+  final Map<String, int>? mindIdsToChildCount;
   final Function(Mind) onTap;
   final Function(Mind) onLongTap;
 
@@ -14,6 +15,7 @@ class MindIconedListWidget extends StatelessWidget {
     required this.minds,
     required this.onTap,
     required this.onLongTap,
+    required this.mindIdsToChildCount,
   });
 
   @override
@@ -30,11 +32,20 @@ class MindIconedListWidget extends StatelessWidget {
                   onTap: () => onTap(mind),
                   onLongTap: () => onLongTap(mind),
                   isHighlighted: mind.note.isNotEmpty,
+                  badge: _obtainBadgeText(mind),
                 ).animate().fadeIn(),
               )
               .toList(),
         ),
       ],
     );
+  }
+
+  String? _obtainBadgeText(Mind mind) {
+    final int? count = mindIdsToChildCount?[mind.id];
+    if (count == null || count == 0) {
+      return null;
+    }
+    return '${mindIdsToChildCount?[mind.id]}';
   }
 }

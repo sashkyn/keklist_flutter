@@ -21,6 +21,8 @@ class RoundedText extends StatelessWidget {
       backgroundColor: backgroundColor,
       borderColor: borderColor,
       borderWidth: 1,
+      width: 35.0,
+      height: 35.0,
       child: Text(
         text,
         style: TextStyle(

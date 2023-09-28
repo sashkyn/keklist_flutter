@@ -53,7 +53,9 @@ Future<void> main() async {
   final Injector mainInjector = MainContainer().initialize(injector);
 
   // Подключаемся к Apple Watch.
-  if (Platform.isIOS) {
+  if (kIsWeb) {
+    // no-op
+  } else if (Platform.isIOS) {
     mainInjector.get<WatchCommunicationManager>().connect();
   }
 

@@ -41,6 +41,7 @@ class MindCollectionEmptyDayWidget extends StatelessWidget {
           item: emoji,
           size: MindSize.large,
           isHighlighted: false,
+          badge: null,
         ),
         const SizedBox(height: 8),
         Text(

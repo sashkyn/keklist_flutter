@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rememoji/widgets/bool_widget.dart';
+import 'package:rememoji/widgets/rounded_circle.dart';
 
 enum MindSize {
   small,
@@ -8,6 +10,7 @@ enum MindSize {
 
 class MindWidget extends StatelessWidget {
   final String item;
+  final String? badge;
   final bool isHighlighted;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -16,6 +19,7 @@ class MindWidget extends StatelessWidget {
   const MindWidget({
     Key? key,
     required this.item,
+    this.badge,
     this.isHighlighted = true,
     this.onTap,
     this.onLongPress,
@@ -38,6 +42,7 @@ class MindWidget extends StatelessWidget {
   factory MindWidget.sized({
     required String item,
     required MindSize size,
+    required String? badge,
     bool isHighlighted = true,
     VoidCallback? onTap,
     VoidCallback? onLongTap,
@@ -46,6 +51,7 @@ class MindWidget extends StatelessWidget {
       case MindSize.small:
         return MindWidget(
           item: item,
+          badge: badge,
           isHighlighted: isHighlighted,
           onTap: onTap,
           onLongPress: onLongTap,
@@ -54,6 +60,7 @@ class MindWidget extends StatelessWidget {
       case MindSize.medium:
         return MindWidget(
           item: item,
+          badge: badge,
           isHighlighted: isHighlighted,
           onTap: onTap,
           onLongPress: onLongTap,
@@ -62,6 +69,7 @@ class MindWidget extends StatelessWidget {
       case MindSize.large:
         return MindWidget(
           item: item,
+          badge: badge,
           isHighlighted: isHighlighted,
           onTap: onTap,
           onLongPress: onLongTap,
@@ -75,17 +83,37 @@ class MindWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
-      child: Center(
-        child: GrayedOut(
-          grayedOut: !isHighlighted,
-          child: Text(
-            item,
-            style: TextStyle(
-              // fontFamily: 'NotoColorEmoji',
-              fontSize: fontSize,
-            )
+      child: Stack(
+        children: [
+          Center(
+            child: GrayedOut(
+              grayedOut: !isHighlighted,
+              child: Text(item,
+                  style: TextStyle(
+                    // fontFamily: 'NotoColorEmoji',
+                    fontSize: fontSize,
+                  )),
+            ),
           ),
-        ),
+          BoolWidget(
+            condition: badge != null,
+            trueChild: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: RoundedCircle(
+                  height: 16.0,
+                  width: 16.0,
+                  backgroundColor: Colors.lightGreen,
+                  borderColor: Colors.white,
+                  borderWidth: 2.0,
+                  child: Container(),
+                ),
+              ),
+            ),
+            falseChild: Container(),
+          )
+        ],
       ),
     );
   }

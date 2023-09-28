@@ -186,6 +186,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                           context: context,
                         ),
                         onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
+                        mindIdsToChildCount: _mindIdsToChildCount,
                       ),
                     ),
                   ),
@@ -195,7 +196,8 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                 child: MindIconedListWidget(
                   minds: _dayMinds,
                   onTap: (Mind mind) => _showMindInfo(mind),
-                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
+                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind), 
+                  mindIdsToChildCount: _mindIdsToChildCount,
                 ),
               ),
             ),
