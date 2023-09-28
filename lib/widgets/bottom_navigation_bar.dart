@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AdaptiveBottomNavigationBar extends StatelessWidget {
@@ -17,7 +18,16 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isIOS) {
+    if (kIsWeb || Platform.isAndroid) {
+      return BottomNavigationBar(
+        items: items,
+        currentIndex: selectedIndex,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        onTap: onTap,
+      );
+    } else if (Platform.isIOS) {
       return CupertinoTabBar(
         items: items,
         currentIndex: selectedIndex,

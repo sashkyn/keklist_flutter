@@ -5,6 +5,8 @@ class RoundedCircle extends StatelessWidget {
   final Color backgroundColor;
   final Color borderColor;
   final double borderWidth;
+  final double width;
+  final double height;
 
   const RoundedCircle({
     super.key,
@@ -12,13 +14,15 @@ class RoundedCircle extends StatelessWidget {
     required this.backgroundColor,
     required this.borderColor,
     required this.borderWidth,
+    required this.width,
+    required this.height,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 35,
-      width: 35,
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: backgroundColor,

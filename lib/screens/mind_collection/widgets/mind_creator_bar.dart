@@ -118,6 +118,7 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
                   item: editableMind.emoji,
                   size: MindSize.small,
                   onTap: onTapEmoji,
+                  badge: null,
                 ),
                 const SizedBox(width: 10.0),
                 Flexible(
@@ -179,6 +180,7 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
           item: selectedEmoji,
           size: MindSize.medium,
           onTap: onSearchEmoji,
+          badge: null,
         ),
         const SizedBox(width: 5.0),
         Flexible(
@@ -238,6 +240,7 @@ class MindCreatorSuggestionsWidget extends StatelessWidget {
             item: suggestionMinds[index],
             size: MindSize.small,
             onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
+            badge: null,
           ),
         );
       }),
