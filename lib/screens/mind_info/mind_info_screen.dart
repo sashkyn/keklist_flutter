@@ -1,5 +1,6 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -102,11 +103,10 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                           'Comments',
                           textAlign: TextAlign.center,
                         ),
-                        MindMonologListWidget(
+                        MindBulletListWidget(
                           minds: childMinds,
                           onTap: (Mind mind) => () {},
                           onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                          mindIdsToChildCount: null,
                         ),
                       }
                     ],
