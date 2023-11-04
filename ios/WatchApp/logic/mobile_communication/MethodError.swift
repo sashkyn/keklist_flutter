@@ -1,7 +1,6 @@
 import Foundation
 
 enum MethodError: LocalizedError {
-    
     case notAuthorized
     case notPaired
     case unknown
