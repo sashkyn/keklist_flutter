@@ -53,6 +53,7 @@ dependencies:
   url_strategy: ^0.2.0
   uuid: ^3.0.7
   webview_flutter: ^4.1.0
+  gap: ^3.0.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

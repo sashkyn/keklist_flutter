@@ -1,8 +1,8 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
 import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
@@ -96,17 +96,19 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                         ],
                       ),
                       if (childMinds.isNotEmpty) ...{
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        const Text(
-                          'Comments',
-                          textAlign: TextAlign.center,
+                        const Gap(16.0),
+                        Container(
+                          color: Colors.white,
+                          height: 8.0,
                         ),
                         MindBulletListWidget(
                           minds: childMinds,
                           onTap: (Mind mind) => () {},
                           onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                        ),
+                        Container(
+                          color: Colors.white,
+                          height: 8.0,
                         ),
                       }
                     ],

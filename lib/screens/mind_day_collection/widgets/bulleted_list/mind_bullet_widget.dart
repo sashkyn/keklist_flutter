@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class MindBulletWidget extends StatelessWidget {
   final String emoji;
@@ -14,32 +15,30 @@ class MindBulletWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+    return Container(
+      color: Colors.white,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
-          const SizedBox(
-            width: 8.0,
-          ),
+          const Gap(10.0),
           Text(
             emoji,
-            style: const TextStyle(fontSize: 20.0),
+            style: const TextStyle(fontSize: 25.0),
           ),
-          const SizedBox(width: 8.0),
+          const Gap(8.0),
           Flexible(
             fit: FlexFit.tight,
-            child: Text(
-              text,
-              maxLines: null,
-              style: const TextStyle(fontSize: 15.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Text(
+                text,
+                maxLines: null,
+                style: const TextStyle(fontSize: 16.0),
+              ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.more_horiz),
-            onPressed: onOptions,
-          ),
+          const Gap(10.0),
         ],
       ),
     );
