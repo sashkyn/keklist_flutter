@@ -57,7 +57,8 @@ platform :ios do
     match(
       app_identifier: [
         "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp"
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
       ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
@@ -70,7 +71,8 @@ platform :ios do
     match(
       app_identifier: [
         "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp"
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
       ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
@@ -88,6 +90,7 @@ platform :ios do
         provisioningProfiles: {
           "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
           "com.sashkyn.kekable.watchkitapp" => "match AppStore com.sashkyn.kekable.watchkitapp",
+          "com.sashkyn.kekable.widget" => "match AppStore com.sashkyn.kekable.widget"
         }
       },
       verbose: true
@@ -112,7 +115,8 @@ platform :ios do
     match(
       app_identifier: [
         "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp"
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
       ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
@@ -123,7 +127,8 @@ platform :ios do
     match(
       app_identifier: [
         "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp"
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
       ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
@@ -143,6 +148,7 @@ platform :ios do
         provisioningProfiles: {
           "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
           "com.sashkyn.kekable.watchkitapp" => "match AppStore com.sashkyn.kekable.watchkitapp",
+          "com.sashkyn.kekable.widget" => "match AppStore com.sashkyn.kekable.widget"
         }
       },
       verbose: true
