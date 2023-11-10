@@ -9,34 +9,39 @@ import WidgetKit
 import SwiftUI
 
 struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), emoji: "😀")
+    func placeholder(in context: Context) -> MindEntry {
+        MindEntry(emoji: "No data", text: "No data", date: Date())
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), emoji: "😀")
+    func getSnapshot(in context: Context, completion: @escaping (MindEntry) -> ()) {
+        let entry: MindEntry
+        if context.isPreview {
+            entry = placeholder(in: context)
+        } else {
+            let userDefaults = UserDefaults(suiteName: "group.kekable")
+            let emoji = userDefaults?.string(forKey: "mind_emoji") ?? "No emoji"
+            let text = userDefaults?.string(forKey: "mind_text") ?? "No text"
+            entry = MindEntry(
+                emoji: emoji, 
+                text: text, 
+                date: Date()
+            )
+        }
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, emoji: "😀")
-            entries.append(entry)
+        getSnapshot(in: context) { mindEntry in
+            let timeline = Timeline(entries: [mindEntry], policy: .atEnd)
+            completion(timeline)
         }
-
-        let timeline = Timeline(entries: entries, policy: .atEnd)
-        completion(timeline)
     }
 }
 
-struct SimpleEntry: TimelineEntry {
-    let date: Date
+struct MindEntry: TimelineEntry {
     let emoji: String
+    let text: String
+    let date: Date
 }
 
 struct MindDayWidgetEntryView : View {
@@ -44,11 +49,8 @@ struct MindDayWidgetEntryView : View {
 
     var body: some View {
         VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Emoji:")
-            Text(entry.emoji)
+            Text(entry.emoji).font(.largeTitle)
+            Text(entry.text)
         }
     }
 }
@@ -70,11 +72,4 @@ struct MindDayWidget: Widget {
         .configurationDisplayName("My Widget")
         .description("This is an example widget.")
     }
-}
-
-#Preview(as: .systemLarge) {
-    return MindDayWidget()
-} timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
 }

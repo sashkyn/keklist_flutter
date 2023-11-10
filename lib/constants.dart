@@ -27,6 +27,11 @@ class DateFormatters {
   static DateFormat fullDateFormat = DateFormat('dd.MM.yyyy - EEEE');
 }
 
+class PlatformConstants {
+  static String iosGroupId = 'group.kekable';
+  static String iosWidgetName = 'MindDayWidget';
+}
+
 class KeklistConstants {
   static String demoAccountEmail = '***REMOVED***';
   static String termsOfUseURL = 'https://sashkyn.notion.site/Zenmode-Terms-of-Use-df179704b2d149b8a5a915296f5cb78f';

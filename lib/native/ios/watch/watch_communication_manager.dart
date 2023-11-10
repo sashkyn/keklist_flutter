@@ -13,14 +13,12 @@ import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/services/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 
-// TODO: покрыть тестами
-
 abstract class WatchCommunicationManager {
   void connect() {}
 }
 
 class AppleWatchCommunicationManager implements WatchCommunicationManager {
-  final _channel = const MethodChannel('com.sashkyn.kekable');
+  final MethodChannel _channel = const MethodChannel('com.sashkyn.kekable');
 
   final MainService mainService;
   final SupabaseClient client;
@@ -46,7 +44,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       ),
     );
 
-    final methodName = stringFromEnum(outputMethod);
+    final String methodName = stringFromEnum(outputMethod);
     await _channel.invokeMethod(
       methodName,
       [methodArguments],
@@ -61,25 +59,26 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         }
 
         final String methodName = call.method;
-        final methodArgs = call.arguments;
+        final dynamic methodArgs = call.arguments;
 
         // print('methodName = $methodName');
         // print('methodArgs = $methodArgs');
 
+        // TODO: переписать на Switch
         if (methodName == stringFromEnum(WatchInputMethod.obtainTodayMinds)) {
           return _showMindList();
         } else if (methodName == stringFromEnum(WatchInputMethod.obtainPredictedEmojies)) {
-          final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
+          final String mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
           return _showPredictedEmojies(mindText: mindText);
         } else if (methodName == stringFromEnum(WatchInputMethod.createMind)) {
-          final mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
-          final emoji = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindEmoji)];
+          final String mindText = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindText)];
+          final String emoji = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindEmoji)];
           return _createMindForToday(
             mindText: mindText,
             emoji: emoji,
           );
         } else if (methodName == stringFromEnum(WatchInputMethod.deleteMind)) {
-          final mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindId)];
+          final String mindId = methodArgs[stringFromEnum(WatchMethodArgumentKey.mindId)];
           return _removeMindFromToday(id: mindId);
         }
       },
@@ -90,11 +89,11 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     required String mindText,
     required String emoji,
   }) async {
-    final dayIndex = MindUtils.getDayIndex(from: DateTime.now());
-    final mindList = await mainService.getMindList();
-    final sortIndex = mindList.where((element) => element.dayIndex == dayIndex).length;
+    final int dayIndex = MindUtils.getDayIndex(from: DateTime.now());
+    final Iterable<Mind> mindList = await mainService.getMindList();
+    final int sortIndex = mindList.where((element) => element.dayIndex == dayIndex).length;
 
-    final mind = Mind(
+    final Mind mind = Mind(
       id: const Uuid().v4(),
       dayIndex: MindUtils.getDayIndex(from: DateTime.now()),
       note: mindText,
@@ -104,7 +103,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       rootId: null,
     );
     await mainService.createMind(mind);
-    final mindJSON = json.encode(
+    final String mindJSON = json.encode(
       mind,
       toEncodable: (_) => mind.toWatchJson(),
     );
@@ -117,12 +116,8 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _showMindList() async {
-    final mindList = await mainService.getMindList();
-    final todayMindList = mindList
-        .where(
-          (element) => element.dayIndex == MindUtils.getDayIndex(from: DateTime.now()),
-        )
-        .toList();
+    final Iterable<Mind> mindList = await mainService.getMindList();
+    final List<Mind> todayMindList = MindUtils.findTodayMinds(allMinds: mindList.toList());
     final List<String> mindJSONList = todayMindList
         .map(
           (mind) => json.encode(
@@ -147,7 +142,6 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     );
   }
 
-  // TODO: проверить как себя ведет метод возврата всех эмодзи
   Future<void> _showPredictedEmojies({required String mindText}) async {
     final Iterable<Mind> minds = await mainService.getMindList();
     List<String> predictedEmojies = minds

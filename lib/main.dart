@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:rememoji/screens/main/main_screen.dart';
 import 'package:rememoji/services/hive/constants.dart';
 import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
@@ -29,6 +30,7 @@ import 'native/ios/watch/watch_communication_manager.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  _setupWidgets();
   _setupBlockingLoadingWidget();
   _setupOrientations();
 
@@ -89,6 +91,10 @@ Future<void> main() async {
     child: const KeklistApp(),
   );
   runApp(application);
+}
+
+void _setupWidgets() {
+  HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
 }
 
 void _setupBlockingLoadingWidget() {
