@@ -25,11 +25,21 @@ platform :ios do
   desc "Create provisioning profiles"
   lane :create_provisioning_profiles do
     match(
+      app_identifier: [
+        "com.sashkyn.kekable", 
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
+      ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "development"
     )
     match(
+      app_identifier: [
+        "com.sashkyn.kekable", 
+        "com.sashkyn.kekable.watchkitapp",
+        "com.sashkyn.kekable.widget"
+      ],
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
