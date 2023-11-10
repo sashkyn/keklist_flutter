@@ -5,6 +5,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_bar.dart';
@@ -210,7 +211,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         centerTitle: true,
         automaticallyImplyLeading: true,
         title: GestureDetector(
-          onTap: () => _scrollToNow(),
+          onTap: () {
+            _scrollToNow();
+          },
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -302,14 +305,13 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 final String randomEmoji = KeklistConstants
                     .demoModeEmodjiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
                 return Mind(
-                  emoji: randomEmoji,
-                  creationDate: DateTime.now(),
-                  note: '',
-                  dayIndex: 0,
-                  id: const Uuid().v4(),
-                  sortIndex: 0,
-                  rootId: null
-                );
+                    emoji: randomEmoji,
+                    creationDate: DateTime.now(),
+                    note: '',
+                    dayIndex: 0,
+                    id: const Uuid().v4(),
+                    sortIndex: 0,
+                    rootId: null);
               },
             )
                 .map(

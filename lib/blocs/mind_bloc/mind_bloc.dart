@@ -57,12 +57,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     on<MindStopSearch>(_stopSearch);
     on<MindEnterSearchText>(
       _enterTextSearch,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
     on<MindUploadCandidates>(_uploadCandidates);
     on<MindChangeCreateText>(
       _changeTextOfCreatingMind,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
+      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 100)).asyncExpand(mapper),
     );
     on<MindGetUploadCandidates>(_getUploadCandidates);
     on<MindInternalGetListFromCache>(

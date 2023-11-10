@@ -54,6 +54,7 @@ dependencies:
   uuid: ^3.0.7
   webview_flutter: ^4.1.0
   gap: ^3.0.1
+  home_widget: ^0.3.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
