@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/widgets/bool_widget.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
@@ -38,8 +37,6 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
       onDoubleTap: () {
         setState(() {
           nextInt = _random.nextInt(listLenght);
-          HomeWidget.saveWidgetData('mind_emoji', randomMind.emoji);
-          HomeWidget.saveWidgetData('mind_text', randomMind.note);
         });
       },
       child: BoolWidget(

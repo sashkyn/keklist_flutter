@@ -35,7 +35,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   Stream<MindObject?> get _mindObjectsStream => _mindBox
       .watch()
       .map((BoxEvent event) => event.value as MindObject?)
-      .debounceTime(const Duration(milliseconds: 100));
+      .debounceTime(const Duration(milliseconds: 500));
 
   final Box<QueueTransactionObject> _mindQueueTransactionsBox =
       Hive.box<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
@@ -48,6 +48,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
     on<MindGetList>(_getMinds);
+    on<MindGetTodayList>(_getTodayMinds);
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
     on<MindDeleteAllMinds>(_deleteAllMindsFromServer);
@@ -139,14 +140,13 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
 
   Future<void> _createMind(MindCreate event, Emitter<MindState> emit) async {
     final Mind mind = Mind(
-      id: const Uuid().v4(),
-      dayIndex: event.dayIndex,
-      note: event.note.trim(),
-      emoji: event.emoji,
-      creationDate: DateTime.now().toUtc(),
-      sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
-      rootId: event.rootId
-    );
+        id: const Uuid().v4(),
+        dayIndex: event.dayIndex,
+        note: event.note.trim(),
+        emoji: event.emoji,
+        creationDate: DateTime.now().toUtc(),
+        sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
+        rootId: event.rootId);
 
     // Добавляем в локальное хранилище.
     final MindObject object = mind.toObject(isUploadedToServer: false);
@@ -342,17 +342,14 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       );
 
       // Редактируем на сервере.
-      final Future<void> transaction = _service
-          .editMind(mind: event.mind)
-          .then((_) {
-            emit(
-                MindOperationCompleted(
-                  minds: [event.mind],
-                  type: MindOperationType.edit,
-                ),
-              );
-          })
-          .onError(
+      final Future<void> transaction = _service.editMind(mind: event.mind).then((_) {
+        emit(
+          MindOperationCompleted(
+            minds: [event.mind],
+            type: MindOperationType.edit,
+          ),
+        );
+      }).onError(
         (error, _) {
           // Роллбек
           editedMind.toObject(isUploadedToServer: true).save();
@@ -533,5 +530,13 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     await transaction.transaction;
 
     // _mindQueueTransactionsBox.add(transaction);
+  }
+
+  void _getTodayMinds(MindGetTodayList event, Emitter<MindState> emit) {
+    final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
+    final List<Mind> todayMinds = MindUtils.findTodayMinds(allMinds: minds.toList());
+    emit(
+      MindTodayList(values: todayMinds),
+    );
   }
 }

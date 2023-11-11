@@ -31,6 +31,7 @@
 		E6ABA04B2AF6356A003378F7 /* MindDayWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6ABA04A2AF6356A003378F7 /* MindDayWidget.swift */; };
 		E6ABA04D2AF6356C003378F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6ABA04C2AF6356C003378F7 /* Assets.xcassets */; };
 		E6ABA0512AF6356C003378F7 /* WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E6ABA0422AF6356A003378F7 /* WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E6AC007E2AFF946B00E8E57D /* Mind.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FAD34429BE01720078A43B /* Mind.swift */; };
 		E6D13A4B29B71D2F0045C7FA /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4A29B71D2F0045C7FA /* WatchApp.swift */; };
 		E6D13A4D29B71D2F0045C7FA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D13A4C29B71D2F0045C7FA /* MainView.swift */; };
 		E6D13A4F29B71D300045C7FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6D13A4E29B71D300045C7FA /* Assets.xcassets */; };
@@ -572,6 +573,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6AC007E2AFF946B00E8E57D /* Mind.swift in Sources */,
 				E6ABA0492AF6356A003378F7 /* MindWidgetBundle.swift in Sources */,
 				E6ABA04B2AF6356A003378F7 /* MindDayWidget.swift in Sources */,
 			);
