@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -100,13 +101,15 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       })?.disposed(by: this);
 
       subscribeTo<MindBloc>(
-        onNewState: (state) {
+        onNewState: (state) async {
           if (state is MindList) {
             setState(() => _minds = state.values);
           } else if (state is MindServerOperationStarted) {
             if (state.type == MindOperationType.fetch) {
               setState(() => _updating = true);
             }
+            // INFO: запрос для виджета
+            sendEventTo<MindBloc>(MindGetTodayList());
           } else if (state is MindOperationCompleted) {
             if (state.type == MindOperationType.fetch) {
               setState(() => _updating = false);
@@ -134,6 +137,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             }
           } else if (state is MindSearching) {
             setState(() => _searchingMindState = state);
+          } else if (state is MindTodayList) {
+            await _updateMobileWidgets(state);
           }
         },
       )?.disposed(by: this);
@@ -484,5 +489,21 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
     _scrollToDayIndex(dayIndex);
+  }
+
+  Future<void> _updateMobileWidgets(MindTodayList state) async {
+    final List<String> todayMindJSONList = state.values
+        .map(
+          (mind) => json.encode(
+            mind,
+            toEncodable: (i) => mind.toWatchJson(),
+          ),
+        )
+        .toList();
+    await HomeWidget.saveWidgetData(
+      'mind_today_widget_today_minds',
+      todayMindJSONList,
+    );
+    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosWidgetName);
   }
 }

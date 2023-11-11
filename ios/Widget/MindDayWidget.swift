@@ -10,7 +10,10 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> MindEntry {
-        MindEntry(emoji: "No data", text: "No data", date: Date())
+        MindEntry(
+            text: "😃 🌟 🐾 🍕 🎈 🌸 🚀 🌊 🌮 🎉", 
+            date: Date()
+        )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (MindEntry) -> ()) {
@@ -19,11 +22,19 @@ struct Provider: TimelineProvider {
             entry = placeholder(in: context)
         } else {
             let userDefaults = UserDefaults(suiteName: "group.kekable")
-            let emoji = userDefaults?.string(forKey: "mind_emoji") ?? "No emoji"
-            let text = userDefaults?.string(forKey: "mind_text") ?? "No text"
-            entry = MindEntry(
-                emoji: emoji, 
-                text: text, 
+            let mindsJSONs = userDefaults?.stringArray(forKey: "mind_today_widget_today_minds") ?? []
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let minds = mindsJSONs.compactMap { mindString -> Mind? in
+                guard let mindData = mindString.data(using: .utf8) else {
+                    return nil
+                }
+                return try? decoder.decode(Mind.self, from: mindData) 
+            }
+            
+            entry = MindEntry( 
+                text: minds.map { $0.emoji.description }.joined(separator: " "), 
                 date: Date()
             )
         }
@@ -39,7 +50,6 @@ struct Provider: TimelineProvider {
 }
 
 struct MindEntry: TimelineEntry {
-    let emoji: String
     let text: String
     let date: Date
 }
@@ -48,9 +58,12 @@ struct MindDayWidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            Text(entry.emoji).font(.largeTitle)
+        if entry.text.isEmpty {
+            Text("No data for today...")
+        } else {
             Text(entry.text)
+                .font(.system(size: 48))
+                .multilineTextAlignment(.center)
         }
     }
 }
@@ -69,7 +82,7 @@ struct MindDayWidget: Widget {
                     .background()
             }
         }
-        .configurationDisplayName("My Widget")
+        .configurationDisplayName("Today minds")
         .description("This is an example widget.")
     }
 }

@@ -106,3 +106,5 @@ final class MindGetUploadCandidates extends MindEvent {}
 final class MindInternalGetListFromCache extends MindEvent {}
 
 final class MindGetTransactionList extends MindEvent {}
+
+final class MindGetTodayList extends MindEvent {}

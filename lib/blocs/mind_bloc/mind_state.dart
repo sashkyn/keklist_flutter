@@ -8,6 +8,12 @@ class MindList extends MindState {
   MindList({required this.values});
 }
 
+class MindTodayList extends MindState {
+  final Iterable<Mind> values;
+
+  MindTodayList({required this.values});
+}
+
 class MindSearching extends MindState {
   final bool enabled;
   final Iterable<Mind> allValues;
