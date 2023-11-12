@@ -55,7 +55,7 @@ class Mind with EquatableMixin {
     };
   }
 
-  Map<String, dynamic> toWatchJson() => {
+  Map<String, dynamic> toShortJson() => {
         'uuid': id,
         'emoji': emoji,
         'note': note,

@@ -105,7 +105,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     await mainService.createMind(mind);
     final String mindJSON = json.encode(
       mind,
-      toEncodable: (_) => mind.toWatchJson(),
+      toEncodable: (_) => mind.toShortJson(),
     );
     return _sendToWatch(
       outputMethod: WatchOutputMethod.mindDidCreated,
@@ -122,7 +122,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
         .map(
           (mind) => json.encode(
             mind,
-            toEncodable: (i) => mind.toWatchJson(),
+            toEncodable: (i) => mind.toShortJson(),
           ),
         )
         .toList();

@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:rememoji/constants.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/services/hive/constants.dart';
@@ -48,7 +51,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
     on<MindGetList>(_getMinds);
-    on<MindGetTodayList>(_getTodayMinds);
+    on<MindUpdateMobileWidgets>(_updateMobileWidgets);
     on<MindCreate>(_createMind);
     on<MindDelete>(_deleteMind);
     on<MindDeleteAllMinds>(_deleteAllMindsFromServer);
@@ -532,11 +535,22 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     // _mindQueueTransactionsBox.add(transaction);
   }
 
-  void _getTodayMinds(MindGetTodayList event, Emitter<MindState> emit) {
+  Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
     final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
     final List<Mind> todayMinds = MindUtils.findTodayMinds(allMinds: minds.toList());
-    emit(
-      MindTodayList(values: todayMinds),
+
+    final List<String> todayMindJSONList = todayMinds
+        .map(
+          (mind) => json.encode(
+            mind,
+            toEncodable: (i) => mind.toShortJson(),
+          ),
+        )
+        .toList();
+    await HomeWidget.saveWidgetData(
+      'mind_today_widget_today_minds',
+      todayMindJSONList,
     );
+    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosWidgetName);
   }
 }

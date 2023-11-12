@@ -8,11 +8,7 @@ class MindList extends MindState {
   MindList({required this.values});
 }
 
-class MindTodayList extends MindState {
-  final Iterable<Mind> values;
-
-  MindTodayList({required this.values});
-}
+class MindMobileWidgetsUpdated extends MindState {}
 
 class MindSearching extends MindState {
   final bool enabled;
@@ -124,5 +120,4 @@ class MindTransactions extends MindState {
   final List<QueueTransactionObject> transactions;
 
   MindTransactions(this.transactions);
-
 }

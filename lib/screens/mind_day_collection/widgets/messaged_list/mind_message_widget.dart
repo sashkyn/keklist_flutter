@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:rememoji/services/entities/mind.dart';
 import 'package:rememoji/widgets/rounded_container.dart';
@@ -76,6 +77,7 @@ class MindMessageWidget extends StatelessWidget {
             const SizedBox(height: 16.0),
             Column(
               children: children
+                  .mySortedBy((it) => it.creationDate)
                   .map(
                     (mindChild) => MindBulletWidget(
                       mind: mindChild,

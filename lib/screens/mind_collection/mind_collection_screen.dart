@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_search_bar.dart';
@@ -109,7 +107,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               setState(() => _updating = true);
             }
             // INFO: запрос для виджета
-            sendEventTo<MindBloc>(MindGetTodayList());
+            sendEventTo<MindBloc>(MindUpdateMobileWidgets());
           } else if (state is MindOperationCompleted) {
             if (state.type == MindOperationType.fetch) {
               setState(() => _updating = false);
@@ -137,8 +135,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
             }
           } else if (state is MindSearching) {
             setState(() => _searchingMindState = state);
-          } else if (state is MindTodayList) {
-            await _updateMobileWidgets(state);
           }
         },
       )?.disposed(by: this);
@@ -326,12 +322,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           );
         } else {
           final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex);
-          final List<Widget> realMindWidgets = mindsOfDay
-              .mySortedBy(
-                (e) => e.sortIndex,
-              )
-              .map((mind) => MindWidget(item: mind.emoji))
-              .toList();
+          final List<Widget> realMindWidgets =
+              mindsOfDay.mySortedBy((e) => e.sortIndex).map((mind) => MindWidget(item: mind.emoji)).toList();
           mindWidgets.addAll(realMindWidgets);
         }
 
@@ -489,21 +481,5 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
     _scrollToDayIndex(dayIndex);
-  }
-
-  Future<void> _updateMobileWidgets(MindTodayList state) async {
-    final List<String> todayMindJSONList = state.values
-        .map(
-          (mind) => json.encode(
-            mind,
-            toEncodable: (i) => mind.toWatchJson(),
-          ),
-        )
-        .toList();
-    await HomeWidget.saveWidgetData(
-      'mind_today_widget_today_minds',
-      todayMindJSONList,
-    );
-    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosWidgetName);
   }
 }
