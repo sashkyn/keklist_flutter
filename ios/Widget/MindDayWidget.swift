@@ -69,7 +69,7 @@ struct MindDayWidgetEntryView : View {
 }
 
 struct MindDayWidget: Widget {
-    let kind: String = "Widget"
+    let kind: String = "MindDayWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
