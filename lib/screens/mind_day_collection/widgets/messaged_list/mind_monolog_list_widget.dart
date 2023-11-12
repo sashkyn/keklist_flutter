@@ -5,7 +5,7 @@ import 'package:rememoji/services/entities/mind.dart';
 
 class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
-  final Map<String, int>? mindIdsToChildCount;
+  final Map<String, List<Mind>>? mindIdsToChildren;
   final Function(Mind) onTap;
   final Function(Mind) onOptions;
 
@@ -14,7 +14,7 @@ class MindMonologListWidget extends StatelessWidget {
     required this.minds,
     required this.onTap,
     required this.onOptions,
-    required this.mindIdsToChildCount,
+    required this.mindIdsToChildren,
   });
 
   @override
@@ -28,7 +28,7 @@ class MindMonologListWidget extends StatelessWidget {
                     onTap: () => onTap(mind),
                     child: MindMessageWidget(
                       mind: mind,
-                      childCount: mindIdsToChildCount?[mind.id],
+                      children: mindIdsToChildren?[mind.id] ?? [],
                       onOptions: () => onOptions(mind),
                     ).animate().fadeIn()),
               ],

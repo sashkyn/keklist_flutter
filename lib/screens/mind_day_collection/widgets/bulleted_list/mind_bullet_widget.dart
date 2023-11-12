@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:rememoji/services/entities/mind.dart';
 
 class MindBulletWidget extends StatelessWidget {
-  final String emoji;
-  final String text;
+  final Mind mind;
   final VoidCallback? onOptions;
 
   const MindBulletWidget({
     super.key,
-    required this.emoji,
-    required this.text,
+    required this.mind,
     this.onOptions,
   });
 
@@ -23,7 +22,7 @@ class MindBulletWidget extends StatelessWidget {
         children: [
           const Gap(10.0),
           Text(
-            emoji,
+            mind.emoji,
             style: const TextStyle(fontSize: 25.0),
           ),
           const Gap(8.0),
@@ -32,9 +31,9 @@ class MindBulletWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 6.0),
               child: Text(
-                text,
+                mind.note,
                 maxLines: null,
-                style: const TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
             ),
           ),

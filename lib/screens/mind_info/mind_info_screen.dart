@@ -91,7 +91,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                           MindMessageWidget(
                             mind: rootMind,
                             onOptions: null,
-                            childCount: null,
+                            children: const [],
                           ),
                         ],
                       ),

@@ -41,8 +41,8 @@ class MindSearchResultListWidget extends StatelessWidget {
               final Mind mind = results[index - 1];
               return MindMessageWidget(
                 mind: mind,
-                onOptions: null, 
-                childCount: null,
+                onOptions: null,
+                children: const [],
               );
             }
           }

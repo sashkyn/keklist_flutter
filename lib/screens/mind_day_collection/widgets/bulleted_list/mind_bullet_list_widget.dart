@@ -18,16 +18,16 @@ class MindBulletListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-        children: minds.map((mind) {
-      return GestureDetector(
-        onTap: () => onTap(mind),
-        onLongPress: () => onOptions(mind),
-        child: MindBulletWidget(
-          emoji: mind.emoji,
-          text: mind.note,
-          onOptions: () => onOptions(mind),
-        ).animate().fadeIn(),
-      );
-    }).toList());
+      children: minds.map((mind) {
+        return GestureDetector(
+          onTap: () => onTap(mind),
+          onLongPress: () => onOptions(mind),
+          child: MindBulletWidget(
+            mind: mind,
+            onOptions: () => onOptions(mind),
+          ),
+        );
+      }).toList(),
+    ).animate().fadeIn();
   }
 }
