@@ -50,7 +50,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         allMinds: allMinds,
       );
 
-  Map<String, int> get _mindIdsToChildCount => MindUtils.convertToMindCountMap(minds: allMinds);
+  Map<String, List<Mind>> get _mindIdsToChildren => MindUtils.convertToMindChildren(minds: allMinds);
 
   // TODO: Перетащить стейт в бар
   // NOTE: Состояние CreateMarkBar с вводом текста.
@@ -176,7 +176,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                         minds: _dayMinds,
                         onTap: (Mind mind) => _showMindInfo(mind),
                         onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                        mindIdsToChildCount: _mindIdsToChildCount,
+                        mindIdsToChildren: _mindIdsToChildren,
                       ),
                       falseChild: MindIconedListWidget(
                         minds: _dayMinds,
@@ -186,7 +186,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                           context: context,
                         ),
                         onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                        mindIdsToChildCount: _mindIdsToChildCount,
+                        mindIdsToChildCount: null,
                       ),
                     ),
                   ),
@@ -197,7 +197,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                   minds: _dayMinds,
                   onTap: (Mind mind) => _showMindInfo(mind),
                   onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind), 
-                  mindIdsToChildCount: _mindIdsToChildCount,
+                  mindIdsToChildCount: null,
                 ),
               ),
             ),

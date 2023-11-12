@@ -89,7 +89,26 @@ class MindUtils {
 
     return mindCountMap;
   }
+
+  static Map<String, List<Mind>> convertToMindChildren({required List<Mind> minds}) {
+    Map<String, List<Mind>> mindChildrenMap = {};
+
+    for (Mind mind in minds.where(
+      (element) => element.rootId != null,
+    )) {
+      final String parentId = mind.rootId!;
+
+      if (mindChildrenMap.containsKey(parentId)) {
+        mindChildrenMap[parentId]!.add(mind);
+      } else {
+        mindChildrenMap[parentId] = [mind];
+      }
+    }
+
+    return mindChildrenMap;
+  }
 }
+
 
 // NOTE: Sorted by.
 
