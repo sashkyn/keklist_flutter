@@ -107,4 +107,4 @@ final class MindInternalGetListFromCache extends MindEvent {}
 
 final class MindGetTransactionList extends MindEvent {}
 
-final class MindGetTodayList extends MindEvent {}
+final class MindUpdateMobileWidgets extends MindEvent {}
