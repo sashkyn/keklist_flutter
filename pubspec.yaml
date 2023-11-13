@@ -55,6 +55,7 @@ dependencies:
   webview_flutter: ^4.1.0
   gap: ^3.0.1
   home_widget: ^0.3.0
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
