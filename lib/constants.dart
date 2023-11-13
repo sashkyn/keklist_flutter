@@ -29,7 +29,7 @@ class DateFormatters {
 
 class PlatformConstants {
   static String iosGroupId = 'group.kekable';
-  static String iosWidgetName = 'MindDayWidget';
+  static String iosMindDayWidgetName = 'MindDayWidget';
 }
 
 class KeklistConstants {
