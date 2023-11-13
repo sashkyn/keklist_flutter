@@ -551,6 +551,6 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       'mind_today_widget_today_minds',
       todayMindJSONList,
     );
-    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosWidgetName);
+    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
   }
 }
