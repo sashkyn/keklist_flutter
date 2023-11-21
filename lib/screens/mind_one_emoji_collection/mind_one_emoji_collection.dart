@@ -109,7 +109,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
                   child: MindMonologListWidget(
                     minds: emojiMinds,
                     onTap: (Mind mind) => _showMindInfo(mind),
-                    onOptions: (Mind mind) => _showMindOptionsActionSheet(mind), 
+                    onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
                     mindIdsToChildren: null,
                   ),
                 ),
@@ -276,7 +276,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
       value: [
         MindUtils.getDateFromIndex(MindUtils.getTodayIndex()),
       ],
-      config: CalendarDatePicker2WithActionButtonsConfig(),
+      config: CalendarDatePicker2WithActionButtonsConfig(firstDayOfWeek: 1),
       dialogSize: const Size(325, 400),
       borderRadius: BorderRadius.circular(15),
     );

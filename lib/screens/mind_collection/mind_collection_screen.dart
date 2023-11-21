@@ -470,7 +470,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
       value: [],
-      config: CalendarDatePicker2WithActionButtonsConfig(),
+      config: CalendarDatePicker2WithActionButtonsConfig(firstDayOfWeek: 1),
       dialogSize: const Size(325, 400),
       borderRadius: BorderRadius.circular(15),
     );
