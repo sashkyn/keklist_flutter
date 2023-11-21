@@ -41,7 +41,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
   List<Mind> get emojiMinds => MindUtils.findMindsByEmoji(
         emoji: emoji,
         allMinds: allMinds,
-      ).mySortedBy((e) => e.dayIndex).toList();
+      ).mySortedBy((e) => e.dayIndex);
 
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();

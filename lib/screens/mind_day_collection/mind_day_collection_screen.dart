@@ -37,7 +37,7 @@ final class MindDayCollectionScreen extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState(
         dayIndex: initialDayIndex,
-        allMinds: allMinds.mySortedBy((e) => e.sortIndex).toList(),
+        allMinds: allMinds.mySortedBy((e) => e.sortIndex),
       );
 }
 

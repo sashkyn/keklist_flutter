@@ -46,7 +46,7 @@ void main() {
         [5, 20, 10],
       );
 
-      final List<Mind> sortedList = unsortedMinds.mySortedBy((it) => it.sortIndex).toList();
+      final List<Mind> sortedList = unsortedMinds.mySortedBy((it) => it.sortIndex);
 
       expect(
         sortedList.map((e) => e.sortIndex),

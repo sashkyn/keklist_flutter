@@ -31,7 +31,7 @@ class MindUtils {
     required String rootId,
     required Iterable<Mind> allMinds,
   }) =>
-      allMinds.where((item) => rootId == item.rootId).mySortedBy((it) => it.sortIndex).toList();
+      allMinds.where((item) => rootId == item.rootId).mySortedBy((it) => it.sortIndex);
 
   static List<Mind> findYesterdayMinds({required List<Mind> allMinds}) {
     final int yesterdayIndex = MindUtils.getDayIndex(from: DateTime.now()) - 1;
@@ -113,7 +113,7 @@ class MindUtils {
 // NOTE: Sorted by.
 
 extension ListIterable<E> on Iterable<E> {
-  Iterable<E> mySortedBy(Comparable Function(E e) key) => toList()
+  List<E> mySortedBy(Comparable Function(E e) key) => toList()
     ..sort(
       (a, b) => key(a).compareTo(key(b)),
     );
