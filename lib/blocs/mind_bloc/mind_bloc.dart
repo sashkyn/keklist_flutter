@@ -38,7 +38,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   Stream<MindObject?> get _mindObjectsStream => _mindBox
       .watch()
       .map((BoxEvent event) => event.value as MindObject?)
-      .debounceTime(const Duration(milliseconds: 500));
+      .debounceTime(const Duration(milliseconds: 300));
 
   final Box<QueueTransactionObject> _mindQueueTransactionsBox =
       Hive.box<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
