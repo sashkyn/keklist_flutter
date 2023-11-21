@@ -93,7 +93,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     final String webResult = await FlutterWebAuth2.authenticate(
       url: result.url.toString(),
       callbackUrlScheme: 'io.supabase.points',
-      preferEphemeral: false,
+      options: const FlutterWebAuth2Options(
+        preferEphemeral: false,
+      ),
     );
 
     final Uri uri = Uri.parse(webResult);

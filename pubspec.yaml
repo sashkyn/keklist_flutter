@@ -9,7 +9,7 @@ environment:
   sdk: ">=3.0.0"
 
 dependencies:
-  adaptive_dialog: ^1.9.0-no-macos.2
+  adaptive_dialog: ^2.0.0
   bloc: ^8.1.1
   blur: ^3.1.0
   calendar_date_picker2: ^0.5.2
@@ -20,7 +20,7 @@ dependencies:
   emojis: ^0.9.9
   equatable: ^2.0.5
   fast_immutable_collections: ^9.1.1
-  fl_chart: ^0.63.0
+  fl_chart: ^0.64.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -32,14 +32,14 @@ dependencies:
   #flutter_inapp_purchase: ^5.4.1
   flutter_simple_dependency_injection: ^2.0.0
   flutter_svg: ^2.0.5
-  flutter_web_auth_2: ^2.0.4
+  flutter_web_auth_2: ^3.0.4
   form_field_validator: ^1.1.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   html: ^0.15.1
   intl: ^0.18.0
   modal_bottom_sheet: ^3.0.0-pre
-  package_info_plus: ^4.0.0
+  package_info_plus: ^5.0.1
   path_provider: ^2.0.12
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
@@ -51,7 +51,7 @@ dependencies:
   syncfusion_flutter_charts: ^23.1.36
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
-  uuid: ^3.0.7
+  uuid: ^4.2.1
   webview_flutter: ^4.1.0
   gap: ^3.0.1
   home_widget: ^0.3.0
@@ -59,7 +59,7 @@ dependencies:
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
-  flutter_lints: ^2.0.1
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.0
