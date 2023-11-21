@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:rememoji/helpers/bloc_utils.dart';
 import 'package:rememoji/helpers/extensions/dispose_bag.dart';
 import 'package:rememoji/helpers/mind_utils.dart';
 import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
 import 'package:rememoji/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
@@ -29,6 +31,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   final FocusNode _mindCreatorFocusNode = FocusNode();
   bool _hasFocus = false;
   Mind? _editableMind;
+  late String _selectedEmoji = rootMind.emoji;
 
   Mind get rootMind => widget.rootMind;
   List<Mind> get allMinds => widget.allMinds;
@@ -36,7 +39,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   List<Mind> get childMinds => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
-      );
+      ).mySortedBy((mind) => mind.creationDate);
 
   @override
   void initState() {
@@ -134,30 +137,34 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
-                    placeholder: 'Reflect about mind...',
+                    placeholder: 'Comment your mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(
                           MindCreate(
                             dayIndex: rootMind.dayIndex,
                             note: data.text,
-                            emoji: '✍️',
+                            emoji: _selectedEmoji,
                             rootId: rootMind.id,
                           ),
                         );
                       } else {
                         final Mind mindForEdit = _editableMind!.copyWith(
                           note: data.text,
-                          emoji: '✍️',
+                          emoji: _selectedEmoji,
                         );
                         sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
                       }
                       _resetMindCreator();
                     },
                     suggestionMinds: const [],
-                    selectedEmoji: '✍️',
+                    selectedEmoji: _selectedEmoji,
                     onTapSuggestionEmoji: (_) {},
-                    onTapEmoji: () {},
+                    onTapEmoji: () {
+                      _showEmojiPickerScreen(onSelect: (String emoji) {
+                        setState(() => _selectedEmoji = emoji);
+                      });
+                    },
                     doneTitle: 'DONE',
                     onTapCancelEdit: () {
                       _resetMindCreator();
@@ -217,5 +224,12 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
       _createMindEditingController.text = mind.note;
       _mindCreatorFocusNode.requestFocus();
     }
+  }
+
+  void _showEmojiPickerScreen({required Function(String) onSelect}) async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => MindPickerScreen(onSelect: onSelect),
+    );
   }
 }
