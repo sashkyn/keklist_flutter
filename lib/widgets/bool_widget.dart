@@ -6,11 +6,11 @@ class BoolWidget extends StatelessWidget {
   final Widget? falseChild;
 
   const BoolWidget({
-    Key? key,
+    super.key,
     required this.condition,
     required this.trueChild,
     this.falseChild,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

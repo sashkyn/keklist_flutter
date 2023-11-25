@@ -70,9 +70,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mind'),
-      ),
+      appBar: AppBar(title: const Text('Mind')),
       body: Stack(
         children: [
           GestureDetector(
@@ -91,10 +89,13 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          MindMessageWidget(
-                            mind: rootMind,
-                            onOptions: null,
-                            children: const [],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: MindMessageWidget(
+                              mind: rootMind,
+                              onOptions: null,
+                              children: const [],
+                            ),
                           ),
                         ],
                       ),

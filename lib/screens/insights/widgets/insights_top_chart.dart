@@ -31,41 +31,44 @@ class InsightsTopChartWidget extends StatelessWidget {
         )
         .toList()
       ..sort((a, b) => b.count.compareTo(a.count));
-    return RoundedContainer(
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Top minds',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: RoundedContainer(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Top minds',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          SfCartesianChart(
-            primaryYAxis: CategoryAxis(
-              isVisible: false,
-              labelStyle: const TextStyle(fontSize: 16.0),
+            SfCartesianChart(
+              primaryYAxis: CategoryAxis(
+                isVisible: false,
+                labelStyle: const TextStyle(fontSize: 16.0),
+              ),
+              primaryXAxis: CategoryAxis(
+                labelStyle: const TextStyle(fontSize: 32.0),
+              ),
+              series: <ChartSeries>[
+                ColumnSeries<_MindData, String>(
+                  dataSource: chartData.take(8).toList(),
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    labelPosition: ChartDataLabelPosition.outside,
+                    textStyle: TextStyle(fontSize: 16.0),
+                  ),
+                  xValueMapper: (_MindData mind, _) => mind.emoji,
+                  yValueMapper: (_MindData mind, _) => mind.count,
+                )
+              ],
             ),
-            primaryXAxis: CategoryAxis(
-              labelStyle: const TextStyle(fontSize: 32.0),
-            ),
-            series: <ChartSeries>[
-              ColumnSeries<_MindData, String>(
-                dataSource: chartData.take(8).toList(),
-                dataLabelSettings: const DataLabelSettings(
-                  isVisible: true,
-                  labelPosition: ChartDataLabelPosition.outside,
-                  textStyle: TextStyle(fontSize: 16.0),
-                ),
-                xValueMapper: (_MindData mind, _) => mind.emoji,
-                yValueMapper: (_MindData mind, _) => mind.count,
-              )
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

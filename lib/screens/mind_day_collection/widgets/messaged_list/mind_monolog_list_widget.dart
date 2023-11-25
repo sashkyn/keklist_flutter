@@ -24,13 +24,17 @@ class MindMonologListWidget extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                GestureDetector(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
                     onTap: () => onTap(mind),
                     child: MindMessageWidget(
                       mind: mind,
                       children: mindIdsToChildren?[mind.id] ?? [],
                       onOptions: () => onOptions(mind),
-                    ).animate().fadeIn()),
+                    ).animate().fadeIn(),
+                  ),
+                ),
               ],
             );
           }).toList() +

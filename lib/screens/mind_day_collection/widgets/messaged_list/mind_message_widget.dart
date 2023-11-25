@@ -11,12 +11,12 @@ class MindMessageWidget extends StatelessWidget {
   final List<Mind> children;
 
   const MindMessageWidget({
-    Key? key,
+    super.key,
     required this.mind,
     required this.onOptions,
     // required this.childCount,
     required this.children,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -3,9 +3,9 @@ import 'package:keklist/constants.dart';
 
 class MyTable extends StatelessWidget {
   const MyTable({
-    Key? key,
+    super.key,
     required this.widgets,
-  }) : super(key: key);
+  });
 
   final List<Widget> widgets;
 

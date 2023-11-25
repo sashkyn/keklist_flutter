@@ -7,6 +7,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_rows_widget.dart';
 import 'package:keklist/screens/mind_collection/widgets/mind_search_bar.dart';
 import 'package:keklist/screens/mind_collection/widgets/mind_search_result_widget.dart';
 import 'package:keklist/screens/web_page/web_page_screen.dart';
@@ -297,9 +298,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       itemScrollController: _itemScrollController,
       itemPositionsListener: _itemPositionsListener,
       itemBuilder: (BuildContext context, int groupDayIndex) {
-        final List<Widget> mindWidgets = [];
+        final List<Mind> minds = [];
         if (_isDemoMode) {
-          mindWidgets.addAll(
+          minds.addAll(
             List.generate(
               16,
               (index) {
@@ -314,17 +315,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                     sortIndex: 0,
                     rootId: null);
               },
-            )
-                .map(
-                  (randomMind) => MindWidget(item: randomMind.emoji).animate().fadeIn(),
-                )
-                .toList(),
+            ).toList(),
           );
         } else {
-          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex);
-          final List<Widget> realMindWidgets =
-              mindsOfDay.mySortedBy((e) => e.sortIndex).map((mind) => MindWidget(item: mind.emoji)).toList();
-          mindWidgets.addAll(realMindWidgets);
+          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex).mySortedBy((e) => e.sortIndex);
+          minds.addAll(mindsOfDay);
         }
 
         final bool isToday = groupDayIndex == _getNowDayIndex();
@@ -352,17 +347,23 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                       )
                     : null,
                 child: BoolWidget(
-                  condition: mindWidgets.isEmpty,
-                  trueChild: () {
-                    if (groupDayIndex < _getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.past();
-                    } else if (groupDayIndex > _getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.future();
-                    } else {
-                      return MindCollectionEmptyDayWidget.present();
-                    }
-                  }(),
-                  falseChild: MyTable(widgets: mindWidgets),
+                  condition: minds.isEmpty,
+                  trueChild: Container(
+                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
+                    child: () {
+                      if (groupDayIndex < _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.past();
+                      } else if (groupDayIndex > _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.future();
+                      } else {
+                        return MindCollectionEmptyDayWidget.present();
+                      }
+                    }(),
+                  ),
+                  falseChild: Container(
+                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
+                    child: MindRowsWidget(minds: minds),
+                  ),
                 ),
               ),
             )
