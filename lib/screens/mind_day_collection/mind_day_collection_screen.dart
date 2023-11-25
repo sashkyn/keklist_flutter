@@ -5,21 +5,21 @@ import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:rememoji/helpers/extensions/state_extensions.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
-import 'package:rememoji/constants.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_info/mind_info_screen.dart';
-import 'package:rememoji/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
-import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/helpers/extensions/state_extensions.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/constants.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_info/mind_info_screen.dart';
+import 'package:keklist/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
+import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 final class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
@@ -196,7 +196,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                 child: MindIconedListWidget(
                   minds: _dayMinds,
                   onTap: (Mind mind) => _showMindInfo(mind),
-                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind), 
+                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
                   mindIdsToChildCount: null,
                 ),
               ),

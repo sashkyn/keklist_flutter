@@ -2,15 +2,15 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
-import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;

@@ -1,9 +1,9 @@
-name: rememoji
-description: A new Flutter project.
+name: keklist
+description: Сonscious TODO list.
 
 publish_to: "none"
 
-version: 2.3.0+53
+version: 2.4.0+54
 
 environment:
   sdk: ">=3.0.0"

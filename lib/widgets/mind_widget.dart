@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/widgets/rounded_circle.dart';
+import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/widgets/rounded_circle.dart';
 
 enum MindSize {
   small,

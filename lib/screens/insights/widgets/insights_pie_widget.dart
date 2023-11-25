@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/rounded_container.dart';
 
 // Improvements:
 // Переключатель по количеству символов

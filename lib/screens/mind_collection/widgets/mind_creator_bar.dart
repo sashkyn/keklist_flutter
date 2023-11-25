@@ -1,5 +1,5 @@
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/mind_widget.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
 
 // TODO: превратить suggestions в миничипсы и убрать эмодзик слева как нибудь

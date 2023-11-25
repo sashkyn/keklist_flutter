@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/rounded_container.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class InsightsTopChartWidget extends StatelessWidget {

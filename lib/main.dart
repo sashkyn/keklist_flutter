@@ -8,25 +8,25 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/main/main_screen.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/services/hive/constants.dart';
-import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
-import 'package:rememoji/services/hive/entities/queue_transaction/queue_transaction_object.dart';
-import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/main/main_screen.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/services/hive/constants.dart';
+import 'package:keklist/services/hive/entities/mind/mind_object.dart';
+import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
+import 'package:keklist/services/hive/entities/settings/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
-import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
+import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
-import 'package:rememoji/constants.dart';
-import 'package:rememoji/cubits/mind_searcher/mind_searcher_cubit.dart';
-import 'package:rememoji/di/containers.dart';
-import 'package:rememoji/services/main_service.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/constants.dart';
+import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:keklist/di/containers.dart';
+import 'package:keklist/services/main_service.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
@@ -187,7 +187,7 @@ void _setupOrientations() {
 }
 
 class KeklistApp extends StatefulWidget {
-  const KeklistApp({Key? key}) : super(key: key);
+  const KeklistApp({super.key});
 
   @override
   State<KeklistApp> createState() => KeklistAppState();
@@ -199,7 +199,7 @@ class KeklistAppState extends State<KeklistApp> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: MaterialApp(
-        title: 'Rememoji',
+        title: 'Keklist',
         home: const MainScreen(),
         theme: ThemeData(
           primarySwatch: Palette.swatch,

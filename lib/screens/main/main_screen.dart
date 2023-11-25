@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/screens/auth/auth_screen.dart';
-import 'package:rememoji/screens/insights/insights_screen.dart';
-import 'package:rememoji/screens/mind_collection/mind_collection_screen.dart';
-import 'package:rememoji/screens/settings/settings_screen.dart';
-import 'package:rememoji/widgets/bottom_navigation_bar.dart';
+import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/screens/auth/auth_screen.dart';
+import 'package:keklist/screens/insights/insights_screen.dart';
+import 'package:keklist/screens/mind_collection/mind_collection_screen.dart';
+import 'package:keklist/screens/settings/settings_screen.dart';
+import 'package:keklist/widgets/bottom_navigation_bar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);

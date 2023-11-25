@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rememoji/widgets/rounded_circle.dart';
+import 'package:keklist/widgets/rounded_circle.dart';
 
 class RoundedText extends StatelessWidget {
   final String text;
