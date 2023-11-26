@@ -1,5 +1,5 @@
 name: keklist
-description: Сonscious TODO list.
+description: Like TODO-List but Keklist.
 
 publish_to: "none"
 
@@ -56,6 +56,7 @@ dependencies:
   gap: ^3.0.1
   home_widget: ^0.3.0
   workmanager: ^0.5.2
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
@@ -86,6 +87,7 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
+    - .env
     - assets/auth_icons/
   fonts:
     - family: NotoColorEmoji

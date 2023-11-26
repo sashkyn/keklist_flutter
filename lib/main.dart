@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -38,6 +39,9 @@ Future<void> main() async {
   _setupBlockingLoadingWidget();
   _setupOrientations();
 
+  // Получение всех констант из .env файла.
+  await dotenv.load(fileName: '.env');
+
   // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
 
@@ -46,9 +50,8 @@ Future<void> main() async {
 
   // Инициализация настроек Supabase.
   await Supabase.initialize(
-    url: '***REMOVED***',
-    anonKey:
-        '***REMOVED***',
+    url: dotenv.get('SUPABASE_URL'),
+    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
     authCallbackUrlHostname: 'login-callback',
     debug: !kReleaseMode,
     storageRetryAttempts: 5,
