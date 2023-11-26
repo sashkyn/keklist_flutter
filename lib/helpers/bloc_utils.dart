@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rememoji/helpers/extensions/state_extensions.dart';
+import 'package:keklist/helpers/extensions/state_extensions.dart';
 
 // TODO: сделать Of как в Navigator
 // TODO: обойти проблему, чтобы нельзя было вызвать sendToBloc(...) без указания типа B

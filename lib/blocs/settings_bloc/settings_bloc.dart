@@ -6,12 +6,12 @@ import 'package:csv/csv.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/services/hive/constants.dart';
-import 'package:rememoji/services/hive/entities/mind/mind_object.dart';
-import 'package:rememoji/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/services/hive/constants.dart';
+import 'package:keklist/services/hive/entities/mind/mind_object.dart';
+import 'package:keklist/services/hive/entities/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:rememoji/services/main_service.dart';
+import 'package:keklist/services/main_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'settings_event.dart';

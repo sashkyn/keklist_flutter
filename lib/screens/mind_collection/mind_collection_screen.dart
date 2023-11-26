@@ -4,33 +4,31 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:rememoji/blocs/settings_bloc/settings_bloc.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_search_bar.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_search_result_widget.dart';
-import 'package:rememoji/screens/web_page/web_page_screen.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_rows_widget.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_search_bar.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_search_result_widget.dart';
+import 'package:keklist/screens/web_page/web_page_screen.dart';
+import 'package:keklist/widgets/rounded_container.dart';
 import 'package:uuid/uuid.dart';
-import 'package:rememoji/blocs/auth_bloc/auth_bloc.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/constants.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
-import 'package:rememoji/screens/mind_picker/mind_picker_screen.dart';
-import 'package:rememoji/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/constants.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
+import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
+import 'package:keklist/services/entities/mind.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/widgets/mind_widget.dart';
+import 'package:keklist/widgets/bool_widget.dart';
 
 class MindCollectionScreen extends StatefulWidget {
-  const MindCollectionScreen({Key? key}) : super(key: key);
+  const MindCollectionScreen({super.key});
 
   @override
   State<MindCollectionScreen> createState() => _MindCollectionScreenState();
@@ -297,14 +295,14 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       itemScrollController: _itemScrollController,
       itemPositionsListener: _itemPositionsListener,
       itemBuilder: (BuildContext context, int groupDayIndex) {
-        final List<Widget> mindWidgets = [];
+        final List<Mind> minds = [];
         if (_isDemoMode) {
-          mindWidgets.addAll(
+          minds.addAll(
             List.generate(
               16,
               (index) {
                 final String randomEmoji = KeklistConstants
-                    .demoModeEmodjiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmodjiList.length - 1)];
+                    .demoModeEmojiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];
                 return Mind(
                     emoji: randomEmoji,
                     creationDate: DateTime.now(),
@@ -314,17 +312,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                     sortIndex: 0,
                     rootId: null);
               },
-            )
-                .map(
-                  (randomMind) => MindWidget(item: randomMind.emoji).animate().fadeIn(),
-                )
-                .toList(),
+            ).toList(),
           );
         } else {
-          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex);
-          final List<Widget> realMindWidgets =
-              mindsOfDay.mySortedBy((e) => e.sortIndex).map((mind) => MindWidget(item: mind.emoji)).toList();
-          mindWidgets.addAll(realMindWidgets);
+          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex).mySortedBy((e) => e.sortIndex);
+          minds.addAll(mindsOfDay);
         }
 
         final bool isToday = groupDayIndex == _getNowDayIndex();
@@ -352,17 +344,23 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                       )
                     : null,
                 child: BoolWidget(
-                  condition: mindWidgets.isEmpty,
-                  trueChild: () {
-                    if (groupDayIndex < _getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.past();
-                    } else if (groupDayIndex > _getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.future();
-                    } else {
-                      return MindCollectionEmptyDayWidget.present();
-                    }
-                  }(),
-                  falseChild: MyTable(widgets: mindWidgets),
+                  condition: minds.isEmpty,
+                  trueChild: Container(
+                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
+                    child: () {
+                      if (groupDayIndex < _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.past();
+                      } else if (groupDayIndex > _getNowDayIndex()) {
+                        return MindCollectionEmptyDayWidget.future();
+                      } else {
+                        return MindCollectionEmptyDayWidget.present();
+                      }
+                    }(),
+                  ),
+                  falseChild: Container(
+                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
+                    child: MindRowsWidget(minds: minds),
+                  ),
                 ),
               ),
             )

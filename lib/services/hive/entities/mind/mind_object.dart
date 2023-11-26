@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 part 'mind_object.g.dart';
 

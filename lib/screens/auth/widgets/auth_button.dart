@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
+import 'package:keklist/widgets/bool_widget.dart';
 
 enum AuthButtonType {
   google(iconAsset: 'assets/auth_icons/google.svg'),

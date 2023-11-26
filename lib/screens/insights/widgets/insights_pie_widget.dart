@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/rounded_container.dart';
 
 // Improvements:
 // Переключатель по количеству символов
@@ -75,86 +75,89 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
     }
 
     final List<PieChartSectionData> pieSections = _getPieSections(choiceMap: intervalChoiceMap);
-    return RoundedContainer(
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Spectrum',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: RoundedContainer(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Spectrum',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                _choices.length,
-                (index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: MyChip(
-                      isSelected: _selectedChoiceIndex == index,
-                      onSelect: (bool selected) {
-                        setState(() {
-                          _selectedChoiceIndex = index;
-                        });
-                      },
-                      selectedColor: Colors.black,
-                      child: Text(
-                        _choices[index].localizedTitle,
-                        style: TextStyle(
-                            fontSize: 14.0, color: _selectedChoiceIndex == index ? Colors.white : Colors.black),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                  _choices.length,
+                  (index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: MyChip(
+                        isSelected: _selectedChoiceIndex == index,
+                        onSelect: (bool selected) {
+                          setState(() {
+                            _selectedChoiceIndex = index;
+                          });
+                        },
+                        selectedColor: Colors.black,
+                        child: Text(
+                          _choices[index].localizedTitle,
+                          style: TextStyle(
+                              fontSize: 14.0, color: _selectedChoiceIndex == index ? Colors.white : Colors.black),
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-          AspectRatio(
-            aspectRatio: 1.05,
-            child: PieChart(
-              PieChartData(
-                sections: pieSections,
-                centerSpaceRadius: 0,
-                sectionsSpace: 0,
-                startDegreeOffset: 0,
+            AspectRatio(
+              aspectRatio: 1.05,
+              child: PieChart(
+                PieChartData(
+                  sections: pieSections,
+                  centerSpaceRadius: 0,
+                  sectionsSpace: 0,
+                  startDegreeOffset: 0,
+                ),
+                swapAnimationCurve: Curves.bounceInOut,
               ),
-              swapAnimationCurve: Curves.bounceInOut,
             ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: intervalChoiceMap.entries.map(
-                (entry) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: MyChip(
-                      isSelected: _selectedEmoji == entry.key,
-                      onSelect: (bool selected) {
-                        setState(() {
-                          _selectedEmoji = entry.key;
-                        });
-                      },
-                      selectedColor: _colorFromEmoji(entry.key),
-                      child: Text(
-                        entry.key,
-                        style: const TextStyle(fontSize: 24.0),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: intervalChoiceMap.entries.map(
+                  (entry) {
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: MyChip(
+                        isSelected: _selectedEmoji == entry.key,
+                        onSelect: (bool selected) {
+                          setState(() {
+                            _selectedEmoji = entry.key;
+                          });
+                        },
+                        selectedColor: _colorFromEmoji(entry.key),
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(fontSize: 24.0),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ).toList(),
+                    );
+                  },
+                ).toList(),
+              ),
             ),
-          ),
-          const SizedBox(height: 8.0),
-        ],
+            const SizedBox(height: 8.0),
+          ],
+        ),
       ),
     );
   }

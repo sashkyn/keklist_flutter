@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
@@ -24,13 +24,17 @@ class MindMonologListWidget extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                GestureDetector(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
                     onTap: () => onTap(mind),
                     child: MindMessageWidget(
                       mind: mind,
                       children: mindIdsToChildren?[mind.id] ?? [],
                       onOptions: () => onOptions(mind),
-                    ).animate().fadeIn()),
+                    ).animate().fadeIn(),
+                  ),
+                ),
               ],
             );
           }).toList() +

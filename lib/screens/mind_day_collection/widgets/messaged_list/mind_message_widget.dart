@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/rounded_container.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/rounded_container.dart';
 
 class MindMessageWidget extends StatelessWidget {
   final Mind mind;
@@ -11,12 +11,12 @@ class MindMessageWidget extends StatelessWidget {
   final List<Mind> children;
 
   const MindMessageWidget({
-    Key? key,
+    super.key,
     required this.mind,
     required this.onOptions,
     // required this.childCount,
     required this.children,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

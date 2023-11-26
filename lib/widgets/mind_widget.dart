@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rememoji/widgets/bool_widget.dart';
-import 'package:rememoji/widgets/rounded_circle.dart';
+import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/widgets/rounded_circle.dart';
 
 enum MindSize {
   small,
@@ -17,14 +17,14 @@ class MindWidget extends StatelessWidget {
   final double fontSize;
 
   const MindWidget({
-    Key? key,
+    super.key,
     required this.item,
     this.badge,
     this.isHighlighted = true,
     this.onTap,
     this.onLongPress,
     this.fontSize = 50,
-  }) : super(key: key);
+  });
 
   factory MindWidget.justEmoji({
     required String emoji,
@@ -124,10 +124,10 @@ class GrayedOut extends StatelessWidget {
   final bool grayedOut;
 
   const GrayedOut({
-    Key? key,
+    super.key,
     required this.child,
     required this.grayedOut,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => grayedOut ? Opacity(opacity: 0.25, child: child) : child;

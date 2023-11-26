@@ -2,15 +2,15 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:rememoji/helpers/extensions/state_extensions.dart';
-import 'package:rememoji/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/helpers/bloc_utils.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/screens/mind_collection/widgets/mind_creator_bar.dart';
-import 'package:rememoji/screens/mind_info/mind_info_screen.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/helpers/extensions/state_extensions.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_info/mind_info_screen.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 // TODO: сделать пробелы в днях между
 // TODO: переделать Monolog на ListView

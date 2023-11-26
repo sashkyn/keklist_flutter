@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rememoji/blocs/mind_bloc/mind_bloc.dart';
-import 'package:rememoji/helpers/extensions/dispose_bag.dart';
-import 'package:rememoji/screens/insights/widgets/insights_pie_widget.dart';
-import 'package:rememoji/screens/insights/widgets/insights_random_mind_widget.dart';
-import 'package:rememoji/screens/insights/widgets/insights_top_chart.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/screens/insights/widgets/insights_pie_widget.dart';
+import 'package:keklist/screens/insights/widgets/insights_random_mind_widget.dart';
+import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});

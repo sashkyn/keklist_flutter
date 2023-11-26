@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 class MindBulletWidget extends StatelessWidget {
   final Mind mind;

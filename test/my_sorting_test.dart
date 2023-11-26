@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rememoji/helpers/mind_utils.dart';
-import 'package:rememoji/services/entities/mind.dart';
+import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/services/entities/mind.dart';
 
 void main() {
   test(
@@ -14,7 +14,7 @@ void main() {
           emoji: ' ',
           dayIndex: 0,
           sortIndex: 5,
-          creationDate: DateTime.now(), 
+          creationDate: DateTime.now(),
           rootId: null,
         ),
       );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:rememoji/screens/mind_collection/widgets/my_table.dart';
-import 'package:rememoji/services/entities/mind.dart';
-import 'package:rememoji/widgets/mind_widget.dart';
+import 'package:keklist/screens/mind_collection/widgets/my_table.dart';
+import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/mind_widget.dart';
 
 class MindIconedListWidget extends StatelessWidget {
   final List<Mind> minds;
