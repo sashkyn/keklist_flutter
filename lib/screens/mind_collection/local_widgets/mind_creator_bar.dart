@@ -18,7 +18,7 @@ class MindCreatorBar extends StatefulWidget {
   final Function(CreateMindData) onDone;
 
   const MindCreatorBar({
-    Key? key,
+    super.key,
     required this.textEditingController,
     required this.suggestionMinds,
     required this.focusNode,
@@ -30,7 +30,7 @@ class MindCreatorBar extends StatefulWidget {
     required this.placeholder,
     this.editableMind,
     required this.onTapCancelEdit,
-  }) : super(key: key);
+  });
 
   @override
   State<MindCreatorBar> createState() => _MindCreatorBarState();

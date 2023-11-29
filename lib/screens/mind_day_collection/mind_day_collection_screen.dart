@@ -17,7 +17,7 @@ import 'package:keklist/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/screens/mind_collection/widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bar.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 

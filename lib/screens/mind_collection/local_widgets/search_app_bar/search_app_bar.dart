@@ -1,16 +1,41 @@
-import 'package:flutter/material.dart';
+part of '../../mind_collection_screen.dart';
 
-class MindSearchBar extends StatelessWidget {
+class _SearchAppBar extends StatelessWidget {
+  final TextEditingController searchTextController;
+  final VoidCallback onSearchAddEmotion;
+  final VoidCallback onSearchCancel;
+
+  const _SearchAppBar({
+    required this.searchTextController,
+    required this.onSearchAddEmotion,
+    required this.onSearchCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      centerTitle: true,
+      automaticallyImplyLeading: true,
+      title: _SearchAppBarTextField(
+        textController: searchTextController,
+        onAddEmotion: onSearchAddEmotion,
+        onCancel: onSearchCancel,
+      ),
+      backgroundColor: Colors.white,
+    );
+  }
+}
+
+class _SearchAppBarTextField extends StatelessWidget {
   final VoidCallback onAddEmotion;
   final VoidCallback onCancel;
   final TextEditingController textController;
 
-  const MindSearchBar({
-    Key? key,
+  const _SearchAppBarTextField({
     required this.textController,
     required this.onAddEmotion,
     required this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

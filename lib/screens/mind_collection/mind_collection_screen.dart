@@ -5,10 +5,9 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/screens/mind_collection/widgets/mind_collection_empty_day_widget.dart';
-import 'package:keklist/screens/mind_collection/widgets/mind_rows_widget.dart';
-import 'package:keklist/screens/mind_collection/widgets/mind_search_bar.dart';
-import 'package:keklist/screens/mind_collection/widgets/mind_search_result_widget.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_rows_widget.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
 import 'package:keklist/screens/web_page/web_page_screen.dart';
 import 'package:keklist/widgets/rounded_container.dart';
 import 'package:uuid/uuid.dart';
@@ -26,6 +25,9 @@ import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:keklist/widgets/bool_widget.dart';
+
+part 'local_widgets/search_app_bar/search_app_bar.dart';
+part 'local_widgets/app_bar/app_bar.dart';
 
 class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
@@ -194,89 +196,31 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _makeAppBar(),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: BoolWidget(
+          condition: !_isDemoMode,
+          falseChild: const SizedBox.shrink(),
+          trueChild: BoolWidget(
+              condition: _isSearching,
+              trueChild: _SearchAppBar(
+                searchTextController: _searchTextController,
+                onSearchAddEmotion: () => _showMindPickerScreen(onSelect: (emoji) {
+                  _searchTextController.text += emoji;
+                }),
+                onSearchCancel: () => _cancelSearch(),
+              ),
+              falseChild: _AppBar(
+                isUpdating: _updating,
+                onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
+                onTitle: () => _scrollToNow(),
+                onCalendar: () async => await _showDateSwitcher(),
+              )),
+        ),
+      ),
       body: _makeBody(),
       resizeToAvoidBottomInset: false,
     );
-  }
-
-  AppBar? _makeAppBar() {
-    if (_isDemoMode) {
-      return null;
-    }
-
-    if (_updating) {
-      return AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        title: GestureDetector(
-          onTap: () {
-            _scrollToNow();
-          },
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Updating'),
-              SizedBox(width: 4),
-              CircularProgressIndicator.adaptive(),
-            ],
-          ),
-        ),
-        backgroundColor: Colors.white,
-      );
-    } else {
-      return AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        actions: _makeAppBarActions(),
-        title: _makeAppBarTitle(),
-        backgroundColor: Colors.white,
-      );
-    }
-  }
-
-  Widget _makeAppBarTitle() {
-    return BoolWidget(
-      condition: _isSearching,
-      trueChild: MindSearchBar(
-        textController: _searchTextController,
-        onAddEmotion: () {
-          _showMindPickerScreen(
-            onSelect: (emoji) {
-              _searchTextController.text += emoji;
-            },
-          );
-        },
-        onCancel: () {
-          _searchTextController.clear();
-          sendEventTo<MindBloc>(MindStopSearch());
-          WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
-        },
-      ),
-      falseChild: GestureDetector(
-        onTap: () => _scrollToNow(),
-        child: const Text('Minds'),
-      ),
-    );
-  }
-
-  List<Widget>? _makeAppBarActions() {
-    if (_isSearching) {
-      return null;
-    }
-
-    return [
-      IconButton(
-        icon: const Icon(Icons.calendar_month),
-        color: Colors.black,
-        onPressed: () async => await _showDateSwitcher(),
-      ),
-      IconButton(
-        icon: const Icon(Icons.search),
-        color: Colors.black,
-        onPressed: () => sendEventTo<MindBloc>(MindStartSearch()),
-      ),
-    ];
   }
 
   late final _demoModeRandom = Random();
@@ -480,4 +424,11 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     final int dayIndex = MindUtils.getDayIndex(from: dates.first!);
     _scrollToDayIndex(dayIndex);
   }
+
+  void _cancelSearch() {
+    _searchTextController.clear();
+    sendEventTo<MindBloc>(MindStopSearch());
+    WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
+  }
 }
+
