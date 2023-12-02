@@ -12,7 +12,7 @@ import 'package:keklist/screens/settings/settings_screen.dart';
 import 'package:keklist/widgets/bottom_navigation_bar.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -23,9 +23,21 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   int _tabSelectedIndex = 0;
 
   static final List<Widget> _mainScreens = [
-    const MindCollectionScreen(),
-    const InsightsScreen(),
-    const SettingsScreen(),
+    const SizedBox(
+      width: 1000,
+      height: 1000,
+      child: MindCollectionScreen(),
+    ),
+    const SizedBox(
+      width: 1000,
+      height: 1000,
+      child: InsightsScreen(),
+    ),
+    const SizedBox(
+      width: 1000,
+      height: 1000,
+      child: SettingsScreen(),
+    ),
   ];
 
   @override
@@ -56,15 +68,45 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _tabSelectedIndex, children: _mainScreens),
-      bottomNavigationBar: AdaptiveBottomNavigationBar(
-        selectedIndex: _tabSelectedIndex,
-        onTap: (index) {
-          setState(() => _tabSelectedIndex = index);
-        },
-        items: _items,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 600 && constraints.maxHeight > 600) {
+          // iPad layout
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  destinations: _mainScreens.map((screen) {
+                    final int index = _mainScreens.indexOf(screen);
+                    return NavigationRailDestination(
+                      icon: _items[index].icon,
+                      label: Text(_items[index].label!),
+                    );
+                  }).toList(),
+                  selectedIndex: _tabSelectedIndex,
+                  onDestinationSelected: (index) {
+                    setState(() => _tabSelectedIndex = index);
+                  },
+                ),
+                const VerticalDivider(thickness: 1, width: 1),
+                IndexedStack(index: _tabSelectedIndex, children: _mainScreens)
+              ],
+            ),
+          );
+        } else {
+          // Phone layout
+          return Scaffold(
+            body: IndexedStack(index: _tabSelectedIndex, children: _mainScreens),
+            bottomNavigationBar: AdaptiveBottomNavigationBar(
+              selectedIndex: _tabSelectedIndex,
+              onTap: (index) {
+                setState(() => _tabSelectedIndex = index);
+              },
+              items: _items,
+            ),
+          );
+        }
+      },
     );
   }
 

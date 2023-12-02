@@ -16,7 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 // TODO: разобраться с улучшенной навигацией во Flutter: go_router
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   SettingsScreenState createState() => SettingsScreenState();
@@ -35,7 +35,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
         switch (state.runtimeType) {
-          case SettingsDataState:
+          case SettingsDataState _:
             setState(() {
               _offlineMode = state.isOfflineMode;
             });
@@ -45,14 +45,14 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<MindBloc>(onNewState: (state) {
       switch (state.runtimeType) {
-        case MindList:
+        case MindList _:
           setState(() {
             _clearCacheVisible = state.values.isNotEmpty;
           });
           if (!_offlineMode) {
             sendEventTo<MindBloc>(MindGetUploadCandidates());
           }
-        case MindCandidatesForUpload:
+        case MindCandidatesForUpload _:
           setState(() {
             if (_isLoggedIn && !_offlineMode) {
               _cachedMindCountToUpload = state.values.length;
@@ -60,13 +60,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               _cachedMindCountToUpload = 0;
             }
           });
-        case MindServerOperationStarted:
+        case MindServerOperationStarted _:
           if (state.type == MindOperationType.uploadCachedData ||
               state.type == MindOperationType.deleteAll ||
               state.type == MindOperationType.clearCache) {
             EasyLoading.show();
           }
-        case MindOperationError:
+        case MindOperationError _:
           if (state.notCompleted == MindOperationType.uploadCachedData ||
               state.notCompleted == MindOperationType.clearCache ||
               state.notCompleted == MindOperationType.deleteAll) {
@@ -77,7 +77,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               message: state.localizedString,
             );
           }
-        case MindOperationCompleted:
+        case MindOperationCompleted _:
           switch (state.type) {
             case MindOperationType.clearCache:
               EasyLoading.dismiss();

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:collection/collection.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/screens/mind_collection/local_widgets/mind_rows_widget.dart';
@@ -28,6 +29,7 @@ import 'package:keklist/widgets/bool_widget.dart';
 
 part 'local_widgets/search_app_bar/search_app_bar.dart';
 part 'local_widgets/app_bar/app_bar.dart';
+part 'local_widgets/body/body.dart';
 
 class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
@@ -37,17 +39,17 @@ class MindCollectionScreen extends StatefulWidget {
 }
 
 class _MindCollectionScreenState extends State<MindCollectionScreen> with DisposeBag {
-  static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
-
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   Iterable<Mind> _minds = [];
+  Map<int, List<Mind>> _mindsByDayIndex = {};
   SettingsDataState? _settings;
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
   bool get _isOfflineMode => _settings?.isOfflineMode ?? false;
+  late final _demoModeRandom = Random();
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -101,7 +103,10 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       subscribeTo<MindBloc>(
         onNewState: (state) async {
           if (state is MindList) {
-            setState(() => _minds = state.values);
+            setState(() {
+              _minds = state.values;
+              _mindsByDayIndex = state.values.toList().groupListsBy((element) => element.dayIndex);
+            });
           } else if (state is MindServerOperationStarted) {
             if (state.type == MindOperationType.fetch) {
               setState(() => _updating = true);
@@ -216,112 +221,19 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               )),
         ),
       ),
-      body: _makeBody(),
-      resizeToAvoidBottomInset: false,
-    );
-  }
-
-  late final _demoModeRandom = Random();
-
-  Widget _makeBody() {
-    if (_isSearching) {
-      return MindSearchResultListWidget(
-        results: _searchResults,
-        onPanDown: () => _hideKeyboard(),
-      );
-    }
-
-    final Widget scrollablePositionedList = ScrollablePositionedList.builder(
-      padding: const EdgeInsets.only(top: 16.0),
-      itemCount: 99999999999,
-      itemScrollController: _itemScrollController,
-      itemPositionsListener: _itemPositionsListener,
-      itemBuilder: (BuildContext context, int groupDayIndex) {
-        final List<Mind> minds = [];
-        if (_isDemoMode) {
-          minds.addAll(
-            List.generate(
-              16,
-              (index) {
-                final String randomEmoji = KeklistConstants
-                    .demoModeEmojiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];
-                return Mind(
-                    emoji: randomEmoji,
-                    creationDate: DateTime.now(),
-                    note: '',
-                    dayIndex: 0,
-                    id: const Uuid().v4(),
-                    sortIndex: 0,
-                    rootId: null);
-              },
-            ).toList(),
-          );
-        } else {
-          final List<Mind> mindsOfDay = _findMindsByDayIndex(groupDayIndex).mySortedBy((e) => e.sortIndex);
-          minds.addAll(mindsOfDay);
-        }
-
-        final bool isToday = groupDayIndex == _getNowDayIndex();
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 18.0),
-            Text(
-              _formatter.format(MindUtils.getDateFromIndex(groupDayIndex)),
-              style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
-            ),
-            const SizedBox(height: 4.0),
-            GestureDetector(
-              onTap: () {
-                _showDayCollectionScreen(
-                  groupDayIndex: groupDayIndex,
-                  initialError: null,
-                );
-              },
-              child: RoundedContainer(
-                border: isToday
-                    ? Border.all(
-                        color: Colors.black.withOpacity(0.3),
-                        width: 2.0,
-                      )
-                    : null,
-                child: BoolWidget(
-                  condition: minds.isEmpty,
-                  trueChild: Container(
-                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
-                    child: () {
-                      if (groupDayIndex < _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.past();
-                      } else if (groupDayIndex > _getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.future();
-                      } else {
-                        return MindCollectionEmptyDayWidget.present();
-                      }
-                    }(),
-                  ),
-                  falseChild: Container(
-                    constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
-                    child: MindRowsWidget(minds: minds),
-                  ),
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
-    return GestureDetector(
-      onPanDown: (_) => _hideKeyboard(),
-      child: BoolWidget(
-        condition: _isDemoMode,
-        trueChild: Blur(
-          blur: 3,
-          blurColor: Colors.transparent,
-          colorOpacity: 0.2,
-          child: scrollablePositionedList,
-        ),
-        falseChild: scrollablePositionedList,
+      body: _Body(
+        demoModeRandom: _demoModeRandom,
+        isSearching: _isSearching,
+        isDemoMode: _isDemoMode,
+        searchResults: _searchResults,
+        hideKeyboard: _hideKeyboard,
+        onTapToDay: _showDayCollectionScreen,
+        itemScrollController: _itemScrollController,
+        itemPositionsListener: _itemPositionsListener,
+        getNowDayIndex: _getNowDayIndex,
+        mindsByDayIndex: _mindsByDayIndex,
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 
@@ -345,10 +257,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
     );
-  }
-
-  List<Mind> _findMindsByDayIndex(int index) {
-    return MindUtils.findMindsByDayIndex(dayIndex: index, allMinds: _minds);
   }
 
   void _jumpToNow() {
@@ -415,7 +323,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       borderRadius: BorderRadius.circular(15),
     );
 
-    if (dates == null || dates.isEmpty || dates.first == null) {
+    if (dates == null || dates.isEmpty) {
       return;
     }
 
@@ -429,4 +337,3 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
   }
 }
-
