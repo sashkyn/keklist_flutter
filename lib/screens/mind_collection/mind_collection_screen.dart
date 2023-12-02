@@ -179,8 +179,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     super.dispose();
   }
 
-  // TODO: убрать в навигатор!
-
   Future<void> _showWhatsNew() {
     return showCupertinoModalBottomSheet(
       context: context,
