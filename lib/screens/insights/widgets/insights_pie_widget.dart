@@ -175,12 +175,12 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             .map((e) => e.value)
             .fold<int>(0, (a, b) => a + b);
         final double percentValue = 100 * currentValue / allValues;
-        final bool showShowTitle = percentValue >= 6;
+        final bool shouldShowTitle = percentValue >= 6;
 
         final bool isSelected = entry.key == _selectedEmoji;
         return PieChartSectionData(
           color: _colorFromEmoji(entry.key),
-          showTitle: showShowTitle,
+          showTitle: shouldShowTitle,
           value: percentValue,
           title: percentValue.toStringAsFixed(1),
           radius: isSelected ? 170 : 150,
@@ -191,7 +191,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
           ),
           titlePositionPercentageOffset: 0.75,
           badgeWidget: BoolWidget(
-            condition: showShowTitle,
+            condition: shouldShowTitle,
             trueChild: Text(
               entry.key,
               style: const TextStyle(fontSize: 22.0),
