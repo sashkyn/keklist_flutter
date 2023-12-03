@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/helpers/mind_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/bool_widget.dart';
 import 'package:keklist/widgets/rounded_container.dart';
 
 // Improvements:
@@ -118,22 +119,25 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                 ),
               ),
             ),
-            AspectRatio(
-              aspectRatio: 1.05,
-              child: PieChart(
-                PieChartData(
-                  sections: pieSections,
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 0,
-                  startDegreeOffset: 0,
+            Container(
+              constraints: const BoxConstraints(maxHeight: 380.0),
+              child: AspectRatio(
+                aspectRatio: 1.05,
+                child: PieChart(
+                  PieChartData(
+                    sections: pieSections,
+                    centerSpaceRadius: 0,
+                    sectionsSpace: 0,
+                    startDegreeOffset: 0,
+                  ),
+                  swapAnimationCurve: Curves.bounceInOut,
                 ),
-                swapAnimationCurve: Curves.bounceInOut,
               ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: intervalChoiceMap.entries.map(
+                children: intervalChoiceMap.entries.mySortedBy((e) => e.value, reversed: true).map(
                   (entry) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -164,27 +168,38 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
 
   List<PieChartSectionData> _getPieSections({required HashMap<String, int> choiceMap}) {
     final int allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
-    return choiceMap.entries.map(
+    return choiceMap.entries.mySortedBy((e) => e.value).map(
       (entry) {
         final currentValue = choiceMap.entries
             .where((element) => element.key == entry.key)
             .map((e) => e.value)
             .fold<int>(0, (a, b) => a + b);
         final double percentValue = 100 * currentValue / allValues;
+        final bool showShowTitle = percentValue >= 6;
 
         final bool isSelected = entry.key == _selectedEmoji;
         return PieChartSectionData(
-            color: _colorFromEmoji(entry.key),
-            showTitle: percentValue >= 5,
-            value: percentValue,
-            title: percentValue.toStringAsFixed(1),
-            radius: isSelected ? 170 : 150,
-            titleStyle: TextStyle(
-              fontSize: isSelected ? 17.0 : 15.0,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
+          color: _colorFromEmoji(entry.key),
+          showTitle: showShowTitle,
+          value: percentValue,
+          title: percentValue.toStringAsFixed(1),
+          radius: isSelected ? 170 : 150,
+          titleStyle: TextStyle(
+            fontSize: isSelected ? 17.0 : 15.0,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xffffffff),
+          ),
+          titlePositionPercentageOffset: 0.75,
+          badgeWidget: BoolWidget(
+            condition: showShowTitle,
+            trueChild: Text(
+              entry.key,
+              style: const TextStyle(fontSize: 22.0),
             ),
-            titlePositionPercentageOffset: 0.6);
+            falseChild: const SizedBox.shrink(),
+          ),
+          badgePositionPercentageOffset: 0.50,
+        );
       },
     )
         // .where((element) => element.showTitle)

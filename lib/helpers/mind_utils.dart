@@ -112,8 +112,14 @@ class MindUtils {
 // NOTE: Sorted by.
 
 extension ListIterable<E> on Iterable<E> {
-  List<E> mySortedBy(Comparable Function(E e) key) => toList()
+  List<E> mySortedBy(Comparable Function(E e) key, {bool reversed = false}) => toList()
     ..sort(
-      (a, b) => key(a).compareTo(key(b)),
+      (a, b) {
+        if (reversed) {
+          return key(b).compareTo(key(a));
+        } else {
+          return key(a).compareTo(key(b));
+        }
+      },
     );
 }
