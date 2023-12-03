@@ -1,28 +1,26 @@
 part of '../../mind_collection_screen.dart';
 
 class _Body extends StatelessWidget {
+  final bool isBlured;
   final bool isSearching;
-  final bool isDemoMode;
   final List<Mind> searchResults;
-  final Function hideKeyboard;
-  final Function onTapToDay;
+  final VoidCallback hideKeyboard;
+  final Function(int) onTapToDay;
+  final List<Mind> Function(int) getMindByDayIndex;
   final ItemScrollController itemScrollController;
   final ItemPositionsListener itemPositionsListener;
   final Function getNowDayIndex;
-  final Random demoModeRandom;
-  final Map<int, List<Mind>> mindsByDayIndex;
 
   const _Body({
+    required this.isBlured,
     required this.isSearching,
-    required this.isDemoMode,
     required this.searchResults,
     required this.hideKeyboard,
     required this.onTapToDay,
     required this.itemScrollController,
     required this.itemPositionsListener,
     required this.getNowDayIndex,
-    required this.demoModeRandom,
-    required this.mindsByDayIndex,
+    required this.getMindByDayIndex,
   });
 
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
@@ -42,73 +40,40 @@ class _Body extends StatelessWidget {
       itemCount: 99999999999,
       itemScrollController: itemScrollController,
       itemPositionsListener: itemPositionsListener,
-      itemBuilder: (BuildContext context, int groupDayIndex) {
-        final List<Mind> minds = [];
-        if (isDemoMode) {
-          minds.addAll(
-            List.generate(
-              16,
-              (index) {
-                final String randomEmoji = KeklistConstants
-                    .demoModeEmojiList[demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];
-                return Mind(
-                    emoji: randomEmoji,
-                    creationDate: DateTime.now(),
-                    note: '',
-                    dayIndex: 0,
-                    id: const Uuid().v4(),
-                    sortIndex: 0,
-                    rootId: null);
-              },
-            ).toList(),
-          );
-        } else {
-          final List<Mind> mindsOfDay = mindsByDayIndex[groupDayIndex] ?? [];
-          minds.addAll(mindsOfDay);
-        }
+      itemBuilder: (_, int dayIndex) {
+        final List<Mind> minds = getMindByDayIndex(dayIndex);
 
-        final bool isToday = groupDayIndex == getNowDayIndex();
+        final bool isToday = dayIndex == getNowDayIndex();
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 18.0),
             Text(
-              _formatter.format(MindUtils.getDateFromIndex(groupDayIndex)),
+              _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
               style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
             ),
             const SizedBox(height: 4.0),
             GestureDetector(
-              onTap: () {
-                onTapToDay(
-                  groupDayIndex: groupDayIndex,
-                  initialError: null,
-                );
-              },
+              onTap: () => onTapToDay(dayIndex),
               child: RoundedContainer(
                 border: isToday
                     ? Border.all(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withOpacity(0.4),
                         width: 2.0,
                       )
                     : null,
-                child: Container(
-                  constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
-                  child: BoolWidget(
-                    condition: minds.isEmpty,
-                    trueChild: () {
-                      if (groupDayIndex < getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.past();
-                      } else if (groupDayIndex > getNowDayIndex()) {
-                        return MindCollectionEmptyDayWidget.future();
-                      } else {
-                        return MindCollectionEmptyDayWidget.present();
-                      }
-                    }(),
-                    falseChild: Container(
-                      constraints: BoxConstraints.tightForFinite(width: MediaQuery.of(context).size.width - 16.0),
-                      child: MindRowsWidget(minds: minds),
-                    ),
-                  ),
+                child: BoolWidget(
+                  condition: minds.isEmpty,
+                  trueChild: () {
+                    if (dayIndex < getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.past();
+                    } else if (dayIndex > getNowDayIndex()) {
+                      return MindCollectionEmptyDayWidget.future();
+                    } else {
+                      return MindCollectionEmptyDayWidget.present();
+                    }
+                  }(),
+                  falseChild: MindRowsWidget(minds: minds),
                 ),
               ),
             )
@@ -120,7 +85,7 @@ class _Body extends StatelessWidget {
     return GestureDetector(
       onPanDown: (_) => hideKeyboard(),
       child: BoolWidget(
-        condition: isDemoMode,
+        condition: isBlured,
         trueChild: Blur(
           blur: 3,
           blurColor: Colors.transparent,

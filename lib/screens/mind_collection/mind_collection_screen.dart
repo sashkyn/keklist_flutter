@@ -48,6 +48,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
+
   bool get _isOfflineMode => _settings?.isOfflineMode ?? false;
   late final _demoModeRandom = Random();
 
@@ -64,6 +65,28 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   // NOTE: Состояние обновления с сервером.
   bool _updating = false;
+
+  List<Mind> _getMindsBy(int dayIndex) {
+    if (_isDemoMode) {
+      return List.generate(
+        16,
+        (index) {
+          final String randomEmoji = KeklistConstants
+              .demoModeEmojiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];
+          return Mind(
+              emoji: randomEmoji,
+              creationDate: DateTime.now(),
+              note: '',
+              dayIndex: 0,
+              id: const Uuid().v4(),
+              sortIndex: 0,
+              rootId: null);
+        },
+      ).toList();
+    } else {
+      return _mindsByDayIndex[dayIndex] ?? [];
+    }
+  }
 
   @override
   void initState() {
@@ -105,7 +128,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
           if (state is MindList) {
             setState(() {
               _minds = state.values;
-              _mindsByDayIndex = state.values.toList().groupListsBy((element) => element.dayIndex);
+              _mindsByDayIndex =
+                  state.values.where((element) => element.rootId == null).groupListsBy((element) => element.dayIndex);
             });
           } else if (state is MindServerOperationStarted) {
             if (state.type == MindOperationType.fetch) {
@@ -222,16 +246,18 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         ),
       ),
       body: _Body(
-        demoModeRandom: _demoModeRandom,
+        getMindByDayIndex: _getMindsBy,
+        isBlured: _isDemoMode,
         isSearching: _isSearching,
-        isDemoMode: _isDemoMode,
         searchResults: _searchResults,
         hideKeyboard: _hideKeyboard,
-        onTapToDay: _showDayCollectionScreen,
+        onTapToDay: (dayIndex) => _showDayCollectionScreen(
+          groupDayIndex: dayIndex,
+          initialError: null,
+        ),
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
         getNowDayIndex: _getNowDayIndex,
-        mindsByDayIndex: _mindsByDayIndex,
       ),
       resizeToAvoidBottomInset: false,
     );
