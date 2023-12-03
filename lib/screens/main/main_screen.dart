@@ -23,21 +23,9 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   int _tabSelectedIndex = 0;
 
   static final List<Widget> _mainScreens = [
-    const SizedBox(
-      width: 1000,
-      height: 1000,
-      child: MindCollectionScreen(),
-    ),
-    const SizedBox(
-      width: 1000,
-      height: 1000,
-      child: InsightsScreen(),
-    ),
-    const SizedBox(
-      width: 1000,
-      height: 1000,
-      child: SettingsScreen(),
-    ),
+    const MindCollectionScreen(),
+    const InsightsScreen(),
+    const SettingsScreen(),
   ];
 
   @override
@@ -80,7 +68,9 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                     final int index = _mainScreens.indexOf(screen);
                     return NavigationRailDestination(
                       icon: _items[index].icon,
-                      label: Text(_items[index].label!),
+                      label: Text(
+                        _items[index].label!,
+                      ),
                     );
                   }).toList(),
                   selectedIndex: _tabSelectedIndex,
@@ -89,14 +79,22 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                   },
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
-                IndexedStack(index: _tabSelectedIndex, children: _mainScreens)
+                Flexible(
+                  child: IndexedStack(
+                    index: _tabSelectedIndex,
+                    children: _mainScreens,
+                  ),
+                )
               ],
             ),
           );
         } else {
           // Phone layout
           return Scaffold(
-            body: IndexedStack(index: _tabSelectedIndex, children: _mainScreens),
+            body: IndexedStack(
+              index: _tabSelectedIndex,
+              children: _mainScreens,
+            ),
             bottomNavigationBar: AdaptiveBottomNavigationBar(
               selectedIndex: _tabSelectedIndex,
               onTap: (index) {
