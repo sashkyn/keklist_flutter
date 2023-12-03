@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:keklist/widgets/bool_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/helpers/bloc_utils.dart';
@@ -63,22 +64,26 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
           return Scaffold(
             body: Row(
               children: [
-                NavigationRail(
-                  destinations: _mainScreens.map(
-                    (screen) {
-                      final int index = _mainScreens.indexOf(screen);
-                      return NavigationRailDestination(
-                        icon: _items[index].icon,
-                        label: Text(
-                          _items[index].label!,
-                        ),
-                      );
+                BoolWidget(
+                  condition: !_isAuthShowed,
+                  trueChild: NavigationRail(
+                    destinations: _mainScreens.map(
+                      (screen) {
+                        final int index = _mainScreens.indexOf(screen);
+                        return NavigationRailDestination(
+                          icon: _items[index].icon,
+                          label: Text(
+                            _items[index].label!,
+                          ),
+                        );
+                      },
+                    ).toList(),
+                    selectedIndex: _tabSelectedIndex,
+                    onDestinationSelected: (index) {
+                      setState(() => _tabSelectedIndex = index);
                     },
-                  ).toList(),
-                  selectedIndex: _tabSelectedIndex,
-                  onDestinationSelected: (index) {
-                    setState(() => _tabSelectedIndex = index);
-                  },
+                  ),
+                  falseChild: const SizedBox.shrink(),
                 ),
                 const VerticalDivider(
                   thickness: 1.0,
@@ -118,13 +123,13 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
       return;
     }
 
-    _isAuthShowed = true;
+    setState(() => _isAuthShowed = true);
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => const AuthScreen(),
       isDismissible: false,
       enableDrag: false,
     );
-    _isAuthShowed = false;
+    setState(() => _isAuthShowed = false);
   }
 }
