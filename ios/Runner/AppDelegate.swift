@@ -24,7 +24,7 @@ import workmanager
         GeneratedPluginRegistrant.register(with: self)
         
         WorkmanagerPlugin.registerTask(withIdentifier: "update-today-minds")
-        UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*60)) // Each 1 hour.
+        //UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*60)) // Each 1 hour.
         
         // MARK: Activation Apple Watch Session
         if WCSession.isSupported() {

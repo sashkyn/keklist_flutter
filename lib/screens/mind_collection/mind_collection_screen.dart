@@ -11,7 +11,6 @@ import 'package:keklist/screens/mind_collection/local_widgets/mind_rows_widget.d
 import 'package:keklist/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
 import 'package:keklist/screens/web_page/web_page_screen.dart';
 import 'package:keklist/widgets/rounded_container.dart';
-import 'package:uuid/uuid.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/constants.dart';
@@ -26,10 +25,12 @@ import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:keklist/widgets/bool_widget.dart';
+import 'package:uuid/uuid.dart';
 
 part 'local_widgets/search_app_bar/search_app_bar.dart';
 part 'local_widgets/app_bar/app_bar.dart';
 part 'local_widgets/body/body.dart';
+part 'local_widgets/body/demo_body.dart';
 
 class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
@@ -50,7 +51,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   bool _isDemoMode = false;
 
   bool get _isOfflineMode => _settings?.isOfflineMode ?? false;
-  late final _demoModeRandom = Random();
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -65,29 +65,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   // NOTE: Состояние обновления с сервером.
   bool _updating = false;
-
-  List<Mind> _getMindsBy(int dayIndex) {
-    if (_isDemoMode) {
-      return List.generate(
-        16,
-        (index) {
-          final String randomEmoji = KeklistConstants
-              .demoModeEmojiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];
-          return Mind(
-              emoji: randomEmoji,
-              creationDate: DateTime.now(),
-              note: '',
-              dayIndex: 0,
-              id: const Uuid().v4(),
-              sortIndex: 0,
-              rootId: null);
-        },
-      ).toList();
-    } else {
-      return _mindsByDayIndex[dayIndex] ?? [];
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -202,7 +179,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   @override
   void dispose() {
-    _demoAutoScrollingTimer?.cancel();
     cancelSubscriptions();
 
     super.dispose();
@@ -245,19 +221,22 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               )),
         ),
       ),
-      body: _Body(
-        getMindByDayIndex: _getMindsBy,
-        isBlured: _isDemoMode,
-        isSearching: _isSearching,
-        searchResults: _searchResults,
-        hideKeyboard: _hideKeyboard,
-        onTapToDay: (dayIndex) => _showDayCollectionScreen(
-          groupDayIndex: dayIndex,
-          initialError: null,
+      body: BoolWidget(
+        condition: _isDemoMode,
+        trueChild: _DemoBody(),
+        falseChild: _Body(
+          mindsByDayIndex: _mindsByDayIndex,
+          isSearching: _isSearching,
+          searchResults: _searchResults,
+          hideKeyboard: _hideKeyboard,
+          onTapToDay: (dayIndex) => _showDayCollectionScreen(
+            groupDayIndex: dayIndex,
+            initialError: null,
+          ),
+          itemScrollController: _itemScrollController,
+          itemPositionsListener: _itemPositionsListener,
+          getNowDayIndex: _getNowDayIndex,
         ),
-        itemScrollController: _itemScrollController,
-        itemPositionsListener: _itemPositionsListener,
-        getNowDayIndex: _getNowDayIndex,
       ),
       resizeToAvoidBottomInset: false,
     );
@@ -304,28 +283,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   // NOTE: Demo режим для авторизации
 
-  Timer? _demoAutoScrollingTimer;
-
   void _enableDemoMode() {
     if (_isDemoMode) {
       return;
     }
 
     setState(() => _isDemoMode = true);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _jumpToNow();
-      int nextDayIndex = _getNowDayIndex() + 1;
-      _demoAutoScrollingTimer = Timer.periodic(
-        const Duration(seconds: 4),
-        (timer) {
-          _itemScrollController.scrollTo(
-            index: nextDayIndex++,
-            alignment: 0.015,
-            duration: const Duration(milliseconds: 4100),
-          );
-        },
-      );
-    });
   }
 
   void _disableDemoMode() {
@@ -335,7 +298,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
     setState(() => _isDemoMode = false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _demoAutoScrollingTimer?.cancel();
       _jumpToNow();
     });
   }

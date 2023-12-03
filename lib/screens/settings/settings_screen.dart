@@ -35,7 +35,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
         switch (state.runtimeType) {
-          case SettingsDataState _:
+          case const (SettingsDataState):
             setState(() {
               _offlineMode = state.isOfflineMode;
             });
@@ -45,14 +45,14 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
     subscribeTo<MindBloc>(onNewState: (state) {
       switch (state.runtimeType) {
-        case MindList _:
+        case const (MindList):
           setState(() {
             _clearCacheVisible = state.values.isNotEmpty;
           });
           if (!_offlineMode) {
             sendEventTo<MindBloc>(MindGetUploadCandidates());
           }
-        case MindCandidatesForUpload _:
+        case const (MindCandidatesForUpload):
           setState(() {
             if (_isLoggedIn && !_offlineMode) {
               _cachedMindCountToUpload = state.values.length;
@@ -60,13 +60,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               _cachedMindCountToUpload = 0;
             }
           });
-        case MindServerOperationStarted _:
+        case const (MindServerOperationStarted):
           if (state.type == MindOperationType.uploadCachedData ||
               state.type == MindOperationType.deleteAll ||
               state.type == MindOperationType.clearCache) {
             EasyLoading.show();
           }
-        case MindOperationError _:
+        case const (MindOperationError):
           if (state.notCompleted == MindOperationType.uploadCachedData ||
               state.notCompleted == MindOperationType.clearCache ||
               state.notCompleted == MindOperationType.deleteAll) {
@@ -77,7 +77,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               message: state.localizedString,
             );
           }
-        case MindOperationCompleted _:
+        case const (MindOperationCompleted):
           switch (state.type) {
             case MindOperationType.clearCache:
               EasyLoading.dismiss();

@@ -1,18 +1,16 @@
 part of '../../mind_collection_screen.dart';
 
 class _Body extends StatelessWidget {
-  final bool isBlured;
   final bool isSearching;
   final List<Mind> searchResults;
   final VoidCallback hideKeyboard;
   final Function(int) onTapToDay;
-  final List<Mind> Function(int) getMindByDayIndex;
+  final Map<int, List<Mind>> mindsByDayIndex;
   final ItemScrollController itemScrollController;
   final ItemPositionsListener itemPositionsListener;
   final Function getNowDayIndex;
 
   const _Body({
-    required this.isBlured,
     required this.isSearching,
     required this.searchResults,
     required this.hideKeyboard,
@@ -20,7 +18,7 @@ class _Body extends StatelessWidget {
     required this.itemScrollController,
     required this.itemPositionsListener,
     required this.getNowDayIndex,
-    required this.getMindByDayIndex,
+    required this.mindsByDayIndex,
   });
 
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
@@ -41,7 +39,7 @@ class _Body extends StatelessWidget {
       itemScrollController: itemScrollController,
       itemPositionsListener: itemPositionsListener,
       itemBuilder: (_, int dayIndex) {
-        final List<Mind> minds = getMindByDayIndex(dayIndex);
+        final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
 
         final bool isToday = dayIndex == getNowDayIndex();
         return Column(
@@ -84,16 +82,7 @@ class _Body extends StatelessWidget {
 
     return GestureDetector(
       onPanDown: (_) => hideKeyboard(),
-      child: BoolWidget(
-        condition: isBlured,
-        trueChild: Blur(
-          blur: 3,
-          blurColor: Colors.transparent,
-          colorOpacity: 0.2,
-          child: scrollablePositionedList,
-        ),
-        falseChild: scrollablePositionedList,
-      ),
+      child: scrollablePositionedList
     );
   }
 }

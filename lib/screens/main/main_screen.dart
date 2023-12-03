@@ -64,21 +64,26 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
             body: Row(
               children: [
                 NavigationRail(
-                  destinations: _mainScreens.map((screen) {
-                    final int index = _mainScreens.indexOf(screen);
-                    return NavigationRailDestination(
-                      icon: _items[index].icon,
-                      label: Text(
-                        _items[index].label!,
-                      ),
-                    );
-                  }).toList(),
+                  destinations: _mainScreens.map(
+                    (screen) {
+                      final int index = _mainScreens.indexOf(screen);
+                      return NavigationRailDestination(
+                        icon: _items[index].icon,
+                        label: Text(
+                          _items[index].label!,
+                        ),
+                      );
+                    },
+                  ).toList(),
                   selectedIndex: _tabSelectedIndex,
                   onDestinationSelected: (index) {
                     setState(() => _tabSelectedIndex = index);
                   },
                 ),
-                const VerticalDivider(thickness: 1, width: 1),
+                const VerticalDivider(
+                  thickness: 1.0,
+                  width: 1.0,
+                ),
                 Flexible(
                   child: IndexedStack(
                     index: _tabSelectedIndex,
