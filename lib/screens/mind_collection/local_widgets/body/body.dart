@@ -33,56 +33,57 @@ class _Body extends StatelessWidget {
       );
     }
 
-    final Widget scrollablePositionedList = ScrollablePositionedList.builder(
-      padding: const EdgeInsets.only(top: 16.0),
-      itemCount: 99999999999,
-      itemScrollController: itemScrollController,
-      itemPositionsListener: itemPositionsListener,
-      itemBuilder: (_, int dayIndex) {
-        final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
-
-        final bool isToday = dayIndex == getNowDayIndex();
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 18.0),
-            Text(
-              _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
-              style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
-            ),
-            const SizedBox(height: 4.0),
-            GestureDetector(
-              onTap: () => onTapToDay(dayIndex),
-              child: RoundedContainer(
-                border: isToday
-                    ? Border.all(
-                        color: Colors.black.withOpacity(0.4),
-                        width: 2.0,
-                      )
-                    : null,
-                child: BoolWidget(
-                  condition: minds.isEmpty,
-                  trueChild: () {
-                    if (dayIndex < getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.past();
-                    } else if (dayIndex > getNowDayIndex()) {
-                      return MindCollectionEmptyDayWidget.future();
-                    } else {
-                      return MindCollectionEmptyDayWidget.present();
-                    }
-                  }(),
-                  falseChild: MindRowsWidget(minds: minds),
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
-
     return GestureDetector(
       onPanDown: (_) => hideKeyboard(),
-      child: scrollablePositionedList
+      child: ScrollablePositionedList.builder(
+        padding: const EdgeInsets.only(top: 16.0),
+        itemCount: 99999999999,
+        itemScrollController: itemScrollController,
+        itemPositionsListener: itemPositionsListener,
+        itemBuilder: (_, int dayIndex) {
+          final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
+
+          final bool isToday = dayIndex == getNowDayIndex();
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 18.0),
+              Text(
+                _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
+                style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
+              ),
+              const SizedBox(height: 4.0),
+              GestureDetector(
+                onTap: () => onTapToDay(dayIndex),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: RoundedContainer(
+                    border: isToday
+                        ? Border.all(
+                            color: Colors.black.withOpacity(0.4),
+                            width: 2.0,
+                          )
+                        : null,
+                    child: BoolWidget(
+                      condition: minds.isEmpty,
+                      trueChild: BoolWidget(
+                        condition: dayIndex < getNowDayIndex(),
+                        trueChild: MindCollectionEmptyDayWidget.past(),
+                        falseChild: BoolWidget(
+                          condition: dayIndex > getNowDayIndex(),
+                          trueChild: MindCollectionEmptyDayWidget.future(),
+                          falseChild: MindCollectionEmptyDayWidget.present(),
+                        ),
+                      ),
+                      falseChild: MindRowsWidget(minds: minds),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 }

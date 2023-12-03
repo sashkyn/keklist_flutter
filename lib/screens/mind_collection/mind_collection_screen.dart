@@ -281,8 +281,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   int _getNowDayIndex() => MindUtils.getDayIndex(from: DateTime.now());
 
-  // NOTE: Demo режим для авторизации
-
   void _enableDemoMode() {
     if (_isDemoMode) {
       return;

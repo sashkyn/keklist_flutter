@@ -66,7 +66,10 @@ class _DemoBodyState extends State<_DemoBody> {
               const SizedBox(height: 18.0),
               Text(_DemoBody._formatter.format(MindUtils.getDateFromIndex(dayIndex))),
               const SizedBox(height: 4.0),
-              MindRowsWidget(minds: minds),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: MindRowsWidget(minds: minds),
+              ),
             ],
           );
         },
