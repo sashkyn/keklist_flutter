@@ -8,12 +8,17 @@ class MindRowsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Text(
-        minds.map((e) => e.emoji).join(' '),
-        style: const TextStyle(fontSize: 50.0),
-        textAlign: TextAlign.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            minds.map((e) => e.emoji).join(' '),
+            style: const TextStyle(fontSize: 50.0),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

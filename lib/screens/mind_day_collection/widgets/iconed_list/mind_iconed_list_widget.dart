@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:keklist/screens/mind_collection/widgets/my_table.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/my_table.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/mind_widget.dart';
 

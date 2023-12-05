@@ -25,6 +25,8 @@ platform :ios do
   desc "Create provisioning profiles"
   lane :create_provisioning_profiles do
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",
@@ -35,6 +37,8 @@ platform :ios do
       type: "development"
     )
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",
@@ -65,6 +69,8 @@ platform :ios do
       is_key_content_base64: true
     )
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",
@@ -77,8 +83,11 @@ platform :ios do
       readonly: true,
       keychain_name: keychain_name,
       keychain_password: keychain_password,
+      force_for_new_devices: true
     )
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",
@@ -91,6 +100,7 @@ platform :ios do
       readonly: true,
       keychain_name: keychain_name,
       keychain_password: keychain_password,
+      force_for_new_devices: true
     )
     build_app(
       workspace: "Runner.xcworkspace", 
@@ -123,6 +133,8 @@ platform :ios do
       is_key_content_base64: true
     )
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",
@@ -135,6 +147,8 @@ platform :ios do
       readonly: false,
     )
     match(
+      username: "#{ENV["APPLE_ID"]}",
+      team_id: "#{ENV["APPLE_TEAM_ID"]}",
       app_identifier: [
         "com.sashkyn.kekable", 
         "com.sashkyn.kekable.watchkitapp",

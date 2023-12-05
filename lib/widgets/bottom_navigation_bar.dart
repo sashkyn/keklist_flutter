@@ -38,7 +38,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
       return BottomNavigationBar(
         items: items,
         currentIndex: selectedIndex,
-        selectedItemColor: Colors.black,
+        selectedItemColor: const Color.fromARGB(255, 132, 127, 127),
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         onTap: onTap,
