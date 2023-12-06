@@ -22,8 +22,6 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
       return BottomNavigationBar(
         items: items,
         currentIndex: selectedIndex,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         onTap: onTap,
       );
@@ -31,7 +29,6 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
       return CupertinoTabBar(
         items: items,
         currentIndex: selectedIndex,
-        activeColor: Colors.black,
         onTap: onTap,
       );
     } else {
@@ -39,7 +36,6 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
         items: items,
         currentIndex: selectedIndex,
         selectedItemColor: const Color.fromARGB(255, 132, 127, 127),
-        unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         onTap: onTap,
       );

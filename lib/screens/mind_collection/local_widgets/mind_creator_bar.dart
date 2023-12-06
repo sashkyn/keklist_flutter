@@ -41,7 +41,7 @@ class _MindCreatorBarState extends State<MindCreatorBar> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
             const MindCreatorSeparator(),
@@ -104,7 +104,7 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
           child: Icon(Icons.edit),
         ),
         Container(
-          color: Colors.grey,
+          color: Theme.of(context).dividerColor,
           height: 55.0,
           width: 0.3,
         ),
@@ -147,7 +147,7 @@ class MindCreatorSeparator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey,
+      color: Theme.of(context).dividerColor,
       height: 0.3,
     );
   }

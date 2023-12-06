@@ -199,18 +199,14 @@ class KeklistApp extends StatefulWidget {
 class KeklistAppState extends State<KeklistApp> {
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: MaterialApp(
-        title: 'Keklist',
-        home: const MainScreen(),
-        theme: ThemeData(
-          primarySwatch: Palette.swatch,
-          useMaterial3: true,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        builder: EasyLoading.init(),
+    return MaterialApp(
+      title: 'Keklist',
+      home: const MainScreen(),
+      theme: ThemeData(
+        primarySwatch: Palette.swatch,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      builder: EasyLoading.init(),
     );
   }
 }

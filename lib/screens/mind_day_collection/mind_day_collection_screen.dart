@@ -208,7 +208,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   height: 90,
                 ),
               ),

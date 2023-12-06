@@ -102,7 +102,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                       if (childMinds.isNotEmpty) ...{
                         const Gap(16.0),
                         Container(
-                          color: Colors.white,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           height: 8.0,
                         ),
                         MindBulletListWidget(
@@ -111,7 +111,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                           onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
                         ),
                         Container(
-                          color: Colors.white,
+                          color: Theme.of(context).scaffoldBackgroundColor,
                           height: 8.0,
                         ),
                       }
@@ -127,7 +127,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   height: 90,
                 ),
               ),

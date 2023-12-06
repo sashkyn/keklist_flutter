@@ -33,8 +33,8 @@ class AuthButton extends StatelessWidget {
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-          shadowColor: MaterialStateProperty.all<Color>(Colors.black.withOpacity(0.5)),
+          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).cardColor),
+          shadowColor: MaterialStateProperty.all<Color>(Theme.of(context).shadowColor),
           elevation: MaterialStateProperty.all<double>(5.0),
         ),
         onPressed: onTap,

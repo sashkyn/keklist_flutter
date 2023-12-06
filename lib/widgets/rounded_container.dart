@@ -14,12 +14,12 @@ class RoundedContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(10),
         border: border,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Theme.of(context).shadowColor.withOpacity(0.2),
             spreadRadius: 2,
             blurRadius: 10.0,
             offset: const Offset(1.0, 1.0),

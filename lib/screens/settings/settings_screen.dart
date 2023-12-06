@@ -135,8 +135,6 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           'Settings',
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
       ),
       body: SettingsList(
         sections: [
