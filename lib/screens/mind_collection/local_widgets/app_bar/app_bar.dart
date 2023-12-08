@@ -38,7 +38,7 @@ class _AppBar extends StatelessWidget {
         actions: _makeAppBarActions(),
         title: GestureDetector(
           onTap: onTitle,
-          child: const Text('Minds'),
+          child: const Text('Keklist'),
         ),
       );
     }

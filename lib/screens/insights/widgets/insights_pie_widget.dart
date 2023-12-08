@@ -107,11 +107,14 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                             _selectedChoiceIndex = index;
                           });
                         },
-                        selectedColor: Colors.black,
+                        selectedColor: Theme.of(context).colorScheme.primary,
                         child: Text(
                           _choices[index].localizedTitle,
                           style: TextStyle(
-                              fontSize: 14.0, color: _selectedChoiceIndex == index ? Colors.white : Colors.black),
+                              fontSize: 14.0,
+                              color: _selectedChoiceIndex == index
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                  : Theme.of(context).colorScheme.primary),
                         ),
                       ),
                     );
@@ -184,7 +187,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
           titleStyle: TextStyle(
             fontSize: isSelected ? 17.0 : 15.0,
             fontWeight: FontWeight.bold,
-            color: const Color(0xffffffff),
+            color: Colors.white,
           ),
           titlePositionPercentageOffset: 0.75,
           badgeWidget: BoolWidget(
@@ -234,7 +237,7 @@ class MyChip extends StatelessWidget {
     return RawChip(
       showCheckmark: false,
       label: child,
-      backgroundColor: isSelected ? selectedColor : Colors.white,
+      backgroundColor: isSelected ? selectedColor : null,
       shape: StadiumBorder(
         side: BorderSide(
           color: selectedColor,

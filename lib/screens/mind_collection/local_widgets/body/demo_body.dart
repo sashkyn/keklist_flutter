@@ -44,7 +44,7 @@ class _DemoBodyState extends State<_DemoBody> {
         itemPositionsListener: _itemPositionsListener,
         itemBuilder: (_, int dayIndex) {
           final List<Mind> minds = List.generate(
-            16,
+            15,
             (index) {
               final String randomEmoji = KeklistConstants
                   .demoModeEmojiList[_demoModeRandom.nextInt(KeklistConstants.demoModeEmojiList.length - 1)];

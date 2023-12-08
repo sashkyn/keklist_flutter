@@ -8,6 +8,7 @@ import 'package:keklist/screens/insights/widgets/insights_pie_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_random_mind_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_today_minds_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
+import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
 
 class InsightsScreen extends StatefulWidget {
@@ -58,8 +59,14 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
                 children: [
                   StaggeredGridTile.fit(
                     crossAxisCellCount: crossAxisCellCount,
-                    child: InsightsTodayMindsWidget(
-                      todayMinds: MindUtils.findTodayMinds(allMinds: _minds),
+                    child: GestureDetector(
+                      onTap: () => _showDayCollectionScreen(
+                        groupDayIndex: MindUtils.getTodayIndex(),
+                        initialError: null,
+                      ),
+                      child: InsightsTodayMindsWidget(
+                        todayMinds: MindUtils.findTodayMinds(allMinds: _minds),
+                      ),
                     ),
                   ),
                   StaggeredGridTile.fit(
@@ -78,6 +85,21 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  void _showDayCollectionScreen({
+    required int groupDayIndex,
+    required MindOperationError? initialError,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MindDayCollectionScreen(
+          allMinds: _minds,
+          initialDayIndex: groupDayIndex,
+          initialError: initialError,
         ),
       ),
     );

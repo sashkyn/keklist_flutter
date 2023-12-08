@@ -35,6 +35,7 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
       if (state is SettingsAuthState && state.needToShowAuth) {
+        setState(() => _tabSelectedIndex = 1);
         _showAuthBottomSheet();
       }
     })?.disposed(by: this);

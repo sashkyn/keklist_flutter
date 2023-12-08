@@ -179,13 +179,6 @@ Future<void> _setupHive() async {
   await Hive.openBox<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
 }
 
-// void _setupOrientations() {
-//   SystemChrome.setPreferredOrientations([
-//     DeviceOrientation.portraitUp,
-//     DeviceOrientation.portraitDown,
-//   ]);
-// }
-
 class KeklistApp extends StatefulWidget {
   const KeklistApp({super.key});
 

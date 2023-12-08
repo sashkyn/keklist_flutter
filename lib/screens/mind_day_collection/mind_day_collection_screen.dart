@@ -160,6 +160,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           BoolWidget(
             condition: _isMindContentVisible,
             trueChild: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 150),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: BoolWidget(
                 condition: _isMindContentVisible,
@@ -182,6 +183,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               ),
             ),
             falseChild: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 150),
               child: SafeArea(
                 child: MindIconedListWidget(
                   minds: _dayMinds,
