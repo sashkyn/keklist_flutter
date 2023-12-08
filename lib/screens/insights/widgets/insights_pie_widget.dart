@@ -119,19 +119,16 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                 ),
               ),
             ),
-            Container(
-              constraints: const BoxConstraints(maxHeight: 380.0),
-              child: AspectRatio(
-                aspectRatio: 1.05,
-                child: PieChart(
-                  PieChartData(
-                    sections: pieSections,
-                    centerSpaceRadius: 0,
-                    sectionsSpace: 0,
-                    startDegreeOffset: 0,
-                  ),
-                  swapAnimationCurve: Curves.bounceInOut,
+            SizedBox(
+              height: 350,
+              child: PieChart(
+                PieChartData(
+                  sections: pieSections,
+                  centerSpaceRadius: 0,
+                  sectionsSpace: 0,
+                  startDegreeOffset: 0,
                 ),
+                swapAnimationCurve: Curves.bounceInOut,
               ),
             ),
             SingleChildScrollView(

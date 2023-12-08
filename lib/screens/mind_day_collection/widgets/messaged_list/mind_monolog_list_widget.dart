@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 
@@ -19,28 +20,23 @@ class MindMonologListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: minds.map((mind) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GestureDetector(
-                    onTap: () => onTap(mind),
-                    child: MindMessageWidget(
-                      mind: mind,
-                      children: mindIdsToChildren?[mind.id] ?? [],
-                      onOptions: () => onOptions(mind),
-                    ).animate().fadeIn(),
-                  ),
-                ),
-              ],
-            );
-          }).toList() +
-          [
-            const Column(children: [SizedBox(height: 160.0)]),
-          ],
-    );
+    return StaggeredGrid.count(
+        crossAxisCount: 1,
+        children: minds.map((mind) {
+          return StaggeredGridTile.fit(
+            crossAxisCellCount: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: () => onTap(mind),
+                child: MindMessageWidget(
+                  mind: mind,
+                  children: mindIdsToChildren?[mind.id] ?? [],
+                  onOptions: () => onOptions(mind),
+                ).animate().fadeIn(),
+              ),
+            ),
+          );
+        }).toList());
   }
 }

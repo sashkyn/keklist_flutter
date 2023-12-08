@@ -24,8 +24,8 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   int _tabSelectedIndex = 0;
 
   static final List<Widget> _mainScreens = [
-    const MindCollectionScreen(),
     const InsightsScreen(),
+    const MindCollectionScreen(),
     const SettingsScreen(),
   ];
 
@@ -42,12 +42,12 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
   static const List<BottomNavigationBarItem> _items = [
     BottomNavigationBarItem(
-      icon: Icon(Icons.emoji_emotions),
-      label: 'Weeks',
-    ),
-    BottomNavigationBarItem(
       icon: Icon(Icons.widgets),
       label: 'Insights',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.emoji_emotions),
+      label: 'Weeks',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.settings),
