@@ -13,6 +13,7 @@ abstract class SettingsState {
 class SettingsDataState extends SettingsState {
   final bool isMindContentVisible;
   final bool isOfflineMode;
+  final bool isDarkMode;
 
   // @override
   // List<Object?> get props => [isMindContentVisible, isOfflineMode];
@@ -20,15 +21,18 @@ class SettingsDataState extends SettingsState {
   SettingsDataState({
     required this.isMindContentVisible,
     required this.isOfflineMode,
+    required this.isDarkMode,
   });
 
   SettingsDataState copyWith({
     bool? isMindContentVisible,
     bool? isOfflineMode,
+    bool? isDarkMode,
   }) {
     return SettingsDataState(
       isMindContentVisible: isMindContentVisible ?? this.isMindContentVisible,
       isOfflineMode: isOfflineMode ?? this.isOfflineMode,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
     );
   }
 }

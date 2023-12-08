@@ -27,3 +27,9 @@ class SettingsUploadMindsFromCacheToServer extends SettingsEvent {}
 class SettingsNeedToShowAuth extends SettingsEvent {}
 
 class SettingGetWhatsNew extends SettingsEvent {}
+
+class SettingsChangeIsDarkMode extends SettingsEvent {
+  final bool isDarkMode;
+
+  const SettingsChangeIsDarkMode({required this.isDarkMode});
+}

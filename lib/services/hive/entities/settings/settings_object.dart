@@ -13,10 +13,14 @@ class SettingsObject extends HiveObject {
   @HiveField(2, defaultValue: false)
   late bool isOfflineMode;
 
+  @HiveField(3, defaultValue: true)
+  late bool isDarkMode;
+
   SettingsObject();
 
   factory SettingsObject.initial() => SettingsObject()
-      ..isMindContentVisible = true
-      ..previousAppVersion = null
-      ..isOfflineMode = false;
+    ..isMindContentVisible = true
+    ..previousAppVersion = null
+    ..isOfflineMode = false
+    ..isDarkMode = true;
 }

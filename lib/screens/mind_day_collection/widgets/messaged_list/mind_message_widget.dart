@@ -6,7 +6,6 @@ import 'package:keklist/widgets/rounded_container.dart';
 
 class MindMessageWidget extends StatelessWidget {
   final Mind mind;
-  // final int? childCount;
   final VoidCallback? onOptions;
   final List<Mind> children;
 
@@ -14,7 +13,6 @@ class MindMessageWidget extends StatelessWidget {
     super.key,
     required this.mind,
     required this.onOptions,
-    // required this.childCount,
     required this.children,
   });
 
@@ -56,24 +54,10 @@ class MindMessageWidget extends StatelessWidget {
                   ),
                 ),
               },
-              // if (childCount != null && childCount != 0) ...{
-              //   Padding(
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: Align(
-              //       alignment: Alignment.topLeft,
-              //       child: RoundedText(
-              //         text: '$childCount',
-              //         textColor: Colors.white,
-              //         backgroundColor: Colors.lightGreen,
-              //         borderColor: Colors.white,
-              //       ),
-              //     ),
-              //   ),
-              // },
             ],
           ),
           if (children.isNotEmpty) ...[
-            Container(height: 0.8, color: Colors.grey[300]),
+            Container(height: 0.3, color: Colors.grey[300]),
             const SizedBox(height: 16.0),
             Column(
               children: children

@@ -13,8 +13,6 @@ import 'package:keklist/screens/web_page/web_page_screen.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// TODO: разобраться с улучшенной навигацией во Flutter: go_router
-
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -25,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
+  bool _isDarkMode = false;
   int _cachedMindCountToUpload = 0;
   bool _clearCacheVisible = false;
 
@@ -38,6 +37,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
           case const (SettingsDataState):
             setState(() {
               _offlineMode = state.isOfflineMode;
+              _isDarkMode = state.isDarkMode;
             });
         }
       },
@@ -131,10 +131,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: Text('Settings', style: Theme.of(context).appBarTheme.titleTextStyle),
       ),
       body: SettingsList(
         sections: [
@@ -157,6 +154,17 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                     sendEventTo<AuthBloc>(AuthLogout());
                   },
                 ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Appearance'.toUpperCase()),
+            tiles: [
+              SettingsTile.switchTile(
+                initialValue: _isDarkMode,
+                leading: const Icon(Icons.dark_mode, color: Colors.grey),
+                title: const Text('Dark mode'),
+                onToggle: (bool value) => _switchDarkMode(value),
+              ),
             ],
           ),
           SettingsSection(
@@ -183,6 +191,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                 title: const Text('Export to CSV'),
                 leading: const Icon(Icons.file_download, color: Colors.brown),
                 onPressed: (BuildContext context) {
+                  // TODO: Add loading
                   sendEventTo<SettingsBloc>(SettingsExportAllMindsToCSV());
                 },
               ),
@@ -302,6 +311,10 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     if (!value) {
       sendEventTo<MindBloc>(MindGetList());
     }
+  }
+
+  Future<void> _switchDarkMode(bool value) async {
+    sendEventTo<SettingsBloc>(SettingsChangeIsDarkMode(isDarkMode: value));
   }
 
   void _showWhatsNew() {

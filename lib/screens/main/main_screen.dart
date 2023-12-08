@@ -42,12 +42,12 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
   static const List<BottomNavigationBarItem> _items = [
     BottomNavigationBarItem(
-      icon: Icon(Icons.widgets),
-      label: 'Insights',
+      icon: Icon(Icons.home),
+      label: 'Home',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.emoji_emotions),
-      label: 'Weeks',
+      icon: Icon(Icons.calendar_month_rounded),
+      label: 'Keklist',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.settings),

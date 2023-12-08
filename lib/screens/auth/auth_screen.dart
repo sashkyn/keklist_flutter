@@ -81,7 +81,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor),
+                style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
                 onPressed: () async {
                   if (_loginTextEditingController.text == KeklistConstants.demoAccountEmail) {
                     _displayTextInputDialog(
@@ -156,7 +156,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                 onPressed: () => launchUrlString(KeklistConstants.termsOfUseURL),
                 child: Text(
                   'Terms of use',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).primaryColor),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
               )
             ],
