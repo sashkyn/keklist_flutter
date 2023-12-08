@@ -157,7 +157,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       sendEventTo<AuthBloc>(AuthGetStatus());
       sendEventTo<SettingsBloc>(SettingsGet());
-      sendEventTo<SettingsBloc>(SettingGetWhatsNew());
+      // sendEventTo<SettingsBloc>(SettingGetWhatsNew());
       //_payementService.initConnection();
     });
   }
