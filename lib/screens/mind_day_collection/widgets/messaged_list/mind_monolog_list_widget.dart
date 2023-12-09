@@ -20,23 +20,33 @@ class MindMonologListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StaggeredGrid.count(
-        crossAxisCount: 1,
-        children: minds.map((mind) {
-          return StaggeredGridTile.fit(
-            crossAxisCellCount: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () => onTap(mind),
-                child: MindMessageWidget(
-                  mind: mind,
-                  children: mindIdsToChildren?[mind.id] ?? [],
-                  onOptions: () => onOptions(mind),
-                ).animate().fadeIn(),
-              ),
-            ),
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final int crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+          return StaggeredGrid.count(
+            crossAxisCount: crossAxisCount,
+            children: minds.map(
+              (mind) {
+                return StaggeredGridTile.fit(
+                  crossAxisCellCount: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () => onTap(mind),
+                      child: MindMessageWidget(
+                        mind: mind,
+                        children: mindIdsToChildren?[mind.id] ?? [],
+                        onOptions: () => onOptions(mind),
+                      ).animate().fadeIn(),
+                    ),
+                  ),
+                );
+              },
+            ).toList(),
           );
-        }).toList());
+        },
+      ),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -60,7 +61,7 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 600 && constraints.maxHeight > 600) {
+        if (constraints.maxWidth > 600) {
           // iPad layout
           return Scaffold(
             body: Row(
@@ -68,14 +69,14 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                 BoolWidget(
                   condition: !_isAuthShowed,
                   trueChild: NavigationRail(
-                    destinations: _mainScreens.map(
-                      (screen) {
-                        final int index = _mainScreens.indexOf(screen);
+                    destinations: _items.mapIndexed(
+                      (index, item) {
                         return NavigationRailDestination(
-                          icon: _items[index].icon,
-                          label: Text(
-                            _items[index].label!,
+                          icon: Icon(
+                            (item.icon as Icon).icon,
+                            color: _tabSelectedIndex == index ? Theme.of(context).scaffoldBackgroundColor : null,
                           ),
+                          label: Text(item.label!),
                         );
                       },
                     ).toList(),
@@ -86,9 +87,13 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                   ),
                   falseChild: const SizedBox.shrink(),
                 ),
-                const VerticalDivider(
-                  thickness: 1.0,
-                  width: 1.0,
+                BoolWidget(
+                  condition: !_isAuthShowed,
+                  trueChild: const VerticalDivider(
+                    thickness: 1.0,
+                    width: 0.2,
+                  ),
+                  falseChild: const SizedBox.shrink(),
                 ),
                 Flexible(
                   child: IndexedStack(

@@ -73,47 +73,38 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
       appBar: AppBar(title: const Text('Mind')),
       body: Stack(
         children: [
-          CustomScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                fillOverscroll: true,
-                child: Column(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: MindMessageWidget(
-                            mind: rootMind,
-                            onOptions: null,
-                            children: const [],
-                          ),
-                        ),
-                      ],
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 150.0),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MindMessageWidget(
+                      mind: rootMind,
+                      onOptions: null,
+                      children: const [],
                     ),
-                    if (childMinds.isNotEmpty) ...{
-                      const Gap(16.0),
-                      Container(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        height: 8.0,
-                      ),
-                      MindBulletListWidget(
-                        minds: childMinds,
-                        onTap: (Mind mind) => () {},
-                        onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                      ),
-                      Container(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        height: 8.0,
-                      ),
-                    }
-                  ],
-                ),
+                  ),
+                  if (childMinds.isNotEmpty) ...{
+                    const Gap(16.0),
+                    Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      height: 8.0,
+                    ),
+                    MindBulletListWidget(
+                      minds: childMinds,
+                      onTap: (Mind mind) => () {},
+                      onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                    ),
+                    Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      height: 8.0,
+                    ),
+                  }
+                ],
               ),
-            ],
+            ),
           ),
           Stack(
             children: [
