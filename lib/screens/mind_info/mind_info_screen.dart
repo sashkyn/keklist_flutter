@@ -29,7 +29,7 @@ final class MindInfoScreen extends StatefulWidget {
 final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
-  bool _hasFocus = false;
+  bool _creatorPanelHasFocus = false;
   Mind? _editableMind;
   late String _selectedEmoji = rootMind.emoji;
 
@@ -47,11 +47,11 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _mindCreatorFocusNode.addListener(() {
-        if (_hasFocus == _mindCreatorFocusNode.hasFocus) {
+        if (_creatorPanelHasFocus == _mindCreatorFocusNode.hasFocus) {
           return;
         }
         setState(() {
-          _hasFocus = _mindCreatorFocusNode.hasFocus;
+          _creatorPanelHasFocus = _mindCreatorFocusNode.hasFocus;
         });
       });
     });
@@ -73,52 +73,37 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
       appBar: AppBar(title: const Text('Mind')),
       body: Stack(
         children: [
-          GestureDetector(
-            onPanDown: (_) {
-              if (_mindCreatorFocusNode.hasFocus) {
-                _hideKeyboard();
-              }
-            },
-            child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  fillOverscroll: true,
-                  child: Column(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MindMessageWidget(
-                              mind: rootMind,
-                              onOptions: null,
-                              children: const [],
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (childMinds.isNotEmpty) ...{
-                        const Gap(16.0),
-                        Container(
-                          color: Colors.white,
-                          height: 8.0,
-                        ),
-                        MindBulletListWidget(
-                          minds: childMinds,
-                          onTap: (Mind mind) => () {},
-                          onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                        ),
-                        Container(
-                          color: Colors.white,
-                          height: 8.0,
-                        ),
-                      }
-                    ],
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 150.0),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MindMessageWidget(
+                      mind: rootMind,
+                      onOptions: null,
+                      children: const [],
+                    ),
                   ),
-                ),
-              ],
+                  if (childMinds.isNotEmpty) ...{
+                    const Gap(16.0),
+                    Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      height: 8.0,
+                    ),
+                    MindBulletListWidget(
+                      minds: childMinds,
+                      onTap: (Mind mind) => () {},
+                      onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                    ),
+                    Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      height: 8.0,
+                    ),
+                  }
+                ],
+              ),
             ),
           ),
           Stack(
@@ -127,7 +112,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   height: 90,
                 ),
               ),

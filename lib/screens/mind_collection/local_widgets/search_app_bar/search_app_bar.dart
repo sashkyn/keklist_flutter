@@ -21,7 +21,6 @@ class _SearchAppBar extends StatelessWidget {
         onAddEmotion: onSearchAddEmotion,
         onCancel: onSearchCancel,
       ),
-      backgroundColor: Colors.white,
     );
   }
 }
@@ -43,10 +42,7 @@ class _SearchAppBarTextField extends StatelessWidget {
       children: [
         const Flexible(
           flex: 1,
-          child: Icon(
-            Icons.search,
-            color: Colors.black,
-          ),
+          child: Icon(Icons.search),
         ),
         const SizedBox(width: 8.0),
         Flexible(
@@ -64,10 +60,7 @@ class _SearchAppBarTextField extends StatelessWidget {
         Flexible(
           flex: 1,
           child: IconButton(
-            icon: const Icon(
-              Icons.emoji_emotions_outlined,
-              color: Colors.black,
-            ),
+            icon: const Icon(Icons.emoji_emotions_outlined),
             onPressed: onAddEmotion,
           ),
         ),
@@ -75,10 +68,7 @@ class _SearchAppBarTextField extends StatelessWidget {
         Flexible(
           flex: 1,
           child: IconButton(
-            icon: const Icon(
-              Icons.cancel,
-              color: Colors.black,
-            ),
+            icon: const Icon(Icons.cancel),
             onPressed: onCancel,
           ),
         ),

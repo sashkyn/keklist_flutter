@@ -2,21 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 
-class Palette {
-  static const MaterialColor swatch = MaterialColor(
-    0xff000000, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
-    <int, Color>{
-      50: Color(0xff333333), //10%
-      100: Color(0xff4d4d4d), //20%
-      200: Color(0xff666666), //30%
-      300: Color(0xff808080), //40%
-      400: Color(0xff999999), //50%
-      500: Color(0xffb3b3b3), //60%
-      600: Color(0xffcccccc), //70%
-      700: Color(0xffe6e6e6), //80%
-      800: Color(0xffffffff), //90%
-      900: Color(0xff000000), //100%
-    },
+class Themes {
+  static final ThemeData light = ThemeData(
+    scaffoldBackgroundColor: Colors.white,
+    colorScheme: const ColorScheme.light(
+      primary: Colors.black,
+      onPrimary: Colors.white,
+      secondary: Colors.black,
+    ),
+    cardTheme: const CardTheme(color: Colors.white),
+    iconTheme: const IconThemeData(color: Colors.black),
+    textTheme: ThemeData().textTheme.apply(
+          bodyColor: Colors.black,
+          displayColor: Colors.black,
+          decorationColor: Colors.black,
+        ),
+  );
+
+  static final ThemeData dark = ThemeData(
+    scaffoldBackgroundColor: Colors.black,
+    colorScheme: const ColorScheme.dark(
+      primary: Colors.white,
+      onPrimary: Colors.black,
+      secondary: Colors.white,
+    ),
+    cardTheme: const CardTheme(color: Colors.black),
+    iconTheme: const IconThemeData(color: Colors.white),
+    textTheme: ThemeData().textTheme.apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+          decorationColor: Colors.white,
+        ),
   );
 }
 

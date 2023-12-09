@@ -50,7 +50,7 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
                 const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'Thoughts out loud',
+                    'Random mind',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500,

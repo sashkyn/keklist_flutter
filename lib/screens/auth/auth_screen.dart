@@ -12,7 +12,7 @@ import 'package:keklist/constants.dart';
 import 'package:keklist/helpers/extensions/dispose_bag.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({super.key});
 
   @override
   AuthScreenState createState() => AuthScreenState();
@@ -56,13 +56,9 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Sign in',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16.0),
               Form(
@@ -71,7 +67,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                   validator: MultiValidator([
                     EmailValidator(errorText: 'Enter a valid email address'),
                     MinLengthValidator(4, errorText: 'Please enter email'),
-                  ]),
+                  ]).call,
                   controller: _loginTextEditingController,
                   keyboardType: TextInputType.emailAddress,
                   enableSuggestions: false,
@@ -85,7 +81,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
                 onPressed: () async {
                   if (_loginTextEditingController.text == KeklistConstants.demoAccountEmail) {
                     _displayTextInputDialog(
@@ -112,24 +108,20 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                     message: 'Please, go to your email app and open magic link',
                   );
                 },
-                child: const SizedBox(
+                child: SizedBox(
                   width: 100,
                   height: 44,
                   child: Center(
                       child: Text(
                     'Get magic link',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                   )),
                 ),
               ),
               const SizedBox(height: 24.0),
-              const Text(
+              Text(
                 'or continue with social networks:',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(context).textTheme.labelMedium,
               ),
               const SizedBox(height: 16.0),
               Row(
@@ -162,9 +154,9 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
               const SizedBox(height: 32.0),
               TextButton(
                 onPressed: () => launchUrlString(KeklistConstants.termsOfUseURL),
-                child: const Text(
+                child: Text(
                   'Terms of use',
-                  style: TextStyle(color: Colors.blue),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
               )
             ],

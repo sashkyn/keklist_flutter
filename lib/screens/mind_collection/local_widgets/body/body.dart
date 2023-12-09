@@ -60,7 +60,7 @@ class _Body extends StatelessWidget {
                   child: RoundedContainer(
                     border: isToday
                         ? Border.all(
-                            color: Colors.black.withOpacity(0.4),
+                            color: Theme.of(context).primaryColor.withOpacity(0.4),
                             width: 2.0,
                           )
                         : null,

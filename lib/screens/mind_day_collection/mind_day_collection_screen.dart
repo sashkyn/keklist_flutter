@@ -157,42 +157,34 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       ),
       body: Stack(
         children: [
-          GestureDetector(
-            onPanDown: (_) {
-              if (_mindCreatorFocusNode.hasFocus) {
-                _hideKeyboard();
-              }
-            },
-            child: BoolWidget(
-              condition: _isMindContentVisible,
-              trueChild: CustomScrollView(
-                slivers: [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    fillOverscroll: true,
-                    child: BoolWidget(
-                      condition: _isMindContentVisible,
-                      trueChild: MindMonologListWidget(
-                        minds: _dayMinds,
-                        onTap: (Mind mind) => _showMindInfo(mind),
-                        onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                        mindIdsToChildren: _mindIdsToChildren,
-                      ),
-                      falseChild: MindIconedListWidget(
-                        minds: _dayMinds,
-                        onTap: (Mind mind) => showOkAlertDialog(
-                          title: mind.emoji,
-                          message: mind.note,
-                          context: context,
-                        ),
-                        onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                        mindIdsToChildCount: null,
-                      ),
-                    ),
+          BoolWidget(
+            condition: _isMindContentVisible,
+            trueChild: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 150),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: BoolWidget(
+                condition: _isMindContentVisible,
+                trueChild: MindMonologListWidget(
+                  minds: _dayMinds,
+                  onTap: (Mind mind) => _showMindInfo(mind),
+                  onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                  mindIdsToChildren: _mindIdsToChildren,
+                ),
+                falseChild: MindIconedListWidget(
+                  minds: _dayMinds,
+                  onTap: (Mind mind) => showOkAlertDialog(
+                    title: mind.emoji,
+                    message: mind.note,
+                    context: context,
                   ),
-                ],
+                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
+                  mindIdsToChildCount: null,
+                ),
               ),
-              falseChild: SingleChildScrollView(
+            ),
+            falseChild: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 150),
+              child: SafeArea(
                 child: MindIconedListWidget(
                   minds: _dayMinds,
                   onTap: (Mind mind) => _showMindInfo(mind),
@@ -208,7 +200,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   height: 90,
                 ),
               ),

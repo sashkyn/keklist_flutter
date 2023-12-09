@@ -30,7 +30,6 @@ class _AppBar extends StatelessWidget {
             ],
           ),
         ),
-        backgroundColor: Colors.white,
       );
     } else {
       return AppBar(
@@ -39,9 +38,8 @@ class _AppBar extends StatelessWidget {
         actions: _makeAppBarActions(),
         title: GestureDetector(
           onTap: onTitle,
-          child: const Text('Minds'),
+          child: const Text('Keklist'),
         ),
-        backgroundColor: Colors.white,
       );
     }
   }
@@ -50,12 +48,10 @@ class _AppBar extends StatelessWidget {
     return [
       IconButton(
         icon: const Icon(Icons.calendar_month),
-        color: Colors.black,
         onPressed: onCalendar,
       ),
       IconButton(
         icon: const Icon(Icons.search),
-        color: Colors.black,
         onPressed: onSearch,
       ),
     ];

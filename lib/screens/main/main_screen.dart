@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -24,8 +25,8 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   int _tabSelectedIndex = 0;
 
   static final List<Widget> _mainScreens = [
-    const MindCollectionScreen(),
     const InsightsScreen(),
+    const MindCollectionScreen(),
     const SettingsScreen(),
   ];
 
@@ -35,6 +36,7 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
       if (state is SettingsAuthState && state.needToShowAuth) {
+        setState(() => _tabSelectedIndex = 1);
         _showAuthBottomSheet();
       }
     })?.disposed(by: this);
@@ -42,12 +44,12 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
 
   static const List<BottomNavigationBarItem> _items = [
     BottomNavigationBarItem(
-      icon: Icon(Icons.emoji_emotions),
-      label: 'Weeks',
+      icon: Icon(Icons.home),
+      label: 'Home',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.widgets),
-      label: 'Insights',
+      icon: Icon(Icons.calendar_month_rounded),
+      label: 'Keklist',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.settings),
@@ -59,7 +61,7 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 600 && constraints.maxHeight > 600) {
+        if (constraints.maxWidth > 600) {
           // iPad layout
           return Scaffold(
             body: Row(
@@ -67,14 +69,14 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                 BoolWidget(
                   condition: !_isAuthShowed,
                   trueChild: NavigationRail(
-                    destinations: _mainScreens.map(
-                      (screen) {
-                        final int index = _mainScreens.indexOf(screen);
+                    destinations: _items.mapIndexed(
+                      (index, item) {
                         return NavigationRailDestination(
-                          icon: _items[index].icon,
-                          label: Text(
-                            _items[index].label!,
+                          icon: Icon(
+                            (item.icon as Icon).icon,
+                            color: _tabSelectedIndex == index ? Theme.of(context).scaffoldBackgroundColor : null,
                           ),
+                          label: Text(item.label!),
                         );
                       },
                     ).toList(),
@@ -85,9 +87,13 @@ class _MainScreenState extends State<MainScreen> with DisposeBag {
                   ),
                   falseChild: const SizedBox.shrink(),
                 ),
-                const VerticalDivider(
-                  thickness: 1.0,
-                  width: 1.0,
+                BoolWidget(
+                  condition: !_isAuthShowed,
+                  trueChild: const VerticalDivider(
+                    thickness: 1.0,
+                    width: 0.2,
+                  ),
+                  falseChild: const SizedBox.shrink(),
                 ),
                 Flexible(
                   child: IndexedStack(

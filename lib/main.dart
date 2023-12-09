@@ -1,17 +1,15 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/helpers/extensions/dispose_bag.dart';
 import 'package:keklist/screens/main/main_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/services/hive/constants.dart';
 import 'package:keklist/services/hive/entities/mind/mind_object.dart';
 import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
@@ -28,7 +26,6 @@ import 'package:keklist/constants.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
 import 'package:keklist/services/main_service.dart';
-import 'package:workmanager/workmanager.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
 
@@ -37,7 +34,7 @@ Future<void> main() async {
 
   _setupWidgets();
   _setupBlockingLoadingWidget();
-  _setupOrientations();
+  // _setupOrientations();
 
   // Получение всех констант из .env файла.
   await dotenv.load(fileName: '.env');
@@ -102,51 +99,51 @@ Future<void> main() async {
 
 // TODO: вынести в отдельный сервис или блок
 // TODO: запрос только тех майндов, которые нужны с сервера.
-@pragma('vm:entry-point')
-void _updateTodayMindsInBackroundAndUpdateWidgets() {
-  Workmanager().executeTask((task, inputData) async {
-    print('widget updating started with $task');
-    if (task == 'update-today-minds') {
-      final MainService mainService = MainContainer().initialize(Injector()).get<MainService>();
-      final List<Mind> todayMinds = (await mainService.getMindList())
-          .where(
-            (element) => element.rootId == null && element.dayIndex == MindUtils.getTodayIndex(),
-          )
-          .toList(growable: false);
-      final List<String> todayMindJSONList = todayMinds
-          .map(
-            (mind) => json.encode(
-              mind,
-              toEncodable: (i) => mind.toShortJson(),
-            ),
-          )
-          .toList();
-      await HomeWidget.saveWidgetData(
-        'mind_today_widget_today_minds',
-        todayMindJSONList,
-      );
-      await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
-      print('widget success');
-      return Future.value(true);
-    } else {
-      return Future.value(true);
-    }
-  });
-}
+// @pragma('vm:entry-point')
+// void _updateTodayMindsInBackroundAndUpdateWidgets() {
+//   Workmanager().executeTask((task, inputData) async {
+//     print('widget updating started with $task');
+//     if (task == 'update-today-minds') {
+//       final MainService mainService = MainContainer().initialize(Injector()).get<MainService>();
+//       final List<Mind> todayMinds = (await mainService.getMindList())
+//           .where(
+//             (element) => element.rootId == null && element.dayIndex == MindUtils.getTodayIndex(),
+//           )
+//           .toList(growable: false);
+//       final List<String> todayMindJSONList = todayMinds
+//           .map(
+//             (mind) => json.encode(
+//               mind,
+//               toEncodable: (i) => mind.toShortJson(),
+//             ),
+//           )
+//           .toList();
+//       await HomeWidget.saveWidgetData(
+//         'mind_today_widget_today_minds',
+//         todayMindJSONList,
+//       );
+//       await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
+//       print('widget success');
+//       return Future.value(true);
+//     } else {
+//       return Future.value(true);
+//     }
+//   });
+// }
 
 void _setupWidgets() {
   HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
-  Workmanager().initialize(
-    _updateTodayMindsInBackroundAndUpdateWidgets,
-    isInDebugMode: !kReleaseMode,
-  );
-  Workmanager().registerOneOffTask(
-    'update-today-minds', // Shared task name.
-    'updateTodayMinds', // Only Android supported.
-    constraints: Constraints(
-      networkType: NetworkType.connected,
-    ),
-  );
+  // Workmanager().initialize(
+  //   _updateTodayMindsInBackroundAndUpdateWidgets,
+  //   isInDebugMode: !kReleaseMode,
+  // );
+  // Workmanager().registerOneOffTask(
+  //   'update-today-minds', // Shared task name.
+  //   'updateTodayMinds', // Only Android supported.
+  //   constraints: Constraints(
+  //     networkType: NetworkType.connected,
+  //   ),
+  // );
 }
 
 void _setupBlockingLoadingWidget() {
@@ -182,13 +179,6 @@ Future<void> _setupHive() async {
   await Hive.openBox<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
 }
 
-void _setupOrientations() {
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-}
-
 class KeklistApp extends StatefulWidget {
   const KeklistApp({super.key});
 
@@ -196,21 +186,30 @@ class KeklistApp extends StatefulWidget {
   State<KeklistApp> createState() => KeklistAppState();
 }
 
-class KeklistAppState extends State<KeklistApp> {
+class KeklistAppState extends State<KeklistApp> with DisposeBag {
+
+  bool _isDarkMode = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    subscribeTo<SettingsBloc>(onNewState: (state) {
+      if (state is SettingsDataState) {
+        setState(() => _isDarkMode = state.isDarkMode);
+      }
+    })?.disposed(by: this);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: MaterialApp(
-        title: 'Keklist',
-        home: const MainScreen(),
-        theme: ThemeData(
-          primarySwatch: Palette.swatch,
-          useMaterial3: true,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        builder: EasyLoading.init(),
-      ),
+    return MaterialApp(
+      title: 'Keklist',
+      home: const MainScreen(),
+      theme: _isDarkMode ? Themes.dark : Themes.light,
+      darkTheme: Themes.dark,
+      themeMode: ThemeMode.light,
+      builder: EasyLoading.init(),
     );
   }
 }

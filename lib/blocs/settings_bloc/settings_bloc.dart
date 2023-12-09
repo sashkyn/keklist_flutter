@@ -32,6 +32,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           SettingsDataState(
             isMindContentVisible: true,
             isOfflineMode: false,
+            isDarkMode: true,
           ),
         ) {
     _lastSettingsState = state as SettingsDataState;
@@ -43,6 +44,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsGet>(_getSettings);
     on<SettingsNeedToShowAuth>(_showAuth);
     on<SettingGetWhatsNew>(_sendWhatsNewIfNeeded);
+    on<SettingsChangeIsDarkMode>(_changeSettingsDarkMode);
   }
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
@@ -63,11 +65,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
     final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
     final bool isOfflineMode = settingsObject?.isOfflineMode ?? false;
+    final bool isDarkMode = settingsObject?.isDarkMode ?? false;
     _emitAndSaveDataState(
       emit,
       SettingsDataState(
         isMindContentVisible: isMindContentVisible,
         isOfflineMode: isOfflineMode,
+        isDarkMode: isDarkMode,
       ),
     );
 
@@ -120,6 +124,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     // Cбор и отправка стейта показа Auth.
     final bool needToShowAuth = !_lastSettingsState.isOfflineMode && client.auth.currentUser == null;
     emit(SettingsAuthState(needToShowAuth));
+  }
+
+  FutureOr<void> _changeSettingsDarkMode(SettingsChangeIsDarkMode event, Emitter<SettingsState> emit) {
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.isDarkMode = event.isDarkMode;
+    settingsObject?.save();
+
+    emit(_lastSettingsState.copyWith(isDarkMode: event.isDarkMode));
   }
 
   void _showAuth(SettingsNeedToShowAuth event, Emitter<SettingsState> emit) {
