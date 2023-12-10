@@ -56,7 +56,7 @@ With Keklist I'm trying to resolve this kind of problems. Firstly, I'm trying to
 // TODO: write an instruction
 
 # How to support?
-- Reach me in [Telegram](t.me/sashkyn) or by email sashkn2@gmail.com
+- Reach me in [Telegram](https://t.me/sashkyn) or by email sashkn2@gmail.com
 - You are more than welcome for issues, proposals and PRs
 
 # Stack
