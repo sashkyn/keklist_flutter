@@ -10,10 +10,12 @@ import 'package:keklist/widgets/rounded_container.dart';
 
 class InsightsRandomMindWidget extends StatefulWidget {
   final List<Mind> allMinds;
+  final Function(Mind) onTapToMind;
 
   const InsightsRandomMindWidget({
     super.key,
     required this.allMinds,
+    required this.onTapToMind,
   });
 
   @override
@@ -34,6 +36,7 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
     final Mind randomMind = widget.allMinds[nextInt];
 
     return GestureDetector(
+      onTap: () => widget.onTapToMind(randomMind),
       onDoubleTap: () {
         setState(() {
           nextInt = _random.nextInt(listLenght);

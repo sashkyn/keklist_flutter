@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -48,6 +49,8 @@ class PlatformConstants {
   static String iosGroupId = 'group.kekable';
   static String iosMindDayWidgetName = 'MindDayWidget';
 }
+
+enum SupportedPlatform { iOS, android, web }
 
 class KeklistConstants {
   static String demoAccountEmail = dotenv.get('DEMO_ACCOUNT_EMAIL');

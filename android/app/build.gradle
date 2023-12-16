@@ -50,8 +50,8 @@ android {
         applicationId "com.sashkyn.emodzen"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34
+        minSdkVersion 24
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -65,9 +65,11 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
+    android {
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }

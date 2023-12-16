@@ -45,6 +45,7 @@ class AuthButton extends StatelessWidget {
             type.iconAsset,
             width: 35.0,
             height: 35.0,
+            colorFilter: type == AuthButtonType.apple ? ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn) : null,
           ),
         ),
       ),

@@ -49,9 +49,8 @@ Future<void> main() async {
   await Supabase.initialize(
     url: dotenv.get('SUPABASE_URL'),
     anonKey: dotenv.get('SUPABASE_ANON_KEY'),
-    authCallbackUrlHostname: 'login-callback',
+    authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
     debug: !kReleaseMode,
-    storageRetryAttempts: 5,
   );
 
   // Инициализация DI-контейнера.
@@ -187,7 +186,6 @@ class KeklistApp extends StatefulWidget {
 }
 
 class KeklistAppState extends State<KeklistApp> with DisposeBag {
-
   bool _isDarkMode = true;
 
   @override

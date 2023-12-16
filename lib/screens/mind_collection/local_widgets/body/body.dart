@@ -25,64 +25,66 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: extract searching widget
-    if (isSearching) {
-      return MindSearchResultListWidget(
+    return BoolWidget(
+      condition: !isSearching,
+      falseChild: MindSearchResultListWidget(
         results: searchResults,
-        onPanDown: () => hideKeyboard(),
-      );
-    }
+        onTapToMind: (mind) => () {
+          hideKeyboard();
+          onTapToDay(mind.dayIndex);
+        },
+      ),
+      trueChild: GestureDetector(
+        onPanDown: (_) => hideKeyboard(),
+        child: ScrollablePositionedList.builder(
+          padding: const EdgeInsets.only(top: 16.0),
+          itemCount: 99999999999,
+          itemScrollController: itemScrollController,
+          itemPositionsListener: itemPositionsListener,
+          itemBuilder: (_, int dayIndex) {
+            final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
 
-    return GestureDetector(
-      onPanDown: (_) => hideKeyboard(),
-      child: ScrollablePositionedList.builder(
-        padding: const EdgeInsets.only(top: 16.0),
-        itemCount: 99999999999,
-        itemScrollController: itemScrollController,
-        itemPositionsListener: itemPositionsListener,
-        itemBuilder: (_, int dayIndex) {
-          final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
-
-          final bool isToday = dayIndex == getNowDayIndex();
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 18.0),
-              Text(
-                _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
-                style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
-              ),
-              const SizedBox(height: 4.0),
-              GestureDetector(
-                onTap: () => onTapToDay(dayIndex),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: RoundedContainer(
-                    border: isToday
-                        ? Border.all(
-                            color: Theme.of(context).primaryColor.withOpacity(0.4),
-                            width: 2.0,
-                          )
-                        : null,
-                    child: BoolWidget(
-                      condition: minds.isEmpty,
-                      trueChild: BoolWidget(
-                        condition: dayIndex < getNowDayIndex(),
-                        trueChild: MindCollectionEmptyDayWidget.past(),
-                        falseChild: BoolWidget(
-                          condition: dayIndex > getNowDayIndex(),
-                          trueChild: MindCollectionEmptyDayWidget.future(),
-                          falseChild: MindCollectionEmptyDayWidget.present(),
+            final bool isToday = dayIndex == getNowDayIndex();
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 18.0),
+                Text(
+                  _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
+                  style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
+                ),
+                const SizedBox(height: 4.0),
+                GestureDetector(
+                  onTap: () => onTapToDay(dayIndex),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: RoundedContainer(
+                      border: isToday
+                          ? Border.all(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                              width: 2.0,
+                            )
+                          : null,
+                      child: BoolWidget(
+                        condition: minds.isEmpty,
+                        trueChild: BoolWidget(
+                          condition: dayIndex < getNowDayIndex(),
+                          trueChild: MindCollectionEmptyDayWidget.past(),
+                          falseChild: BoolWidget(
+                            condition: dayIndex > getNowDayIndex(),
+                            trueChild: MindCollectionEmptyDayWidget.future(),
+                            falseChild: MindCollectionEmptyDayWidget.present(),
+                          ),
                         ),
+                        falseChild: MindRowsWidget(minds: minds),
                       ),
-                      falseChild: MindRowsWidget(minds: minds),
                     ),
                   ),
-                ),
-              )
-            ],
-          );
-        },
+                )
+              ],
+            );
+          },
+        ),
       ),
     );
   }
