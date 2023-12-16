@@ -64,10 +64,7 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
                     StaggeredGridTile.fit(
                       crossAxisCellCount: crossAxisCellCount,
                       child: GestureDetector(
-                        onTap: () => _showDayCollectionScreen(
-                          groupDayIndex: MindUtils.getTodayIndex(),
-                          initialError: null,
-                        ),
+                        onTap: () => _showDayCollectionScreen(groupDayIndex: MindUtils.getTodayIndex()),
                         child: InsightsTodayMindsWidget(
                           todayMinds: MindUtils.findTodayMinds(allMinds: _minds),
                         ),
@@ -75,7 +72,10 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
                     ),
                     StaggeredGridTile.fit(
                       crossAxisCellCount: crossAxisCellCount,
-                      child: InsightsRandomMindWidget(allMinds: _minds),
+                      child: InsightsRandomMindWidget(
+                        allMinds: _minds,
+                        onTapToMind: (mind) => _showDayCollectionScreen(groupDayIndex: mind.dayIndex),
+                      ),
                     ),
                     StaggeredGridTile.fit(
                       crossAxisCellCount: crossAxisCellCount,
@@ -97,7 +97,7 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
 
   void _showDayCollectionScreen({
     required int groupDayIndex,
-    required MindOperationError? initialError,
+    MindOperationError? initialError,
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
