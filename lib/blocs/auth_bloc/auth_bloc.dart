@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:keklist/services/main_service.dart';
 
@@ -65,11 +68,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   Future<void> _authWithSocialNetwork(event, emit) async {
     switch (event.socialNetwork) {
       case SocialNetwork.google:
-        return _signInWithWebOAuth(Provider.google);
+        return _signInWithWebOAuth(OAuthProvider.google);
       case SocialNetwork.facebook:
-        return _signInWithWebOAuth(Provider.facebook);
+        return _signInWithWebOAuth(OAuthProvider.facebook);
       case SocialNetwork.apple:
-        return _signInWithWebOAuth(Provider.apple);
+        return _signInWithWebOAuth(OAuthProvider.apple);
     }
   }
 
@@ -84,7 +87,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   //   super.emit(state);
   // }
 
-  Future<void> _signInWithWebOAuth(Provider provider) async {
+  Future<void> _signInWithWebOAuth(OAuthProvider provider) async {
+    if (provider == OAuthProvider.apple) {
+      await _signInWithApple();
+      return;
+    }
+
     final OAuthResponse result = await client.auth.getOAuthSignInUrl(
       provider: provider,
       redirectTo: 'io.supabase.zenmode://login-callback/',
@@ -105,11 +113,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     );
 
     // NOTE: теперь можно делать, но окошко с браузером не закрывается автоматически. Нужно понять почему...
-    // await client.auth.signInWithOAuth(
-    //   provider,
-    //   authScreenLaunchMode: LaunchMode.inAppWebView,
-    //   redirectTo: 'io.supabase.zenmode://login-callback/',
-    // );
+    // await client.auth.signInWithOAuth(provider);
+  }
+
+  Future<AuthResponse> _signInWithApple() async {
+    final rawNonce = client.auth.generateRawNonce();
+    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [AppleIDAuthorizationScopes.email],
+      nonce: hashedNonce,
+    );
+
+    final idToken = credential.identityToken;
+    if (idToken == null) {
+      throw const AuthException('Could not find ID Token from generated credential.');
+    }
+
+    return client.auth.signInWithIdToken(
+      provider: OAuthProvider.apple,
+      idToken: idToken,
+      nonce: rawNonce,
+    );
   }
 
   @override

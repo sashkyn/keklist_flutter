@@ -10,7 +10,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/helpers/bloc_utils.dart';
 import 'package:keklist/screens/auth/widgets/auth_button.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:keklist/constants.dart';

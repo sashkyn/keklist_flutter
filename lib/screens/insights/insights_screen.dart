@@ -10,6 +10,7 @@ import 'package:keklist/screens/insights/widgets/insights_today_minds_widget.dar
 import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/widgets/bool_widget.dart';
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
@@ -52,36 +53,40 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
           builder: (BuildContext context, BoxConstraints constraints) {
             final int crossAxisCount = constraints.maxWidth > 600 ? 4 : 3;
             final int crossAxisCellCount = constraints.maxWidth > 600 ? 2 : 3;
-            return SingleChildScrollView(
-              child: StaggeredGrid.count(
-                axisDirection: AxisDirection.down,
-                crossAxisCount: crossAxisCount,
-                children: [
-                  StaggeredGridTile.fit(
-                    crossAxisCellCount: crossAxisCellCount,
-                    child: GestureDetector(
-                      onTap: () => _showDayCollectionScreen(
-                        groupDayIndex: MindUtils.getTodayIndex(),
-                        initialError: null,
-                      ),
-                      child: InsightsTodayMindsWidget(
-                        todayMinds: MindUtils.findTodayMinds(allMinds: _minds),
+            return BoolWidget(
+              condition: _minds.isNotEmpty,
+              falseChild: const SizedBox.shrink(),
+              trueChild: SingleChildScrollView(
+                child: StaggeredGrid.count(
+                  axisDirection: AxisDirection.down,
+                  crossAxisCount: crossAxisCount,
+                  children: [
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: crossAxisCellCount,
+                      child: GestureDetector(
+                        onTap: () => _showDayCollectionScreen(
+                          groupDayIndex: MindUtils.getTodayIndex(),
+                          initialError: null,
+                        ),
+                        child: InsightsTodayMindsWidget(
+                          todayMinds: MindUtils.findTodayMinds(allMinds: _minds),
+                        ),
                       ),
                     ),
-                  ),
-                  StaggeredGridTile.fit(
-                    crossAxisCellCount: crossAxisCellCount,
-                    child: InsightsRandomMindWidget(allMinds: _minds),
-                  ),
-                  StaggeredGridTile.fit(
-                    crossAxisCellCount: crossAxisCellCount,
-                    child: InsightsPieWidget(allMinds: _minds),
-                  ),
-                  StaggeredGridTile.fit(
-                    crossAxisCellCount: crossAxisCellCount,
-                    child: InsightsTopChartWidget(allMinds: _minds),
-                  ),
-                ],
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: crossAxisCellCount,
+                      child: InsightsRandomMindWidget(allMinds: _minds),
+                    ),
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: crossAxisCellCount,
+                      child: InsightsPieWidget(allMinds: _minds),
+                    ),
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: crossAxisCellCount,
+                      child: InsightsTopChartWidget(allMinds: _minds),
+                    ),
+                  ],
+                ),
               ),
             );
           },
