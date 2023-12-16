@@ -100,20 +100,15 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
                 _hideKeyboard();
               }
             },
-            child: CustomScrollView(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 150),
               controller: _scrollController,
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  fillOverscroll: true,
-                  child: MindMonologListWidget(
-                    minds: emojiMinds,
-                    onTap: (Mind mind) => _showMindInfo(mind),
-                    onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                    mindIdsToChildren: null,
-                  ),
-                ),
-              ],
+              child: MindMonologListWidget(
+                minds: emojiMinds,
+                onTap: (Mind mind) => _showMindInfo(mind),
+                onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                mindIdsToChildren: null,
+              ),
             ),
           ),
           Stack(
@@ -122,7 +117,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   height: 90,
                 ),
               ),
