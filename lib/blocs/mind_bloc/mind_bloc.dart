@@ -103,7 +103,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
 
-      final Future<dynamic> transaction = _service.getMindList().then((Iterable<Mind> serverMinds) {
+      await _service.getMindList().then((Iterable<Mind> serverMinds) {
         // Обновляем локальное хранилище.
         _mindBox.putAll(
           Map.fromEntries(
@@ -133,12 +133,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         },
       );
 
-      await _addTransactionToQueue(
-        QueueTransactionObject(
-          debugName: 'getMindList',
-          transaction: transaction,
-        ),
-      );
+      // await _addTransactionToQueue(
+      //   QueueTransactionObject(
+      //     debugName: 'getMindList',
+      //     transaction: transaction,
+      //   ),
+      // );
     }
   }
 
@@ -164,7 +164,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
       // Добавляем на сервере.
-      final Future<void> transaction = _service.createMind(mind).then((value) {
+      await _service.createMind(mind).then((value) {
         object
           ..isUploadedToServer = true
           ..save();
@@ -185,12 +185,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       });
 
-      await _addTransactionToQueue(
-        QueueTransactionObject(
-          debugName: 'createMind',
-          transaction: transaction,
-        ),
-      );
+      // await _addTransactionToQueue(
+      //   QueueTransactionObject(
+      //     debugName: 'createMind',
+      //     transaction: transaction,
+      //   ),
+      // );
     }
   }
 
@@ -211,7 +211,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
       // Удаляем на сервере.
-      final Future<void> transaction = _service.deleteMind(event.uuid).then((_) {
+      await _service.deleteMind(event.uuid).then((_) {
         emit(
           MindOperationCompleted(
             minds: [mindToDelete],
@@ -234,12 +234,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       });
 
-      await _addTransactionToQueue(
-        QueueTransactionObject(
-          debugName: 'deleteMind',
-          transaction: transaction,
-        ),
-      );
+      // await _addTransactionToQueue(
+      //   QueueTransactionObject(
+      //     debugName: 'deleteMind',
+      //     transaction: transaction,
+      //   ),
+      // );
     }
   }
 
@@ -346,7 +346,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       );
 
       // Редактируем на сервере.
-      final Future<void> transaction = _service.editMind(mind: event.mind).then((_) {
+      await _service.editMind(mind: event.mind).then((_) {
         emit(
           MindOperationCompleted(
             minds: [event.mind],
@@ -368,12 +368,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         },
       );
 
-      await _addTransactionToQueue(
-        QueueTransactionObject(
-          debugName: 'editMind',
-          transaction: transaction,
-        ),
-      );
+      // await _addTransactionToQueue(
+      //   QueueTransactionObject(
+      //     debugName: 'editMind',
+      //     transaction: transaction,
+      //   ),
+      // );
     }
   }
 
@@ -394,7 +394,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         type: MindOperationType.deleteAll,
       ),
     );
-    final Future<void> transaction = _service.deleteAllMinds().then(
+    await _service.deleteAllMinds().then(
       (_) async {
         _mindBox.values.map((object) => object
           ..isUploadedToServer = false
@@ -416,12 +416,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       },
     );
-    await _addTransactionToQueue(
-      QueueTransactionObject(
-        debugName: 'deleteAllMinds',
-        transaction: transaction,
-      ),
-    );
+    // await _addTransactionToQueue(
+    //   QueueTransactionObject(
+    //     debugName: 'deleteAllMinds',
+    //     transaction: transaction,
+    //   ),
+    // );
   }
 
   Future<void> _clearCache(MindClearCache event, Emitter<MindState> emit) async {
@@ -454,11 +454,9 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     MindUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    // INFO: здесь листы потому что видимо в листах присутствуют ссылки на объекты а он не создает новых,
-    // хз надо разобраться
-    final Iterable<MindObject> objects =
+    final Iterable<MindObject> mindObjects =
         _mindBox.values.where((MindObject mind) => !mind.isUploadedToServer).toList(growable: false);
-    final Iterable<Mind> uploadCandidates = objects.map((MindObject mind) => mind.toMind()).toList(growable: false);
+    final Iterable<Mind> uploadCandidates = mindObjects.map((MindObject mind) => mind.toMind()).toList(growable: false);
     emit(
       MindServerOperationStarted(
         minds: uploadCandidates,
@@ -466,30 +464,9 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       ),
     );
 
-    final Iterable<Mind> refreshedUploadCandidates =
-        uploadCandidates.map((Mind mind) => mind.copyWith(id: const Uuid().v4())).toList(growable: false);
+    final Iterable<Mind> rootMinds = uploadCandidates.where((Mind mind) => mind.rootId == null);
 
-    final Future<void> transaction = _service.addAllMinds(values: refreshedUploadCandidates).then(
-      (_) async {
-        await _mindBox.deleteAll(uploadCandidates.map((Mind mind) => mind.id));
-
-        final Map<String, MindObject> refreshedCandidateObjects = refreshedUploadCandidates.fold({}, (
-          Map<String, MindObject> map,
-          Mind mind,
-        ) {
-          map[mind.id] = mind.toObject(isUploadedToServer: true);
-          return map;
-        });
-        await _mindBox.putAll(refreshedCandidateObjects);
-
-        emit(
-          MindOperationCompleted(
-            minds: refreshedUploadCandidates,
-            type: MindOperationType.uploadCachedData,
-          ),
-        );
-      },
-    ).onError(
+    final Future<void> uploadRootTasks = _service.addAllMinds(values: rootMinds).onError(
       (error, _) {
         emit(
           MindOperationError(
@@ -500,12 +477,52 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       },
     );
 
-    _addTransactionToQueue(
-      QueueTransactionObject(
-        debugName: 'addAllMinds',
-        transaction: transaction,
-      ),
+    final Iterable<Mind> notRootMinds = uploadCandidates.where((Mind mind) => mind.rootId != null);
+
+    final Future<void> uploadNonRootTasks = _service.addAllMinds(values: notRootMinds).onError(
+      (error, _) {
+        emit(
+          MindOperationError(
+            minds: uploadCandidates,
+            notCompleted: MindOperationType.uploadCachedData,
+          ),
+        );
+      },
     );
+
+    await uploadRootTasks.then((_) async {
+      await uploadNonRootTasks.then((_) async {
+        await _mindBox.deleteAll(uploadCandidates.map((Mind mind) => mind.id));
+        final Map<String, MindObject> refreshedCandidateMindObjects = uploadCandidates.fold({}, (
+          Map<String, MindObject> map,
+          Mind mind,
+        ) {
+          map[mind.id] = mind.toObject(isUploadedToServer: true);
+          return map;
+        });
+        await _mindBox.putAll(refreshedCandidateMindObjects);
+        emit(
+          MindOperationCompleted(
+            minds: uploadCandidates,
+            type: MindOperationType.uploadCachedData,
+          ),
+        );
+      }).onError((error, _) {
+        emit(
+          MindOperationError(
+            minds: uploadCandidates,
+            notCompleted: MindOperationType.uploadCachedData,
+          ),
+        );
+      });
+    }).onError((error, _) {
+      emit(
+        MindOperationError(
+          minds: uploadCandidates,
+          notCompleted: MindOperationType.uploadCachedData,
+        ),
+      );
+    });
   }
 
   Future<void> _getUploadCandidates(
@@ -529,12 +546,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  Future<void> _addTransactionToQueue(QueueTransactionObject transaction) async {
-    // TODO: выполнять транзакции в очереди в MindTransactionBloc.
-    await transaction.transaction;
+  // Future<void> _addTransactionToQueue(QueueTransactionObject transaction) async {
+  //   // TODO: выполнять транзакции в очереди в MindTransactionBloc.
+  //   await transaction.transaction;
 
-    // _mindQueueTransactionsBox.add(transaction);
-  }
+  //   // _mindQueueTransactionsBox.add(transaction);
+  // }
 
   Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
     final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());

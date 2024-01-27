@@ -127,6 +127,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
               setState(() => _updating = false);
             }
 
+            // TODO: сделать единый центр обработки блокирующих событий UI-ных
             // Показ ошибки.
             if (MindOperationType.values
                 .where(

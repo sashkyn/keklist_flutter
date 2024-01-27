@@ -52,7 +52,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final Iterable<Mind> minds = _mindsBox.values.map((mindObject) => mindObject.toMind());
     // Конвертация в CSV и шаринг.
     final List<List<String>> csvEntryList = minds.map((entry) => entry.toCSVEntry()).toList(growable: false);
-    final String csv = const ListToCsvConverter().convert(csvEntryList);
+    final String csv = const ListToCsvConverter(fieldDelimiter: ';').convert(csvEntryList);
     final Directory temporaryDirectory = await getTemporaryDirectory();
     final File csvFile = File('${temporaryDirectory.path}/user_data.csv'); // TODO: добавить дату в название файла.
     await csvFile.writeAsString(csv);

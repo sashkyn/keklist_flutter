@@ -19,7 +19,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   emojis: ^0.9.9
   equatable: ^2.0.5
-  fast_immutable_collections: ^9.1.1
+  fast_immutable_collections: ^10.0.0
   fl_chart: ^0.65.0
   flutter:
     sdk: flutter

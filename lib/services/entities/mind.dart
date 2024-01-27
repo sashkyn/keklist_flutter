@@ -70,6 +70,7 @@ class Mind with EquatableMixin {
         dayIndex.toString(),
         sortIndex.toString(),
         creationDate.toString(),
+        rootId?.toString() ?? "null",
       ];
 
   Mind copyWith({

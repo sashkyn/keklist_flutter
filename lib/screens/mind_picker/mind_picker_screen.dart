@@ -7,9 +7,9 @@ class MindPickerScreen extends StatefulWidget {
   final Function(String) onSelect;
 
   const MindPickerScreen({
-    Key? key,
+    super.key,
     required this.onSelect,
-  }) : super(key: key);
+  });
 
   @override
   MindPickerScreenState createState() => MindPickerScreenState();
