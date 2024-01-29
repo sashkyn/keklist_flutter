@@ -75,7 +75,7 @@ With Keklist I'm trying to resolve this kind of problems. Firstly, I'm trying to
 - bloc
 - iOS/Swift
 - Supabase
-## Third party
+## Dependencies
 | Dependency                          | Reason                                                          |
 | ----------------------------------- | --------------------------------------------------------------- |
 | flutter                             | Flutter SDK                                                     |
