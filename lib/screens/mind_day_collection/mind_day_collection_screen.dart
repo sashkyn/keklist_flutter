@@ -17,7 +17,7 @@ import 'package:keklist/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bottom_bar.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 
@@ -37,13 +37,15 @@ final class MindDayCollectionScreen extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State<MindDayCollectionScreen> createState() => _MindDayCollectionScreenState(
         dayIndex: initialDayIndex,
-        allMinds: allMinds.mySortedBy((e) => e.sortIndex),
+        allMinds: allMinds.sortedBySortIndex(),
       );
 }
 
 final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen> with DisposeBag {
   int dayIndex;
   final List<Mind> allMinds;
+
+  final ScrollController _scrollController = ScrollController();
 
   List<Mind> get _dayMinds => MindUtils.findMindsByDayIndex(
         dayIndex: dayIndex,
@@ -105,7 +107,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((e) => e.sortIndex));
+            ..addAll(state.values.sortedBySortIndex());
         });
       } else if (state is MindSuggestions) {
         setState(() {
@@ -136,12 +138,14 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           IconButton(
             icon: const Icon(Icons.calendar_month),
             onPressed: () async {
-              final int? changedDay = await _showDateSwitcherToNewDay();
-              if (changedDay == null) {
+              final int? selectedDayIndex = await _showDateSwitcherToNewDay();
+              if (selectedDayIndex == null) {
                 return;
               }
               setState(() {
-                dayIndex = changedDay;
+                dayIndex = selectedDayIndex;
+                _hideKeyboard();
+                _scrollController.jumpTo(0);
               });
             },
           ),
@@ -160,6 +164,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           BoolWidget(
             condition: _isMindContentVisible,
             trueChild: SingleChildScrollView(
+              controller: _scrollController,
               padding: const EdgeInsets.only(bottom: 150),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: BoolWidget(
@@ -183,7 +188,9 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               ),
             ),
             falseChild: SingleChildScrollView(
+              controller: _scrollController,
               padding: const EdgeInsets.only(bottom: 150),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: SafeArea(
                 child: MindIconedListWidget(
                   minds: _dayMinds,
@@ -207,7 +214,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  MindCreatorBar(
+                  MindCreatorBottomBar(
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
@@ -401,11 +408,12 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       borderRadius: BorderRadius.circular(15),
     );
 
-    if (dates?.firstOrNull == null) {
+    final DateTime? selectedDateTime = dates?.firstOrNull;
+    if (selectedDateTime == null) {
       return null;
     }
 
-    final int dayIndex = MindUtils.getDayIndex(from: dates!.first!);
+    final int dayIndex = MindUtils.getDayIndex(from: selectedDateTime);
     return dayIndex;
   }
 

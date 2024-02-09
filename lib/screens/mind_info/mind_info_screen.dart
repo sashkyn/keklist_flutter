@@ -8,7 +8,7 @@ import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/helpers/bloc_utils.dart';
 import 'package:keklist/helpers/extensions/dispose_bag.dart';
 import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
 
@@ -119,7 +119,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  MindCreatorBar(
+                  MindCreatorBottomBar(
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,

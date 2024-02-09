@@ -75,7 +75,7 @@ class _Body extends StatelessWidget {
                             falseChild: MindCollectionEmptyDayWidget.present(),
                           ),
                         ),
-                        falseChild: MindRowsWidget(minds: minds),
+                        falseChild: MindRowWidget(minds: minds),
                       ),
                     ),
                   ),
