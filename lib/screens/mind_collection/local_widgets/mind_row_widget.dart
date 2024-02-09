@@ -15,7 +15,7 @@ class MindRowWidget extends StatelessWidget {
         children: [
           Text(
             minds.map((e) => e.emoji).join(' '),
-            style: const TextStyle(fontSize: 50.0),
+            style: const TextStyle(fontSize: 40.0),
             textAlign: TextAlign.center,
           ),
         ],

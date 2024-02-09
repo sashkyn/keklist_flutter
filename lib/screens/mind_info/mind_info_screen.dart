@@ -61,7 +61,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((mind) => mind.creationDate));
+            ..addAll(state.values.sortedByCreationDate());
         });
       }
     })?.disposed(by: this);
@@ -114,7 +114,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  height: 90,
+                  height: 60,
                 ),
               ),
               Column(

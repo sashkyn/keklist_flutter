@@ -127,6 +127,10 @@ extension ListIterable<E> on Iterable<E> {
     );
 }
 
-extension MindListExtension on Iterable<Mind> {
+extension MindListIndexSortExtension on Iterable<Mind> {
   List<Mind> sortedBySortIndex() => mySortedBy((it) => it.sortIndex);
+}
+
+extension MindListCreationDateSortExtension on Iterable<Mind> {
+  List<Mind> sortedByCreationDate() => mySortedBy((it) => it.creationDate);
 }
