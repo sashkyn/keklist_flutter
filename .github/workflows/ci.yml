@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: TELEGRAM_LOGGER
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
@@ -35,7 +35,7 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
@@ -43,7 +43,7 @@ jobs:
             [CI] ✅ - Analyze & Test
 
       - name: Sending error message to Dev channel if needed
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
@@ -80,7 +80,7 @@ jobs:
           subdirectory: "ios"
 
       - name: Sending error message to Dev channel if needed
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ success() }}
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
             [CI] ✅ - iOS
 
       - name: Sending error message to Dev channel if needed
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
@@ -138,7 +138,7 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
@@ -146,7 +146,7 @@ jobs:
             [CI] ✅ - Android
 
       - name: Sending error message to Dev channel if needed
-        uses: lienminhquang/telegram_action@v1
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
