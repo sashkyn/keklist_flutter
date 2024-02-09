@@ -72,7 +72,6 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0"
-          bundler-cache: true
           working-directory: "ios"
 
       - uses: maierj/fastlane-action@v3.0.0
