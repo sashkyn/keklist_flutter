@@ -38,6 +38,9 @@ jobs:
           token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           message: |
             [CI] ✅ - Analyze & Test
+      
+      - name: Decode main .env file
+        run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
 
       - name: Sending error message to Dev channel if needed
         uses: appleboy/telegram-action@master
