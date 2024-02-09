@@ -83,7 +83,7 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - \
+    - .env
     - assets/auth_icons/
   fonts:
     - family: NotoColorEmoji
