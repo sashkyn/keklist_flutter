@@ -102,7 +102,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     );
 
     // NOTE: теперь можно делать, но окошко с браузером не закрывается автоматически. Нужно понять почему...
-    // await client.auth.signInWithOAuth(provider);
+    // NOTE: пока не понятно, как открывать это в боттом шите :(
+    // await client.auth.signInWithOAuth(
+    //   provider,
+    //   redirectTo: 'io.supabase.zenmode',
+    //   authScreenLaunchMode: LaunchMode.inAppBrowserView,
+    // );
   }
 
   Future<AuthResponse> _signInWithApple() async {

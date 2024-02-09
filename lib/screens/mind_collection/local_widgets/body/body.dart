@@ -42,8 +42,7 @@ class _Body extends StatelessWidget {
           itemScrollController: itemScrollController,
           itemPositionsListener: itemPositionsListener,
           itemBuilder: (_, int dayIndex) {
-            final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
-
+            final List<Mind> minds = mindsByDayIndex[dayIndex]?.sortedBySortIndex() ?? [];
             final bool isToday = dayIndex == getNowDayIndex();
             return Column(
               mainAxisSize: MainAxisSize.min,
