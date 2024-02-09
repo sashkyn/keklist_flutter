@@ -76,17 +76,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     }
   }
 
-  // @override
-  // void emit(AuthState state) {
-  //   print('----------');
-  //   print('emit old state ${this.state}');
-  //   print('emit new state ${state}');
-  //   print('emit ${this.state == state}');
-
-  //   // ignore: invalid_use_of_visible_for_testing_member
-  //   super.emit(state);
-  // }
-
   Future<void> _signInWithWebOAuth(OAuthProvider provider) async {
     if (provider == OAuthProvider.apple) {
       await _signInWithApple();
