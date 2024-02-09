@@ -74,6 +74,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
       body: Stack(
         children: [
           SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.only(bottom: 150.0),
             child: SafeArea(
               child: Column(
