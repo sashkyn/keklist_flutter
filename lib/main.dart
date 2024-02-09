@@ -96,53 +96,8 @@ Future<void> main() async {
   runApp(application);
 }
 
-// TODO: вынести в отдельный сервис или блок
-// TODO: запрос только тех майндов, которые нужны с сервера.
-// @pragma('vm:entry-point')
-// void _updateTodayMindsInBackroundAndUpdateWidgets() {
-//   Workmanager().executeTask((task, inputData) async {
-//     print('widget updating started with $task');
-//     if (task == 'update-today-minds') {
-//       final MainService mainService = MainContainer().initialize(Injector()).get<MainService>();
-//       final List<Mind> todayMinds = (await mainService.getMindList())
-//           .where(
-//             (element) => element.rootId == null && element.dayIndex == MindUtils.getTodayIndex(),
-//           )
-//           .toList(growable: false);
-//       final List<String> todayMindJSONList = todayMinds
-//           .map(
-//             (mind) => json.encode(
-//               mind,
-//               toEncodable: (i) => mind.toShortJson(),
-//             ),
-//           )
-//           .toList();
-//       await HomeWidget.saveWidgetData(
-//         'mind_today_widget_today_minds',
-//         todayMindJSONList,
-//       );
-//       await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
-//       print('widget success');
-//       return Future.value(true);
-//     } else {
-//       return Future.value(true);
-//     }
-//   });
-// }
-
 void _setupWidgets() {
   HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
-  // Workmanager().initialize(
-  //   _updateTodayMindsInBackroundAndUpdateWidgets,
-  //   isInDebugMode: !kReleaseMode,
-  // );
-  // Workmanager().registerOneOffTask(
-  //   'update-today-minds', // Shared task name.
-  //   'updateTodayMinds', // Only Android supported.
-  //   constraints: Constraints(
-  //     networkType: NetworkType.connected,
-  //   ),
-  // );
 }
 
 void _setupBlockingLoadingWidget() {
