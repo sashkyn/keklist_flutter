@@ -11,11 +11,11 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: TELEGRAM_LOGGER
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] 🛠️ Starting CI...
 
@@ -36,20 +36,21 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
+          message: |
             [CI] ✅ - Analyze & Test
 
       - name: Sending error message to Dev channel if needed
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         if: ${{ failure() }}
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] ❌ - Analyze & Test
 
@@ -82,22 +83,22 @@ jobs:
           subdirectory: "ios"
 
       - name: Sending error message to Dev channel if needed
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         if: ${{ success() }}
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] ✅ - iOS
 
       - name: Sending error message to Dev channel if needed
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         if: ${{ failure() }}
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] ❌ - iOS
 
@@ -142,20 +143,20 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] ✅ - Android
 
       - name: Sending error message to Dev channel if needed
-        uses: robotomize/notify-telegram@v0.2.4
+        uses: xinthink/action-telegram@v1.1
         if: ${{ failure() }}
         with:
-          chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          status: ${{ job.status }}
+          botToken: ${{ secrets.BotToken }}
+          chatId: ${{ secrets.ChatID }}
+          jobStatus: ${{ job.status }}
           message: |
             [CI] ❌ - Android
