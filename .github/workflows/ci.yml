@@ -11,11 +11,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: TELEGRAM_LOGGER
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] 🛠️ Starting CI...
 
@@ -36,21 +35,19 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - Analyze & Test
 
       - name: Sending error message to Dev channel if needed
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         if: ${{ failure() }}
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - Analyze & Test
 
@@ -83,22 +80,20 @@ jobs:
           subdirectory: "ios"
 
       - name: Sending error message to Dev channel if needed
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         if: ${{ success() }}
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - iOS
 
       - name: Sending error message to Dev channel if needed
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         if: ${{ failure() }}
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - iOS
 
@@ -143,20 +138,18 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - Android
 
       - name: Sending error message to Dev channel if needed
-        uses: xinthink/action-telegram@v1.1
+        uses: lienminhquang/telegram_action@v1
         if: ${{ failure() }}
         with:
-          botToken: ${{ secrets.BotToken }}
-          chatId: ${{ secrets.ChatID }}
-          jobStatus: ${{ job.status }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - Android
