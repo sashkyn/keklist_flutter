@@ -47,14 +47,14 @@ class InsightsTopChartWidget extends StatelessWidget {
               ),
             ),
             SfCartesianChart(
-              primaryYAxis: CategoryAxis(
+              primaryYAxis: const CategoryAxis(
                 isVisible: false,
-                labelStyle: const TextStyle(fontSize: 16.0),
+                labelStyle: TextStyle(fontSize: 16.0),
               ),
-              primaryXAxis: CategoryAxis(
-                labelStyle: const TextStyle(fontSize: 32.0),
+              primaryXAxis: const CategoryAxis(
+                labelStyle: TextStyle(fontSize: 32.0),
               ),
-              series: <ChartSeries>[
+              series: <CartesianSeries>[
                 ColumnSeries<_MindData, String>(
                   dataSource: chartData.take(8).toList(),
                   dataLabelSettings: const DataLabelSettings(

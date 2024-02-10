@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/screens/mind_collection/local_widgets/mind_rows_widget.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:keklist/widgets/rounded_container.dart';
@@ -45,7 +45,7 @@ class _InsightsTodayMindsWidgetState extends State<InsightsTodayMindsWidget> {
                   ),
                 ),
               ),
-              MindRowsWidget(
+              MindRowWidget(
                 minds: widget.todayMinds,
               ),
             ],

@@ -27,6 +27,9 @@ class MindUtils {
     );
   }
 
+  static List<Mind> getSortedMindsBySortIndex({required List<Mind> allMinds}) =>
+      allMinds.mySortedBy((it) => it.sortIndex);
+
   static List<Mind> findMindsByRootId({
     required String rootId,
     required Iterable<Mind> allMinds,
@@ -122,4 +125,12 @@ extension ListIterable<E> on Iterable<E> {
         }
       },
     );
+}
+
+extension MindListIndexSortExtension on Iterable<Mind> {
+  List<Mind> sortedBySortIndex() => mySortedBy((it) => it.sortIndex);
+}
+
+extension MindListCreationDateSortExtension on Iterable<Mind> {
+  List<Mind> sortedByCreationDate() => mySortedBy((it) => it.creationDate);
 }

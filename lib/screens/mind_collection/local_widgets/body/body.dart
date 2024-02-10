@@ -42,8 +42,22 @@ class _Body extends StatelessWidget {
           itemScrollController: itemScrollController,
           itemPositionsListener: itemPositionsListener,
           itemBuilder: (_, int dayIndex) {
-            final List<Mind> minds = mindsByDayIndex[dayIndex] ?? [];
-
+            final List<Mind> minds = mindsByDayIndex[dayIndex]?.sortedBySortIndex() ?? [];
+            // final List<Mind> minds = List.generate(
+            //   Random().nextInt(50) + 1,
+            //   (index) {
+            //     final String randomEmoji = KeklistConstants.demoModeEmojiList[index];
+            //     return Mind(
+            //       emoji: randomEmoji,
+            //       creationDate: DateTime.now(),
+            //       note: '',
+            //       dayIndex: 0,
+            //       id: const Uuid().v4(),
+            //       sortIndex: 0,
+            //       rootId: null,
+            //     );
+            //   },
+            // ).toList();
             final bool isToday = dayIndex == getNowDayIndex();
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -76,7 +90,7 @@ class _Body extends StatelessWidget {
                             falseChild: MindCollectionEmptyDayWidget.present(),
                           ),
                         ),
-                        falseChild: MindRowsWidget(minds: minds),
+                        falseChild: MindRowWidget(minds: minds),
                       ),
                     ),
                   ),

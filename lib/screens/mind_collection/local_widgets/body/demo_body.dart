@@ -68,7 +68,7 @@ class _DemoBodyState extends State<_DemoBody> {
               const SizedBox(height: 4.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: MindRowsWidget(minds: minds),
+                child: MindRowWidget(minds: minds),
               ),
             ],
           );

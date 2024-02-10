@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // TODO: превратить suggestions в миничипсы и убрать эмодзик слева как нибудь
 
-class MindCreatorBar extends StatefulWidget {
+class MindCreatorBottomBar extends StatefulWidget {
   final Mind? editableMind;
   final TextEditingController textEditingController;
   final List<String> suggestionMinds;
@@ -17,7 +17,7 @@ class MindCreatorBar extends StatefulWidget {
   final VoidCallback onTapCancelEdit;
   final Function(CreateMindData) onDone;
 
-  const MindCreatorBar({
+  const MindCreatorBottomBar({
     super.key,
     required this.textEditingController,
     required this.suggestionMinds,
@@ -33,10 +33,10 @@ class MindCreatorBar extends StatefulWidget {
   });
 
   @override
-  State<MindCreatorBar> createState() => _MindCreatorBarState();
+  State<MindCreatorBottomBar> createState() => _MindCreatorBottomBarState();
 }
 
-class _MindCreatorBarState extends State<MindCreatorBar> {
+class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -1,20 +1,20 @@
 name: CI
 on:
-  # pull_request:
-  #   branches:
-  #     - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
   analyze_and_test:
     name: Run Flutter analyze & test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: TELEGRAM_LOGGER
-        uses: appleboy/telegram-action@master
+        uses: lienminhquang/telegram_action@v1.9
         with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] 🛠️ Starting CI...
 
@@ -24,6 +24,9 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Decode main .env file
+        run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
+
       - run: flutter pub get
 
       - run: flutter analyze
@@ -32,26 +35,26 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: appleboy/telegram-action@master
+        uses: lienminhquang/telegram_action@v1.9
         with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - Analyze & Test
 
       - name: Sending error message to Dev channel if needed
-        uses: appleboy/telegram-action@master
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
         with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - Analyze & Test
 
   build_ios_app:
     name: Build iOS
     needs: [analyze_and_test]
-    runs-on: macos-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
 
@@ -61,7 +64,7 @@ jobs:
       
       - run: flutter pub get
       
-      - run: flutter build ios --release --no-codesign
+      - run: flutter build ios --release --no-codesign --verbose
 
       - name: Decode Fastlane iOS Environment file
         run: echo "${{ secrets.IOS_FASTLANE_EVN_FILE_BASE64 }}" | base64 --decode > ios/.env
@@ -69,7 +72,6 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.0"
-          bundler-cache: true
           working-directory: "ios"
 
       - uses: maierj/fastlane-action@v3.0.0
@@ -77,29 +79,27 @@ jobs:
           lane: "build_and_upload_to_testfilght"
           subdirectory: "ios"
 
-      # - name: Sending error message to Dev channel if needed
-      #   uses: robotomize/notify-telegram@v0.1.0
-      #   if: ${{ success() }}
-      #   with:
-      #     chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-      #     token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-      #     status: ${{ job.status }}
-      #     message: |
-      #       [CI] ✅ - iOS
+      - name: Sending error message to Dev channel if needed
+        uses: lienminhquang/telegram_action@v1.9
+        if: ${{ success() }}
+        with:
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          message: |
+            [CI] ✅ - iOS
 
-      # - name: Sending error message to Dev channel if needed
-      #   uses: robotomize/notify-telegram@v0.1.0
-      #   if: ${{ failure() }}
-      #   with:
-      #     chat: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-      #     token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-      #     status: ${{ job.status }}
-      #     message: |
-      #       [CI] ❌ - iOS
+      - name: Sending error message to Dev channel if needed
+        uses: lienminhquang/telegram_action@v1.9
+        if: ${{ failure() }}
+        with:
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
+          message: |
+            [CI] ❌ - iOS
 
   build_android_app:
     name: Build Android
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [analyze_and_test]
     steps:
       - name: Checking out to current branch
@@ -115,7 +115,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          cache: true
 
       - name: Decoding android/keystore.jks
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
@@ -139,18 +138,18 @@ jobs:
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
-        uses: appleboy/telegram-action@master
+        uses: lienminhquang/telegram_action@v1.9
         with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - Android
 
       - name: Sending error message to Dev channel if needed
-        uses: appleboy/telegram-action@master
+        uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
         with:
-          to: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
-          token: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - Android

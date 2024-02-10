@@ -8,7 +8,7 @@ import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/helpers/bloc_utils.dart';
 import 'package:keklist/helpers/extensions/dispose_bag.dart';
 import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bar.dart';
+import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
 
@@ -61,7 +61,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((mind) => mind.creationDate));
+            ..addAll(state.values.sortedByCreationDate());
         });
       }
     })?.disposed(by: this);
@@ -74,6 +74,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
       body: Stack(
         children: [
           SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.only(bottom: 150.0),
             child: SafeArea(
               child: Column(
@@ -113,13 +114,13 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  height: 90,
+                  height: 60,
                 ),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  MindCreatorBar(
+                  MindCreatorBottomBar(
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,

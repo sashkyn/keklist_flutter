@@ -76,17 +76,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     }
   }
 
-  // @override
-  // void emit(AuthState state) {
-  //   print('----------');
-  //   print('emit old state ${this.state}');
-  //   print('emit new state ${state}');
-  //   print('emit ${this.state == state}');
-
-  //   // ignore: invalid_use_of_visible_for_testing_member
-  //   super.emit(state);
-  // }
-
   Future<void> _signInWithWebOAuth(OAuthProvider provider) async {
     if (provider == OAuthProvider.apple) {
       await _signInWithApple();
@@ -100,7 +89,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
 
     final String webResult = await FlutterWebAuth2.authenticate(
       url: result.url.toString(),
-      callbackUrlScheme: 'io.supabase.points',
+      callbackUrlScheme: 'io.supabase.zenmode',
       options: const FlutterWebAuth2Options(
         preferEphemeral: false,
       ),
@@ -113,7 +102,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     );
 
     // NOTE: теперь можно делать, но окошко с браузером не закрывается автоматически. Нужно понять почему...
-    // await client.auth.signInWithOAuth(provider);
+    // NOTE: пока не понятно, как открывать это в боттом шите :(
+    // await client.auth.signInWithOAuth(
+    //   provider,
+    //   redirectTo: 'io.supabase.zenmode',
+    //   authScreenLaunchMode: LaunchMode.inAppBrowserView,
+    // );
   }
 
   Future<AuthResponse> _signInWithApple() async {
