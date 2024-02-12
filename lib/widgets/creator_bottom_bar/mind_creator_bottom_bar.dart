@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:keklist/constants.dart';
 import 'package:keklist/helpers/platform_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/mind_widget.dart';
