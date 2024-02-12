@@ -130,7 +130,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   BoolWidget(
-                    condition: SupportedPlatformUtils.getPlatform(context) == SupportedPlatform.iOS,
+                    condition: DeviceUtils.safeGetPlatform(context) == SupportedPlatform.iOS,
                     trueChild: AuthButton(
                       onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.apple()),
                       type: AuthButtonType.apple,

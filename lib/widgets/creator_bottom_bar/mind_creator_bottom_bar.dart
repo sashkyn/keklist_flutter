@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:keklist/constants.dart';
+import 'package:keklist/helpers/platform_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +56,9 @@ class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
               ),
               const _HorizontalSeparator(),
             ],
-            if (widget.suggestionMinds.isNotEmpty) ...[
+            if (widget.suggestionMinds.isNotEmpty &&
+                MediaQuery.of(context).orientation != Orientation.landscape &&
+                DeviceUtils.isPhone(context)) ...[
               _SuggestionsWidget(
                 suggestionMinds: widget.suggestionMinds,
                 onSelectSuggestionEmoji: widget.onTapSuggestionEmoji,
@@ -104,7 +109,7 @@ class _EditableMindInfoWidget extends StatelessWidget {
         ),
         Container(
           color: Theme.of(context).disabledColor,
-          height: 55.0,
+          height: 38.0,
           width: 0.3,
         ),
         Expanded(
@@ -184,19 +189,23 @@ class _TextFieldWidget extends StatelessWidget {
         Flexible(
           flex: 1,
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.4,
-            ),
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.2),
             child: TextField(
               focusNode: focusNode,
               keyboardType: TextInputType.multiline,
-              maxLines: null,
+              maxLines: () {
+                if (MediaQuery.of(context).orientation != Orientation.landscape && DeviceUtils.isPhone(context)) {
+                  return null;
+                } else {
+                  return 1;
+                }
+              }(),
               textCapitalization: TextCapitalization.sentences,
               controller: textEditingController,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(12.0),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0)),
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 ),
                 hintText: placeholder,
                 suffixIcon: TextButton(
@@ -231,18 +240,21 @@ class _SuggestionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(suggestionMinds.length, (index) {
-        return Flexible(
-          flex: 1,
-          child: MindWidget.sized(
-            item: suggestionMinds[index],
-            size: MindSize.small,
-            onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
-            badge: null,
-          ),
-        );
-      }),
+    return SizedBox(
+      height: 38.0,
+      child: Row(
+        children: List.generate(suggestionMinds.length, (index) {
+          return Flexible(
+            flex: 1,
+            child: MindWidget.sized(
+              item: suggestionMinds[index],
+              size: MindSize.small,
+              onTap: () => onSelectSuggestionEmoji(suggestionMinds[index]),
+              badge: null,
+            ),
+          );
+        }),
+      ),
     );
   }
 }
