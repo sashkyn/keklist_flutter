@@ -29,7 +29,7 @@ class MindChatDiscussionScreen extends StatefulWidget {
 
 class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
   // TODO: move to bloc + repository
-  final chatGpt = ChatGPT.builder(token: dotenv.get('OPEN_AI_TOKEN'));
+  final ChatGPT chatGpt = ChatGPT.builder(token: dotenv.get('OPEN_AI_TOKEN'));
 
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
@@ -178,8 +178,7 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
 
   Future<void> _completeWithSSE(Mind mind) async {
-    final String prompt =
-        'Its message to myself with content - ${mind.note} and with main emoji - ${mind.emoji}. Could you give short comment like a pro psycologist? Its important to use language of message content for feedback otherwise I dont know english.';
+    final String prompt = _makePromt(mind);
     final ChatCompletion? chatCompletion = await chatGpt.chatCompletion(
       request: ChatRequest(
         model: 'gpt-3.5-turbo-0125',
@@ -199,5 +198,14 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
     setState(() {
       messages.add(message);
     });
+  }
+
+  String _makePromt(Mind mind) {
+    String prompt = '''
+        Its my mind with content - ${mind.note}. I set this emoji for this note - ${mind.emoji}.
+        Could you give short comment like a pro psycologist?
+        Its important to use language of message content for feedback otherwise I dont know english.
+        ''';
+    return prompt;
   }
 }
