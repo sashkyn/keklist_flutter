@@ -185,7 +185,7 @@ class _TextFieldWidget extends StatelessWidget {
           flex: 1,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.2,
+              maxHeight: MediaQuery.of(context).size.height * 0.4,
             ),
             child: TextField(
               focusNode: focusNode,
