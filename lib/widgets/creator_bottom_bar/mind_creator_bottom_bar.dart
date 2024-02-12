@@ -44,23 +44,23 @@ class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
-            const MindCreatorSeparator(),
+            const _HorizontalSeparator(),
             if (widget.editableMind != null) ...[
-              MindCreatorEditableMindInfoWidget(
+              _EditableMindInfoWidget(
                 editableMind: widget.editableMind!,
                 onTapCancelEdit: widget.onTapCancelEdit,
                 onTapEmoji: widget.onTapEmoji,
               ),
-              const MindCreatorSeparator(),
+              const _HorizontalSeparator(),
             ],
             if (widget.suggestionMinds.isNotEmpty) ...[
-              MindCreatorSuggestionsWidget(
+              _SuggestionsWidget(
                 suggestionMinds: widget.suggestionMinds,
                 onSelectSuggestionEmoji: widget.onTapSuggestionEmoji,
               ),
               const SizedBox(height: 8.0),
             ],
-            MindCreatorTextFieldWidget(
+            _TextFieldWidget(
               selectedEmoji: widget.selectedEmoji,
               onSearchEmoji: widget.onTapEmoji,
               placeholder: widget.placeholder,
@@ -83,13 +83,12 @@ class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
   }
 }
 
-class MindCreatorEditableMindInfoWidget extends StatelessWidget {
+class _EditableMindInfoWidget extends StatelessWidget {
   final Mind editableMind;
   final Function() onTapEmoji;
   final Function() onTapCancelEdit;
 
-  const MindCreatorEditableMindInfoWidget({
-    super.key,
+  const _EditableMindInfoWidget({
     required this.editableMind,
     required this.onTapEmoji,
     required this.onTapCancelEdit,
@@ -104,7 +103,7 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
           child: Icon(Icons.edit),
         ),
         Container(
-          color: Theme.of(context).dividerColor,
+          color: Theme.of(context).disabledColor,
           height: 55.0,
           width: 0.3,
         ),
@@ -141,21 +140,20 @@ class MindCreatorEditableMindInfoWidget extends StatelessWidget {
   }
 }
 
-class MindCreatorSeparator extends StatelessWidget {
-  const MindCreatorSeparator({super.key});
+class _HorizontalSeparator extends StatelessWidget {
+  const _HorizontalSeparator();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).dividerColor,
+      color: Theme.of(context).disabledColor,
       height: 0.3,
     );
   }
 }
 
-class MindCreatorTextFieldWidget extends StatelessWidget {
-  const MindCreatorTextFieldWidget({
-    super.key,
+class _TextFieldWidget extends StatelessWidget {
+  const _TextFieldWidget({
     required this.selectedEmoji,
     required this.placeholder,
     required this.onSearchEmoji,
@@ -175,18 +173,20 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SizedBox(width: 6.0),
+        const SizedBox(width: 4.0),
         MindWidget.sized(
           item: selectedEmoji,
           size: MindSize.medium,
           onTap: onSearchEmoji,
           badge: null,
         ),
-        const SizedBox(width: 5.0),
+        const SizedBox(width: 4.0),
         Flexible(
           flex: 1,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.2,
+            ),
             child: TextField(
               focusNode: focusNode,
               keyboardType: TextInputType.multiline,
@@ -214,15 +214,14 @@ class MindCreatorTextFieldWidget extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 6.0),
+        const SizedBox(width: 4.0),
       ],
     );
   }
 }
 
-class MindCreatorSuggestionsWidget extends StatelessWidget {
-  const MindCreatorSuggestionsWidget({
-    super.key,
+class _SuggestionsWidget extends StatelessWidget {
+  const _SuggestionsWidget({
     required this.suggestionMinds,
     required this.onSelectSuggestionEmoji,
   });
