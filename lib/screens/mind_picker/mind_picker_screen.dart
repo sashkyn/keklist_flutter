@@ -53,7 +53,7 @@ class MindPickerScreenState extends State<MindPickerScreen> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: UnderlineInputBorder(),
-              hintText: 'Search emoji mark',
+              hintText: 'Search your emoji...',
             ),
           ),
           Flexible(

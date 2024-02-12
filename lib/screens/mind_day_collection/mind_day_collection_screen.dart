@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/helpers/extensions/state_extensions.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
@@ -303,10 +304,25 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     );
   }
 
+  void _showDiscussionScreen({required Mind mind}) async {
+    await showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => MindChatDiscussionScreen(
+        rootMind: mind,
+        allMinds: allMinds,
+      ),
+    );
+  }
+
   void _showMindOptionsActionSheet(Mind mind) async {
     final String? result = await showModalActionSheet(
       context: context,
       actions: [
+        const SheetAction(
+          icon: Icons.edit,
+          label: 'Discuss with AI',
+          key: 'discuss_with_ai',
+        ),
         const SheetAction(
           icon: Icons.edit,
           label: 'Edit',
@@ -330,7 +346,9 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         ),
       ],
     );
-    if (result == 'remove_key') {
+    if (result == 'discuss_with_ai') {
+      _showDiscussionScreen(mind: mind);
+    } else if (result == 'remove_key') {
       sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
     } else if (result == 'edit_key') {
       setState(() {
