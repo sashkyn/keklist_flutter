@@ -140,15 +140,11 @@ jobs:
             [CI] ✅ - Android
 
       - name: "Send the APK to Telegram"
-        uses: indiesdev/curl@v1.1
-        env:
-          APK_PATH: build/app/outputs/bundle/release/app-release.apk
-        with:
-          url: "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
-          method: "POST"
-          headers: '{ "Content-Type": "multipart/form-data" }'
-          params: '{ "chat_id": "${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}", "caption": "Template-$(date +\\"%Y%m%d-%H%M\\")" }'
-          body: '{ "document": "@${{ env.APK_PATH }}" }'
+        run: |
+          curl -F document=@build/app/outputs/bundle/release/app-release.apk \
+          -F chat_id=${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }} \
+          -F caption="Template-$(date +'%Y%m%d-%H%M')" \
+          "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
 
       - name: Sending error message to Dev channel if needed
         uses: lienminhquang/telegram_action@v1.9
