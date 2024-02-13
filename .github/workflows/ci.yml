@@ -10,7 +10,7 @@ jobs:
     name: Run Flutter analyze & test
     runs-on: self-hosted
     steps:
-      - name: TELEGRAM_LOGGER
+      - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
