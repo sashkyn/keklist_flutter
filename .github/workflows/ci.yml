@@ -72,12 +72,6 @@ jobs:
       - name: Decode Fastlane iOS Environment file
         run: echo "${{ secrets.IOS_FASTLANE_EVN_FILE_BASE64 }}" | base64 --decode > ios/.env
 
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.0"
-          working-directory: "ios"
-          bundler-cache: true
-
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: "build_and_upload_to_testfilght"
