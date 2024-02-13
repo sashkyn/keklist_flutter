@@ -114,6 +114,9 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Decode main .env file
+        run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
+
       - name: Decoding android/keystore.jks
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
 
