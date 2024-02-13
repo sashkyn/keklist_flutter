@@ -16,6 +16,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
+            --------------------------
             [CI] 🛠️ Starting CI...
 
       - uses: actions/checkout@v3
@@ -125,17 +126,20 @@ jobs:
 
       - name: Getting dependencies
         run: flutter pub get
+      
+      - name: Building Android apk
+        run: flutter build apk --verbose
 
-      - name: Building Android appbundle
-        run: flutter build appbundle --verbose
+      # - name: Building Android appbundle
+      #   run: flutter build appbundle --verbose
 
-      - name: Uploading to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
-          groups: android-testers
-          file: build/app/outputs/bundle/release/app-release.aab
+      # - name: Uploading to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{secrets.FIREBASE_APP_ID}}
+      #     serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
+      #     groups: android-testers
+      #     file: build/app/outputs/bundle/release/app-release.aab
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
@@ -145,6 +149,7 @@ jobs:
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ✅ - Android
+          file: build/app/outputs/bundle/release/app-release.apk
 
       - name: Sending error message to Dev channel if needed
         uses: lienminhquang/telegram_action@v1.9
