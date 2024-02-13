@@ -86,7 +86,7 @@ flutter:
   assets:
     - .env
     - assets/auth_icons/
-  fonts:
-    - family: NotoColorEmoji
-      fonts:
-        - asset: assets/fonts/NotoColorEmoji.ttf
+  # fonts:
+  #   - family: NotoColorEmoji
+  #     fonts:
+  #       - asset: assets/fonts/NotoColorEmoji.ttf
