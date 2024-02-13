@@ -143,8 +143,6 @@ jobs:
         uses: indiesdev/curl@v1.1
         env:
           APK_PATH: build/app/outputs/bundle/release/app-release.apk
-          BOT_API_KEY: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
         with:
           url: "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
           method: "POST"
