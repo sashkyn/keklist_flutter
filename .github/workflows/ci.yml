@@ -146,6 +146,11 @@ jobs:
           -F caption="Template-$(date +'%Y%m%d-%H%M')" \
           "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
 
+      - name: List file details
+        run: |
+          ls -l build/app/outputs/bundle/release/app-release.apk
+          file build/app/outputs/bundle/release/app-release.apk
+
       - name: Sending error message to Dev channel if needed
         uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
