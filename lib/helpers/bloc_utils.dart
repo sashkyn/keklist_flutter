@@ -25,6 +25,9 @@ class BlocUtils {
 
 extension StatebleBlocs on State {
   void sendEventTo<B extends Bloc>(Object event) {
+    final caller = StackTrace.current;
+    print('sendEventTo was called by: $caller');
+    
     BlocUtils.sendEventTo<B>(
       context: mountedContext,
       event: event,

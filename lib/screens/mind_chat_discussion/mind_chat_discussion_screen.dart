@@ -1,14 +1,11 @@
-import 'package:chat_gpt_api/app/chat_gpt.dart';
-import 'package:chat_gpt_api/app/model/data_model/chat/chat_completion.dart';
-import 'package:chat_gpt_api/app/model/data_model/chat/chat_request.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gap/gap.dart';
-import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/blocs/message_bloc/message_bloc.dart';
 import 'package:keklist/helpers/bloc_utils.dart';
 import 'package:keklist/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
+import 'package:keklist/services/entities/message.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:uuid/uuid.dart';
@@ -28,19 +25,16 @@ class MindChatDiscussionScreen extends StatefulWidget {
 }
 
 class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
-  // TODO: move to bloc + repository
-  final ChatGPT chatGpt = ChatGPT.builder(token: dotenv.get('OPEN_AI_TOKEN'));
-
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   Mind? _editableMind;
-  late final String _selectedEmoji = rootMind.emoji;
 
   Mind get rootMind => widget.rootMind;
   List<Mind> get allMinds => widget.allMinds;
-  final List<String> messages = [];
+  final List<Message> messages = [];
+  bool _isLoading = false;
 
-  List<Mind> get childMinds => MindUtils.findMindsByRootId(
+  List<Mind> get mindChildren => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
       ).mySortedBy((mind) => mind.creationDate);
@@ -50,8 +44,29 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _completeWithSSE(rootMind);
+      sendEventTo<MessageBloc>(MessageGetAll());
     });
+
+    subscribeTo<MessageBloc>(
+      onNewState: (state) {
+        switch (state) {
+          case MessageChat chatState:
+            setState(() {
+              messages.clear();
+              final List<Message> chatMessages =
+                  chatState.messages.where((element) => element.rootMindId == rootMind.id).toList();
+              messages.addAll(chatMessages);
+            });
+          case MessageLoadingStatus loadingState:
+            if (_isLoading == loadingState.isLoading) {
+              return;
+            }
+            setState(() {
+              _isLoading = loadingState.isLoading;
+            });
+        }
+      },
+    );
   }
 
   @override
@@ -69,28 +84,33 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: MindMessageWidget(
                       mind: rootMind,
-                      onOptions: null,
-                      children: const [],
+                      onOptions: () => sendEventTo<MessageBloc>(MessageClearChatWithMind(rootMindId: rootMind.id)),
+                      children: mindChildren,
                     ),
                   ),
-                  if (childMinds.isNotEmpty) ...{
-                    const Gap(16.0),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
-                    ),
-                    MindBulletListWidget(
-                      minds: childMinds,
-                      onTap: (Mind mind) => () {},
-                      onOptions: (Mind mind) => () {},
-                    ),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
+                  const Gap(16.0),
+                  if (messages.isEmpty) ...{
+                    ElevatedButton(
+                      onPressed: () => sendEventTo<MessageBloc>(
+                        MessageStartDiscussion(
+                          mind: rootMind,
+                          children: mindChildren,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
+                        backgroundColor: Colors.red,
+                      ),
+                      child: const Text('Start discussion',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          )),
                     ),
                   },
-                  const Gap(16.0),
-                  if (messages.isEmpty) ...{const CircularProgressIndicator()},
                   if (messages.isNotEmpty) ...{
                     MindBulletListWidget(
                       minds: messages
@@ -98,7 +118,7 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
                             (e) => Mind(
                               creationDate: DateTime.now(),
                               emoji: '👨‍⚕️',
-                              note: e,
+                              note: e.text,
                               id: const Uuid().v4(),
                               dayIndex: 0,
                               sortIndex: 0,
@@ -109,7 +129,9 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
                       onTap: (_) {},
                       onOptions: (_) {},
                     ),
-                  }
+                  },
+                  const Gap(8.0),
+                  if (_isLoading) ...{const CircularProgressIndicator()},
                 ],
               ),
             ),
@@ -131,32 +153,22 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
-                    placeholder: 'Comment your mind...',
+                    placeholder: 'Send message...',
                     onDone: (CreateMindData data) {
-                      if (_editableMind == null) {
-                        sendEventTo<MindBloc>(
-                          MindCreate(
-                            dayIndex: rootMind.dayIndex,
-                            note: data.text,
-                            emoji: _selectedEmoji,
-                            rootId: rootMind.id,
-                          ),
-                        );
-                      } else {
-                        final Mind mindForEdit = _editableMind!.copyWith(
-                          note: data.text,
-                          emoji: _selectedEmoji,
-                        );
-                        sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
-                      }
-                      _resetMindCreator();
+                      sendEventTo<MessageBloc>(
+                        MessageSend(
+                          message: data.text,
+                          rootMindId: rootMind.id,
+                        ),
+                      );
+                      _resetBottomBar();
                     },
                     suggestionMinds: const [],
-                    selectedEmoji: _selectedEmoji,
+                    selectedEmoji: null,
                     onTapSuggestionEmoji: (_) {},
                     onTapEmoji: () {},
-                    doneTitle: 'DONE',
-                    onTapCancelEdit: () => _resetMindCreator(),
+                    doneTitle: 'SEND',
+                    onTapCancelEdit: () => _resetBottomBar(),
                   ),
                 ],
               ),
@@ -167,7 +179,7 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
     );
   }
 
-  void _resetMindCreator() {
+  void _resetBottomBar() {
     setState(() {
       _editableMind = null;
       _createMindEditingController.text = '';
@@ -176,36 +188,4 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
   }
 
   void _hideKeyboard() => FocusScope.of(context).requestFocus(FocusNode());
-
-  Future<void> _completeWithSSE(Mind mind) async {
-    final String prompt = _makePromt(mind);
-    final ChatCompletion? chatCompletion = await chatGpt.chatCompletion(
-      request: ChatRequest(
-        model: 'gpt-3.5-turbo-0125',
-        maxTokens: 256,
-        messages: [
-          ChatMessage(
-            role: 'system',
-            content: prompt,
-          ),
-        ],
-      ),
-    );
-    final String message =
-        chatCompletion?.choices?.map((e) => e.message?.content).join('\n') ?? 'Error to get response, try again later';
-
-    messages.clear();
-    setState(() {
-      messages.add(message);
-    });
-  }
-
-  String _makePromt(Mind mind) {
-    String prompt = '''
-        Its my mind with content - ${mind.note}. I set this emoji for this note - ${mind.emoji}.
-        Could you give short comment like a pro psycologist?
-        Its important to use language of message content for feedback otherwise I dont know english.
-        ''';
-    return prompt;
-  }
 }

@@ -10,7 +10,7 @@ class MindCreatorBottomBar extends StatefulWidget {
   final TextEditingController textEditingController;
   final List<String> suggestionMinds;
   final FocusNode focusNode;
-  final String selectedEmoji;
+  final String? selectedEmoji;
   final VoidCallback onTapEmoji;
   final String doneTitle;
   final String placeholder;
@@ -72,7 +72,7 @@ class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
               onDone: () {
                 widget.onDone(
                   CreateMindData(
-                    emoji: widget.selectedEmoji,
+                    emoji: widget.selectedEmoji ?? '',
                     text: widget.textEditingController.text,
                   ),
                 );
@@ -165,7 +165,7 @@ class _TextFieldWidget extends StatelessWidget {
     required this.onDone,
   });
 
-  final String selectedEmoji;
+  final String? selectedEmoji;
   final VoidCallback onSearchEmoji;
   final FocusNode focusNode;
   final TextEditingController textEditingController;
@@ -177,13 +177,15 @@ class _TextFieldWidget extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 4.0),
-        MindWidget.sized(
-          item: selectedEmoji,
-          size: MindSize.medium,
-          onTap: onSearchEmoji,
-          badge: null,
-        ),
-        const SizedBox(width: 4.0),
+        if (selectedEmoji != null) ...[
+          MindWidget.sized(
+            item: selectedEmoji!,
+            size: MindSize.medium,
+            onTap: onSearchEmoji,
+            badge: null,
+          ),
+          const SizedBox(width: 4.0),
+        ],
         Flexible(
           flex: 1,
           child: ConstrainedBox(
