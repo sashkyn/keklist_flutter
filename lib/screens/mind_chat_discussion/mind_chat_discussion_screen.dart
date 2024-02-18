@@ -88,7 +88,15 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Discussion')),
+        appBar: AppBar(
+          title: const Text('Discussion'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.update),
+              onPressed: () => _bloc.add(MessageClearChatWithMind(rootMindId: rootMind.id)),
+            ),
+          ],
+        ),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -101,7 +109,7 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                       padding: const EdgeInsets.all(8.0),
                       child: MindMessageWidget(
                         mind: rootMind,
-                        onOptions: () => _bloc.add(MessageClearChatWithMind(rootMindId: rootMind.id)),
+                        onOptions: null,
                         children: mindChildren,
                       ),
                     ),

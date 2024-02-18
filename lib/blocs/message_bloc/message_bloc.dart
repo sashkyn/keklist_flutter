@@ -44,10 +44,10 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   FutureOr<void> _getMessages(MessageGetAll event, Emitter emit) {
     try {
       final List<Message> messages =
-          _hiveObjects.map((object) => object.toMessage()).mySortedBy((e) => e.timestamp).toList();
+          _hiveObjects.map((object) => object.toMessage()).mySortedBy((object) => object.timestamp).toList();
       emit(MessageChat(messages: messages));
-    } catch (e) {
-      emit(MessageError(message: '$e'));
+    } catch (error) {
+      emit(MessageError(message: '$error'));
     }
   }
 
@@ -69,11 +69,14 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       await _hiveBox.deleteAll(
         _hiveObjects.where((element) => element.rootMindId == event.mind.id).map((object) => object.id).toList(),
       );
-    } catch (e) {
-      emit(MessageError(message: '$e'));
+    } catch (error) {
+      emit(MessageError(message: '$error'));
       return;
     }
-    final String prompt = _makeStartingPromt(event.mind);
+    final String prompt = _makeStartingPromt(
+      mind: event.mind,
+      childrenMinds: event.children,
+    );
     final ChatCompletion? chatCompletion = await _chatGpt.chatCompletion(
       request: ChatRequest(
         model: 'gpt-3.5-turbo-0125',
@@ -104,8 +107,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       );
       final MessageObject messageObject = message.toObject();
       _hiveBox.put(messageObject.id, messageObject);
-    } catch (e) {
-      emit(MessageError(message: '$e'));
+    } catch (error) {
+      emit(MessageError(message: '$error'));
     }
   }
 
@@ -119,17 +122,27 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
     final MessageObject messageObject = message.toObject();
     try {
       await _hiveBox.put(messageObject.id, messageObject);
-    } on Exception catch (e) {
-      emit(MessageError(message: '$e'));
+    } catch (error) {
+      emit(MessageError(message: '$error'));
     }
   }
 
-  // TODO: add additional chlidren minds if any.
+  String _makeStartingPromt({
+    required Mind mind,
+    required List<Mind> childrenMinds,
+  }) {
+    final String mindChildrenPromt = () {
+      if (childrenMinds.isEmpty) {
+        return '';
+      }
+      final String mindChildrenPromt = childrenMinds.map((mind) => '${mind.emoji} - ${mind.note}').join(';\n');
+      return 'Here is my list of comments for this mind:\n$mindChildrenPromt';
+    }();
 
-  String _makeStartingPromt(Mind mind) {
     final String prompt = '''
         It's my mind with the note - ${mind.note}. 
         I've set this emoji for the note - ${mind.emoji}.
+        $mindChildrenPromt
         Could you give short comment like a pro psycologist?
         It's important to use language of message content for feedback otherwise I dont know english.
     ''';
