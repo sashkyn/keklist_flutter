@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -46,34 +47,44 @@ class LoggerBlocObserver extends BlocObserver {
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
 
-    print('onEvent: $event');
+    if (kDebugMode) {
+      print('onEvent: $event');
+    }
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
 
-    print(error);
+    if (kDebugMode) {
+      print(error);
+    }
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
 
-    print('onChange: ${bloc.state}');
+    if (kDebugMode) {
+      print('onChange: ${bloc.state}');
+    }
   }
 
   @override
   void onClose(BlocBase bloc) {
     super.onClose(bloc);
 
-    print('onClose: ${bloc.runtimeType}');
+    if (kDebugMode) {
+      print('onClose: ${bloc.runtimeType}');
+    }
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
 
-    print('onTransition: $bloc.state');
+    if (kDebugMode) {
+      print('onTransition: $bloc.state');
+    }
   }
 }
