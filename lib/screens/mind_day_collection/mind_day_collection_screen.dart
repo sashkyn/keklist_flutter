@@ -18,8 +18,8 @@ import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 
 final class MindDayCollectionScreen extends StatefulWidget {

@@ -8,7 +8,7 @@ import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/core/helpers/bloc_utils.dart';
 import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
-import 'package:keklist/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
+import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
 

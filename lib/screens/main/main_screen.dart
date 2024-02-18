@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/core/helpers/bloc_utils.dart';
@@ -11,7 +11,7 @@ import 'package:keklist/screens/auth/auth_screen.dart';
 import 'package:keklist/screens/insights/insights_screen.dart';
 import 'package:keklist/screens/mind_collection/mind_collection_screen.dart';
 import 'package:keklist/screens/settings/settings_screen.dart';
-import 'package:keklist/widgets/bottom_navigation_bar.dart';
+import 'package:keklist/core/widgets/bottom_navigation_bar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

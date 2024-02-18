@@ -10,7 +10,7 @@ import 'package:keklist/screens/insights/widgets/insights_today_minds_widget.dar
 import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});

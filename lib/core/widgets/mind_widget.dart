@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/widgets/bool_widget.dart';
-import 'package:keklist/widgets/rounded_circle.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/rounded_circle.dart';
 
 enum MindSize {
   small,

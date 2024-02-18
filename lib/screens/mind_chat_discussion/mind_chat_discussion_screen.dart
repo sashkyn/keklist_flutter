@@ -1,16 +1,15 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:keklist/blocs/message_bloc/message_bloc.dart';
-import 'package:keklist/core/helpers/bloc_utils.dart';
-import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
+import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/services/entities/message.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:uuid/uuid.dart';
 
 class MindChatDiscussionScreen extends StatefulWidget {
@@ -37,6 +36,8 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
   final List<Message> messages = [];
   bool _isLoading = false;
 
+  late final MessageBloc _bloc = MessageBloc();
+
   List<Mind> get mindChildren => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
@@ -46,8 +47,22 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
   void initState() {
     super.initState();
 
-    subscribeTo<MessageBloc>(
-      onNewState: (state) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bloc.add(MessageGetAll());
+    });
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _bloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener(
+      bloc: _bloc,
+      listener: (BuildContext context, MessageState state) {
         switch (state) {
           case MessageChat chatState:
             setState(() {
@@ -72,119 +87,112 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
             );
         }
       },
-    )?.disposed(by: this);
-    sendEventTo<MessageBloc>(MessageGetAll());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Discussion'),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.only(bottom: 150.0),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MindMessageWidget(
-                      mind: rootMind,
-                      onOptions: () => sendEventTo<MessageBloc>(MessageClearChatWithMind(rootMindId: rootMind.id)),
-                      children: mindChildren,
-                    ),
-                  ),
-                  const Gap(16.0),
-                  if (messages.isEmpty && !_isLoading) ...{
-                    ElevatedButton(
-                      onPressed: () => sendEventTo<MessageBloc>(
-                        MessageStartDiscussion(
-                          mind: rootMind,
-                          children: mindChildren,
-                        ),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Discussion')),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.only(bottom: 150.0),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MindMessageWidget(
+                        mind: rootMind,
+                        onOptions: () => _bloc.add(MessageClearChatWithMind(rootMindId: rootMind.id)),
+                        children: mindChildren,
                       ),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    const Gap(16.0),
+                    if (messages.isEmpty && !_isLoading) ...{
+                      ElevatedButton(
+                        onPressed: () => _bloc.add(
+                          MessageStartDiscussion(
+                            mind: rootMind,
+                            children: mindChildren,
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
-                        backgroundColor: Colors.red,
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text('Start discussion',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            )),
                       ),
-                      child: const Text('Start discussion',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ),
-                  },
-                  if (messages.isNotEmpty) ...{
-                    MindBulletListWidget(
-                      minds: messages
-                          .map(
-                            (e) => Mind(
-                              creationDate: DateTime.now(),
-                              emoji: '👨‍⚕️',
-                              note: e.text,
-                              id: const Uuid().v4(),
-                              dayIndex: 0,
-                              sortIndex: 0,
-                              rootId: null,
-                            ),
-                          )
-                          .toList(),
-                      onTap: (_) {},
-                      onOptions: (_) {},
-                    ),
-                  },
-                  const Gap(8.0),
-                  if (_isLoading) ...{const CircularProgressIndicator()},
-                ],
-              ),
-            ),
-          ),
-          Stack(
-            children: [
-              // NOTE: Подложка для скрытия текста эмодзи.
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  height: 60,
+                    },
+                    if (messages.isNotEmpty) ...{
+                      MindBulletListWidget(
+                        minds: messages
+                            .map(
+                              (e) => Mind(
+                                creationDate: DateTime.now(),
+                                emoji: '👨‍⚕️',
+                                note: e.text,
+                                id: const Uuid().v4(),
+                                dayIndex: 0,
+                                sortIndex: 0,
+                                rootId: null,
+                              ),
+                            )
+                            .toList(),
+                        onTap: (_) {},
+                        onOptions: (_) {},
+                      ),
+                    },
+                    const Gap(8.0),
+                    if (_isLoading) ...{const CircularProgressIndicator()},
+                  ],
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  MindCreatorBottomBar(
-                    editableMind: _editableMind,
-                    focusNode: _mindCreatorFocusNode,
-                    textEditingController: _createMindEditingController,
-                    placeholder: 'Send message...',
-                    onDone: (CreateMindData data) {
-                      sendEventTo<MessageBloc>(
-                        MessageSend(
-                          message: data.text,
-                          rootMindId: rootMind.id,
-                        ),
-                      );
-                      _resetBottomBar();
-                    },
-                    suggestionMinds: const [],
-                    selectedEmoji: null,
-                    onTapSuggestionEmoji: (_) {},
-                    onTapEmoji: () {},
-                    doneTitle: 'SEND',
-                    onTapCancelEdit: () => _resetBottomBar(),
+            ),
+            Stack(
+              children: [
+                // NOTE: Подложка для скрытия текста эмодзи.
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    height: 60,
                   ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    MindCreatorBottomBar(
+                      editableMind: _editableMind,
+                      focusNode: _mindCreatorFocusNode,
+                      textEditingController: _createMindEditingController,
+                      placeholder: 'Send message...',
+                      onDone: (CreateMindData data) {
+                        _bloc.add(
+                          MessageSend(
+                            message: data.text,
+                            rootMindId: rootMind.id,
+                          ),
+                        );
+                        _resetBottomBar();
+                      },
+                      suggestionMinds: const [],
+                      selectedEmoji: null,
+                      onTapSuggestionEmoji: (_) {},
+                      onTapEmoji: () {},
+                      doneTitle: 'SEND',
+                      onTapCancelEdit: () => _resetBottomBar(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

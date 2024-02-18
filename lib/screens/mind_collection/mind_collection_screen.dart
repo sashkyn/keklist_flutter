@@ -10,7 +10,7 @@ import 'package:keklist/screens/mind_collection/local_widgets/mind_collection_em
 import 'package:keklist/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
 import 'package:keklist/screens/web_page/web_page_screen.dart';
-import 'package:keklist/widgets/rounded_container.dart';
+import 'package:keklist/core/widgets/rounded_container.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/constants.dart';
@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 import 'package:uuid/uuid.dart';
 part 'local_widgets/search_app_bar/search_app_bar.dart';
 part 'local_widgets/app_bar/app_bar.dart';

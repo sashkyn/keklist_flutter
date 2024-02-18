@@ -1,5 +1,5 @@
 import 'package:keklist/constants.dart';
-import 'package:keklist/widgets/mind_widget.dart';
+import 'package:keklist/core/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 

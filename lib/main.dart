@@ -32,7 +32,7 @@ import 'native/ios/watch/watch_communication_manager.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  _setupWidgets();
+  _initNativeWidgets();
   _setupBlockingLoadingWidget();
 
   await dotenv.load(fileName: '.env');
@@ -94,12 +94,11 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
             client: Supabase.instance.client,
           ),
         ),
-        BlocProvider(create: (context) => MessageBloc()),
       ],
       child: const KeklistApp(),
     );
 
-void _setupWidgets() {
+void _initNativeWidgets() {
   HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
 }
 

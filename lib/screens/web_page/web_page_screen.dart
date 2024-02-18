@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 // TODO: добавить обработку ошибок

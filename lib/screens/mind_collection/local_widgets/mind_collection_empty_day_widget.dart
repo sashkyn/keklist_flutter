@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/widgets/mind_widget.dart';
+import 'package:keklist/core/widgets/mind_widget.dart';
 
 class MindCollectionEmptyDayWidget extends StatelessWidget {
   final String emoji;

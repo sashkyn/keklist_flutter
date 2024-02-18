@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/widgets/bool_widget.dart';
-import 'package:keklist/widgets/rounded_container.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/rounded_container.dart';
 
 // TODO: добавить дату
 // TODO: возможность перехода на источник
