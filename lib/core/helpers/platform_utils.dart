@@ -1,15 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/constants.dart';
 
 class DeviceUtils {
-  static SupportedPlatform safeGetPlatform(BuildContext context) {
+  static SupportedPlatform? safeGetPlatform() {
     if (kIsWeb) {
       return SupportedPlatform.web;
-    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
+    } else if (Platform.isIOS) {
       return SupportedPlatform.iOS;
-    } else {
+    } else if (Platform.isAndroid) {
       return SupportedPlatform.android;
+    } else {
+      return null;
     }
   }
 

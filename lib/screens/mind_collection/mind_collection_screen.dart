@@ -14,9 +14,9 @@ import 'package:keklist/widgets/rounded_container.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/constants.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
 import 'package:keklist/services/entities/mind.dart';
@@ -184,18 +184,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     super.dispose();
   }
 
-  Future<void> _showWhatsNew() {
-    return showCupertinoModalBottomSheet(
-      context: context,
-      builder: (builder) {
-        return WebPageScreen(
-          title: 'Whats new?',
-          initialUri: Uri.parse(KeklistConstants.whatsNewURL),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,6 +227,18 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
         ),
       ),
       resizeToAvoidBottomInset: false,
+    );
+  }
+
+  Future<void> _showWhatsNew() {
+    return showCupertinoModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return WebPageScreen(
+          title: 'Whats new?',
+          initialUri: Uri.parse(KeklistConstants.whatsNewURL),
+        );
+      },
     );
   }
 

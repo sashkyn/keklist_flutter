@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
 
 final class DebugTransactionsScreen extends StatefulWidget {
   const DebugTransactionsScreen({super.key});

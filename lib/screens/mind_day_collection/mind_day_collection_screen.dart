@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:keklist/helpers/extensions/state_extensions.dart';
+import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/constants.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
@@ -305,11 +305,12 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   }
 
   void _showDiscussionScreen({required Mind mind}) async {
-    await showCupertinoModalBottomSheet(
-      context: context,
-      builder: (context) => MindChatDiscussionScreen(
-        rootMind: mind,
-        allMinds: allMinds,
+    Navigator.of(mountedContext!).push(
+      MaterialPageRoute(
+        builder: (_) => MindChatDiscussionScreen(
+          rootMind: mind,
+          allMinds: allMinds,
+        ),
       ),
     );
   }

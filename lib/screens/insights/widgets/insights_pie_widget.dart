@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:keklist/widgets/rounded_container.dart';

@@ -8,8 +8,9 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:keklist/constants.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/platform_utils.dart';
 import 'package:keklist/services/hive/constants.dart';
 import 'package:keklist/services/hive/entities/mind/mind_object.dart';
 import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
@@ -546,14 +547,10 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  // Future<void> _addTransactionToQueue(QueueTransactionObject transaction) async {
-  //   // TODO: выполнять транзакции в очереди в MindTransactionBloc.
-  //   await transaction.transaction;
-
-  //   // _mindQueueTransactionsBox.add(transaction);
-  // }
-
   Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
+    if (DeviceUtils.safeGetPlatform() != SupportedPlatform.iOS) {
+      return;
+    }
     final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
     final List<Mind> todayMinds = MindUtils.findTodayMinds(allMinds: minds.toList());
 

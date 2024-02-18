@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keklist/helpers/extensions/state_extensions.dart';
+import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 
 // TODO: сделать Of как в Navigator
 // TODO: обойти проблему, чтобы нельзя было вызвать sendToBloc(...) без указания типа B
@@ -25,9 +25,6 @@ class BlocUtils {
 
 extension StatebleBlocs on State {
   void sendEventTo<B extends Bloc>(Object event) {
-    final caller = StackTrace.current;
-    print('sendEventTo was called by: $caller');
-    
     BlocUtils.sendEventTo<B>(
       context: mountedContext,
       event: event,

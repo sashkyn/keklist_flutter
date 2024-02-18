@@ -1,4 +1,4 @@
-import 'package:keklist/helpers/platform_utils.dart';
+import 'package:keklist/core/helpers/platform_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';

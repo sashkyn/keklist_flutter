@@ -2,16 +2,16 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:keklist/helpers/platform_utils.dart';
+import 'package:keklist/core/helpers/platform_utils.dart';
 import 'package:keklist/widgets/bool_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
 import 'package:keklist/screens/auth/widgets/auth_button.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
 import 'package:keklist/constants.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/core/dispose_bag.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -130,7 +130,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   BoolWidget(
-                    condition: DeviceUtils.safeGetPlatform(context) == SupportedPlatform.iOS,
+                    condition: DeviceUtils.safeGetPlatform() == SupportedPlatform.iOS,
                     trueChild: AuthButton(
                       onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.apple()),
                       type: AuthButtonType.apple,

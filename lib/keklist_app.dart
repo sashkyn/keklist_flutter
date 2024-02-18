@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/constants.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/screens/main/main_screen.dart';
 
 class KeklistApp extends StatefulWidget {

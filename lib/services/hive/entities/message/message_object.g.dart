@@ -12,7 +12,15 @@ class MessageObjectAdapter extends TypeAdapter<MessageObject> {
 
   @override
   MessageObject read(BinaryReader reader) {
-    return MessageObject();
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return MessageObject()
+      ..id = fields[0] as String
+      ..text = fields[1] as String
+      ..rootMindId = fields[2] as String
+      ..timestamp = fields[3] as DateTime;
   }
 
   @override

@@ -6,16 +6,16 @@ part 'message_object.g.dart';
 @HiveType(typeId: 3)
 class MessageObject extends HiveObject {
   @HiveField(0)
-  late final String id;
+  late String id;
 
   @HiveField(1)
-  late final String text;
+  late String text;
 
   @HiveField(2)
-  late final String rootMindId;
+  late String rootMindId;
 
   @HiveField(3)
-  late final DateTime timestamp;
+  late DateTime timestamp;
 
   MessageObject();
 

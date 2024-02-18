@@ -1,8 +1,11 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:keklist/blocs/message_bloc/message_bloc.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/core/screen/kek_screen_state.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/services/entities/message.dart';
@@ -24,7 +27,7 @@ class MindChatDiscussionScreen extends StatefulWidget {
   State<MindChatDiscussionScreen> createState() => _MindChatDiscussionScreenState();
 }
 
-class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
+class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   Mind? _editableMind;
@@ -43,10 +46,6 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      sendEventTo<MessageBloc>(MessageGetAll());
-    });
-
     subscribeTo<MessageBloc>(
       onNewState: (state) {
         switch (state) {
@@ -64,14 +63,25 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
             setState(() {
               _isLoading = loadingState.isLoading;
             });
+          case MessageError errorState:
+            setState(() => _isLoading = false);
+            showOkAlertDialog(
+              context: context,
+              title: 'Error',
+              message: errorState.message,
+            );
         }
       },
-    );
+    )?.disposed(by: this);
+    sendEventTo<MessageBloc>(MessageGetAll());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Discussion'),
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -89,7 +99,7 @@ class _MindChatDiscussionScreenState extends State<MindChatDiscussionScreen> {
                     ),
                   ),
                   const Gap(16.0),
-                  if (messages.isEmpty) ...{
+                  if (messages.isEmpty && !_isLoading) ...{
                     ElevatedButton(
                       onPressed: () => sendEventTo<MessageBloc>(
                         MessageStartDiscussion(

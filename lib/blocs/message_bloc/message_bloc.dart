@@ -7,8 +7,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/services/entities/message.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/services/hive/constants.dart';
@@ -42,22 +42,37 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   }
 
   FutureOr<void> _getMessages(MessageGetAll event, Emitter emit) {
-    final List<Message> messages =
-        _hiveObjects.map((object) => object.toMessage()).mySortedBy((e) => e.timestamp).toList();
-    emit(MessageChat(messages: messages));
+    try {
+      final List<Message> messages =
+          _hiveObjects.map((object) => object.toMessage()).mySortedBy((e) => e.timestamp).toList();
+      emit(MessageChat(messages: messages));
+    } catch (e) {
+      emit(MessageError(message: '$e'));
+    }
   }
 
-  FutureOr<void> _clearMessages(MessageClearChatWithMind event, Emitter emit) {
-    _hiveBox.deleteAll(
-      _hiveObjects.where((element) => element.rootMindId == event.rootMindId).map((object) => object.id).toList(),
-    );
-    add(MessageGetAll());
+  FutureOr<void> _clearMessages(MessageClearChatWithMind event, Emitter emit) async {
+    try {
+      final Iterable<String> messageObjectIdsToDelete =
+          _hiveObjects.where((element) => element.rootMindId == event.rootMindId).map((object) => object.id).toList();
+      await _hiveBox.deleteAll(messageObjectIdsToDelete);
+      add(MessageGetAll());
+    } catch (e) {
+      emit(MessageError(message: '$e'));
+    }
   }
 
   FutureOr<void> _startNewDiscussion(MessageStartDiscussion event, Emitter emit) async {
-    _hiveBox.deleteAll(
-      _hiveObjects.where((element) => element.rootMindId == event.mind.id).map((object) => object.id).toList(),
-    );
+    // await _hiveBox.clear();
+    emit(MessageLoadingStatus(isLoading: true));
+    try {
+      await _hiveBox.deleteAll(
+        _hiveObjects.where((element) => element.rootMindId == event.mind.id).map((object) => object.id).toList(),
+      );
+    } catch (e) {
+      emit(MessageError(message: '$e'));
+      return;
+    }
     final String prompt = _makeStartingPromt(event.mind);
     final ChatCompletion? chatCompletion = await _chatGpt.chatCompletion(
       request: ChatRequest(
@@ -72,32 +87,52 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       ),
     );
     emit(MessageLoadingStatus(isLoading: false));
-    final String message = chatCompletion?.choices?.map((choice) => choice.message?.content).join('\n') ??
-        'Error to get response, try again later';
-    final MessageObject messageObject = MessageObject()
-      ..id = const Uuid().v4()
-      ..text = message
-      ..rootMindId = event.mind.id
-      ..timestamp = DateTime.now();
-    _hiveBox.put(messageObject.id, messageObject);
+    try {
+      if (chatCompletion == null) {
+        throw Exception('There is no chat completion!');
+      }
+
+      if (chatCompletion.choices == null) {
+        throw Exception('There are no chat completion choices!');
+      }
+      final String messageText = chatCompletion.choices!.map((choice) => choice.message?.content).join('\n');
+      final Message message = Message(
+        id: const Uuid().v4(),
+        text: messageText,
+        rootMindId: event.mind.id,
+        timestamp: DateTime.now(),
+      );
+      final MessageObject messageObject = message.toObject();
+      _hiveBox.put(messageObject.id, messageObject);
+    } catch (e) {
+      emit(MessageError(message: '$e'));
+    }
   }
 
-  FutureOr<void> _sendMessage(MessageSend event, Emitter emit) {
-    final MessageObject messageObject = Message(
+  FutureOr<void> _sendMessage(MessageSend event, Emitter emit) async {
+    final Message message = Message(
       id: const Uuid().v4(),
       text: event.message,
       rootMindId: event.rootMindId,
       timestamp: DateTime.now(),
-    ).toObject();
-    _hiveBox.put(messageObject.id, messageObject);
+    );
+    final MessageObject messageObject = message.toObject();
+    try {
+      await _hiveBox.put(messageObject.id, messageObject);
+    } on Exception catch (e) {
+      emit(MessageError(message: '$e'));
+    }
   }
+
+  // TODO: add additional chlidren minds if any.
 
   String _makeStartingPromt(Mind mind) {
     final String prompt = '''
-        Its my mind with content - ${mind.note}. I set this emoji for this note - ${mind.emoji}.
+        It's my mind with the note - ${mind.note}. 
+        I've set this emoji for the note - ${mind.emoji}.
         Could you give short comment like a pro psycologist?
-        Its important to use language of message content for feedback otherwise I dont know english.
-        ''';
+        It's really important to use language of the note's text for feedback.
+    ''';
     return prompt;
   }
 }

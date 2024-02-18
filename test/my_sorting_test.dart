@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
 
 void main() {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/widgets/rounded_container.dart';
