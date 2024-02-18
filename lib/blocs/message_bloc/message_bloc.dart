@@ -131,7 +131,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
         It's my mind with the note - ${mind.note}. 
         I've set this emoji for the note - ${mind.emoji}.
         Could you give short comment like a pro psycologist?
-        It's really important to use language of the note's text for feedback.
+        It's important to use language of message content for feedback otherwise I dont know english.
     ''';
     return prompt;
   }
