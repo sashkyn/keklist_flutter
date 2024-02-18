@@ -7,7 +7,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/blocs/message_bloc/message_bloc.dart';
 import 'package:keklist/keklist_app.dart';
 import 'package:keklist/services/hive/constants.dart';
 import 'package:keklist/services/hive/entities/message/message_object.dart';
