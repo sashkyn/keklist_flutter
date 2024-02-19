@@ -150,7 +150,7 @@ platform :ios do
     )
     cocoapods(
       repo_update: true, 
-      use_bundle_exec: false
+      use_bundle_exec: true
     )
     build_app(
       workspace: "Runner.xcworkspace", 
