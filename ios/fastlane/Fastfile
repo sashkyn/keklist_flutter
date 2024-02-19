@@ -1,5 +1,17 @@
 default_platform(:ios)
 
+APP_IDENTIFIERS = [
+  "com.sashkyn.kekable", 
+  "com.sashkyn.kekable.watchkitapp",
+  "com.sashkyn.kekable.widget"
+]
+
+PROVISIONING_PROFILES = {
+  "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
+  "com.sashkyn.kekable.watchkitapp" => "match AppStore com.sashkyn.kekable.watchkitapp",
+  "com.sashkyn.kekable.widget" => "match AppStore com.sashkyn.kekable.widget"
+}
+
 def delete_temp_keychain(name)
   delete_keychain(
     name: name
@@ -27,11 +39,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "development"
@@ -39,11 +47,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
@@ -71,11 +75,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "development",
@@ -88,11 +88,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
@@ -102,16 +98,16 @@ platform :ios do
       keychain_password: keychain_password,
       force_for_new_devices: true
     )
+    cocoapods(
+      repo_update: true, 
+      use_bundle_exec: false
+    )
     build_app(
       workspace: "Runner.xcworkspace", 
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
-        provisioningProfiles: {
-          "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
-          "com.sashkyn.kekable.watchkitapp" => "match AppStore com.sashkyn.kekable.watchkitapp",
-          "com.sashkyn.kekable.widget" => "match AppStore com.sashkyn.kekable.widget"
-        }
+        provisioningProfiles: PROVISIONING_PROFILES
       },
       verbose: true
     )
@@ -135,11 +131,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "development",
@@ -149,11 +141,7 @@ platform :ios do
     match(
       username: "#{ENV["APPLE_ID"]}",
       team_id: "#{ENV["APPLE_TEAM_ID"]}",
-      app_identifier: [
-        "com.sashkyn.kekable", 
-        "com.sashkyn.kekable.watchkitapp",
-        "com.sashkyn.kekable.widget"
-      ],
+      app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
       type: "appstore",
@@ -169,11 +157,7 @@ platform :ios do
       scheme: "Runner",
       export_method: "app-store",
       export_options: {
-        provisioningProfiles: {
-          "com.sashkyn.kekable" => "match AppStore com.sashkyn.kekable",
-          "com.sashkyn.kekable.watchkitapp" => "match AppStore com.sashkyn.kekable.watchkitapp",
-          "com.sashkyn.kekable.widget" => "match AppStore com.sashkyn.kekable.widget"
-        }
+        provisioningProfiles: PROVISIONING_PROFILES
       },
       verbose: true
     )
