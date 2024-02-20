@@ -42,6 +42,7 @@ platform :ios do
       app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
+      readonly: false,
       type: "development"
     )
     match(
@@ -50,6 +51,7 @@ platform :ios do
       app_identifier: APP_IDENTIFIERS,
       git_basic_authorization: "#{ENV["FASTLANE_GITHUB_BASIC_AUTH_BASE64"]}",
       git_url: "#{ENV["FASTLANE_MATCH_GIT_URL"]}",
+      readonly: false,
       type: "appstore",
     )
   end
@@ -65,7 +67,6 @@ platform :ios do
       keychain_name, 
       keychain_password
     )
-
     api_key = app_store_connect_api_key(
       key_id: "#{ENV["APPSTORE_KEY_ID"]}",
       issuer_id: "#{ENV["APPSTORE_ISSUER_ID"]}",
@@ -98,10 +99,6 @@ platform :ios do
       keychain_password: keychain_password,
       force_for_new_devices: true
     )
-    cocoapods(
-      repo_update: true, 
-      use_bundle_exec: false
-    )
     build_app(
       workspace: "Runner.xcworkspace", 
       scheme: "Runner",
@@ -116,6 +113,7 @@ platform :ios do
       skip_submission: true,
       ipa: "./Runner.ipa"
     )
+    delete_temp_keychain(keychain_name)
   end
 end
 
