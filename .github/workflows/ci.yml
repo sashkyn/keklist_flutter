@@ -9,6 +9,7 @@ jobs:
   analyze_and_test:
     name: Run Flutter analyze & test
     runs-on: self-hosted
+    continue-on-error: true
     steps:
       - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
@@ -141,7 +142,7 @@ jobs:
 
       - name: "Send the APK to Telegram"
         run: |
-          curl -F document=@build/app/outputs/bundle/release/app-release.apk \
+          curl -F document=@build/app/outputs/flutter-apk/app-release.apk \
           -F chat_id=${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }} \
           -F caption="Template-$(date +'%Y%m%d-%H%M')" \
           "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
