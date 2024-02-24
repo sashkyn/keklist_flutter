@@ -119,7 +119,7 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                         onPressed: () => _bloc.add(
                           MessageStartDiscussion(
                             mind: rootMind,
-                            children: mindChildren,
+                            mindChildren: mindChildren,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(

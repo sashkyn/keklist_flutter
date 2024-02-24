@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'entities/mind.dart';
+import '../entities/mind.dart';
 
-abstract class MainService {
+abstract class MindService {
   Future<void> editMind({required Mind mind});
   Future<void> createMind(Mind mind);
   Future<void> deleteMind(String id);

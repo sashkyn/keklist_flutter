@@ -25,7 +25,7 @@ import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/constants.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
 
@@ -85,20 +85,20 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => MindBloc(
-            mainService: mainInjector.get<MainService>(),
+            mainService: mainInjector.get<MindService>(),
             mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
           ),
         ),
         BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
         BlocProvider(
           create: (context) => AuthBloc(
-            mainService: mainInjector.get<MainService>(),
+            mainService: mainInjector.get<MindService>(),
             client: Supabase.instance.client,
           ),
         ),
         BlocProvider(
           create: (context) => SettingsBloc(
-            mainService: mainInjector.get<MainService>(),
+            mainService: mainInjector.get<MindService>(),
             client: Supabase.instance.client,
           ),
         ),

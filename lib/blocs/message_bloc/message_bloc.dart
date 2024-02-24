@@ -15,6 +15,8 @@ import 'package:uuid/uuid.dart';
 part 'message_event.dart';
 part 'message_state.dart';
 
+// TODO: написать сервис который будет удобен в интерфейсе для взаимодействия с чатом и сообщениями.
+
 class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   final Box<MessageObject> _hiveBox = Hive.box<MessageObject>(HiveConstants.messageChatBoxName);
   Iterable<MessageObject> get _hiveObjects => _hiveBox.values;
@@ -53,8 +55,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
           _hiveObjects.where((element) => element.rootMindId == event.rootMindId).map((object) => object.id).toList();
       await _hiveBox.deleteAll(messageObjectIdsToDelete);
       add(MessageGetAll());
-    } catch (e) {
-      emit(MessageError(message: '$e'));
+    } catch (error) {
+      emit(MessageError(message: '$error'));
     }
   }
 
@@ -68,11 +70,29 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       emit(MessageError(message: '$error'));
       return;
     }
-    final String prompt = _makeInitialSystemPromt(
-      mind: event.mind,
-      childrenMinds: event.children,
-    );
 
+    final OpenAIChatCompletionModel chatCompletion = await _requestChatCompletionFromAI(
+      mind: event.mind,
+      mindChildren: event.mindChildren,
+    );
+    emit(MessageLoadingStatus(isLoading: false));
+    try {
+      final Message message = _getLastMessage(chatCompletion, event);
+      final MessageObject messageObject = message.toObject();
+      _hiveBox.put(messageObject.id, messageObject);
+    } catch (error) {
+      emit(MessageError(message: '$error'));
+    }
+  }
+
+  Future<OpenAIChatCompletionModel> _requestChatCompletionFromAI({
+    required Mind mind,
+    required List<Mind> mindChildren,
+  }) async {
+    final String prompt = _makeInitialSystemPromt(
+      mind: mind,
+      mindChildren: mindChildren,
+    );
     final systemMessage = OpenAIChatCompletionChoiceMessageModel(
       content: [
         OpenAIChatCompletionChoiceMessageContentItemModel.text(prompt),
@@ -92,34 +112,32 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       temperature: 0.2, // 0.2 determined, 0.8 more random, 2.0 very random
       maxTokens: 256,
     );
-    emit(MessageLoadingStatus(isLoading: false));
-    try {
-      if (chatCompletion.choices.isEmpty) {
-        throw Exception('There are no chat completion choices!');
-      }
-      final OpenAIChatCompletionChoiceModel firstChoice = chatCompletion.choices.first;
-      if (firstChoice.message.content == null) {
-        throw Exception('There are no chat completion choices!');
-      }
-      final OpenAIChatCompletionChoiceMessageContentItemModel? firstChoiceContent = firstChoice.message.content?.first;
-      if (firstChoiceContent == null) {
-        throw Exception('There are no chat completion choices!');
-      }
-      final String? messageText = firstChoiceContent.text;
-      if (messageText == null || messageText.isEmpty) {
-        throw Exception('There is no message!');
-      }
-      final Message message = Message(
-        id: const Uuid().v4(),
-        text: messageText,
-        rootMindId: event.mind.id,
-        timestamp: DateTime.now(),
-      );
-      final MessageObject messageObject = message.toObject();
-      _hiveBox.put(messageObject.id, messageObject);
-    } catch (error) {
-      emit(MessageError(message: '$error'));
+    return chatCompletion;
+  }
+
+  Message _getLastMessage(OpenAIChatCompletionModel chatCompletion, MessageStartDiscussion event) {
+    if (chatCompletion.choices.isEmpty) {
+      throw Exception('There are no chat completion choices!');
     }
+    final OpenAIChatCompletionChoiceModel firstChoice = chatCompletion.choices.first;
+    if (firstChoice.message.content == null) {
+      throw Exception('There are no chat completion choices!');
+    }
+    final OpenAIChatCompletionChoiceMessageContentItemModel? firstChoiceContent = firstChoice.message.content?.first;
+    if (firstChoiceContent == null) {
+      throw Exception('There are no chat completion choices!');
+    }
+    final String? messageText = firstChoiceContent.text;
+    if (messageText == null || messageText.isEmpty) {
+      throw Exception('There is no message!');
+    }
+    final Message message = Message(
+      id: const Uuid().v4(),
+      text: messageText,
+      rootMindId: event.mind.id,
+      timestamp: DateTime.now(),
+    );
+    return message;
   }
 
   FutureOr<void> _sendMessage(MessageSend event, Emitter emit) async {
@@ -139,13 +157,13 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
 
   String _makeInitialSystemPromt({
     required Mind mind,
-    required List<Mind> childrenMinds,
+    required List<Mind> mindChildren,
   }) {
     final String mindChildrenPromt = () {
-      if (childrenMinds.isEmpty) {
+      if (mindChildren.isEmpty) {
         return '';
       }
-      final String mindChildrenPromt = childrenMinds.map((mind) => '${mind.emoji} - ${mind.note}').join(';\n');
+      final String mindChildrenPromt = mindChildren.map((mind) => '${mind.emoji} - ${mind.note}').join(';\n');
       return 'Here is my list of comments for this mind:\n$mindChildrenPromt';
     }();
 

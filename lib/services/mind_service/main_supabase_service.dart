@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:keklist/services/keklist_error.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 
-class MainSupabaseService implements MainService {
+final class MindSupabaseService implements MindService {
   final SupabaseClient _client = Supabase.instance.client;
 
   @override

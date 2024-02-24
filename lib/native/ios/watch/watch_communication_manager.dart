@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:keklist/core/enum_from_string.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 
 abstract class WatchCommunicationManager {
@@ -20,7 +20,7 @@ abstract class WatchCommunicationManager {
 class AppleWatchCommunicationManager implements WatchCommunicationManager {
   final MethodChannel _channel = const MethodChannel('com.sashkyn.kekable');
 
-  final MainService mainService;
+  final MindService mainService;
   final SupabaseClient client;
 
   AppleWatchCommunicationManager({

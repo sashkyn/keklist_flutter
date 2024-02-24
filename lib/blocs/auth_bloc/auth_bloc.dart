@@ -8,13 +8,13 @@ import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/limitaions.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
-  final MainService mainService;
+  final MindService mainService;
   final SupabaseClient client;
 
   AuthBloc({

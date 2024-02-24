@@ -11,7 +11,7 @@ import 'package:keklist/services/hive/constants.dart';
 import 'package:keklist/services/hive/entities/mind/mind_object.dart';
 import 'package:keklist/services/hive/entities/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'settings_event.dart';
@@ -19,7 +19,7 @@ part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SupabaseClient client;
-  final MainService mainService;
+  final MindService mainService;
   final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
   final Box<SettingsObject> _settingsBox = Hive.box(HiveConstants.settingsBoxName);
 

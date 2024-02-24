@@ -22,15 +22,15 @@ class MessageClearChatWithMind extends MessageEvent {
 
 class MessageStartDiscussion extends MessageEvent {
   final Mind mind;
-  final List<Mind> children;
+  final List<Mind> mindChildren;
 
   MessageStartDiscussion({
     required this.mind,
-    required this.children,
+    required this.mindChildren,
   });
 
   @override
-  List<Object?> get props => [mind, children];
+  List<Object?> get props => [mind, mindChildren];
 }
 
 class MessageSend extends MessageEvent {

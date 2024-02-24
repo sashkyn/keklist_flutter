@@ -18,7 +18,7 @@ import 'package:keklist/services/hive/entities/settings/settings_object.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/services/mind_service/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -28,7 +28,7 @@ part 'mind_event.dart';
 part 'mind_state.dart';
 
 final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
-  late final MainService _service;
+  late final MindService _service;
   late final MindSearcherCubit _searcherCubit;
 
   final SettingsObject? _settings =
@@ -46,7 +46,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   Stream<QueueTransactionObject?> get _mindQueueStream => _mindQueueTransactionsBox.watch().map((event) => event.value);
 
   MindBloc({
-    required MainService mainService,
+    required MindService mainService,
     required MindSearcherCubit mindSearcherCubit,
   }) : super(MindList(values: const [])) {
     _service = mainService;
