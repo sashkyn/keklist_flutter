@@ -58,6 +58,7 @@ dependencies:
   sign_in_with_apple: ^5.0.0
   crypto: ^3.0.3
   chat_gpt_api: ^2.0.0
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

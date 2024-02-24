@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/limitaions.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:keklist/services/main_service.dart';
@@ -67,11 +69,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
 
   Future<void> _authWithSocialNetwork(event, emit) async {
     switch (event.socialNetwork) {
-      case SocialNetwork.google:
+      case KeklistSupportedSocialNetwork.google:
         return _signInWithWebOAuth(OAuthProvider.google);
-      case SocialNetwork.facebook:
+      case KeklistSupportedSocialNetwork.facebook:
         return _signInWithWebOAuth(OAuthProvider.facebook);
-      case SocialNetwork.apple:
+      case KeklistSupportedSocialNetwork.apple:
         return _signInWithWebOAuth(OAuthProvider.apple);
     }
   }
@@ -79,6 +81,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   Future<void> _signInWithWebOAuth(OAuthProvider provider) async {
     if (provider == OAuthProvider.apple) {
       await _signInWithApple();
+      return;
+    }
+
+    if (provider == OAuthProvider.google) {
+      await _signInWithGoogle();
       return;
     }
 
@@ -108,6 +115,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     //   redirectTo: 'io.supabase.zenmode',
     //   authScreenLaunchMode: LaunchMode.inAppBrowserView,
     // );
+  }
+
+  /// TODO:
+  /// Add scope only for email
+  /// Wait responce from Google about adding logo
+  /// Test on iOS, make only for android if needed
+  Future<AuthResponse> _signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final googleUser = await googleSignIn.signIn();
+    final googleAuth = await googleUser!.authentication;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      throw 'Google: No ID Token found.';
+    }
+
+    return client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: googleAuth.accessToken,
+    );
   }
 
   Future<AuthResponse> _signInWithApple() async {
