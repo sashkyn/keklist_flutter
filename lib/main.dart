@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
@@ -44,9 +45,17 @@ Future<void> main() async {
   final Injector mainInjector = MainContainer().initialize(injector);
 
   _connectToWatchCommunicationManager(mainInjector);
-  _enableBlocLogs();
+  _enableDebugBLOCLogs();
+  _configureOpenAI();
+
   final Widget application = _getApplication(mainInjector);
   runApp(application);
+}
+
+void _configureOpenAI() {
+  OpenAI.apiKey = dotenv.get('OPEN_AI_TOKEN');
+  OpenAI.showLogs = !kReleaseMode;
+  OpenAI.requestsTimeOut = const Duration(seconds: 40);
 }
 
 Future<void> _initSupabase() async {
@@ -58,7 +67,7 @@ Future<void> _initSupabase() async {
   );
 }
 
-void _enableBlocLogs() {
+void _enableDebugBLOCLogs() {
   if (!kReleaseMode) {
     Bloc.observer = LoggerBlocObserver();
   }

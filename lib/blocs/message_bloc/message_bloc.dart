@@ -1,11 +1,8 @@
 import 'dart:async';
 
-import 'package:chat_gpt_api/app/chat_gpt.dart';
-import 'package:chat_gpt_api/app/model/data_model/chat/chat_completion.dart';
-import 'package:chat_gpt_api/app/model/data_model/chat/chat_request.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
@@ -19,7 +16,6 @@ part 'message_event.dart';
 part 'message_state.dart';
 
 class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
-  final ChatGPT _chatGpt = ChatGPT.builder(token: dotenv.get('OPEN_AI_TOKEN'));
   final Box<MessageObject> _hiveBox = Hive.box<MessageObject>(HiveConstants.messageChatBoxName);
   Iterable<MessageObject> get _hiveObjects => _hiveBox.values;
   Stream<MessageObject?> get _hiveObjectsStream =>
@@ -63,7 +59,6 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   }
 
   FutureOr<void> _startNewDiscussion(MessageStartDiscussion event, Emitter emit) async {
-    // await _hiveBox.clear();
     emit(MessageLoadingStatus(isLoading: true));
     try {
       await _hiveBox.deleteAll(
@@ -73,32 +68,47 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       emit(MessageError(message: '$error'));
       return;
     }
-    final String prompt = _makeStartingPromt(
+    final String prompt = _makeInitialSystemPromt(
       mind: event.mind,
       childrenMinds: event.children,
     );
-    final ChatCompletion? chatCompletion = await _chatGpt.chatCompletion(
-      request: ChatRequest(
-        model: 'gpt-3.5-turbo-0125',
-        maxTokens: 256,
-        messages: [
-          ChatMessage(
-            role: 'system',
-            content: prompt,
-          ),
-        ],
-      ),
+
+    final systemMessage = OpenAIChatCompletionChoiceMessageModel(
+      content: [
+        OpenAIChatCompletionChoiceMessageContentItemModel.text(prompt),
+      ],
+      role: OpenAIChatMessageRole.system,
+    );
+
+    // all messages to be sent.
+    final requestMessages = [systemMessage];
+
+    final OpenAIChatCompletionModel chatCompletion = await OpenAI.instance.chat.create(
+      // model: "gpt-3.5-turbo-1106",
+      model: 'gpt-4-0125-preview',
+      n: 1,
+      seed: 6,
+      messages: requestMessages,
+      temperature: 0.2, // 0.2 determined, 0.8 more random, 2.0 very random
+      maxTokens: 256,
     );
     emit(MessageLoadingStatus(isLoading: false));
     try {
-      if (chatCompletion == null) {
-        throw Exception('There is no chat completion!');
-      }
-
-      if (chatCompletion.choices == null) {
+      if (chatCompletion.choices.isEmpty) {
         throw Exception('There are no chat completion choices!');
       }
-      final String messageText = chatCompletion.choices!.map((choice) => choice.message?.content).join('\n');
+      final OpenAIChatCompletionChoiceModel firstChoice = chatCompletion.choices.first;
+      if (firstChoice.message.content == null) {
+        throw Exception('There are no chat completion choices!');
+      }
+      final OpenAIChatCompletionChoiceMessageContentItemModel? firstChoiceContent = firstChoice.message.content?.first;
+      if (firstChoiceContent == null) {
+        throw Exception('There are no chat completion choices!');
+      }
+      final String? messageText = firstChoiceContent.text;
+      if (messageText == null || messageText.isEmpty) {
+        throw Exception('There is no message!');
+      }
       final Message message = Message(
         id: const Uuid().v4(),
         text: messageText,
@@ -127,7 +137,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
     }
   }
 
-  String _makeStartingPromt({
+  String _makeInitialSystemPromt({
     required Mind mind,
     required List<Mind> childrenMinds,
   }) {
