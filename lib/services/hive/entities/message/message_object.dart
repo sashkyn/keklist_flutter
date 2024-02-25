@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:keklist/core/enum_from_string.dart';
 import 'package:keklist/services/entities/message.dart';
 
 part 'message_object.g.dart';
@@ -17,6 +18,9 @@ class MessageObject extends HiveObject {
   @HiveField(3)
   late DateTime timestamp;
 
+  @HiveField(4)
+  late String? sender;
+
   MessageObject();
 
   Message toMessage() => Message(
@@ -24,5 +28,6 @@ class MessageObject extends HiveObject {
         text: text,
         rootMindId: rootMindId,
         timestamp: timestamp,
+        sender: enumFromString(value: sender, fromValues: MessageSender.values) ?? MessageSender.assistant,
       );
 }

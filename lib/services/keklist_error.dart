@@ -1,5 +1,3 @@
-import 'dart:math';
-
 enum KeklistErrorType {
   noAuthed(localizedMessage: 'Auth session has expired'),
   noConnection(localizedMessage: 'No internet connection'),

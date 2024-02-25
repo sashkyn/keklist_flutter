@@ -20,13 +20,14 @@ class MessageObjectAdapter extends TypeAdapter<MessageObject> {
       ..id = fields[0] as String
       ..text = fields[1] as String
       ..rootMindId = fields[2] as String
-      ..timestamp = fields[3] as DateTime;
+      ..timestamp = fields[3] as DateTime
+      ..sender = fields[4] as String?;
   }
 
   @override
   void write(BinaryWriter writer, MessageObject obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -34,7 +35,9 @@ class MessageObjectAdapter extends TypeAdapter<MessageObject> {
       ..writeByte(2)
       ..write(obj.rootMindId)
       ..writeByte(3)
-      ..write(obj.timestamp);
+      ..write(obj.timestamp)
+      ..writeByte(4)
+      ..write(obj.sender);
   }
 
   @override

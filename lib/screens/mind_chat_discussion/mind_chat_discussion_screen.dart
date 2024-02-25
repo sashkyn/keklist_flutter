@@ -140,10 +140,10 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                       MindBulletListWidget(
                         minds: messages
                             .map(
-                              (e) => Mind(
+                              (message) => Mind(
                                 creationDate: DateTime.now(),
-                                emoji: '👨‍⚕️',
-                                note: e.text,
+                                emoji: message.sender == MessageSender.assistant ? '👨‍⚕️' : '💬',
+                                note: message.text,
                                 id: const Uuid().v4(),
                                 dayIndex: 0,
                                 sortIndex: 0,

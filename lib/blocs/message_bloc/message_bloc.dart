@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dart_openai/dart_openai.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +9,7 @@ import 'package:keklist/services/entities/message.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/services/hive/constants.dart';
 import 'package:keklist/services/hive/entities/message/message_object.dart';
+import 'package:keklist/services/message_service/message_service.dart';
 import 'package:uuid/uuid.dart';
 
 part 'message_event.dart';
@@ -18,6 +18,8 @@ part 'message_state.dart';
 // TODO: написать сервис который будет удобен в интерфейсе для взаимодействия с чатом и сообщениями.
 
 class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
+  // TODO: extract to DI
+  final MessageService _messageService = MessageOpenAIService();
   final Box<MessageObject> _hiveBox = Hive.box<MessageObject>(HiveConstants.messageChatBoxName);
   Iterable<MessageObject> get _hiveObjects => _hiveBox.values;
   Stream<MessageObject?> get _hiveObjectsStream =>
@@ -41,8 +43,11 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
 
   FutureOr<void> _getMessages(MessageGetAll event, Emitter emit) {
     try {
-      final List<Message> messages =
-          _hiveObjects.map((object) => object.toMessage()).mySortedBy((object) => object.timestamp).toList();
+      final List<Message> messages = _hiveObjects
+        .map((messageObject) => messageObject.toMessage())
+        .where((message) => message.sender != MessageSender.system)
+        .mySortedBy((message) => message.timestamp)
+        .toList();
       emit(MessageChat(messages: messages));
     } catch (error) {
       emit(MessageError(message: '$error'));
@@ -70,89 +75,56 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       emit(MessageError(message: '$error'));
       return;
     }
-
-    final OpenAIChatCompletionModel chatCompletion = await _requestChatCompletionFromAI(
-      mind: event.mind,
-      mindChildren: event.mindChildren,
+    final MessageHistory messageHistory = await _messageService.initializeDiscussion(
+      rootMind: event.mind,
+      rootMindChildren: event.mindChildren,
+      initMessageText: _makeInitialSystemPromt(
+        mind: event.mind,
+        mindChildren: event.mindChildren,
+      ),
     );
-    emit(MessageLoadingStatus(isLoading: false));
     try {
-      final Message message = _getLastMessage(chatCompletion, event);
-      final MessageObject messageObject = message.toObject();
-      _hiveBox.put(messageObject.id, messageObject);
+      final Map<String, MessageObject> messageObjects = {};
+      for (final Message message in messageHistory.messages) {
+        final MessageObject messageObject = message.toObject();
+        messageObjects[messageObject.id] = messageObject;
+      }
+      await _hiveBox.putAll(messageObjects);
     } catch (error) {
       emit(MessageError(message: '$error'));
     }
-  }
-
-  Future<OpenAIChatCompletionModel> _requestChatCompletionFromAI({
-    required Mind mind,
-    required List<Mind> mindChildren,
-  }) async {
-    final String prompt = _makeInitialSystemPromt(
-      mind: mind,
-      mindChildren: mindChildren,
-    );
-    final systemMessage = OpenAIChatCompletionChoiceMessageModel(
-      content: [
-        OpenAIChatCompletionChoiceMessageContentItemModel.text(prompt),
-      ],
-      role: OpenAIChatMessageRole.system,
-    );
-
-    // all messages to be sent.
-    final requestMessages = [systemMessage];
-
-    final OpenAIChatCompletionModel chatCompletion = await OpenAI.instance.chat.create(
-      // model: "gpt-3.5-turbo-1106",
-      model: 'gpt-4-0125-preview',
-      n: 1,
-      seed: 6,
-      messages: requestMessages,
-      temperature: 0.2, // 0.2 determined, 0.8 more random, 2.0 very random
-      maxTokens: 256,
-    );
-    return chatCompletion;
-  }
-
-  Message _getLastMessage(OpenAIChatCompletionModel chatCompletion, MessageStartDiscussion event) {
-    if (chatCompletion.choices.isEmpty) {
-      throw Exception('There are no chat completion choices!');
-    }
-    final OpenAIChatCompletionChoiceModel firstChoice = chatCompletion.choices.first;
-    if (firstChoice.message.content == null) {
-      throw Exception('There are no chat completion choices!');
-    }
-    final OpenAIChatCompletionChoiceMessageContentItemModel? firstChoiceContent = firstChoice.message.content?.first;
-    if (firstChoiceContent == null) {
-      throw Exception('There are no chat completion choices!');
-    }
-    final String? messageText = firstChoiceContent.text;
-    if (messageText == null || messageText.isEmpty) {
-      throw Exception('There is no message!');
-    }
-    final Message message = Message(
-      id: const Uuid().v4(),
-      text: messageText,
-      rootMindId: event.mind.id,
-      timestamp: DateTime.now(),
-    );
-    return message;
+    emit(MessageLoadingStatus(isLoading: false));
   }
 
   FutureOr<void> _sendMessage(MessageSend event, Emitter emit) async {
-    final Message message = Message(
+    emit(MessageLoadingStatus(isLoading: true));
+    final Message userMessage = Message(
       id: const Uuid().v4(),
       text: event.message,
       rootMindId: event.rootMindId,
       timestamp: DateTime.now(),
+      sender: MessageSender.user,
     );
-    final MessageObject messageObject = message.toObject();
+    final MessageObject userMessageObject = userMessage.toObject();
     try {
-      await _hiveBox.put(messageObject.id, messageObject);
+      await _hiveBox.put(userMessageObject.id, userMessageObject);
     } catch (error) {
       emit(MessageError(message: '$error'));
     }
+
+    final Message openAIAnswerMessage = await _messageService.requestAnswer(
+      history: MessageHistory(
+        messages: _hiveObjects.map((object) => object.toMessage()).mySortedBy((object) => object.timestamp).toList(),
+        rootMindId: event.rootMindId,
+      ),
+    );
+
+    try {
+      await _hiveBox.put(openAIAnswerMessage.id, openAIAnswerMessage.toObject());
+    } catch (error) {
+      emit(MessageError(message: '$error'));
+    }
+    emit(MessageLoadingStatus(isLoading: false));
   }
 
   String _makeInitialSystemPromt({

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:keklist/core/enum_from_string.dart';
 import 'package:keklist/services/hive/entities/message/message_object.dart';
 
 class Message with EquatableMixin {
@@ -6,12 +7,14 @@ class Message with EquatableMixin {
   final String text;
   final String rootMindId;
   final DateTime timestamp;
+  final MessageSender sender;
 
   Message({
     required this.id,
     required this.text,
     required this.rootMindId,
     required this.timestamp,
+    required this.sender,
   });
 
   @override
@@ -29,5 +32,8 @@ class Message with EquatableMixin {
     ..id = id
     ..text = text
     ..rootMindId = rootMindId
-    ..timestamp = timestamp;
+    ..timestamp = timestamp
+    ..sender = stringFromEnum(sender);
 }
+
+enum MessageSender { user, system, assistant }
