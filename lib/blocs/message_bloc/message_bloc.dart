@@ -44,10 +44,10 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   FutureOr<void> _getMessages(MessageGetAll event, Emitter emit) {
     try {
       final List<Message> messages = _hiveObjects
-        .map((messageObject) => messageObject.toMessage())
-        .where((message) => message.sender != MessageSender.system)
-        .mySortedBy((message) => message.timestamp)
-        .toList();
+          .map((messageObject) => messageObject.toMessage())
+          .where((message) => message.sender != MessageSender.system)
+          .mySortedBy((message) => message.timestamp)
+          .toList();
       emit(MessageChat(messages: messages));
     } catch (error) {
       emit(MessageError(message: '$error'));
@@ -140,11 +140,14 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
     }();
 
     final String prompt = '''
-        It's my mind with the note - ${mind.note}. 
-        I've set this emoji for the note - ${mind.emoji}.
-        $mindChildrenPromt
-        Could you give short comment like a pro psycologist?
-        It's important to use language of message content for feedback otherwise I dont know english.
+    ACT YOUR SELF LIKE PRO SPECIALIST.
+    It's my mind with the note - ${mind.note}. 
+    I've set this emoji for the note - ${mind.emoji}.
+    $mindChildrenPromt
+    It's important to use language of message content for feedback otherwise I dont know english.
+    You have only 220 tokens to each answer. PLEASE Give your further answers as short as possible.
+    ALWAYS ASK something in the end of your message.
+    DO NOT USE MARKDOWNS.
     ''';
     return prompt;
   }

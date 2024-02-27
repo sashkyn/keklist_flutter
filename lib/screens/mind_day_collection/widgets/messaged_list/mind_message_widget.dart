@@ -63,9 +63,13 @@ class MindMessageWidget extends StatelessWidget {
               children: children
                   .mySortedBy((it) => it.creationDate)
                   .map(
-                    (mindChild) => MindBulletWidget(
-                      mind: mindChild,
-                      onOptions: null,
+                    (e) => MindBulletWidget(
+                      model: MindBulletModel(
+                        entityId: e.id,
+                        emoji: e.emoji,
+                        text: e.note,
+                        emojiLocation: MindBulletWidgetEmojiLocation.leading,
+                      ),
                     ),
                   )
                   .toList(),

@@ -7,10 +7,10 @@ import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
 import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/services/entities/message.dart';
 import 'package:keklist/services/entities/mind.dart';
-import 'package:uuid/uuid.dart';
 
 class MindChatDiscussionScreen extends StatefulWidget {
   final Mind rootMind;
@@ -54,8 +54,9 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
 
   @override
   Future<void> dispose() async {
-    await _bloc.close();
     super.dispose();
+
+    await _bloc.close();
   }
 
   @override
@@ -129,26 +130,24 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                           padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
                           backgroundColor: Colors.red,
                         ),
-                        child: const Text('Start discussion',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            )),
+                        child: const Text(
+                          'Start discussion',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     },
                     if (messages.isNotEmpty) ...{
                       MindBulletListWidget(
-                        minds: messages
+                        models: messages
                             .map(
-                              (message) => Mind(
-                                creationDate: DateTime.now(),
-                                emoji: message.sender == MessageSender.assistant ? '👨‍⚕️' : '💬',
-                                note: message.text,
-                                id: const Uuid().v4(),
-                                dayIndex: 0,
-                                sortIndex: 0,
-                                rootId: null,
-                              ),
+                              (message) => MindBulletModel(
+                                  entityId: message.id,
+                                  emoji: message.sender == MessageSender.assistant ? '👨‍⚕️' : '💬',
+                                  text: message.text,
+                                  emojiLocation: MindBulletWidgetEmojiLocation.leading),
                             )
                             .toList(),
                         onTap: (_) {},

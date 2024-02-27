@@ -1,6 +1,7 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
@@ -94,9 +95,17 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                       height: 8.0,
                     ),
                     MindBulletListWidget(
-                      minds: childMinds,
-                      onTap: (Mind mind) => () {},
-                      onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                      models: childMinds.map((mind) => MindBulletModel(
+                          entityId: mind.id,
+                          emoji: mind.emoji,
+                          text: mind.note,
+                          emojiLocation: MindBulletWidgetEmojiLocation.leading,
+                        )).toList(),
+                      onTap: (_) => () {},
+                      onOptions: (String mindId) {
+                        final Mind mind = childMinds.firstWhere((element) => element.id == mindId);
+                        _showMindOptionsActionSheet(mind);
+                      },
                     ),
                     Container(
                       color: Theme.of(context).scaffoldBackgroundColor,

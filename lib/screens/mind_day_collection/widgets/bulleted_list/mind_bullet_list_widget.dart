@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
-import 'package:keklist/services/entities/mind.dart';
 
-class MindBulletListWidget extends StatelessWidget {
-  final List<Mind> minds;
-  final Function(Mind) onTap;
-  final Function(Mind) onOptions;
+final class MindBulletListWidget extends StatelessWidget {
+  final List<MindBulletModel> models;
+  final Function(String) onTap;
+  final Function(String) onOptions;
 
   const MindBulletListWidget({
     super.key,
-    required this.minds,
+    required this.models,
     required this.onTap,
     required this.onOptions,
   });
@@ -18,14 +17,11 @@ class MindBulletListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: minds.map((mind) {
+      children: models.map((model) {
         return GestureDetector(
-          onTap: () => onTap(mind),
-          onLongPress: () => onOptions(mind),
-          child: MindBulletWidget(
-            mind: mind,
-            onOptions: () => onOptions(mind),
-          ),
+          onTap: () => onTap(model.entityId),
+          onLongPress: () => onOptions(model.entityId),
+          child: MindBulletWidget(model: model),
         );
       }).toList(),
     ).animate().fadeIn();
