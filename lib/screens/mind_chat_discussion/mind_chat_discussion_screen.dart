@@ -144,14 +144,14 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                         models: messages
                             .map(
                               (message) => MindBulletModel(
-                                  entityId: message.id,
-                                  emoji: message.sender == MessageSender.assistant ? '👨‍⚕️' : '💬',
-                                  text: message.text,
-                                  emojiLocation: MindBulletWidgetEmojiLocation.leading),
+                                entityId: message.id,
+                                emoji: message.sender == MessageSender.assistant ? '👨‍⚕️' : '💬',
+                                text: message.text,
+                              ),
                             )
                             .toList(),
                         onTap: (_) {},
-                        onOptions: (_) {},
+                        onLongPress: (_) {},
                       ),
                     },
                     const Gap(8.0),

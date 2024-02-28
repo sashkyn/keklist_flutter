@@ -1,9 +1,11 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
+import 'package:keklist/core/helpers/extensions/state_extensions.dart';
+import 'package:keklist/core/screen/kek_screen_state.dart';
+import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/core/helpers/bloc_utils.dart';
@@ -27,7 +29,7 @@ final class MindInfoScreen extends StatefulWidget {
   State<MindInfoScreen> createState() => _MindInfoScreenState();
 }
 
-final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
+final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   bool _creatorPanelHasFocus = false;
@@ -37,7 +39,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   Mind get rootMind => widget.rootMind;
   List<Mind> get allMinds => widget.allMinds;
 
-  List<Mind> get childMinds => MindUtils.findMindsByRootId(
+  List<Mind> get rootMindChildren => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
       ).mySortedBy((mind) => mind.creationDate);
@@ -79,37 +81,53 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
             padding: const EdgeInsets.only(bottom: 150.0),
             child: SafeArea(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: MindMessageWidget(
                       mind: rootMind,
                       onOptions: null,
-                      children: const [],
+                      children: rootMindChildren,
                     ),
                   ),
-                  if (childMinds.isNotEmpty) ...{
-                    const Gap(16.0),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
+                  if (rootMindChildren.isNotEmpty) ...{
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0, right: 16.0),
+                      child: Text(
+                        'Extra',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                    MindBulletListWidget(
-                      models: childMinds.map((mind) => MindBulletModel(
-                          entityId: mind.id,
-                          emoji: mind.emoji,
-                          text: mind.note,
-                          emojiLocation: MindBulletWidgetEmojiLocation.leading,
-                        )).toList(),
-                      onTap: (_) => () {},
-                      onOptions: (String mindId) {
-                        final Mind mind = childMinds.firstWhere((element) => element.id == mindId);
-                        _showMindOptionsActionSheet(mind);
-                      },
-                    ),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
+                    CupertinoListSection(
+                      topMargin: 0.0,
+                      margin: EdgeInsets.zero,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      children: [
+                        CupertinoListTile(
+                          title: const Text('Chat with AI'),
+                          leading: const Icon(Icons.chat_rounded),
+                          trailing: const CupertinoListTileChevron(),
+                          onTap: () => _showMessageScreen(mind: rootMind),
+                        ),
+                        CupertinoListTile(
+                          title: const Text('Photos on this day'),
+                          trailing: const Row(
+                            children: [
+                              Text('Coming soon'),
+                              Gap(8.0),
+                              CupertinoListTileChevron(),
+                            ],
+                          ),
+                          leading: const Icon(Icons.photo),
+                          onTap: () {
+                            // TODO: open photos on this day
+                          },
+                        ),
+                      ],
                     ),
                   }
                 ],
@@ -175,13 +193,6 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
     );
   }
 
-  @override
-  void dispose() {
-    cancelSubscriptions();
-
-    super.dispose();
-  }
-
   void _resetMindCreator() {
     setState(() {
       _editableMind = null;
@@ -226,6 +237,17 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
+    );
+  }
+
+  void _showMessageScreen({required Mind mind}) async {
+    Navigator.of(mountedContext!).push(
+      MaterialPageRoute(
+        builder: (_) => MindChatDiscussionScreen(
+          rootMind: mind,
+          allMinds: allMinds,
+        ),
+      ),
     );
   }
 }

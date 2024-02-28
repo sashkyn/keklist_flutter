@@ -84,15 +84,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         sendEventTo<MindBloc>(MindChangeCreateText(text: _createMindEditingController.text));
       });
 
-      // TODO: сделать чтобы по перевороту работало а не по тряске, а то работает удовлетворительно
-      // NOTE: По тряске телефона скрываем/показываем текст эмодзи.
-      // final ShakeDetector shakeDetector = ShakeDetector.autoStart(
-      //   shakeThresholdGravity: 5.0,
-      //   shakeSlopTimeMS: 1300,
-      //   onPhoneShake: () => _changeContentVisibility(),
-      // );
-      // shakeDetector.streamSubscription?.disposed(by: this);
-
       _mindCreatorFocusNode.addListener(() {
         if (_hasFocus == _mindCreatorFocusNode.hasFocus) {
           return;
@@ -304,7 +295,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     );
   }
 
-  void _showDiscussionScreen({required Mind mind}) async {
+  void _showMessageScreen({required Mind mind}) async {
     Navigator.of(mountedContext!).push(
       MaterialPageRoute(
         builder: (_) => MindChatDiscussionScreen(
@@ -348,7 +339,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       ],
     );
     if (result == 'discuss_with_ai') {
-      _showDiscussionScreen(mind: mind);
+      _showMessageScreen(mind: mind);
     } else if (result == 'remove_key') {
       sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
     } else if (result == 'edit_key') {

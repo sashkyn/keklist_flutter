@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/core/widgets/rounded_container.dart';
 
 class MindMessageWidget extends StatelessWidget {
   final Mind mind;
-  final VoidCallback? onOptions;
   final List<Mind> children;
+  final Function(Mind)? onOptions;
 
   const MindMessageWidget({
     super.key,
     required this.mind,
-    required this.onOptions,
     required this.children,
+    this.onOptions,
   });
 
   @override
@@ -50,7 +51,7 @@ class MindMessageWidget extends StatelessWidget {
                   alignment: Alignment.topRight,
                   child: IconButton(
                     icon: const Icon(Icons.more_horiz),
-                    onPressed: onOptions,
+                    onPressed: () => onOptions?.call(mind),
                   ),
                 ),
               },
@@ -58,21 +59,19 @@ class MindMessageWidget extends StatelessWidget {
           ),
           if (children.isNotEmpty) ...[
             Container(height: 0.3, color: Colors.grey[300]),
-            const SizedBox(height: 16.0),
-            Column(
-              children: children
+            MindBulletListWidget(
+              models: children
                   .mySortedBy((it) => it.creationDate)
                   .map(
-                    (e) => MindBulletWidget(
-                      model: MindBulletModel(
-                        entityId: e.id,
-                        emoji: e.emoji,
-                        text: e.note,
-                        emojiLocation: MindBulletWidgetEmojiLocation.leading,
-                      ),
+                    (mind) => MindBulletModel(
+                      entityId: mind.id,
+                      emoji: mind.emoji,
+                      text: mind.note,
                     ),
                   )
                   .toList(),
+              onLongPress: (String) {},
+              onTap: (String) {},
             ),
             const SizedBox(height: 16.0),
           ]
