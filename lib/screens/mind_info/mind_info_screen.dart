@@ -1,7 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -87,49 +85,46 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: MindMessageWidget(
                       mind: rootMind,
-                      onOptions: null,
                       children: rootMindChildren,
+                      onOptions: (Mind mind) {
+                        _showMindOptionsActionSheet(mind);
+                      },
                     ),
                   ),
-                  if (rootMindChildren.isNotEmpty) ...{
-                    const Padding(
-                      padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0, right: 16.0),
-                      child: Text(
-                        'Extra',
-                        style: TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0, right: 16.0),
+                    child: Text(
+                      'Extra',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    CupertinoListSection(
-                      topMargin: 0.0,
-                      margin: EdgeInsets.zero,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  ListTile(
+                    title: const Text('Chat with AI'),
+                    leading: const Icon(Icons.chat_rounded),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _showMessageScreen(mind: rootMind),
+                  ),
+                  ListTile(
+                    title: const Text('Photos on this day'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        CupertinoListTile(
-                          title: const Text('Chat with AI'),
-                          leading: const Icon(Icons.chat_rounded),
-                          trailing: const CupertinoListTileChevron(),
-                          onTap: () => _showMessageScreen(mind: rootMind),
+                        Text(
+                          'Coming soon',
+                          style: TextStyle(color: Theme.of(context).disabledColor),
                         ),
-                        CupertinoListTile(
-                          title: const Text('Photos on this day'),
-                          trailing: const Row(
-                            children: [
-                              Text('Coming soon'),
-                              Gap(8.0),
-                              CupertinoListTileChevron(),
-                            ],
-                          ),
-                          leading: const Icon(Icons.photo),
-                          onTap: () {
-                            // TODO: open photos on this day
-                          },
-                        ),
+                        const SizedBox(width: 8.0),
+                        Icon(Icons.chevron_right, color: Theme.of(context).disabledColor),
                       ],
                     ),
-                  }
+                    leading: const Icon(Icons.photo),
+                    onTap: () {
+                      // TODO: open photos on this day
+                    },
+                  ),
                 ],
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
@@ -59,6 +60,7 @@ class MindMessageWidget extends StatelessWidget {
           ),
           if (children.isNotEmpty) ...[
             Container(height: 0.3, color: Colors.grey[300]),
+            const Gap(16.0),
             MindBulletListWidget(
               models: children
                   .mySortedBy((it) => it.creationDate)
@@ -70,8 +72,9 @@ class MindMessageWidget extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              onLongPress: (String) {},
-              onTap: (String) {},
+              onLongPress: (String mindId) {
+                onOptions?.call(children.firstWhere((it) => it.id == mindId));
+              },
             ),
             const SizedBox(height: 16.0),
           ]
