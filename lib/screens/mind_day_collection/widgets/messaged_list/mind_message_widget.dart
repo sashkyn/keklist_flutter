@@ -6,16 +6,16 @@ import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_b
 import 'package:keklist/services/entities/mind.dart';
 import 'package:keklist/core/widgets/rounded_container.dart';
 
-class MindMessageWidget extends StatelessWidget {
+final class MindMessageWidget extends StatelessWidget {
   final Mind mind;
   final List<Mind> children;
-  final Function(Mind)? onOptions;
+  final Widget? optionsWidget;
 
   const MindMessageWidget({
     super.key,
     required this.mind,
     required this.children,
-    this.onOptions,
+    required this.optionsWidget,
   });
 
   @override
@@ -47,13 +47,10 @@ class MindMessageWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              if (onOptions != null) ...{
+              if (optionsWidget != null) ...{
                 Align(
                   alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () => onOptions?.call(mind),
-                  ),
+                  child: optionsWidget,
                 ),
               },
             ],
@@ -73,7 +70,7 @@ class MindMessageWidget extends StatelessWidget {
                   )
                   .toList(),
               onLongPress: (String mindId) {
-                onOptions?.call(children.firstWhere((it) => it.id == mindId));
+                // onOptions?.call(children.firstWhere((it) => it.id == mindId));
               },
             ),
             const SizedBox(height: 16.0),

@@ -79,7 +79,7 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
               ActionModel.chatWithAI(),
               ActionModel.photosPerDay(),
             ],
-            action: ActionModel.extraActionsMenu(),
+            action: ActionModel.extraActions(),
             onMenuAction: (action) {
               switch (action) {
                 case ChatWithAIActionModel _:
@@ -108,9 +108,10 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     child: MindMessageWidget(
                       mind: _rootMind,
                       children: _rootMindChildren,
-                      onOptions: (Mind mind) {
-                        _showMindOptionsActionSheet(mind);
-                      },
+                      optionsWidget: null,
+                      // onOptions: (Mind mind) {
+                      //   _showMindOptionsActionSheet(mind);
+                      // },
                     ),
                   ),
                 ],

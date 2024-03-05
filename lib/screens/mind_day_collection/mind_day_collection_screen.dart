@@ -4,6 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
@@ -153,44 +155,45 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       ),
       body: Stack(
         children: [
-          BoolWidget(
-            condition: _isMindContentVisible,
-            trueChild: SingleChildScrollView(
-              controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 150),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: BoolWidget(
-                condition: _isMindContentVisible,
-                trueChild: MindMonologListWidget(
-                  minds: _dayMinds,
-                  onTap: (Mind mind) => _showMindInfo(mind),
-                  onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                  mindIdsToChildren: _mindIdsToChildren,
-                ),
-                falseChild: MindIconedListWidget(
-                  minds: _dayMinds,
-                  onTap: (Mind mind) => showOkAlertDialog(
-                    title: mind.emoji,
-                    message: mind.note,
-                    context: context,
-                  ),
-                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                  mindIdsToChildCount: null,
-                ),
+          SingleChildScrollView(
+            controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 150),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: MindMonologListWidget(
+              minds: _dayMinds,
+              onTap: (Mind mind) => _showMindInfo(mind),
+              optionsWidget: MenuActionsIconWidget(
+                menuActions: [
+                  ActionModel.chatWithAI(),
+                  ActionModel.edit(),
+                  ActionModel.switchDay(),
+                  ActionModel.showAll(),
+                  ActionModel.delete(),
+                ],
+                action: ActionModel.mindOptions(),
+                onMenuAction: (action) {
+                  switch (action) {
+                    case ChatWithAIActionModel _:
+                      _showMessageScreen(mind: _dayMinds.first);
+                      break;
+                    case EditMenuActionModel _:
+                      _editMind(_dayMinds.first);
+                      break;
+                    case SwitchDayMenuActionModel _:
+                      _switchMindDay(_dayMinds.first);
+                      break;
+                    case ShowAllMenuActionModel _:
+                      _showAllMinds(_dayMinds.first);
+                      break;
+                    case DeleteMenuActionModel _:
+                      _removeMind(_dayMinds.first);
+                      break;
+                    default:
+                      break;
+                  }
+                },
               ),
-            ),
-            falseChild: SingleChildScrollView(
-              controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 150),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: SafeArea(
-                child: MindIconedListWidget(
-                  minds: _dayMinds,
-                  onTap: (Mind mind) => _showMindInfo(mind),
-                  onLongTap: (Mind mind) => _showMindOptionsActionSheet(mind),
-                  mindIdsToChildCount: null,
-                ),
-              ),
+              mindIdsToChildren: _mindIdsToChildren,
             ),
           ),
           Stack(
@@ -306,74 +309,41 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     );
   }
 
-  void _showMindOptionsActionSheet(Mind mind) async {
-    final String? result = await showModalActionSheet(
-      context: context,
-      actions: [
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Discuss with AI',
-          key: 'discuss_with_ai',
-        ),
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Edit',
-          key: 'edit_key',
-        ),
-        const SheetAction(
-          icon: Icons.date_range,
-          label: 'Switch day',
-          key: 'switch_day_key',
-        ),
-        const SheetAction(
-          icon: Icons.emoji_emotions,
-          label: 'Show all',
-          key: 'show_all_key',
-        ),
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Delete',
-          key: 'remove_key',
-          isDestructiveAction: true,
-        ),
-      ],
-    );
-    if (result == 'discuss_with_ai') {
-      _showMessageScreen(mind: mind);
-    } else if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
-    } else if (result == 'edit_key') {
-      setState(() {
-        _editableMind = mind;
-        _selectedEmoji = mind.emoji;
-      });
-      _createMindEditingController.text = mind.note;
-      _mindCreatorFocusNode.requestFocus();
-    } else if (result == 'switch_day_key') {
-      final int? switchedDay = await _showDateSwitcherToNewDay();
-      if (switchedDay != null) {
-        final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
-          dayIndex: switchedDay,
+  void _showAllMinds(Mind mind) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MindOneEmojiCollectionScreen(
+          emoji: mind.emoji,
           allMinds: allMinds,
-        );
-        final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
-        final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
-        sendEventTo<MindBloc>(MindEdit(mind: newMind));
-      }
-    } else if (result == 'show_all_key') {
-      if (mountedContext == null) {
-        return;
-      }
-
-      Navigator.of(mountedContext!).push(
-        MaterialPageRoute(
-          builder: (_) => MindOneEmojiCollectionScreen(
-            emoji: mind.emoji,
-            allMinds: allMinds,
-          ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _switchMindDay(Mind mind) async {
+    final int? switchedDay = await _showDateSwitcherToNewDay();
+    if (switchedDay != null) {
+      final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
+        dayIndex: switchedDay,
+        allMinds: allMinds,
       );
+      final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
+      final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
+      sendEventTo<MindBloc>(MindEdit(mind: newMind));
     }
+  }
+
+  void _editMind(Mind mind) {
+    setState(() {
+      _editableMind = mind;
+      _selectedEmoji = mind.emoji;
+    });
+    _createMindEditingController.text = mind.note;
+    _mindCreatorFocusNode.requestFocus();
+  }
+
+  void _removeMind(Mind mind) {
+    sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
   }
 
   void _handleError(MindOperationError error) {
