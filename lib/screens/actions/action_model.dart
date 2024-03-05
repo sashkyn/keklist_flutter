@@ -1,7 +1,6 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-sealed class ActionModel with EquatableMixin {
+sealed class ActionModel {
   final int id;
   final String title;
   final Icon icon;
@@ -15,9 +14,6 @@ sealed class ActionModel with EquatableMixin {
   factory ActionModel.chatWithAI() => const ChatWithAIActionModel();
   factory ActionModel.photosPerDay() => const PhotosPerDayActionModel();
   factory ActionModel.extraActionsMenu() => const ExtraActionsMenuActionModel();
-
-  @override
-  List<Object?> get props => [id];
 }
 
 final class ChatWithAIActionModel extends ActionModel {
