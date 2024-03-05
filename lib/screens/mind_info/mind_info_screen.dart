@@ -2,6 +2,8 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
+import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/actions_screen.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
@@ -32,15 +34,13 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
   final FocusNode _mindCreatorFocusNode = FocusNode();
   bool _creatorPanelHasFocus = false;
   Mind? _editableMind;
-  late String _selectedEmoji = rootMind.emoji;
+  late String _selectedEmoji = _rootMind.emoji;
 
-  Mind get rootMind => widget.rootMind;
-  List<Mind> get allMinds => widget.allMinds;
+  Mind get _rootMind => widget.rootMind;
+  List<Mind> get _allMinds => widget.allMinds;
 
-  List<Mind> get rootMindChildren => MindUtils.findMindsByRootId(
-        rootId: rootMind.id,
-        allMinds: widget.allMinds,
-      ).mySortedBy((mind) => mind.creationDate);
+  List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
+      .sortedByFunction((mind) => mind.creationDate);
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
     subscribeTo<MindBloc>(onNewState: (state) async {
       if (state is MindList) {
         setState(() {
-          allMinds
+          _allMinds
             ..clear()
             ..addAll(state.values.sortedByCreationDate());
         });
@@ -71,7 +71,15 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mind')),
+      appBar: AppBar(
+        title: const Text('Mind'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.read_more),
+            onPressed: () => _showActionPickerScreen(),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -84,46 +92,12 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: MindMessageWidget(
-                      mind: rootMind,
-                      children: rootMindChildren,
+                      mind: _rootMind,
+                      children: _rootMindChildren,
                       onOptions: (Mind mind) {
                         _showMindOptionsActionSheet(mind);
                       },
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16.0, top: 16.0, bottom: 16.0, right: 16.0),
-                    child: Text(
-                      'Extra',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Chat with AI'),
-                    leading: const Icon(Icons.chat_rounded),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _showMessageScreen(mind: rootMind),
-                  ),
-                  ListTile(
-                    title: const Text('Photos on this day'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Coming soon',
-                          style: TextStyle(color: Theme.of(context).disabledColor),
-                        ),
-                        const SizedBox(width: 8.0),
-                        Icon(Icons.chevron_right, color: Theme.of(context).disabledColor),
-                      ],
-                    ),
-                    leading: const Icon(Icons.photo),
-                    onTap: () {
-                      // TODO: open photos on this day
-                    },
                   ),
                 ],
               ),
@@ -146,15 +120,15 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
-                    placeholder: 'Comment your mind...',
+                    placeholder: 'Comment mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(
                           MindCreate(
-                            dayIndex: rootMind.dayIndex,
+                            dayIndex: _rootMind.dayIndex,
                             note: data.text,
                             emoji: _selectedEmoji,
-                            rootId: rootMind.id,
+                            rootId: _rootMind.id,
                           ),
                         );
                       } else {
@@ -170,9 +144,11 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     selectedEmoji: _selectedEmoji,
                     onTapSuggestionEmoji: (_) {},
                     onTapEmoji: () {
-                      _showEmojiPickerScreen(onSelect: (String emoji) {
-                        setState(() => _selectedEmoji = emoji);
-                      });
+                      _showEmojiPickerScreen(
+                        onSelect: (String emoji) {
+                          setState(() => _selectedEmoji = emoji);
+                        },
+                      );
                     },
                     doneTitle: 'DONE',
                     onTapCancelEdit: () {
@@ -240,8 +216,29 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
       MaterialPageRoute(
         builder: (_) => MindChatDiscussionScreen(
           rootMind: mind,
-          allMinds: allMinds,
+          allMinds: _allMinds,
         ),
+      ),
+    );
+  }
+
+  void _showActionPickerScreen() async {
+    showMaterialModalBottomSheet(
+      context: context,
+      builder: (context) => ActionsScreen(
+        actions: [
+          ActionModel.chatWithAI(),
+          ActionModel.photosPerDay(),
+        ],
+        onAction: (action) {
+          switch (action) {
+            case ChatWithAIActionModel _:
+              _showMessageScreen(mind: _rootMind);
+              break;
+            case PhotosPerDayActionModel _:
+              break;
+          }
+        },
       ),
     );
   }

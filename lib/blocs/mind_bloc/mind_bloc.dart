@@ -308,7 +308,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   List<Mind> _findMindsByDayIndex(int index) => _mindBox.values
       .where((item) => index == item.dayIndex)
       .where((item) => item.rootId == null)
-      .mySortedBy(
+      .sortedByFunction(
         (it) => it.sortIndex,
       )
       .map(

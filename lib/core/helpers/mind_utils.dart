@@ -17,7 +17,7 @@ class MindUtils {
       allMinds
           .where((item) => dayIndex == item.dayIndex)
           .where((item) => item.rootId == null)
-          .mySortedBy((it) => it.sortIndex)
+          .sortedByFunction((it) => it.sortIndex)
           .toList();
 
   static List<Mind> findTodayMinds({required List<Mind> allMinds}) {
@@ -28,13 +28,13 @@ class MindUtils {
   }
 
   static List<Mind> getSortedMindsBySortIndex({required List<Mind> allMinds}) =>
-      allMinds.mySortedBy((it) => it.sortIndex);
+      allMinds.sortedByFunction((it) => it.sortIndex);
 
   static List<Mind> findMindsByRootId({
     required String rootId,
     required Iterable<Mind> allMinds,
   }) =>
-      allMinds.where((item) => rootId == item.rootId).mySortedBy((it) => it.sortIndex);
+      allMinds.where((item) => rootId == item.rootId).sortedByFunction((it) => it.sortIndex);
 
   static List<Mind> findYesterdayMinds({required List<Mind> allMinds}) {
     final int yesterdayIndex = MindUtils.getDayIndex(from: DateTime.now()) - 1;
@@ -66,7 +66,7 @@ class MindUtils {
     required String emoji,
     required Iterable<Mind> allMinds,
   }) =>
-      allMinds.where((item) => emoji == item.emoji).mySortedBy((it) => it.sortIndex).toList();
+      allMinds.where((item) => emoji == item.emoji).sortedByFunction((it) => it.sortIndex).toList();
 
   static Map<String, int> convertToMindCountMap({required List<Mind> minds}) {
     Map<String, int> mindCountMap = {};
@@ -115,7 +115,7 @@ class MindUtils {
 // NOTE: Sorted by.
 
 extension ListIterable<E> on Iterable<E> {
-  List<E> mySortedBy(Comparable Function(E e) key, {bool reversed = false}) => toList()
+  List<E> sortedByFunction(Comparable Function(E e) key, {bool reversed = false}) => toList()
     ..sort(
       (a, b) {
         if (reversed) {
@@ -128,9 +128,9 @@ extension ListIterable<E> on Iterable<E> {
 }
 
 extension MindListIndexSortExtension on Iterable<Mind> {
-  List<Mind> sortedBySortIndex() => mySortedBy((it) => it.sortIndex);
+  List<Mind> sortedBySortIndex() => sortedByFunction((it) => it.sortIndex);
 }
 
 extension MindListCreationDateSortExtension on Iterable<Mind> {
-  List<Mind> sortedByCreationDate() => mySortedBy((it) => it.creationDate);
+  List<Mind> sortedByCreationDate() => sortedByFunction((it) => it.creationDate);
 }

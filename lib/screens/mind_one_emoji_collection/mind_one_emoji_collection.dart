@@ -30,7 +30,7 @@ final class MindOneEmojiCollectionScreen extends StatefulWidget {
   // ignore: no_logic_in_create_state
   State<MindOneEmojiCollectionScreen> createState() => _MindOneEmojiCollectionScreenState(
         emoji: emoji,
-        allMinds: allMinds.mySortedBy((e) => e.dayIndex).toList(),
+        allMinds: allMinds.sortedByFunction((e) => e.dayIndex).toList(),
       );
 }
 
@@ -41,7 +41,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
   List<Mind> get emojiMinds => MindUtils.findMindsByEmoji(
         emoji: emoji,
         allMinds: allMinds,
-      ).mySortedBy((e) => e.dayIndex);
+      ).sortedByFunction((e) => e.dayIndex);
 
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
@@ -78,7 +78,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
         setState(() {
           allMinds
             ..clear()
-            ..addAll(state.values.mySortedBy((e) => e.dayIndex));
+            ..addAll(state.values.sortedByFunction((e) => e.dayIndex));
         });
       } else if (state is MindOperationError) {
         _handleError(state);

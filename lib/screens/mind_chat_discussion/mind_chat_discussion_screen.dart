@@ -41,7 +41,7 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
   List<Mind> get mindChildren => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
-      ).mySortedBy((mind) => mind.creationDate);
+      ).sortedByFunction((mind) => mind.creationDate);
 
   @override
   void initState() {

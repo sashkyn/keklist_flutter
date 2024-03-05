@@ -51,7 +51,7 @@ class MindMessageWidget extends StatelessWidget {
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
-                    icon: const Icon(Icons.more_horiz),
+                    icon: const Icon(Icons.more_vert),
                     onPressed: () => onOptions?.call(mind),
                   ),
                 ),
@@ -63,7 +63,7 @@ class MindMessageWidget extends StatelessWidget {
             const Gap(16.0),
             MindBulletListWidget(
               models: children
-                  .mySortedBy((it) => it.creationDate)
+                  .sortedByFunction((it) => it.creationDate)
                   .map(
                     (mind) => MindBulletModel(
                       entityId: mind.id,

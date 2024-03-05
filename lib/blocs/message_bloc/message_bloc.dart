@@ -15,10 +15,9 @@ import 'package:uuid/uuid.dart';
 part 'message_event.dart';
 part 'message_state.dart';
 
-// TODO: написать сервис который будет удобен в интерфейсе для взаимодействия с чатом и сообщениями.
+// TODO: extract _messageService to DI
 
-class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
-  // TODO: extract to DI
+final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   final MessageService _messageService = MessageOpenAIService();
   final Box<MessageObject> _hiveBox = Hive.box<MessageObject>(HiveConstants.messageChatBoxName);
   Iterable<MessageObject> get _hiveObjects => _hiveBox.values;
@@ -46,7 +45,7 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
       final List<Message> messages = _hiveObjects
           .map((messageObject) => messageObject.toMessage())
           .where((message) => message.sender != MessageSender.system)
-          .mySortedBy((message) => message.timestamp)
+          .sortedByFunction((message) => message.timestamp)
           .toList();
       emit(MessageChat(messages: messages));
     } catch (error) {
@@ -114,7 +113,8 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
 
     final Message openAIAnswerMessage = await _messageService.requestAnswer(
       history: MessageHistory(
-        messages: _hiveObjects.map((object) => object.toMessage()).mySortedBy((object) => object.timestamp).toList(),
+        messages:
+            _hiveObjects.map((object) => object.toMessage()).sortedByFunction((object) => object.timestamp).toList(),
         rootMindId: event.rootMindId,
       ),
     );

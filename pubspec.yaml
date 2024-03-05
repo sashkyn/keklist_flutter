@@ -59,6 +59,8 @@ dependencies:
   crypto: ^3.0.3
   google_sign_in: ^6.2.1
   dart_openai: ^5.1.0
+  bottom_sheet: ^4.0.0
+  action_sheet: ^1.0.4
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
