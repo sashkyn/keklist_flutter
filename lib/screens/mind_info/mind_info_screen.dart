@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
 import 'package:keklist/screens/actions/action_model.dart';
-import 'package:keklist/screens/actions/actions_screen.dart';
+import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
@@ -74,10 +74,24 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.read_more),
-            onPressed: () => _showActionPickerScreen(),
-          ),
+          MenuActionsIconWidget(
+            menuActions: [
+              ActionModel.chatWithAI(),
+              ActionModel.photosPerDay(),
+            ],
+            action: ActionModel.extraActionsMenu(),
+            onMenuAction: (action) {
+              switch (action) {
+                case ChatWithAIActionModel _:
+                  _showMessageScreen(mind: _rootMind);
+                  break;
+                case PhotosPerDayActionModel _:
+                  break;
+                default:
+                  break;
+              }
+            },
+          )
         ],
       ),
       body: Stack(
@@ -218,27 +232,6 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
           rootMind: mind,
           allMinds: _allMinds,
         ),
-      ),
-    );
-  }
-
-  void _showActionPickerScreen() async {
-    showMaterialModalBottomSheet(
-      context: context,
-      builder: (context) => ActionsScreen(
-        actions: [
-          ActionModel.chatWithAI(),
-          ActionModel.photosPerDay(),
-        ],
-        onAction: (action) {
-          switch (action) {
-            case ChatWithAIActionModel _:
-              _showMessageScreen(mind: _rootMind);
-              break;
-            case PhotosPerDayActionModel _:
-              break;
-          }
-        },
       ),
     );
   }

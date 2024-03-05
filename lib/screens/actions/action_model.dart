@@ -14,6 +14,7 @@ sealed class ActionModel with EquatableMixin {
 
   factory ActionModel.chatWithAI() => const ChatWithAIActionModel();
   factory ActionModel.photosPerDay() => const PhotosPerDayActionModel();
+  factory ActionModel.extraActionsMenu() => const ExtraActionsMenuActionModel();
 
   @override
   List<Object?> get props => [id];
@@ -34,5 +35,14 @@ final class PhotosPerDayActionModel extends ActionModel {
           id: 2,
           title: 'Photos per day',
           icon: const Icon(Icons.photo),
+        );
+}
+
+final class ExtraActionsMenuActionModel extends ActionModel {
+  const ExtraActionsMenuActionModel()
+      : super(
+          id: 3,
+          title: 'Extra actions',
+          icon: const Icon(Icons.read_more),
         );
 }
