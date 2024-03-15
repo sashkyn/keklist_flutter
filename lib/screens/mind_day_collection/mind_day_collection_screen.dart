@@ -1,4 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:emojis/emoji.dart';
@@ -9,7 +8,6 @@ import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
-import 'package:keklist/screens/mind_day_collection/widgets/iconed_list/mind_iconed_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
@@ -66,6 +64,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   bool _isMindContentVisible = false;
   bool _hasFocus = false;
   Mind? _editableMind;
+  bool _isFingerOnScroll = false;
 
   _MindDayCollectionScreenState({
     required this.dayIndex,
@@ -75,6 +74,19 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   @override
   void initState() {
     super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 250) {
+        if (_isFingerOnScroll) {
+          return;
+        }
+        _scrollController.jumpTo(0);
+        setState(() {
+          dayIndex = dayIndex + 1;
+          _hideKeyboard();
+        });
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.initialError != null) {
@@ -155,45 +167,60 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       ),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 150),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: MindMonologListWidget(
-              minds: _dayMinds,
-              onTap: (Mind mind) => _showMindInfo(mind),
-              optionsWidget: MenuActionsIconWidget(
-                menuActions: [
-                  ActionModel.chatWithAI(),
-                  ActionModel.edit(),
-                  ActionModel.switchDay(),
-                  ActionModel.showAll(),
-                  ActionModel.delete(),
-                ],
-                action: ActionModel.mindOptions(),
-                onMenuAction: (action) {
-                  switch (action) {
-                    case ChatWithAIActionModel _:
-                      _showMessageScreen(mind: _dayMinds.first);
-                      break;
-                    case EditMenuActionModel _:
-                      _editMind(_dayMinds.first);
-                      break;
-                    case SwitchDayMenuActionModel _:
-                      _switchMindDay(_dayMinds.first);
-                      break;
-                    case ShowAllMenuActionModel _:
-                      _showAllMinds(_dayMinds.first);
-                      break;
-                    case DeleteMenuActionModel _:
-                      _removeMind(_dayMinds.first);
-                      break;
-                    default:
-                      break;
-                  }
-                },
+          Listener(
+            onPointerDown: (event) {
+              _isFingerOnScroll = true;
+            },
+            onPointerUp: (PointerUpEvent event) {
+              _isFingerOnScroll = false;
+              // User has lifted their finger off the screen
+              if (_scrollController.offset < -250) {
+                setState(() {
+                  dayIndex = dayIndex - 1;
+                  _hideKeyboard();
+                });
+              }
+            },
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              padding: const EdgeInsets.only(bottom: 150),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: MindMonologListWidget(
+                minds: _dayMinds,
+                onTap: (Mind mind) => _showMindInfo(mind),
+                optionsWidget: MenuActionsIconWidget(
+                  menuActions: [
+                    ActionModel.chatWithAI(),
+                    ActionModel.edit(),
+                    ActionModel.switchDay(),
+                    ActionModel.showAll(),
+                    ActionModel.delete(),
+                  ],
+                  action: ActionModel.mindOptions(),
+                  onMenuAction: (action) {
+                    switch (action) {
+                      case ChatWithAIActionModel _:
+                        _showMessageScreen(mind: _dayMinds.first);
+                        break;
+                      case EditMenuActionModel _:
+                        _editMind(_dayMinds.first);
+                        break;
+                      case SwitchDayMenuActionModel _:
+                        _switchMindDay(_dayMinds.first);
+                        break;
+                      case ShowAllMenuActionModel _:
+                        _showAllMinds(_dayMinds.first);
+                        break;
+                      case DeleteMenuActionModel _:
+                        _removeMind(_dayMinds.first);
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                ),
+                mindIdsToChildren: _mindIdsToChildren,
               ),
-              mindIdsToChildren: _mindIdsToChildren,
             ),
           ),
           Stack(

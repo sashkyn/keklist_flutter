@@ -65,7 +65,6 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 300)).asyncExpand(mapper),
     );
     on<MindUploadCandidates>(_uploadCandidates);
-    // INFO: 500 мс для того чтобы не лагало и клавиатура успела скрыться
     on<MindChangeCreateText>(
       _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
