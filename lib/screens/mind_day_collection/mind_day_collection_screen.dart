@@ -87,17 +87,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   void initState() {
     super.initState();
 
-    // _scrollController.addListener(() {
-    //   print('_scrollController.position.pixels = ${_scrollController.position.pixels}');
-    //   if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150) {
-    //     _vibrateOnSwitchDay();
-    //     if (_isFingerOnScroll) {
-    //       return;
-    //     }
-    //     _switchToDayIndex(dayIndex + 1);
-    //   }
-    // });
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.initialError != null) {
         _handleError(widget.initialError!);
