@@ -16,58 +16,66 @@ final class MindHiveRepository implements MindRepository {
       .debounceTime(const Duration(milliseconds: 100));
 
   @override
-  Future<void> createMind({required Mind mind, required bool isUploadedToServer}) {
+  FutureOr<void> createMind({required Mind mind, required bool isUploadedToServer}) async {
+    final Stopwatch stopwatch = _measureStart();
     final MindObject object = mind.toObject(isUploadedToServer: isUploadedToServer);
-    return _mindBox.put(mind.id, object);
+    await _mindBox.put(mind.id, object);
+    _measureStop(stopwatch, 'createMind');
   }
 
   @override
-  Future<void> deleteMind({required String mindId}) {
+  FutureOr<void> deleteMind({required String mindId}) {
+    final Stopwatch stopwatch = _measureStart();
     final MindObject? object = _mindBox.get(mindId);
-    return object?.delete() ?? Future.value();
+    object?.delete();
+    _measureStop(stopwatch, 'deleteMind');
   }
 
   @override
-  Future<Mind> obtainMind({required String mindId}) {
+  FutureOr<Mind?> obtainMind({required String mindId}) {
+    final Stopwatch stopwatch = _measureStart();
     final MindObject? object = _mindBox.get(mindId);
-    return Future.value(object?.toMind());
+    _measureStop(stopwatch, 'obtainMind');
+    return object?.toMind();
   }
 
   @override
-  Future<List<Mind>> obtainMinds() {
+  FutureOr<List<Mind>> obtainMinds() {
+    final Stopwatch stopwatch = _measureStart();
     final List<Mind> minds = _mindObjects.map((mindObject) => mindObject.toMind()).toList();
-    return Future.value(minds);
+    _measureStop(stopwatch, 'obtainMinds');
+    return minds;
   }
 
   @override
-  Future<void> updateMind({required Mind mind, required bool isUploadedToServer}) {
+  FutureOr<void> updateMind({required Mind mind, required bool isUploadedToServer}) {
+    final Stopwatch stopwatch = _measureStart();
     final bool isUploadedToServer = _mindBox.get(mind.id)?.isUploadedToServer ?? false;
     final MindObject object = mind.toObject(isUploadedToServer: isUploadedToServer);
+    _measureStop(stopwatch, 'updateMind');
     return _mindBox.put(mind.id, object);
   }
 
   @override
-  Future<void> updateUploadedOnServerMind({required String mindId, required bool isUploadedToServer}) {
+  FutureOr<void> updateUploadedOnServerMind({required String mindId, required bool isUploadedToServer}) async {
+    final Stopwatch stopwatch = _measureStart();
     final MindObject? object = _mindBox.get(mindId);
     object?.isUploadedToServer = isUploadedToServer;
-    return object?.save() ?? Future.value();
+    await object?.save();
+    _measureStop(stopwatch, 'updateUploadedOnServerMind');
   }
 
   @override
-  Future<void> updateMinds({required List<Mind> minds, required bool isUploadedToServer}) {
-    final Map<String, MindObject> mindEntries = Map.fromEntries(
-      minds.map(
-        (mind) => MapEntry(
-          mind.id,
-          mind.toObject(isUploadedToServer: isUploadedToServer),
-        ),
-      ),
-    );
-    return _mindBox.putAll(mindEntries);
+  FutureOr<void> updateMinds({required List<Mind> minds, required bool isUploadedToServer}) async {
+    final mindEntries = {for (final mind in minds) mind.id: mind.toObject(isUploadedToServer: isUploadedToServer)};
+    final Stopwatch stopwatch = _measureStart();
+    await _mindBox.putAll(mindEntries);
+    _measureStop(stopwatch, 'updateMinds - putAll');
   }
 
   @override
-  Future<void> updateUploadedOnServerMinds({required List<Mind> minds, required bool isUploadedToServer}) {
+  FutureOr<void> updateUploadedOnServerMinds({required List<Mind> minds, required bool isUploadedToServer}) async {
+    final Stopwatch stopwatch = _measureStart();
     final List<MindObject> mindObjects =
         minds.map((mind) => mind.toObject(isUploadedToServer: isUploadedToServer)).toList();
     final Map<String, MindObject> mindEntries = Map.fromEntries(
@@ -78,31 +86,50 @@ final class MindHiveRepository implements MindRepository {
         ),
       ),
     );
-    return _mindBox.putAll(mindEntries);
+    await _mindBox.putAll(mindEntries);
+    _measureStop(stopwatch, 'updateUploadedOnServerMinds');
   }
 
   @override
-  Future<List<Mind>> obtainMindsWhere(bool Function(Mind) where) {
+  FutureOr<List<Mind>> obtainMindsWhere(bool Function(Mind) where) {
+    final Stopwatch stopwatch = _measureStart();
     final List<Mind> minds = _mindObjects.map((mindObject) => mindObject.toMind()).where(where).toList();
-    return Future.value(minds);
+    _measureStop(stopwatch, 'obtainMindsWhere');
+    return minds;
   }
 
   @override
-  Future<List<Mind>> obtainNotUploadedToServerMinds() {
+  FutureOr<List<Mind>> obtainNotUploadedToServerMinds() {
+    final Stopwatch stopwatch = _measureStart();
     final List<Mind> notUploadedMinds =
         _mindObjects.where((mindObject) => !mindObject.isUploadedToServer).map((mind) => mind.toMind()).toList();
-    return Future.value(notUploadedMinds);
+    _measureStop(stopwatch, 'obtainNotUploadedToServerMinds');
+    return notUploadedMinds;
   }
 
   @override
-  Future<void> deleteMindsWhere(bool Function(Mind) where) {
+  FutureOr<void> deleteMindsWhere(bool Function(Mind) where) async {
+    final Stopwatch stopwatch = _measureStart();
     final List<String> mindIds =
         _mindObjects.map((mindObject) => mindObject.toMind()).where(where).map((mind) => mind.id).toList();
-    return _mindBox.deleteAll(mindIds);
+    _measureStop(stopwatch, 'deleteMindsWhere');
+    await _mindBox.deleteAll(mindIds);
   }
 
   @override
-  Future<void> deleteMinds() {
-    return _mindBox.clear();
+  FutureOr<void> deleteMinds() async {
+    final Stopwatch stopwatch = _measureStart();
+    await _mindBox.clear();
+    _measureStop(stopwatch, 'deleteMinds');
+  }
+
+  Stopwatch _measureStart() {
+    final stopwatch = Stopwatch()..start();
+    return stopwatch;
+  }
+
+  _measureStop(Stopwatch stopwatch, String functionName) {
+    print('$functionName measured: ${stopwatch.elapsed}');
+    stopwatch.stop();
   }
 }

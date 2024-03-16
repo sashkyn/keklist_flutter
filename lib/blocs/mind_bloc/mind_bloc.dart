@@ -349,21 +349,11 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         type: MindOperationType.clearCache,
       ),
     );
-    await _repository.deleteMinds().then(
-      (_) {
-        return emit(
-          MindOperationCompleted(
-            minds: [],
-            type: MindOperationType.clearCache,
-          ),
-        );
-      },
-    ).onError(
-      (error, _) => emit(
-        MindOperationError(
-          minds: [],
-          notCompleted: MindOperationType.clearCache,
-        ),
+    await _repository.deleteMinds();
+    emit(
+      MindOperationCompleted(
+        minds: [],
+        type: MindOperationType.clearCache,
       ),
     );
   }
