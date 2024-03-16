@@ -11,14 +11,13 @@ import 'package:keklist/constants.dart';
 import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/helpers/platform_utils.dart';
-import 'package:keklist/services/hive/constants.dart';
-import 'package:keklist/services/hive/entities/mind/mind_object.dart';
-import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
-import 'package:keklist/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/mind_service/main_service.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -30,27 +29,19 @@ part 'mind_state.dart';
 final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   late final MindService _service;
   late final MindSearcherCubit _searcherCubit;
+  late final MindRepository _repository;
 
   final SettingsObject? _settings =
       Hive.box<SettingsObject>(HiveConstants.settingsBoxName).get(HiveConstants.settingsGlobalSettingsIndex);
 
-  final Box<MindObject> _mindBox = Hive.box<MindObject>(HiveConstants.mindBoxName);
-  Iterable<MindObject> get _mindObjects => _mindBox.values;
-  Stream<MindObject?> get _mindObjectsStream => _mindBox
-      .watch()
-      .map((BoxEvent event) => event.value as MindObject?)
-      .debounceTime(const Duration(milliseconds: 300));
-
-  final Box<QueueTransactionObject> _mindQueueTransactionsBox =
-      Hive.box<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
-  Stream<QueueTransactionObject?> get _mindQueueStream => _mindQueueTransactionsBox.watch().map((event) => event.value);
-
   MindBloc({
     required MindService mainService,
     required MindSearcherCubit mindSearcherCubit,
+    required MindRepository mindRepository,
   }) : super(MindList(values: const [])) {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
+    _repository = mindRepository;
     on<MindGetList>(_getMinds);
     on<MindUpdateMobileWidgets>(_updateMobileWidgets);
     on<MindCreate>(_createMind);
@@ -70,19 +61,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
     );
     on<MindGetUploadCandidates>(_getUploadCandidates);
-    on<MindInternalGetListFromCache>(
-      (event, emit) {
-        _emitMindList(emit);
-      },
-    );
-    on<MindGetTransactionList>(
-      (event, emit) {
-        emit(MindTransactions(_mindQueueTransactionsBox.values.toList()));
-      },
-    );
-
-    _mindObjectsStream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
-    _mindQueueStream.listen((event) => add(MindGetTransactionList())).disposed(by: this);
+    on<MindInternalGetListFromCache>((_, emit) => _emitMindList(emit));
+    _repository.stream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
   }
 
   @override
@@ -103,19 +83,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
 
-      await _service.getMindList().then((Iterable<Mind> serverMinds) {
-        // Обновляем локальное хранилище.
-        _mindBox.putAll(
-          Map.fromEntries(
-            serverMinds.map(
-              (mind) => MapEntry(
-                mind.id,
-                mind.toObject(isUploadedToServer: true),
-              ),
-            ),
-          ),
-        );
-
+      await _service.getMindList().then((Iterable<Mind> serverMinds) async {
+        await _repository.updateMinds(minds: serverMinds.toList(), isUploadedToServer: true);
         emit(
           MindOperationCompleted(
             minds: [],
@@ -132,29 +101,21 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
           );
         },
       );
-
-      // await _addTransactionToQueue(
-      //   QueueTransactionObject(
-      //     debugName: 'getMindList',
-      //     transaction: transaction,
-      //   ),
-      // );
     }
   }
 
   Future<void> _createMind(MindCreate event, Emitter<MindState> emit) async {
+    final int sortIndex =
+        ((await _findMindsByDayIndex(event.dayIndex)).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
     final Mind mind = Mind(
         id: const Uuid().v4(),
         dayIndex: event.dayIndex,
         note: event.note.trim(),
         emoji: event.emoji,
         creationDate: DateTime.now().toUtc(),
-        sortIndex: (_findMindsByDayIndex(event.dayIndex).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1,
+        sortIndex: sortIndex,
         rootId: event.rootId);
-
-    // Добавляем в локальное хранилище.
-    final MindObject object = mind.toObject(isUploadedToServer: false);
-    _mindBox.put(mind.id, object);
+    _repository.createMind(mind: mind, isUploadedToServer: false);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
@@ -164,17 +125,15 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
       // Добавляем на сервере.
-      await _service.createMind(mind).then((value) {
-        object
-          ..isUploadedToServer = true
-          ..save();
+      await _service.createMind(mind).then((_) {
+        _repository.updateUploadedOnServerMind(mindId: mind.id, isUploadedToServer: true);
         MindOperationCompleted(
           minds: [mind],
           type: MindOperationType.create,
         );
-      }).onError((error, _) {
+      }).onError((error, _) async {
         // Роллбек
-        object.delete();
+        await _repository.deleteMind(mindId: mind.id);
 
         // Обработка ошибки
         emit(
@@ -184,26 +143,15 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
           ),
         );
       });
-
-      // await _addTransactionToQueue(
-      //   QueueTransactionObject(
-      //     debugName: 'createMind',
-      //     transaction: transaction,
-      //   ),
-      // );
     }
   }
 
   // TODO: удалить каскадно все остальное
   Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
-    final MindObject? object = _mindBox.get(event.uuid);
-    if (object == null) {
-      return;
-    }
-    object.delete();
+    _repository.deleteMind(mindId: event.mind.id);
 
     if (!(_settings?.isOfflineMode ?? true)) {
-      final Mind mindToDelete = object.toMind();
+      final Mind mindToDelete = event.mind;
       emit(
         MindServerOperationStarted(
           minds: [mindToDelete],
@@ -211,19 +159,16 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         ),
       );
       // Удаляем на сервере.
-      await _service.deleteMind(event.uuid).then((_) {
+      await _service.deleteMind(mindToDelete.id).then((_) {
         emit(
           MindOperationCompleted(
             minds: [mindToDelete],
             type: MindOperationType.delete,
           ),
         );
-      }).onError((error, _) {
+      }).onError((error, _) async {
         // Роллбек
-        _mindBox.put(
-          mindToDelete.id,
-          object,
-        );
+        await _repository.createMind(mind: mindToDelete, isUploadedToServer: true);
 
         // Обработка ошибки
         emit(
@@ -233,43 +178,38 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
           ),
         );
       });
-
-      // await _addTransactionToQueue(
-      //   QueueTransactionObject(
-      //     debugName: 'deleteMind',
-      //     transaction: transaction,
-      //   ),
-      // );
     }
   }
 
   FutureOr<void> _startSearch(MindStartSearch event, emit) async {
+    final List<Mind> minds = await _repository.obtainMinds();
     emit(
       MindSearching(
         enabled: true,
-        allValues: _mindObjects.map((e) => e.toMind()),
+        allValues: minds,
         resultValues: const [],
       ),
     );
   }
 
   FutureOr<void> _stopSearch(MindStopSearch event, emit) async {
+    final List<Mind> minds = await _repository.obtainMinds();
     emit(
       MindSearching(
         enabled: false,
-        allValues: _mindObjects.map((e) => e.toMind()),
+        allValues: minds,
         resultValues: const [],
       ),
     );
   }
 
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
+    final List<Mind> minds = await _repository.obtainMinds();
     final List<Mind> filteredMinds = await _searcherCubit.searchMindList(event.text);
-
     emit(
       MindSearching(
         enabled: true,
-        allValues: _mindObjects.map((e) => e.toMind()),
+        allValues: minds,
         resultValues: filteredMinds,
       ),
     );
@@ -280,22 +220,23 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   FutureOr<void> _changeTextOfCreatingMind(
     MindChangeCreateText event,
     Emitter<MindState> emit,
-  ) {
+  ) async {
     const count = 9;
-    final List<String> suggestions = _mindObjects
-        .where((MindObject mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
-        .map((MindObject mind) => mind.emoji)
+    final List<Mind> minds = await _repository.obtainMinds();
+    final List<String> suggestions = minds
+        .where((Mind mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
+        .map((Mind mind) => mind.emoji)
         .toList()
         .distinct()
-        .sorted((String emoji1, String emoji2) => _mindObjects
-            .where((MindObject mind) => mind.emoji == emoji2)
+        .sorted((String emoji1, String emoji2) => minds
+            .where((Mind mind) => mind.emoji == emoji2)
             .length
-            .compareTo(_mindObjects.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
+            .compareTo(minds.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
         .take(count)
         .toList();
 
     if (suggestions.isEmpty) {
-      if (_mindObjects.isEmpty) {
+      if (minds.isEmpty) {
         _lastSuggestions = emojies_pub.Emoji.all().take(count).map((emoji) => emoji.char).toList();
       }
     } else {
@@ -304,16 +245,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     emit(MindSuggestions(values: _lastSuggestions));
   }
 
-  List<Mind> _findMindsByDayIndex(int index) => _mindBox.values
-      .where((item) => index == item.dayIndex)
-      .where((item) => item.rootId == null)
-      .sortedByFunction(
-        (it) => it.sortIndex,
-      )
-      .map(
-        (e) => e.toMind(),
-      )
-      .toList();
+  Future<List<Mind>> _findMindsByDayIndex(int index) async {
+    final List<Mind> dayMinds =
+        await _repository.obtainMindsWhere((mind) => mind.dayIndex == index && mind.rootId == null)
+          ..sortedByFunction((it) => it.sortIndex);
+    return dayMinds;
+  }
 
   Future<void> _editMind(
     MindEdit event,
@@ -321,7 +258,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   ) async {
     final Mind editedMind = event.mind;
 
-    final MindObject? oldMind = _mindBox.get(event.mind.id);
+    final Mind? oldMind = await _repository.obtainMind(mindId: editedMind.id);
     if (oldMind == null) {
       emit(
         MindOperationError(
@@ -332,13 +269,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       return;
     }
 
-    _mindBox.get(event.mind.id)
-      ?..note = editedMind.note
-      ..emoji = editedMind.emoji
-      ..sortIndex = editedMind.sortIndex
-      ..dayIndex = editedMind.dayIndex
-      ..rootId = editedMind.rootId
-      ..save();
+    await _repository.updateMind(mind: editedMind, isUploadedToServer: false);
 
     if (!(_settings?.isOfflineMode ?? true)) {
       emit(
@@ -354,9 +285,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
           ),
         );
       }).onError(
-        (error, _) {
+        (error, _) async {
           // Роллбек
-          editedMind.toObject(isUploadedToServer: true).save();
+          await _repository.updateUploadedOnServerMind(
+            mindId: editedMind.id,
+            isUploadedToServer: true,
+          );
 
           // Обработка ошибки
           emit(
@@ -367,21 +301,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
           );
         },
       );
-
-      // await _addTransactionToQueue(
-      //   QueueTransactionObject(
-      //     debugName: 'editMind',
-      //     transaction: transaction,
-      //   ),
-      // );
     }
   }
 
-  void _emitMindList(Emitter<MindState> emit) {
-    final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
-    emit(
-      MindList(values: minds),
-    );
+  Future<void> _emitMindList(Emitter<MindState> emit) async {
+    final List<Mind> minds = await _repository.obtainMinds();
+    emit(MindList(values: minds));
   }
 
   Future<void> _deleteAllMindsFromServer(
@@ -396,9 +321,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
     await _service.deleteAllMinds().then(
       (_) async {
-        _mindBox.values.map((object) => object
-          ..isUploadedToServer = false
-          ..save());
+        final List<Mind> minds = await _repository.obtainMinds();
+        await _repository.updateUploadedOnServerMinds(minds: minds, isUploadedToServer: false);
         emit(
           MindOperationCompleted(
             minds: [],
@@ -416,12 +340,6 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         );
       },
     );
-    // await _addTransactionToQueue(
-    //   QueueTransactionObject(
-    //     debugName: 'deleteAllMinds',
-    //     transaction: transaction,
-    //   ),
-    // );
   }
 
   Future<void> _clearCache(MindClearCache event, Emitter<MindState> emit) async {
@@ -431,8 +349,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         type: MindOperationType.clearCache,
       ),
     );
-    await _mindBox.clear().then(
-      (int countOfDeletedItems) {
+    await _repository.deleteMinds().then(
+      (_) {
         return emit(
           MindOperationCompleted(
             minds: [],
@@ -454,9 +372,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     MindUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    final Iterable<MindObject> mindObjects =
-        _mindBox.values.where((MindObject mind) => !mind.isUploadedToServer).toList(growable: false);
-    final Iterable<Mind> uploadCandidates = mindObjects.map((MindObject mind) => mind.toMind()).toList(growable: false);
+    final List<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
     emit(
       MindServerOperationStarted(
         minds: uploadCandidates,
@@ -492,15 +408,12 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
 
     await uploadRootTasks.then((_) async {
       await uploadNonRootTasks.then((_) async {
-        await _mindBox.deleteAll(uploadCandidates.map((Mind mind) => mind.id));
-        final Map<String, MindObject> refreshedCandidateMindObjects = uploadCandidates.fold({}, (
-          Map<String, MindObject> map,
-          Mind mind,
-        ) {
-          map[mind.id] = mind.toObject(isUploadedToServer: true);
-          return map;
-        });
-        await _mindBox.putAll(refreshedCandidateMindObjects);
+        await _repository
+            .deleteMindsWhere((Mind mind) => uploadCandidates.any((Mind candidate) => candidate.id == mind.id));
+        await _repository.updateMinds(
+          minds: uploadCandidates.toList(),
+          isUploadedToServer: true,
+        );
         emit(
           MindOperationCompleted(
             minds: uploadCandidates,
@@ -529,29 +442,20 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     MindGetUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    if (_mindObjects.isEmpty) {
-      emit(MindCandidatesForUpload(values: []));
-      return;
-    }
-
-    final Iterable<Mind> uploadCandidates =
-        _mindObjects.where((MindObject object) => !object.isUploadedToServer).map((MindObject mind) => mind.toMind());
+    final List<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
     if (uploadCandidates.isEmpty) {
       emit(MindCandidatesForUpload(values: []));
       return;
     }
-
-    emit(
-      MindCandidatesForUpload(values: uploadCandidates),
-    );
+    emit(MindCandidatesForUpload(values: uploadCandidates));
   }
 
   Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
     if (DeviceUtils.safeGetPlatform() != SupportedPlatform.iOS) {
       return;
     }
-    final Iterable<Mind> minds = _mindObjects.map((item) => item.toMind());
-    final List<Mind> todayMinds = MindUtils.findTodayMinds(allMinds: minds.toList());
+    final List<Mind> todayMinds =
+        await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex());
 
     final List<String> todayMindJSONList = todayMinds
         .map(

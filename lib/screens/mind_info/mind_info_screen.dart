@@ -13,7 +13,7 @@ import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;
@@ -209,7 +209,7 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
       ],
     );
     if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
+      sendEventTo<MindBloc>(MindDelete(mind: mind));
     } else if (result == 'edit_key') {
       setState(() {
         _editableMind = mind;

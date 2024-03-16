@@ -1,4 +1,4 @@
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 class MindUtils {
   static const int millisecondsInDay = 1000 * 60 * 60 * 24;

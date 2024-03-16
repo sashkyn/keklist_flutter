@@ -9,7 +9,7 @@ import 'package:keklist/screens/insights/widgets/insights_random_mind_widget.dar
 import 'package:keklist/screens/insights/widgets/insights_today_minds_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/core/widgets/bool_widget.dart';
 
 class InsightsScreen extends StatefulWidget {

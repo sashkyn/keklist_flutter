@@ -3,7 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/core/widgets/rounded_container.dart';
 
 final class MindMessageWidget extends StatelessWidget {

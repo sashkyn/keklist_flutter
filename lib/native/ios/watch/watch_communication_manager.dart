@@ -9,8 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:keklist/core/enum_from_string.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/mind_service/main_service.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 
 abstract class WatchCommunicationManager {

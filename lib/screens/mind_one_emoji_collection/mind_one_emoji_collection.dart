@@ -10,7 +10,7 @@ import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 // TODO: сделать пробелы в днях между
 // TODO: переделать Monolog на ListView
@@ -213,7 +213,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
       ],
     );
     if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
+      sendEventTo<MindBloc>(MindDelete(mind: mind));
     } else if (result == 'edit_key') {
       setState(() {
         _editableMind = mind;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;

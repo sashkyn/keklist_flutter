@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 class MindRowWidget extends StatelessWidget {
   final List<Mind> minds;

@@ -9,8 +9,8 @@ import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:keklist/services/entities/message.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/message.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 class MindChatDiscussionScreen extends StatefulWidget {
   final Mind rootMind;

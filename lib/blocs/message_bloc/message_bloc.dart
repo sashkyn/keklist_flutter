@@ -5,11 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
-import 'package:keklist/services/entities/message.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/hive/constants.dart';
-import 'package:keklist/services/hive/entities/message/message_object.dart';
-import 'package:keklist/services/message_service/message_service.dart';
+import 'package:keklist/domain/services/entities/message.dart';
+import 'package:keklist/domain/services/entities/message_history.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
+import 'package:keklist/domain/services/message_service/message_open_ai_service.dart';
+import 'package:keklist/domain/services/message_service/message_service.dart';
 import 'package:uuid/uuid.dart';
 
 part 'message_event.dart';

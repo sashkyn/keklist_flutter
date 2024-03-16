@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../services/entities/mind.dart';
+import '../../domain/services/entities/mind.dart';
 
 class TextFieldAlert extends StatefulWidget {
   final String title;

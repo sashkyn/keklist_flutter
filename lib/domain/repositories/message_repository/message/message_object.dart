@@ -1,11 +1,11 @@
 import 'package:hive/hive.dart';
 import 'package:keklist/core/enum_from_string.dart';
-import 'package:keklist/services/entities/message.dart';
+import 'package:keklist/domain/services/entities/message.dart';
 
 part 'message_object.g.dart';
 
 @HiveType(typeId: 3)
-class MessageObject extends HiveObject {
+final class MessageObject extends HiveObject {
   @HiveField(0)
   late String id;
 

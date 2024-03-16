@@ -1,26 +1,9 @@
 import 'package:dart_openai/dart_openai.dart';
-import 'package:keklist/services/entities/message.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/message.dart';
+import 'package:keklist/domain/services/entities/message_history.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/services/message_service/message_service.dart';
 import 'package:uuid/uuid.dart';
-
-abstract class MessageService {
-  Future<MessageHistory> initializeDiscussion({
-    required Mind rootMind,
-    required List<Mind> rootMindChildren,
-    required String initMessageText,
-  });
-  Future<Message> requestAnswer({required MessageHistory history});
-}
-
-final class MessageHistory {
-  final String rootMindId;
-  final List<Message> messages;
-
-  MessageHistory({
-    required this.messages,
-    required this.rootMindId,
-  });
-}
 
 final class MessageOpenAIService implements MessageService {
   @override

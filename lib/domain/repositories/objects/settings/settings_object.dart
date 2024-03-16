@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 part 'settings_object.g.dart';
 
 @HiveType(typeId: 0)
-class SettingsObject extends HiveObject {
+final class SettingsObject extends HiveObject {
   @HiveField(0, defaultValue: true)
   late bool isMindContentVisible;
 

@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/core/widgets/rounded_container.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 

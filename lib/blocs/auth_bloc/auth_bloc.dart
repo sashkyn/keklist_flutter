@@ -4,11 +4,13 @@ import 'package:bloc/bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:keklist/constants.dart';
 import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/platform_utils.dart';
 import 'package:keklist/limitaions.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:keklist/services/mind_service/main_service.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -84,7 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
       return;
     }
 
-    if (provider == OAuthProvider.google) {
+    if (DeviceUtils.safeGetPlatform() == SupportedPlatform.android && provider == OAuthProvider.google) {
       await _signInWithGoogle();
       return;
     }

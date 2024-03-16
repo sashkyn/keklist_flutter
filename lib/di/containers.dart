@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
-import 'package:keklist/services/mind_service/main_supabase_service.dart';
+import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
+import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/services/mind_service/main_supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/native/ios/watch/watch_communication_manager.dart';
-import 'package:keklist/services/mind_service/main_service.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 class MainContainer {
   Injector initialize(Injector injector) {
@@ -28,6 +30,7 @@ class MainContainer {
         isSingleton: true,
       );
     }
+    injector.map<MindRepository>((injector) => MindHiveRepository());
     return injector;
   }
 }

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:keklist/services/hive/entities/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
 
 class Mind with EquatableMixin {
   final String id;

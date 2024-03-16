@@ -8,12 +8,12 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:keklist/keklist_app.dart';
-import 'package:keklist/services/hive/constants.dart';
-import 'package:keklist/services/hive/entities/message/message_object.dart';
-import 'package:keklist/services/hive/entities/mind/mind_object.dart';
-import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
-import 'package:keklist/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
+import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
@@ -25,7 +25,7 @@ import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/constants.dart';
 import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
-import 'package:keklist/services/mind_service/main_service.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 import 'native/ios/watch/watch_communication_manager.dart';
 
@@ -87,6 +87,7 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
           create: (context) => MindBloc(
             mainService: mainInjector.get<MindService>(),
             mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
+            mindRepository: mainInjector.get<MindRepository>()
           ),
         ),
         BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
@@ -129,7 +130,6 @@ void _setupBlockingLoadingWidget() {
 Future<void> _initHive() async {
   Hive.registerAdapter<SettingsObject>(SettingsObjectAdapter());
   Hive.registerAdapter<MindObject>(MindObjectAdapter());
-  Hive.registerAdapter<QueueTransactionObject>(QueueTransactionObjectAdapter());
   Hive.registerAdapter<MessageObject>(MessageObjectAdapter());
   await Hive.initFlutter();
   final Box<SettingsObject> settingsBox = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
@@ -138,6 +138,4 @@ Future<void> _initHive() async {
   }
   await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
   await Hive.openBox<MessageObject>(HiveConstants.messageChatBoxName);
-  // TODO: remove
-  await Hive.openBox<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
 }

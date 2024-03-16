@@ -19,7 +19,7 @@ import 'package:keklist/core/dispose_bag.dart';
 import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
