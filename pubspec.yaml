@@ -61,6 +61,7 @@ dependencies:
   dart_openai: ^5.1.0
   bottom_sheet: ^4.0.0
   action_sheet: ^1.0.4
+  haptic_feedback: ^0.4.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

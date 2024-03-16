@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/screens/actions/action_model.dart';
 import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -64,7 +65,18 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   bool _isMindContentVisible = false;
   bool _hasFocus = false;
   Mind? _editableMind;
-  bool _isFingerOnScroll = false;
+  bool _overscrollVibrationWorked = false;
+
+  bool get _isBeginOverscrollTop => _scrollController.position.pixels > -150 && _scrollController.position.pixels < 0;
+
+  bool get _isBeginOverscrollBottom =>
+      _scrollController.position.pixels < _scrollController.position.maxScrollExtent + 150 &&
+      _scrollController.position.pixels > 0;
+
+  bool get _isOverscrolledTop => _scrollController.position.pixels < -150;
+
+  bool get _isOverscrolledBottom =>
+      _scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150;
 
   _MindDayCollectionScreenState({
     required this.dayIndex,
@@ -75,18 +87,16 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   void initState() {
     super.initState();
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 250) {
-        if (_isFingerOnScroll) {
-          return;
-        }
-        _scrollController.jumpTo(0);
-        setState(() {
-          dayIndex = dayIndex + 1;
-          _hideKeyboard();
-        });
-      }
-    });
+    // _scrollController.addListener(() {
+    //   print('_scrollController.position.pixels = ${_scrollController.position.pixels}');
+    //   if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150) {
+    //     _vibrateOnSwitchDay();
+    //     if (_isFingerOnScroll) {
+    //       return;
+    //     }
+    //     _switchToDayIndex(dayIndex + 1);
+    //   }
+    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.initialError != null) {
@@ -148,11 +158,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               if (selectedDayIndex == null) {
                 return;
               }
-              setState(() {
-                dayIndex = selectedDayIndex;
-                _hideKeyboard();
-                _scrollController.jumpTo(0);
-              });
+              _switchToDayIndex(selectedDayIndex);
             },
           ),
           IconButton(
@@ -168,17 +174,25 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       body: Stack(
         children: [
           Listener(
-            onPointerDown: (event) {
-              _isFingerOnScroll = true;
+            onPointerDown: (_) {},
+            onPointerUp: (_) {
+              if (_isOverscrolledTop) {
+                _switchToDayIndex(dayIndex - 1);
+              } else if (_isOverscrolledBottom) {
+                _switchToDayIndex(dayIndex + 1);
+              }
             },
-            onPointerUp: (PointerUpEvent event) {
-              _isFingerOnScroll = false;
-              // User has lifted their finger off the screen
-              if (_scrollController.offset < -250) {
-                setState(() {
-                  dayIndex = dayIndex - 1;
-                  _hideKeyboard();
-                });
+            onPointerMove: (event) {
+              if (_isOverscrolledBottom) {
+                _vibrateOnOverscroll();
+              } else if (_isBeginOverscrollBottom) {
+                _overscrollVibrationWorked = false;
+              }
+
+              if (_isOverscrolledTop) {
+                _vibrateOnOverscroll();
+              } else if (_isBeginOverscrollTop) {
+                _overscrollVibrationWorked = false;
               }
             },
             child: SingleChildScrollView(
@@ -206,7 +220,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
                         _editMind(_dayMinds.first);
                         break;
                       case SwitchDayMenuActionModel _:
-                        _switchMindDay(_dayMinds.first);
+                        _updateMindDay(_dayMinds.first);
                         break;
                       case ShowAllMenuActionModel _:
                         _showAllMinds(_dayMinds.first);
@@ -347,7 +361,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     );
   }
 
-  Future<void> _switchMindDay(Mind mind) async {
+  Future<void> _updateMindDay(Mind mind) async {
     final int? switchedDay = await _showDateSwitcherToNewDay();
     if (switchedDay != null) {
       final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
@@ -437,5 +451,21 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         ),
       ),
     );
+  }
+
+  void _switchToDayIndex(int dayIndex) {
+    _scrollController.jumpTo(0);
+    setState(() {
+      this.dayIndex = dayIndex;
+      _hideKeyboard();
+    });
+  }
+
+  void _vibrateOnOverscroll() {
+    if (_overscrollVibrationWorked) {
+      return;
+    }
+    _overscrollVibrationWorked = true;
+    Haptics.vibrate(HapticsType.heavy);
   }
 }
