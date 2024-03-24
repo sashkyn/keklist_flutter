@@ -21,13 +21,13 @@ class AuthLoginWithEmailAndPassword extends AuthEvent {
 }
 
 class AuthLoginWithSocialNetwork extends AuthEvent {
-  final SocialNetwork socialNetwork;
+  final KeklistSupportedSocialNetwork socialNetwork;
 
   AuthLoginWithSocialNetwork(this.socialNetwork);
 
-  factory AuthLoginWithSocialNetwork.google() => AuthLoginWithSocialNetwork(SocialNetwork.google);
-  factory AuthLoginWithSocialNetwork.facebook() => AuthLoginWithSocialNetwork(SocialNetwork.facebook);
-  factory AuthLoginWithSocialNetwork.apple() => AuthLoginWithSocialNetwork(SocialNetwork.apple);
+  factory AuthLoginWithSocialNetwork.google() => AuthLoginWithSocialNetwork(KeklistSupportedSocialNetwork.google);
+  factory AuthLoginWithSocialNetwork.facebook() => AuthLoginWithSocialNetwork(KeklistSupportedSocialNetwork.facebook);
+  factory AuthLoginWithSocialNetwork.apple() => AuthLoginWithSocialNetwork(KeklistSupportedSocialNetwork.apple);
 }
 
 class AuthLogout extends AuthEvent {}
@@ -39,9 +39,3 @@ class AuthInternalUserAppearedInSession extends AuthEvent {}
 class AuthInternalUserGoneFromSession extends AuthEvent {}
 
 class AuthGetStatus extends AuthEvent {}
-
-enum SocialNetwork {
-  google,
-  facebook,
-  apple,
-}

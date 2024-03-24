@@ -26,12 +26,12 @@ final class MindCreate extends MindEvent {
 }
 
 final class MindDelete extends MindEvent {
-  final String uuid;
+  final Mind mind;
 
-  MindDelete({required this.uuid});
+  MindDelete({required this.mind});
 
   @override
-  List<Object?> get props => [uuid];
+  List<Object?> get props => [mind];
 }
 
 final class MindEdit extends MindEvent {

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
-class MindMonologListWidget extends StatelessWidget {
+final class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
   final Map<String, List<Mind>>? mindIdsToChildren;
   final Function(Mind) onTap;
@@ -14,8 +14,8 @@ class MindMonologListWidget extends StatelessWidget {
     super.key,
     required this.minds,
     required this.onTap,
-    required this.onOptions,
     required this.mindIdsToChildren,
+    required this.onOptions,
   });
 
   @override
@@ -37,7 +37,7 @@ class MindMonologListWidget extends StatelessWidget {
                       child: MindMessageWidget(
                         mind: mind,
                         children: mindIdsToChildren?[mind.id] ?? [],
-                        onOptions: () => onOptions(mind),
+                        onOptions: onOptions,
                       ).animate().fadeIn(),
                     ),
                   ),

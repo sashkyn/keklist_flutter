@@ -115,9 +115,3 @@ class MindCandidatesForUpload extends MindState with EquatableMixin {
   @override
   List<Object?> get props => [values];
 }
-
-class MindTransactions extends MindState {
-  final List<QueueTransactionObject> transactions;
-
-  MindTransactions(this.transactions);
-}

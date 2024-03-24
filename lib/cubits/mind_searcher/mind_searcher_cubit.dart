@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 part 'mind_searcher_state.dart';
 
 class MindSearcherCubit extends Cubit<MindSearcherState> {
-  late final MainService service;
+  late final MindService service;
 
-  MindSearcherCubit({required MainService mainService}) : super(MindSearcherInitial()) {
+  MindSearcherCubit({required MindService mainService}) : super(MindSearcherInitial()) {
     service = mainService;
   }
 

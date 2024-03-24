@@ -1,16 +1,19 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'package:keklist/core/helpers/extensions/state_extensions.dart';
+import 'package:keklist/core/screen/kek_screen_state.dart';
+import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/actions_screen.dart';
+import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
+import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:keklist/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/screens/mind_collection/local_widgets/mind_creator_bottom_bar.dart';
+import 'package:keklist/core/helpers/bloc_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;
@@ -26,20 +29,18 @@ final class MindInfoScreen extends StatefulWidget {
   State<MindInfoScreen> createState() => _MindInfoScreenState();
 }
 
-final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
+final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   bool _creatorPanelHasFocus = false;
   Mind? _editableMind;
-  late String _selectedEmoji = rootMind.emoji;
+  late String _selectedEmoji = _rootMind.emoji;
 
-  Mind get rootMind => widget.rootMind;
-  List<Mind> get allMinds => widget.allMinds;
+  Mind get _rootMind => widget.rootMind;
+  List<Mind> get _allMinds => widget.allMinds;
 
-  List<Mind> get childMinds => MindUtils.findMindsByRootId(
-        rootId: rootMind.id,
-        allMinds: widget.allMinds,
-      ).mySortedBy((mind) => mind.creationDate);
+  List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
+      .sortedByFunction((mind) => mind.creationDate);
 
   @override
   void initState() {
@@ -59,7 +60,7 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
     subscribeTo<MindBloc>(onNewState: (state) async {
       if (state is MindList) {
         setState(() {
-          allMinds
+          _allMinds
             ..clear()
             ..addAll(state.values.sortedByCreationDate());
         });
@@ -70,7 +71,29 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mind')),
+      appBar: AppBar(
+        title: const Text('Mind'),
+        actions: [
+          MenuActionsIconWidget(
+            menuActions: [
+              ActionModel.chatWithAI(),
+              ActionModel.photosPerDay(),
+            ],
+            action: ActionModel.extraActions(),
+            onMenuAction: (action) {
+              switch (action) {
+                case ChatWithAIActionModel _:
+                  _showMessageScreen(mind: _rootMind);
+                  break;
+                case PhotosPerDayActionModel _:
+                  break;
+                default:
+                  break;
+              }
+            },
+          )
+        ],
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -78,31 +101,16 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
             padding: const EdgeInsets.only(bottom: 150.0),
             child: SafeArea(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: MindMessageWidget(
-                      mind: rootMind,
-                      onOptions: null,
-                      children: const [],
+                      mind: _rootMind,
+                      children: _rootMindChildren,
+                      onOptions: (Mind mind) => _showActions(mind),
                     ),
                   ),
-                  if (childMinds.isNotEmpty) ...{
-                    const Gap(16.0),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
-                    ),
-                    MindBulletListWidget(
-                      minds: childMinds,
-                      onTap: (Mind mind) => () {},
-                      onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
-                    ),
-                    Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      height: 8.0,
-                    ),
-                  }
                 ],
               ),
             ),
@@ -124,15 +132,15 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                     editableMind: _editableMind,
                     focusNode: _mindCreatorFocusNode,
                     textEditingController: _createMindEditingController,
-                    placeholder: 'Comment your mind...',
+                    placeholder: 'Comment mind...',
                     onDone: (CreateMindData data) {
                       if (_editableMind == null) {
                         sendEventTo<MindBloc>(
                           MindCreate(
-                            dayIndex: rootMind.dayIndex,
+                            dayIndex: _rootMind.dayIndex,
                             note: data.text,
                             emoji: _selectedEmoji,
-                            rootId: rootMind.id,
+                            rootId: _rootMind.id,
                           ),
                         );
                       } else {
@@ -148,9 +156,11 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
                     selectedEmoji: _selectedEmoji,
                     onTapSuggestionEmoji: (_) {},
                     onTapEmoji: () {
-                      _showEmojiPickerScreen(onSelect: (String emoji) {
-                        setState(() => _selectedEmoji = emoji);
-                      });
+                      _showEmojiPickerScreen(
+                        onSelect: (String emoji) {
+                          setState(() => _selectedEmoji = emoji);
+                        },
+                      );
                     },
                     doneTitle: 'DONE',
                     onTapCancelEdit: () {
@@ -166,13 +176,6 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
     );
   }
 
-  @override
-  void dispose() {
-    cancelSubscriptions();
-
-    super.dispose();
-  }
-
   void _resetMindCreator() {
     setState(() {
       _editableMind = null;
@@ -185,38 +188,42 @@ final class _MindInfoScreenState extends State<MindInfoScreen> with DisposeBag {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showMindOptionsActionSheet(Mind mind) async {
-    final String? result = await showModalActionSheet(
+  void _showActions(Mind mind) {
+    showBarModalBottomSheet(
       context: context,
-      actions: [
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Edit',
-          key: 'edit_key',
-        ),
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Delete',
-          key: 'remove_key',
-          isDestructiveAction: true,
-        ),
-      ],
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.edit(), () => _showMessageScreen(mind: mind)),
+          (
+            ActionModel.delete(),
+            () {
+              setState(() {
+                _editableMind = mind;
+              });
+              _createMindEditingController.text = mind.note;
+              _mindCreatorFocusNode.requestFocus();
+            }
+          ),
+        ],
+      ),
     );
-    if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(uuid: mind.id));
-    } else if (result == 'edit_key') {
-      setState(() {
-        _editableMind = mind;
-      });
-      _createMindEditingController.text = mind.note;
-      _mindCreatorFocusNode.requestFocus();
-    }
   }
 
   void _showEmojiPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
+    );
+  }
+
+  void _showMessageScreen({required Mind mind}) async {
+    Navigator.of(mountedContext!).push(
+      MaterialPageRoute(
+        builder: (_) => MindChatDiscussionScreen(
+          rootMind: mind,
+          allMinds: _allMinds,
+        ),
+      ),
     );
   }
 }

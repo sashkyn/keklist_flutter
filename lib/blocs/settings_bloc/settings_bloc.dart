@@ -4,14 +4,14 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
 import 'package:hive/hive.dart';
+import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/hive/constants.dart';
-import 'package:keklist/services/hive/entities/mind/mind_object.dart';
-import 'package:keklist/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'settings_event.dart';
@@ -19,7 +19,7 @@ part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SupabaseClient client;
-  final MainService mainService;
+  final MindService mainService;
   final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
   final Box<SettingsObject> _settingsBox = Hive.box(HiveConstants.settingsBoxName);
 

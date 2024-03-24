@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/helpers/mind_utils.dart';
+import 'package:keklist/core/dispose_bag.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/screens/insights/widgets/insights_pie_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_random_mind_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_today_minds_widget.dart';
 import 'package:keklist/screens/insights/widgets/insights_top_chart.dart';
 import 'package:keklist/screens/mind_day_collection/mind_day_collection_screen.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/widgets/bool_widget.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});

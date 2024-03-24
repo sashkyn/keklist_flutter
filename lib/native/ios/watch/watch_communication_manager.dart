@@ -7,10 +7,10 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:keklist/helpers/extensions/enum_from_string.dart';
-import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/core/enum_from_string.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 import 'package:emojis/emoji.dart' as emojies_pub;
 
 abstract class WatchCommunicationManager {
@@ -20,7 +20,7 @@ abstract class WatchCommunicationManager {
 class AppleWatchCommunicationManager implements WatchCommunicationManager {
   final MethodChannel _channel = const MethodChannel('com.sashkyn.kekable');
 
-  final MainService mainService;
+  final MindService mainService;
   final SupabaseClient client;
 
   AppleWatchCommunicationManager({

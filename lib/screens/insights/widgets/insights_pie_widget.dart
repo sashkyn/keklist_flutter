@@ -3,10 +3,10 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/services/entities/mind.dart';
-import 'package:keklist/widgets/bool_widget.dart';
-import 'package:keklist/widgets/rounded_container.dart';
+import 'package:keklist/core/helpers/mind_utils.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:keklist/core/widgets/bool_widget.dart';
+import 'package:keklist/core/widgets/rounded_container.dart';
 
 // Improvements:
 // Переключатель по количеству символов
@@ -137,7 +137,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: intervalChoiceMap.entries.mySortedBy((e) => e.value, reversed: true).map(
+                children: intervalChoiceMap.entries.sortedByFunction((e) => e.value, reversed: true).map(
                   (entry) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -168,7 +168,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
 
   List<PieChartSectionData> _getPieSections({required HashMap<String, int> choiceMap}) {
     final int allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
-    return choiceMap.entries.mySortedBy((e) => e.value).map(
+    return choiceMap.entries.sortedByFunction((e) => e.value).map(
       (entry) {
         final currentValue = choiceMap.entries
             .where((element) => element.key == entry.key)

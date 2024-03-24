@@ -1,5 +1,5 @@
 import 'package:keklist/constants.dart';
-import 'package:keklist/widgets/mind_widget.dart';
+import 'package:keklist/core/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +53,7 @@ class MindPickerScreenState extends State<MindPickerScreen> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(8),
               border: UnderlineInputBorder(),
-              hintText: 'Search emoji mark',
+              hintText: 'Search your emoji...',
             ),
           ),
           Flexible(

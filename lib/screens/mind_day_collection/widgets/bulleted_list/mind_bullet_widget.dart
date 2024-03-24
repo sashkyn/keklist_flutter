@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:keklist/services/entities/mind.dart';
 
 class MindBulletWidget extends StatelessWidget {
-  final Mind mind;
-  final VoidCallback? onOptions;
+  final MindBulletModel model;
 
   const MindBulletWidget({
     super.key,
-    required this.mind,
-    this.onOptions,
+    required this.model,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
         const Gap(10.0),
         Text(
-          mind.emoji,
+          model.emoji,
           style: const TextStyle(fontSize: 25.0),
         ),
-        const Gap(8.0),
+        const Gap(16.0),
         Flexible(
           fit: FlexFit.tight,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),
             child: Text(
-              mind.note,
+              model.text,
               maxLines: null,
               style: const TextStyle(fontSize: 15.0),
             ),
@@ -38,5 +34,16 @@ class MindBulletWidget extends StatelessWidget {
         const Gap(10.0),
       ],
     );
-  }
+}
+
+final class MindBulletModel {
+  final String entityId;
+  final String emoji;
+  final String text;
+
+  const MindBulletModel({
+    required this.entityId,
+    required this.emoji,
+    required this.text,
+  });
 }
