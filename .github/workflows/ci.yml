@@ -11,11 +11,6 @@ jobs:
     runs-on: self-hosted
     continue-on-error: true
     steps:
-      - name: Check jq installation
-        run: |
-          echo $PATH
-          which jq
-
       - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
         with:
@@ -24,6 +19,12 @@ jobs:
           message: |
             --------------------------
             [CI] 🛠️ Starting CI...
+
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
 
       - uses: actions/checkout@v3
 
@@ -63,10 +64,11 @@ jobs:
     needs: [analyze_and_test]
     runs-on: self-hosted
     steps:
-      - name: Check jq installation
-        run: |
-          echo $PATH
-          which jq
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
       
       - uses: actions/checkout@v3
 
@@ -112,10 +114,11 @@ jobs:
     runs-on: self-hosted
     needs: [analyze_and_test]
     steps:
-      - name: Check jq installation
-        run: |
-          echo $PATH
-          which jq
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
 
       - name: Checking out to current branch
         uses: actions/checkout@v3
