@@ -69,12 +69,17 @@ jobs:
         with:
           version: '1.7'
           force: true
+
+      - name: 'Setup CocoaPods'
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 'latest'
       
       - uses: actions/checkout@v3
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          channel: 'stable'
 
       - name: Decode main .env file
         run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
