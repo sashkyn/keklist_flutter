@@ -1,8 +1,6 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/screens/actions/action_model.dart';
 import 'package:keklist/screens/actions/actions_screen.dart';

@@ -1,4 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
@@ -209,7 +208,7 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
       ),
     );
   }
-  
+
   void _showEmojiPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
