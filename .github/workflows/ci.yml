@@ -70,6 +70,11 @@ jobs:
           version: '1.7'
           force: true
 
+      - name: 'Setup Ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+
       - name: 'Setup CocoaPods'
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
