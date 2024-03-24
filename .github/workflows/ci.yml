@@ -11,8 +11,10 @@ jobs:
     runs-on: self-hosted
     continue-on-error: true
     steps:
-      - name: Fix jq on self hosted machine
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+      - name: Check jq installation
+        run: |
+          jq --version
+          echo $PATH
 
       - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
@@ -61,8 +63,10 @@ jobs:
     needs: [analyze_and_test]
     runs-on: self-hosted
     steps:
-      - name: Fix jq on self hosted machine
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+      - name: Check jq installation
+        run: |
+          jq --version
+          echo $PATH
       
       - uses: actions/checkout@v3
 
@@ -108,9 +112,11 @@ jobs:
     runs-on: self-hosted
     needs: [analyze_and_test]
     steps:
-      - name: Fix jq on self hosted machine
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
-        
+      - name: Check jq installation
+        run: |
+          jq --version
+          echo $PATH
+
       - name: Checking out to current branch
         uses: actions/checkout@v3
 
