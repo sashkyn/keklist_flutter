@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Check jq installation
         run: |
-          jq --version
           echo $PATH
+          which jq
 
       - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
@@ -65,8 +65,8 @@ jobs:
     steps:
       - name: Check jq installation
         run: |
-          jq --version
           echo $PATH
+          which jq
       
       - uses: actions/checkout@v3
 
@@ -114,8 +114,8 @@ jobs:
     steps:
       - name: Check jq installation
         run: |
-          jq --version
           echo $PATH
+          which jq
 
       - name: Checking out to current branch
         uses: actions/checkout@v3
