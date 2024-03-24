@@ -7,23 +7,25 @@ class ActionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Wrap(
-        children: actions
-            .map(
-              (action) => ListTile(
-                leading: action.$1.icon,
-                title: Text(
-                  action.$1.title,
-                  style: const TextStyle(fontSize: 16.0),
+    return Material(
+      child: SafeArea(
+        child: Wrap(
+          children: actions
+              .map(
+                (action) => ListTile(
+                  leading: action.$1.icon,
+                  title: Text(
+                    action.$1.title,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    action.$2.call();
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  action.$2.call();
-                },
-              ),
-            )
-            .toList(),
+              )
+              .toList(),
+        ),
       ),
     );
   }
