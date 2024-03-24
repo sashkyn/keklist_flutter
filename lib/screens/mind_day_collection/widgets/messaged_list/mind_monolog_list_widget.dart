@@ -8,14 +8,14 @@ final class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
   final Map<String, List<Mind>>? mindIdsToChildren;
   final Function(Mind) onTap;
-  final Widget? optionsWidget;
+  final Function(Mind) onOptions;
 
   const MindMonologListWidget({
     super.key,
     required this.minds,
     required this.onTap,
     required this.mindIdsToChildren,
-    required this.optionsWidget,
+    required this.onOptions,
   });
 
   @override
@@ -37,7 +37,7 @@ final class MindMonologListWidget extends StatelessWidget {
                       child: MindMessageWidget(
                         mind: mind,
                         children: mindIdsToChildren?[mind.id] ?? [],
-                        optionsWidget: optionsWidget,
+                        onOptions: onOptions,
                       ).animate().fadeIn(),
                     ),
                   ),

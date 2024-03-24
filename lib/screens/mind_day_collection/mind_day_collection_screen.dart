@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/actions_screen.dart';
 import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -191,37 +192,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               child: MindMonologListWidget(
                 minds: _dayMinds,
                 onTap: (Mind mind) => _showMindInfo(mind),
-                optionsWidget: MenuActionsIconWidget(
-                  menuActions: [
-                    ActionModel.chatWithAI(),
-                    ActionModel.edit(),
-                    ActionModel.switchDay(),
-                    ActionModel.showAll(),
-                    ActionModel.delete(),
-                  ],
-                  action: ActionModel.mindOptions(),
-                  onMenuAction: (action) {
-                    switch (action) {
-                      case ChatWithAIActionModel _:
-                        _showMessageScreen(mind: _dayMinds.first);
-                        break;
-                      case EditMenuActionModel _:
-                        _editMind(_dayMinds.first);
-                        break;
-                      case SwitchDayMenuActionModel _:
-                        _updateMindDay(_dayMinds.first);
-                        break;
-                      case ShowAllMenuActionModel _:
-                        _showAllMinds(_dayMinds.first);
-                        break;
-                      case DeleteMenuActionModel _:
-                        _removeMind(_dayMinds.first);
-                        break;
-                      default:
-                        break;
-                    }
-                  },
-                ),
+                onOptions: (Mind mind) => _showActions(context, mind),
                 mindIdsToChildren: _mindIdsToChildren,
               ),
             ),
@@ -456,5 +427,20 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     }
     _overscrollVibrationWorked = true;
     Haptics.vibrate(HapticsType.heavy);
+  }
+
+  void _showActions(BuildContext context, Mind mind) {
+    showBarModalBottomSheet(
+      context: context,
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.chatWithAI(), () => _showMessageScreen(mind: mind)),
+          (ActionModel.edit(), () => _editMind(mind)),
+          (ActionModel.switchDay(), () => _updateMindDay(mind)),
+          (ActionModel.showAll(), () => _showAllMinds(mind)),
+          (ActionModel.delete(), () => _removeMind(mind)),
+        ],
+      ),
+    );
   }
 }

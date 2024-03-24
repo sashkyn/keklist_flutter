@@ -110,7 +110,7 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                       padding: const EdgeInsets.all(8.0),
                       child: MindMessageWidget(
                         mind: rootMind,
-                        optionsWidget: null,
+                        onOptions: null,
                         children: mindChildren,
                       ),
                     ),

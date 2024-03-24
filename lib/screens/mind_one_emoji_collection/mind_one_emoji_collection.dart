@@ -2,7 +2,10 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
+import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/actions_screen.dart';
 import 'package:keklist/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
 import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/core/helpers/bloc_utils.dart';
@@ -11,6 +14,7 @@ import 'package:keklist/core/helpers/mind_utils.dart';
 import 'package:keklist/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 // TODO: сделать пробелы в днях между
 // TODO: переделать Monolog на ListView
@@ -105,9 +109,8 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
               controller: _scrollController,
               child: MindMonologListWidget(
                 minds: emojiMinds,
-                onTap: (Mind mind) => _showMindInfo(mind),
-                optionsWidget: null,
-                // onOptions: (Mind mind) => _showMindOptionsActionSheet(mind),
+                onTap: _showMindInfo,
+                onOptions: _showActions,
                 mindIdsToChildren: null,
               ),
             ),
@@ -190,49 +193,41 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showMindOptionsActionSheet(Mind mind) async {
-    final String? result = await showModalActionSheet(
+  void _showActions(Mind mind) {
+    showBarModalBottomSheet(
       context: context,
-      actions: [
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Edit',
-          key: 'edit_key',
-        ),
-        const SheetAction(
-          icon: Icons.date_range,
-          label: 'Switch day',
-          key: 'switch_day_key',
-        ),
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Delete',
-          key: 'remove_key',
-          isDestructiveAction: true,
-        ),
-      ],
+      builder: (context) => ActionsScreen(
+        actions: [
+          (
+            ActionModel.edit(),
+            () {
+              setState(() {
+                _editableMind = mind;
+                // _selectedEmoji = mind.emoji;
+              });
+              _createMindEditingController.text = mind.note;
+              _mindCreatorFocusNode.requestFocus();
+            }
+          ),
+          (
+            ActionModel.switchDay(),
+            () async {
+              final int? switchedDay = await _showDateSwitcherToNewDay();
+              if (switchedDay != null) {
+                final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
+                  dayIndex: switchedDay,
+                  allMinds: allMinds,
+                );
+                final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
+                final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
+                sendEventTo<MindBloc>(MindEdit(mind: newMind));
+              }
+            }
+          ),
+          (ActionModel.delete(), () => sendEventTo<MindBloc>(MindDelete(mind: mind))),
+        ],
+      ),
     );
-    if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(mind: mind));
-    } else if (result == 'edit_key') {
-      setState(() {
-        _editableMind = mind;
-        // _selectedEmoji = mind.emoji;
-      });
-      _createMindEditingController.text = mind.note;
-      _mindCreatorFocusNode.requestFocus();
-    } else if (result == 'switch_day_key') {
-      final int? switchedDay = await _showDateSwitcherToNewDay();
-      if (switchedDay != null) {
-        final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
-          dayIndex: switchedDay,
-          allMinds: allMinds,
-        );
-        final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
-        final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
-        sendEventTo<MindBloc>(MindEdit(mind: newMind));
-      }
-    }
   }
 
   void _handleError(MindOperationError error) {

@@ -9,13 +9,13 @@ import 'package:keklist/core/widgets/rounded_container.dart';
 final class MindMessageWidget extends StatelessWidget {
   final Mind mind;
   final List<Mind> children;
-  final Widget? optionsWidget;
+  final Function(Mind)? onOptions;
 
   const MindMessageWidget({
     super.key,
     required this.mind,
     required this.children,
-    required this.optionsWidget,
+    required this.onOptions,
   });
 
   @override
@@ -47,10 +47,13 @@ final class MindMessageWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              if (optionsWidget != null) ...{
+              if (onOptions != null) ...{
                 Align(
                   alignment: Alignment.topRight,
-                  child: optionsWidget,
+                  child: IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () => onOptions?.call(mind),
+                  ),
                 ),
               },
             ],

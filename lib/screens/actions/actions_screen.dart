@@ -1,36 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:keklist/screens/actions/action_model.dart';
 
-// TODO: make dynamic height
-
 class ActionsScreen extends StatelessWidget {
-  final List<ActionModel> actions;
-  final Function(ActionModel) onAction;
-
-  const ActionsScreen({
-    super.key,
-    required this.actions,
-    required this.onAction,
-  });
+  final List<(ActionModel, Function())> actions;
+  const ActionsScreen({super.key, required this.actions});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Wrap(
-          children: actions
-              .map(
-                (action) => ListTile(
-                  leading: action.icon,
-                  title: Text(
-                    action.title,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    onAction(action);
-                  },
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Wrap(
+        children: actions
+            .map(
+              (action) => ListTile(
+                leading: action.$1.icon,
+                title: Text(
+                  action.$1.title,
+                  style: const TextStyle(fontSize: 16.0),
                 ),
-              )
-              .toList(),
-        ),
-      );
+                onTap: () {
+                  Navigator.of(context).pop();
+                  action.$2.call();
+                },
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
 }

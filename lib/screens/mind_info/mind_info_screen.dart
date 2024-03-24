@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/core/screen/kek_screen_state.dart';
 import 'package:keklist/screens/actions/action_model.dart';
+import 'package:keklist/screens/actions/actions_screen.dart';
 import 'package:keklist/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -108,10 +109,7 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     child: MindMessageWidget(
                       mind: _rootMind,
                       children: _rootMindChildren,
-                      optionsWidget: null,
-                      // onOptions: (Mind mind) {
-                      //   _showMindOptionsActionSheet(mind);
-                      // },
+                      onOptions: (Mind mind) => _showActions(mind),
                     ),
                   ),
                 ],
@@ -191,34 +189,27 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showMindOptionsActionSheet(Mind mind) async {
-    final String? result = await showModalActionSheet(
+  void _showActions(Mind mind) {
+    showBarModalBottomSheet(
       context: context,
-      actions: [
-        const SheetAction(
-          icon: Icons.edit,
-          label: 'Edit',
-          key: 'edit_key',
-        ),
-        const SheetAction(
-          icon: Icons.delete,
-          label: 'Delete',
-          key: 'remove_key',
-          isDestructiveAction: true,
-        ),
-      ],
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.edit(), () => _showMessageScreen(mind: mind)),
+          (
+            ActionModel.delete(),
+            () {
+              setState(() {
+                _editableMind = mind;
+              });
+              _createMindEditingController.text = mind.note;
+              _mindCreatorFocusNode.requestFocus();
+            }
+          ),
+        ],
+      ),
     );
-    if (result == 'remove_key') {
-      sendEventTo<MindBloc>(MindDelete(mind: mind));
-    } else if (result == 'edit_key') {
-      setState(() {
-        _editableMind = mind;
-      });
-      _createMindEditingController.text = mind.note;
-      _mindCreatorFocusNode.requestFocus();
-    }
   }
-
+  
   void _showEmojiPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
