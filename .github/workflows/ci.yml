@@ -70,9 +70,6 @@ jobs:
           version: '1.7'
           force: true
 
-      - name: 'Make dir for Ruby (workaround for self-hosted runners)'
-        run: mkdir -p /opt/hostedtoolcache && chown -R runner:runner /opt/hostedtoolcache
-
       - name: 'Setup Ruby'
         uses: ruby/setup-ruby@v1
         with:
