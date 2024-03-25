@@ -16,18 +16,18 @@ import 'package:keklist/domain/repositories/message_repository/message/message_o
 import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
-import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
+import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
-import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/constants.dart';
-import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:keklist/presentation/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/domain/constants.dart';
+import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
 
-import 'native/ios/watch/watch_communication_manager.dart';
+import 'presentation/native/ios/watch/watch_communication_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

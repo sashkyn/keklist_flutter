@@ -9,8 +9,8 @@ import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:keklist/domain/services/mind_service/main_supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
-import 'package:keklist/native/ios/watch/watch_communication_manager.dart';
+import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:keklist/presentation/native/ios/watch/watch_communication_manager.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 class MainContainer {

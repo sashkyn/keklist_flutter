@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:keklist/core/enum_from_string.dart';
+import 'package:keklist/presentation/core/enum_from_string.dart';
 import 'package:keklist/domain/services/entities/message.dart';
 
 part 'message_object.g.dart';

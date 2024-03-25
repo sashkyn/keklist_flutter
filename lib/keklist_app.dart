@@ -2,20 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/constants.dart';
-import 'package:keklist/core/helpers/bloc_utils.dart';
-import 'package:keklist/core/dispose_bag.dart';
-import 'package:keklist/screens/main/main_screen.dart';
+import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/domain/constants.dart';
+import 'package:keklist/presentation/core/helpers/bloc_utils.dart';
+import 'package:keklist/presentation/core/dispose_bag.dart';
+import 'package:keklist/presentation/screens/main/main_screen.dart';
 
-class KeklistApp extends StatefulWidget {
+final class KeklistApp extends StatefulWidget {
   const KeklistApp({super.key});
 
   @override
   State<KeklistApp> createState() => KeklistAppState();
 }
 
-class KeklistAppState extends State<KeklistApp> with DisposeBag {
+final class KeklistAppState extends State<KeklistApp> with DisposeBag {
   bool _isDarkMode = true;
 
   @override
@@ -42,7 +42,7 @@ class KeklistAppState extends State<KeklistApp> with DisposeBag {
   }
 }
 
-class LoggerBlocObserver extends BlocObserver {
+final class LoggerBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
