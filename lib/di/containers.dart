@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
+import 'package:hive/hive.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:keklist/domain/services/mind_service/main_supabase_service.dart';
@@ -30,7 +33,8 @@ class MainContainer {
         isSingleton: true,
       );
     }
-    injector.map<MindRepository>((injector) => MindHiveRepository());
+    injector.map<MindRepository>(
+        (injector) => MindHiveRepository(mindBox: Hive.box<MindObject>(HiveConstants.mindBoxName)));
     return injector;
   }
 }

@@ -1,14 +1,16 @@
 import 'dart:async';
 
 import 'package:hive/hive.dart';
-import 'package:keklist/domain/hive_constants.dart';
 import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class MindHiveRepository implements MindRepository {
-  final Box<MindObject> _mindBox = Hive.box<MindObject>(HiveConstants.mindBoxName);
+  final Box<MindObject> _mindBox;
+
+  MindHiveRepository({required Box<MindObject> mindBox}) : _mindBox = mindBox;
+
   Iterable<MindObject> get _mindObjects => _mindBox.values;
 
   @override
@@ -43,9 +45,7 @@ final class MindHiveRepository implements MindRepository {
 
   @override
   FutureOr<List<Mind>> obtainMinds() {
-    final Stopwatch stopwatch = _measureStart();
     final List<Mind> minds = _mindObjects.map((mindObject) => mindObject.toMind()).toList();
-    _measureStop(stopwatch, 'obtainMinds');
     return minds;
   }
 
@@ -70,9 +70,7 @@ final class MindHiveRepository implements MindRepository {
   @override
   FutureOr<void> updateMinds({required List<Mind> minds, required bool isUploadedToServer}) async {
     final mindEntries = {for (final mind in minds) mind.id: mind.toObject(isUploadedToServer: isUploadedToServer)};
-    final Stopwatch stopwatch = _measureStart();
     await _mindBox.putAll(mindEntries);
-    _measureStop(stopwatch, 'updateMinds - putAll');
   }
 
   @override
