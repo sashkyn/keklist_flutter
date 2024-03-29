@@ -187,7 +187,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               },
               SettingsTile(
                 title: const Text('Setup OpenAI Token'),
-                leading: const Icon(Icons.chat, color: Colors.brown),
+                leading: const Icon(Icons.chat, color: Colors.redAccent),
                 onPressed: (BuildContext context) async {
                   await _showOpenAITokenChanger();
                 },
@@ -280,7 +280,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   }
 
   Future<void> _openSourceCode() async {
-    final Uri uri = Uri.https(KeklistConstants.sourceCodeURL);
+    final Uri uri = Uri.parse(KeklistConstants.sourceCodeURL);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
