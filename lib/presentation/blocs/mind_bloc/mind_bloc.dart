@@ -219,7 +219,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     Emitter<MindState> emit,
   ) async {
     const count = 9;
-    final List<Mind> minds = _repository.values;
+    final List<Mind> minds = _repository.values.toList();
     final List<String> suggestions = _repository.values
         .where((Mind mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
         .map((Mind mind) => mind.emoji)
@@ -243,10 +243,11 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   }
 
   Future<List<Mind>> _findMindsByDayIndex(int index) async {
-    final List<Mind> dayMinds =
-        await _repository.obtainMindsWhere((mind) => mind.dayIndex == index && mind.rootId == null)
-          ..sortedByFunction((it) => it.sortIndex);
-    return dayMinds;
+    final minds = await _repository.obtainMindsWhere(
+      (mind) => mind.dayIndex == index && mind.rootId == null,
+    )
+      ..sortedByFunction((it) => it.sortIndex);
+    return minds.toList();
   }
 
   Future<void> _editMind(
@@ -360,7 +361,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     MindUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    final List<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
+    final Iterable<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
     emit(
       MindServerOperationStarted(
         minds: uploadCandidates,
@@ -430,7 +431,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     MindGetUploadCandidates event,
     Emitter<MindState> emit,
   ) async {
-    final List<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
+    final Iterable<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
     if (uploadCandidates.isEmpty) {
       emit(MindCandidatesForUpload(values: []));
       return;
@@ -442,7 +443,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     if (DeviceUtils.safeGetPlatform() != SupportedPlatform.iOS) {
       return;
     }
-    final List<Mind> todayMinds =
+    final Iterable<Mind> todayMinds =
         await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex());
 
     final List<String> todayMindJSONList = todayMinds

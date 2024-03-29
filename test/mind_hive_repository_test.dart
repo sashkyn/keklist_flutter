@@ -26,7 +26,7 @@ void main() {
       creationDate: DateTime.now(),
       rootId: null,
     );
-  
+
     // When
     await repository.updateMinds(minds: [mind, mind, mind, mind], isUploadedToServer: false);
     repository.stream.listen((minds) {
