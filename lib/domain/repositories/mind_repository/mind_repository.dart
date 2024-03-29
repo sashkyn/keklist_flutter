@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:keklist/domain/services/entities/mind.dart';
 
 abstract class MindRepository {
+  List<Mind> get values;
   Stream<List<Mind>> get stream;
   FutureOr<List<Mind>> obtainMinds();
   FutureOr<void> createMind({required Mind mind, required bool isUploadedToServer});

@@ -7,11 +7,10 @@ import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart
 import 'package:keklist/domain/services/entities/mind.dart';
 
 Future<void> main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
   Hive.init('.');
   Hive.registerAdapter<MindObject>(MindObjectAdapter());
   final hiveBox = await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
-  final MindRepository repository = MindHiveRepository(mindBox: hiveBox);
+  final MindRepository repository = MindHiveRepository(box: hiveBox);
 
   final minds = List.generate(
     10000,

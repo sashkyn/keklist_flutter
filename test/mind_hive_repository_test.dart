@@ -13,12 +13,33 @@ void main() {
     Hive.init('.');
     Hive.registerAdapter<MindObject>(MindObjectAdapter());
   });
+  test('stream values and saved values the same', () async {
+    // Given
+    final hiveBox = await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
+    final MindRepository repository = MindHiveRepository(box: hiveBox);
+    final Mind mind = Mind(
+      id: '1',
+      note: 'Heh1',
+      emoji: ' ',
+      dayIndex: 0,
+      sortIndex: 5,
+      creationDate: DateTime.now(),
+      rootId: null,
+    );
+  
+    // When
+    await repository.updateMinds(minds: [mind, mind, mind, mind], isUploadedToServer: false);
+    repository.stream.listen((minds) {
+      // Then
+      expect(repository.values, minds);
+    });
+  });
   test(
-    'createMind: creates mind correctly',
+    'mind is created',
     () async {
       // Given
       final hiveBox = await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
-      final MindRepository repository = MindHiveRepository(mindBox: hiveBox);
+      final MindRepository repository = MindHiveRepository(box: hiveBox);
 
       // When
       var mind = Mind(
@@ -37,10 +58,7 @@ void main() {
       final minds = await repository.obtainMinds();
 
       // Then
-      expect(
-        minds.contains(mind),
-        true,
-      );
+      expect(minds.contains(mind), true);
     },
   );
 }
