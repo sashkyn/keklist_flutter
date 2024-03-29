@@ -18,6 +18,7 @@ part 'message_event.dart';
 part 'message_state.dart';
 
 // TODO: extract _messageService to DI
+// TODO: extract _hiveBox to Repository
 
 final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag {
   final MessageService _messageService = MessageOpenAIService();
@@ -58,7 +59,7 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
   FutureOr<void> _clearMessages(MessageClearChatWithMind event, Emitter emit) async {
     try {
       final Iterable<String> messageObjectIdsToDelete =
-          _hiveObjects.where((element) => element.rootMindId == event.rootMindId).map((object) => object.id).toList();
+          _hiveObjects.where((element) => element.rootMindId == event.rootMindId).map((object) => object.id);
       await _hiveBox.deleteAll(messageObjectIdsToDelete);
       add(MessageGetAll());
     } catch (error) {
@@ -70,21 +71,21 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
     emit(MessageLoadingStatus(isLoading: true));
     try {
       await _hiveBox.deleteAll(
-        _hiveObjects.where((element) => element.rootMindId == event.mind.id).map((object) => object.id).toList(),
+        _hiveObjects.where((element) => element.rootMindId == event.mind.id).map((object) => object.id),
       );
     } catch (error) {
       emit(MessageError(message: '$error'));
       return;
     }
-    final MessageHistory messageHistory = await _messageService.initializeDiscussion(
-      rootMind: event.mind,
-      rootMindChildren: event.mindChildren,
-      initMessageText: _makeInitialSystemPromt(
-        mind: event.mind,
-        mindChildren: event.mindChildren,
-      ),
-    );
     try {
+      final MessageHistory messageHistory = await _messageService.initializeDiscussion(
+        rootMind: event.mind,
+        rootMindChildren: event.mindChildren,
+        initMessageText: _makeInitialSystemPromt(
+          mind: event.mind,
+          mindChildren: event.mindChildren,
+        ),
+      );
       final Map<String, MessageObject> messageObjects = {};
       for (final Message message in messageHistory.messages) {
         final MessageObject messageObject = message.toObject();
@@ -115,8 +116,7 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
 
     final Message openAIAnswerMessage = await _messageService.requestAnswer(
       history: MessageHistory(
-        messages:
-            _hiveObjects.map((object) => object.toMessage()).sortedByFunction((object) => object.timestamp).toList(),
+        messages: _hiveObjects.map((object) => object.toMessage()).sortedByFunction((object) => object.timestamp),
         rootMindId: event.rootMindId,
       ),
     );
@@ -142,7 +142,7 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
     }();
 
     final String prompt = '''
-    ACT YOUR SELF LIKE PRO SPECIALIST.
+    ACT YOUR SELF LIKE PRO PSYCOLOGIST.
     It's my mind with the note - ${mind.note}. 
     I've set this emoji for the note - ${mind.emoji}.
     $mindChildrenPromt

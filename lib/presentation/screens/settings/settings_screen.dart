@@ -186,6 +186,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                 ),
               },
               SettingsTile(
+                title: const Text('Setup OpenAI Token'),
+                leading: const Icon(Icons.chat, color: Colors.brown),
+                onPressed: (BuildContext context) async {
+                  await _showOpenAITokenChanger();
+                },
+              ),
+              SettingsTile(
                 title: const Text('Export to CSV'),
                 leading: const Icon(Icons.file_download, color: Colors.brown),
                 onPressed: (BuildContext context) {
@@ -210,6 +217,13 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                 leading: const Icon(Icons.feedback, color: Colors.blue),
                 onPressed: (BuildContext context) async {
                   await _sendFeedback();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Source code'),
+                leading: const Icon(Icons.code, color: Colors.grey),
+                onPressed: (BuildContext context) async {
+                  await _openSourceCode();
                 },
               ),
             ],
@@ -263,6 +277,45 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  Future<void> _openSourceCode() async {
+    final Uri uri = Uri.https(KeklistConstants.sourceCodeURL);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _showOpenAITokenChanger() async {
+    String openAiToken = '';
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Set Open AI Token'),
+          content: TextField(
+            onChanged: (value) => openAiToken = value,
+            decoration: const InputDecoration(
+              hintText: 'Enter token here',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                sendEventTo<SettingsBloc>(SettingsChangeOpenAIKey(openAIToken: openAiToken));
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _deleteAccount() async {

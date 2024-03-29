@@ -33,3 +33,9 @@ class SettingsChangeIsDarkMode extends SettingsEvent {
 
   const SettingsChangeIsDarkMode({required this.isDarkMode});
 }
+
+class SettingsChangeOpenAIKey extends SettingsEvent {
+  final String openAIToken;
+
+  const SettingsChangeOpenAIKey({required this.openAIToken});
+}

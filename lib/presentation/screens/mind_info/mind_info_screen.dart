@@ -29,7 +29,7 @@ final class MindInfoScreen extends StatefulWidget {
   State<MindInfoScreen> createState() => _MindInfoScreenState();
 }
 
-final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
+final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   bool _creatorPanelHasFocus = false;

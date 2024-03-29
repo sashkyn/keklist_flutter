@@ -16,11 +16,15 @@ final class SettingsObject extends HiveObject {
   @HiveField(3, defaultValue: true)
   late bool isDarkMode;
 
+  @HiveField(4, defaultValue: null)
+  late String? openAIKey;
+
   SettingsObject();
 
   factory SettingsObject.initial() => SettingsObject()
     ..isMindContentVisible = true
     ..previousAppVersion = null
     ..isOfflineMode = false
+    ..openAIKey = null
     ..isDarkMode = true;
 }

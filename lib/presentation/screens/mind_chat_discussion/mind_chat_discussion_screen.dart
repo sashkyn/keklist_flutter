@@ -26,7 +26,7 @@ final class MindChatDiscussionScreen extends StatefulWidget {
   State<MindChatDiscussionScreen> createState() => _MindChatDiscussionScreenState();
 }
 
-final class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionScreen> {
+final class _MindChatDiscussionScreenState extends KekWidgetState<MindChatDiscussionScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   Mind? _editableMind;

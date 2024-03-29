@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:hive/hive.dart';
 import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -17,7 +18,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 part 'settings_event.dart';
 part 'settings_state.dart';
 
-class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
+// TODO: use mind repo here
+
+final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SupabaseClient client;
   final MindService mainService;
   final Box<MindObject> _mindsBox = Hive.box(HiveConstants.mindBoxName);
@@ -33,6 +36,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             isMindContentVisible: true,
             isOfflineMode: false,
             isDarkMode: true,
+            openAIKey: null,
           ),
         ) {
     _lastSettingsState = state as SettingsDataState;
@@ -45,6 +49,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsNeedToShowAuth>(_showAuth);
     on<SettingGetWhatsNew>(_sendWhatsNewIfNeeded);
     on<SettingsChangeIsDarkMode>(_changeSettingsDarkMode);
+    on<SettingsChangeOpenAIKey>(_changeOpenAIKey);
   }
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
@@ -66,12 +71,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final bool isMindContentVisible = settingsObject?.isMindContentVisible ?? false;
     final bool isOfflineMode = settingsObject?.isOfflineMode ?? false;
     final bool isDarkMode = settingsObject?.isDarkMode ?? false;
+    final String? openAIKey = settingsObject?.openAIKey;
     _emitAndSaveDataState(
       emit,
       SettingsDataState(
         isMindContentVisible: isMindContentVisible,
         isOfflineMode: isOfflineMode,
-        isDarkMode: isDarkMode,
+        isDarkMode: isDarkMode, 
+        openAIKey: openAIKey,
       ),
     );
 
@@ -157,5 +164,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (needToShowWhatsNewOnStart) {
       emit(SettingsNeedToShowWhatsNew());
     }
+  }
+
+  FutureOr<void> _changeOpenAIKey(SettingsChangeOpenAIKey event, Emitter<SettingsState> emit) {
+    final SettingsObject? settingsObject = _settingsBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.openAIKey = event.openAIToken;
+    settingsObject?.save();
+    OpenAI.apiKey = event.openAIToken;
+    emit(_lastSettingsState.copyWith(openAIKey: event.openAIToken));
   }
 }

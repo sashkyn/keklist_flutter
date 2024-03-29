@@ -14,6 +14,7 @@ class SettingsDataState extends SettingsState {
   final bool isMindContentVisible;
   final bool isOfflineMode;
   final bool isDarkMode;
+  final String? openAIKey;
 
   // @override
   // List<Object?> get props => [isMindContentVisible, isOfflineMode];
@@ -22,17 +23,20 @@ class SettingsDataState extends SettingsState {
     required this.isMindContentVisible,
     required this.isOfflineMode,
     required this.isDarkMode,
+    required this.openAIKey,
   });
 
   SettingsDataState copyWith({
     bool? isMindContentVisible,
     bool? isOfflineMode,
     bool? isDarkMode,
+    String? openAIKey,
   }) {
     return SettingsDataState(
       isMindContentVisible: isMindContentVisible ?? this.isMindContentVisible,
       isOfflineMode: isOfflineMode ?? this.isOfflineMode,
       isDarkMode: isDarkMode ?? this.isDarkMode,
+      openAIKey: openAIKey,
     );
   }
 }

@@ -53,7 +53,6 @@ Future<void> main() async {
 }
 
 void _configureOpenAI() {
-  OpenAI.apiKey = dotenv.get('OPEN_AI_TOKEN');
   OpenAI.showLogs = !kReleaseMode;
   OpenAI.requestsTimeOut = const Duration(seconds: 40);
 }
