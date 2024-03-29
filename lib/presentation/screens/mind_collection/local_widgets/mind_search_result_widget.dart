@@ -41,7 +41,8 @@ class MindSearchResultListWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: MindMessageWidget(
                   mind: mind,
-                  onOptions: null,
+                  onRootOptions: null,
+                  onChildOptions: null,
                   children: const [],
                 ),
               ),

@@ -12,7 +12,7 @@ import 'package:keklist/presentation/screens/mind_day_collection/widgets/message
 import 'package:keklist/domain/services/entities/message.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 
-class MindChatDiscussionScreen extends StatefulWidget {
+final class MindChatDiscussionScreen extends StatefulWidget {
   final Mind rootMind;
   final List<Mind> allMinds;
 
@@ -26,13 +26,12 @@ class MindChatDiscussionScreen extends StatefulWidget {
   State<MindChatDiscussionScreen> createState() => _MindChatDiscussionScreenState();
 }
 
-class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionScreen> {
+final class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionScreen> {
   final TextEditingController _createMindEditingController = TextEditingController(text: null);
   final FocusNode _mindCreatorFocusNode = FocusNode();
   Mind? _editableMind;
 
   Mind get rootMind => widget.rootMind;
-  List<Mind> get allMinds => widget.allMinds;
   final List<Message> messages = [];
   bool _isLoading = false;
 
@@ -110,7 +109,8 @@ class _MindChatDiscussionScreenState extends KekScreenState<MindChatDiscussionSc
                       padding: const EdgeInsets.all(8.0),
                       child: MindMessageWidget(
                         mind: rootMind,
-                        onOptions: null,
+                        onRootOptions: null,
+                        onChildOptions: null,
                         children: mindChildren,
                       ),
                     ),

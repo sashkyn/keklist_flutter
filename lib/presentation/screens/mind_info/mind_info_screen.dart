@@ -3,8 +3,8 @@ import 'package:keklist/presentation/core/helpers/extensions/state_extensions.da
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
-import 'package:keklist/presentation/screens/actions/menu_actions_icon_widget.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
+import 'package:keklist/presentation/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/presentation/blocs/mind_bloc/mind_bloc.dart';
@@ -36,7 +36,10 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
   Mind? _editableMind;
   late String _selectedEmoji = _rootMind.emoji;
 
-  Mind get _rootMind => widget.rootMind;
+  Mind get _rootMind => widget.allMinds.firstWhere(
+        (element) => element.id == widget.rootMind.id,
+        orElse: () => widget.rootMind,
+      );
   List<Mind> get _allMinds => widget.allMinds;
 
   List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
@@ -74,23 +77,9 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
-          MenuActionsIconWidget(
-            menuActions: [
-              ActionModel.chatWithAI(),
-              ActionModel.photosPerDay(),
-            ],
-            action: ActionModel.extraActions(),
-            onMenuAction: (action) {
-              switch (action) {
-                case ChatWithAIActionModel _:
-                  _showMessageScreen(mind: _rootMind);
-                  break;
-                case PhotosPerDayActionModel _:
-                  break;
-                default:
-                  break;
-              }
-            },
+          IconButton(
+            onPressed: () => _showActions(mind: _rootMind),
+            icon: const Icon(Icons.more_vert),
           )
         ],
       ),
@@ -108,7 +97,8 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
                     child: MindMessageWidget(
                       mind: _rootMind,
                       children: _rootMindChildren,
-                      onOptions: (Mind mind) => _showActions(mind),
+                      onRootOptions: null,
+                      onChildOptions: (Mind mind) => _showActions(mind: mind),
                     ),
                   ),
                 ],
@@ -188,31 +178,24 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  void _showActions(Mind mind) {
-    showBarModalBottomSheet(
-      context: context,
-      builder: (context) => ActionsScreen(
-        actions: [
-          (ActionModel.edit(), () => _showMessageScreen(mind: mind)),
-          (
-            ActionModel.delete(),
-            () {
-              setState(() {
-                _editableMind = mind;
-              });
-              _createMindEditingController.text = mind.note;
-              _mindCreatorFocusNode.requestFocus();
-            }
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showEmojiPickerScreen({required Function(String) onSelect}) async {
     await showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => MindPickerScreen(onSelect: onSelect),
+    );
+  }
+
+  void _showActions({required Mind mind}) {
+    showBarModalBottomSheet(
+      context: context,
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.chatWithAI(), () => _showMessageScreen(mind: mind)),
+          (ActionModel.edit(), () => _editMind(mind)),
+          (ActionModel.showAll(), () => _showAllMinds(mind)),
+          (ActionModel.delete(), () => _removeMind(mind)),
+        ],
+      ),
     );
   }
 
@@ -225,5 +208,29 @@ final class _MindInfoScreenState extends KekScreenState<MindInfoScreen> {
         ),
       ),
     );
+  }
+
+  void _editMind(Mind mind) {
+    setState(() {
+      _editableMind = mind;
+      _selectedEmoji = mind.emoji;
+    });
+    _createMindEditingController.text = mind.note;
+    _mindCreatorFocusNode.requestFocus();
+  }
+
+  void _showAllMinds(Mind mind) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MindOneEmojiCollectionScreen(
+          emoji: mind.emoji,
+          allMinds: _allMinds,
+        ),
+      ),
+    );
+  }
+
+  void _removeMind(Mind mind) {
+    sendEventTo<MindBloc>(MindDelete(mind: mind));
   }
 }

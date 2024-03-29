@@ -9,13 +9,15 @@ import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 final class MindMessageWidget extends StatelessWidget {
   final Mind mind;
   final List<Mind> children;
-  final Function(Mind)? onOptions;
+  final Function(Mind)? onRootOptions;
+  final Function(Mind)? onChildOptions;
 
   const MindMessageWidget({
     super.key,
     required this.mind,
     required this.children,
-    required this.onOptions,
+    required this.onRootOptions,
+    required this.onChildOptions,
   });
 
   @override
@@ -47,12 +49,12 @@ final class MindMessageWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              if (onOptions != null) ...{
+              if (onRootOptions != null) ...{
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
                     icon: const Icon(Icons.more_vert),
-                    onPressed: () => onOptions?.call(mind),
+                    onPressed: () => onRootOptions?.call(mind),
                   ),
                 ),
               },
@@ -73,7 +75,8 @@ final class MindMessageWidget extends StatelessWidget {
                   )
                   .toList(),
               onLongPress: (String mindId) {
-                // onOptions?.call(children.firstWhere((it) => it.id == mindId));
+                final mind = children.firstWhere((it) => it.id == mindId);
+                onChildOptions?.call(mind);
               },
             ),
             const SizedBox(height: 16.0),

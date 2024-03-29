@@ -298,54 +298,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     );
   }
 
-  void _showMessageScreen({required Mind mind}) async {
-    Navigator.of(mountedContext!).push(
-      MaterialPageRoute(
-        builder: (_) => MindChatDiscussionScreen(
-          rootMind: mind,
-          allMinds: allMinds,
-        ),
-      ),
-    );
-  }
-
-  void _showAllMinds(Mind mind) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => MindOneEmojiCollectionScreen(
-          emoji: mind.emoji,
-          allMinds: allMinds,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _updateMindDay(Mind mind) async {
-    final int? switchedDay = await _showDateSwitcherToNewDay();
-    if (switchedDay != null) {
-      final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
-        dayIndex: switchedDay,
-        allMinds: allMinds,
-      );
-      final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
-      final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
-      sendEventTo<MindBloc>(MindEdit(mind: newMind));
-    }
-  }
-
-  void _editMind(Mind mind) {
-    setState(() {
-      _editableMind = mind;
-      _selectedEmoji = mind.emoji;
-    });
-    _createMindEditingController.text = mind.note;
-    _mindCreatorFocusNode.requestFocus();
-  }
-
-  void _removeMind(Mind mind) {
-    sendEventTo<MindBloc>(MindDelete(mind: mind));
-  }
-
   void _handleError(MindOperationError error) {
     if (error.notCompleted == MindOperationType.create) {
       final Mind? notCreatedMind = error.minds.firstOrNull;
@@ -428,6 +380,8 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     Haptics.vibrate(HapticsType.heavy);
   }
 
+  // TODO: extract to some navigator
+
   void _showActions(BuildContext context, Mind mind) {
     showBarModalBottomSheet(
       context: context,
@@ -441,5 +395,53 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         ],
       ),
     );
+  }
+
+  void _showMessageScreen({required Mind mind}) async {
+    Navigator.of(mountedContext!).push(
+      MaterialPageRoute(
+        builder: (_) => MindChatDiscussionScreen(
+          rootMind: mind,
+          allMinds: allMinds,
+        ),
+      ),
+    );
+  }
+
+  void _editMind(Mind mind) {
+    setState(() {
+      _editableMind = mind;
+      _selectedEmoji = mind.emoji;
+    });
+    _createMindEditingController.text = mind.note;
+    _mindCreatorFocusNode.requestFocus();
+  }
+
+  Future<void> _updateMindDay(Mind mind) async {
+    final int? switchedDay = await _showDateSwitcherToNewDay();
+    if (switchedDay != null) {
+      final List<Mind> switchedDayMinds = MindUtils.findMindsByDayIndex(
+        dayIndex: switchedDay,
+        allMinds: allMinds,
+      );
+      final int sortIndex = (switchedDayMinds.map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
+      final Mind newMind = mind.copyWith(dayIndex: switchedDay, sortIndex: sortIndex);
+      sendEventTo<MindBloc>(MindEdit(mind: newMind));
+    }
+  }
+
+  void _showAllMinds(Mind mind) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MindOneEmojiCollectionScreen(
+          emoji: mind.emoji,
+          allMinds: allMinds,
+        ),
+      ),
+    );
+  }
+
+  void _removeMind(Mind mind) {
+    sendEventTo<MindBloc>(MindDelete(mind: mind));
   }
 }

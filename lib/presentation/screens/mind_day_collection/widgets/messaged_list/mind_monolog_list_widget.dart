@@ -37,7 +37,8 @@ final class MindMonologListWidget extends StatelessWidget {
                       child: MindMessageWidget(
                         mind: mind,
                         children: mindIdsToChildren?[mind.id] ?? [],
-                        onOptions: onOptions,
+                        onRootOptions: onOptions,
+                        onChildOptions: onOptions,
                       ).animate().fadeIn(),
                     ),
                   ),
