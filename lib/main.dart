@@ -69,7 +69,7 @@ Future<void> _initSupabase() async {
 
 void _enableDebugBLOCLogs() {
   if (!kReleaseMode) {
-    Bloc.observer = LoggerBlocObserver();
+    Bloc.observer = _LoggerBlocObserver();
   }
 }
 
@@ -138,4 +138,51 @@ Future<void> _initHive() async {
   }
   await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
   await Hive.openBox<MessageObject>(HiveConstants.messageChatBoxName);
+}
+
+final class _LoggerBlocObserver extends BlocObserver {
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    super.onEvent(bloc, event);
+
+    if (kDebugMode) {
+      print('onEvent: $event');
+    }
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    super.onError(bloc, error, stackTrace);
+
+    if (kDebugMode) {
+      print(error);
+    }
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+
+    if (kDebugMode) {
+      print('onChange: ${bloc.state}');
+    }
+  }
+
+  @override
+  void onClose(BlocBase bloc) {
+    super.onClose(bloc);
+
+    if (kDebugMode) {
+      print('onClose: ${bloc.runtimeType}');
+    }
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+
+    if (kDebugMode) {
+      print('onTransition: $bloc.state');
+    }
+  }
 }

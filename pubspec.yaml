@@ -15,12 +15,12 @@ dependencies:
   calendar_date_picker2: ^0.5.2
   collection: ^1.17.0
   cross_file: ^0.3.3+4
-  csv: ^5.0.1
+  csv: ^6.0.0
   cupertino_icons: ^1.0.5
   emojis: ^0.9.9
   equatable: ^2.0.5
   fast_immutable_collections: ^10.0.0
-  fl_chart: ^0.66.1
+  fl_chart: ^0.67.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -38,24 +38,24 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.18.1
   modal_bottom_sheet: ^3.0.0-pre
-  package_info_plus: ^5.0.1
+  package_info_plus: ^6.0.0
   path_provider: ^2.0.12
   rxdart: ^0.27.7
   scrollable_positioned_list: ^0.3.5
   settings_ui: ^2.0.2
-  share_plus: ^7.0.0
+  share_plus: ^8.0.2
   supabase_flutter: ^2.0.1
-  syncfusion_flutter_charts: ^24.2.4+3
+  syncfusion_flutter_charts: ^25.1.37
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
   uuid: ^4.2.1
   webview_flutter: ^4.1.0
   gap: ^3.0.1
-  home_widget: ^0.4.0
+  home_widget: ^0.5.0
   workmanager: ^0.5.2
   flutter_dotenv: ^5.1.0
   flutter_staggered_grid_view: ^0.7.0
-  sign_in_with_apple: ^5.0.0
+  sign_in_with_apple: ^6.0.0
   crypto: ^3.0.3
   google_sign_in: ^6.2.1
   dart_openai: ^5.1.0

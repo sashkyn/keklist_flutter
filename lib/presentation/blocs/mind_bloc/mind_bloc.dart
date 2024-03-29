@@ -182,34 +182,31 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   }
 
   FutureOr<void> _startSearch(MindStartSearch event, emit) async {
-    final List<Mind> minds = await _repository.obtainMinds();
     emit(
       MindSearching(
         enabled: true,
-        allValues: minds,
+        allValues: _repository.values,
         resultValues: const [],
       ),
     );
   }
 
   FutureOr<void> _stopSearch(MindStopSearch event, emit) async {
-    final List<Mind> minds = await _repository.obtainMinds();
     emit(
       MindSearching(
         enabled: false,
-        allValues: minds,
+        allValues: _repository.values,
         resultValues: const [],
       ),
     );
   }
 
   FutureOr<void> _enterTextSearch(MindEnterSearchText event, Emitter<MindState> emit) async {
-    final List<Mind> minds = await _repository.obtainMinds();
     final List<Mind> filteredMinds = await _searcherCubit.searchMindList(event.text);
     emit(
       MindSearching(
         enabled: true,
-        allValues: minds,
+        allValues: _repository.values,
         resultValues: filteredMinds,
       ),
     );
@@ -222,8 +219,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     Emitter<MindState> emit,
   ) async {
     const count = 9;
-    final List<Mind> minds = await _repository.obtainMinds();
-    final List<String> suggestions = minds
+    final List<Mind> minds = _repository.values;
+    final List<String> suggestions = _repository.values
         .where((Mind mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
         .map((Mind mind) => mind.emoji)
         .toList()
@@ -305,8 +302,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   }
 
   Future<void> _emitMindList(Emitter<MindState> emit) async {
-    final List<Mind> minds = await _repository.obtainMinds();
-    emit(MindList(values: minds));
+    emit(MindList(values: _repository.values));
   }
 
   Future<void> _deleteAllMindsFromServer(
@@ -321,8 +317,10 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
     await _service.deleteAllMinds().then(
       (_) async {
-        final List<Mind> minds = await _repository.obtainMinds();
-        await _repository.updateUploadedOnServerMinds(minds: minds, isUploadedToServer: false);
+        await _repository.updateUploadedOnServerMinds(
+          minds: _repository.values,
+          isUploadedToServer: false,
+        );
         emit(
           MindOperationCompleted(
             minds: [],

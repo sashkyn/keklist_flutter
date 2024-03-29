@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
-import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 part 'mind_searcher_state.dart';
 
-class MindSearcherCubit extends Cubit<MindSearcherState> {
-  late final MindService service;
+final class MindSearcherCubit extends Cubit<MindSearcherState> {
+  late final MindRepository repository;
 
-  MindSearcherCubit({required MindService mainService}) : super(MindSearcherInitial()) {
-    service = mainService;
+  MindSearcherCubit({required MindRepository repository}) : super(MindSearcherInitial()) {
+    repository = repository;
   }
 
   final _emojiParser = EmojiParser();
@@ -20,7 +20,7 @@ class MindSearcherCubit extends Cubit<MindSearcherState> {
   Future<List<Mind>> searchMindList(String text) async {
     final lowerCasedTrimmedText = text.toLowerCase().trim();
 
-    final minds = await service.getMindList();
+    final minds = repository.values;
     final filteredMinds = minds.where((mind) {
       // Note condition.
       final noteCondition = mind.note.trim().toLowerCase().contains(lowerCasedTrimmedText);
