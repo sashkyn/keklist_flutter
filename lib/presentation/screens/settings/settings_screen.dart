@@ -11,19 +11,23 @@ import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatefulWidget {
+// TODO: move methods from MindBloc to SettingsBloc
+// TODO: set token text from settings to alert
+
+final class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
   SettingsScreenState createState() => SettingsScreenState();
 }
 
-class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
+final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
   bool _isDarkMode = false;
   int _cachedMindCountToUpload = 0;
   bool _clearCacheVisible = false;
+  String _openAiKey = '';
 
   @override
   void initState() {
@@ -36,6 +40,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             setState(() {
               _offlineMode = state.isOfflineMode;
               _isDarkMode = state.isDarkMode;
+              _openAiKey = state.openAIKey ?? '';
             });
         }
       },
@@ -298,7 +303,9 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             onChanged: (value) => openAiToken = value,
             decoration: const InputDecoration(
               hintText: 'Enter token here',
+              labelText: 'Token',
             ),
+            controller: TextEditingController(text: _openAiKey),
           ),
           actions: [
             TextButton(
@@ -307,6 +314,7 @@ class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
             ),
             TextButton(
               onPressed: () {
+                _openAiKey = openAiToken;
                 Navigator.of(context).pop();
                 sendEventTo<SettingsBloc>(SettingsChangeOpenAIKey(openAIToken: openAiToken));
               },
