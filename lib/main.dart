@@ -8,12 +8,13 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
 import 'package:keklist/keklist_app.dart';
 import 'package:keklist/domain/hive_constants.dart';
 import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
-import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
+import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -86,7 +87,8 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
           create: (context) => MindBloc(
             mainService: mainInjector.get<MindService>(),
             mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
-            mindRepository: mainInjector.get<MindRepository>()
+            mindRepository: mainInjector.get<MindRepository>(),
+            settingsRepository: mainInjector.get<SettingsRepository>(),
           ),
         ),
         BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
@@ -100,6 +102,7 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
           create: (context) => SettingsBloc(
             mainService: mainInjector.get<MindService>(),
             client: Supabase.instance.client,
+            repository: mainInjector.get<SettingsRepository>(),
           ),
         ),
       ],
@@ -133,7 +136,7 @@ Future<void> _initHive() async {
   await Hive.initFlutter();
   final Box<SettingsObject> settingsBox = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
   if (settingsBox.get(HiveConstants.settingsGlobalSettingsIndex) == null) {
-    settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, SettingsObject.initial());
+    settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, KeklistSettings.initial().toObject());
   }
   await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
   await Hive.openBox<MessageObject>(HiveConstants.messageChatBoxName);

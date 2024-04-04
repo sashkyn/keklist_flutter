@@ -2,9 +2,12 @@ import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive/hive.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
+import 'package:keklist/domain/repositories/settings_repository/settings_hive_repository.dart';
+import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
 import 'package:keklist/domain/services/mind_service/main_supabase_service.dart';
 import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,8 +33,12 @@ final class MainContainer {
         isSingleton: true,
       );
     }
-    injector
-        .map<MindRepository>((injector) => MindHiveRepository(box: Hive.box<MindObject>(HiveConstants.mindBoxName)));
+    injector.map<MindRepository>(
+      (injector) => MindHiveRepository(box: Hive.box<MindObject>(HiveConstants.mindBoxName)),
+    );
+    injector.map<SettingsRepository>(
+      (injector) => SettingsHiveRepository(box: Hive.box<SettingsObject>(HiveConstants.settingsBoxName)),
+    );
     return injector;
   }
 }

@@ -4,16 +4,13 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/constants.dart';
+import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/presentation/core/helpers/platform_utils.dart';
-import 'package:keklist/domain/hive_constants.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
-import 'package:keklist/domain/repositories/objects/settings/settings_object.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
@@ -30,18 +27,18 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   late final MindService _service;
   late final MindSearcherCubit _searcherCubit;
   late final MindRepository _repository;
-
-  final SettingsObject? _settings =
-      Hive.box<SettingsObject>(HiveConstants.settingsBoxName).get(HiveConstants.settingsGlobalSettingsIndex);
+  late final SettingsRepository _settingsRepository;
 
   MindBloc({
     required MindService mainService,
     required MindSearcherCubit mindSearcherCubit,
     required MindRepository mindRepository,
+    required SettingsRepository settingsRepository,
   }) : super(MindList(values: const [])) {
     _service = mainService;
     _searcherCubit = mindSearcherCubit;
     _repository = mindRepository;
+    _settingsRepository = settingsRepository;
     on<MindGetList>(_getMinds);
     on<MindUpdateMobileWidgets>(_updateMobileWidgets);
     on<MindCreate>(_createMind);
@@ -75,7 +72,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   Future<void> _getMinds(MindGetList event, Emitter<MindState> emit) async {
     _emitMindList(emit);
 
-    if (!(_settings?.isOfflineMode ?? true)) {
+    if (!(_settingsRepository.value.isOfflineMode)) {
       emit(
         MindServerOperationStarted(
           minds: [],
@@ -117,7 +114,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         rootId: event.rootId);
     _repository.createMind(mind: mind, isUploadedToServer: false);
 
-    if (!(_settings?.isOfflineMode ?? true)) {
+    if (!(_settingsRepository.value.isOfflineMode)) {
       emit(
         MindServerOperationStarted(
           minds: [mind],
@@ -150,7 +147,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
     _repository.deleteMind(mindId: event.mind.id);
 
-    if (!(_settings?.isOfflineMode ?? true)) {
+    if (!(_settingsRepository.value.isOfflineMode)) {
       final Mind mindToDelete = event.mind;
       emit(
         MindServerOperationStarted(
@@ -269,7 +266,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
 
     await _repository.updateMind(mind: editedMind, isUploadedToServer: false);
 
-    if (!(_settings?.isOfflineMode ?? true)) {
+    if (!(_settingsRepository.value.isOfflineMode)) {
       emit(
         MindServerOperationStarted(minds: [event.mind], type: MindOperationType.edit),
       );

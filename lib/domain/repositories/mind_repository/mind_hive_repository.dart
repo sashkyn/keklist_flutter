@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:hive/hive.dart';
-import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:rxdart/rxdart.dart';

@@ -25,10 +25,10 @@ final class KeklistAppState extends KekWidgetState<KeklistApp> {
     subscribeTo<SettingsBloc>(
       onNewState: (state) {
         if (state is SettingsDataState) {
-          if (state.openAIKey != null) {
-            OpenAI.apiKey = state.openAIKey!;
+          if (state.settings.openAIKey != null) {
+            OpenAI.apiKey = state.settings.openAIKey!;
           }
-          setState(() => _isDarkMode = state.isDarkMode);
+          setState(() => _isDarkMode = state.settings.isDarkMode);
         }
       },
     )?.disposed(by: this);

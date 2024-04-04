@@ -37,7 +37,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
     })?.disposed(by: this);
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
-      if (state is SettingsDataState && state.isOfflineMode) {
+      if (state is SettingsDataState && state.settings.isOfflineMode) {
         _dismiss();
       }
     })?.disposed(by: this);

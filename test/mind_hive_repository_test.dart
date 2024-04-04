@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/message_repository/mind/mind_object.dart';
+import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
 import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
 import 'package:keklist/domain/services/entities/mind.dart';

@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
 
 part 'settings_object.g.dart';
 
@@ -17,14 +18,15 @@ final class SettingsObject extends HiveObject {
   late bool isDarkMode;
 
   @HiveField(4, defaultValue: null)
-  late String? openAIKey;
+  late String? openAIKey = '';
 
   SettingsObject();
 
-  factory SettingsObject.initial() => SettingsObject()
-    ..isMindContentVisible = true
-    ..previousAppVersion = null
-    ..isOfflineMode = false
-    ..openAIKey = null
-    ..isDarkMode = true;
+  KeklistSettings toSettings() => KeklistSettings(
+        isMindContentVisible: isMindContentVisible,
+        previousAppVersion: previousAppVersion,
+        isOfflineMode: isOfflineMode,
+        openAIKey: openAIKey,
+        isDarkMode: isDarkMode,
+      );
 }

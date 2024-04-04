@@ -126,7 +126,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     subscribeTo<SettingsBloc>(onNewState: (state) {
       if (state is SettingsDataState) {
         setState(() {
-          _isMindContentVisible = state.isMindContentVisible;
+          _isMindContentVisible = state.settings.isMindContentVisible;
         });
       }
     })?.disposed(by: this);

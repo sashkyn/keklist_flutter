@@ -38,9 +38,9 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
         switch (state.runtimeType) {
           case const (SettingsDataState):
             setState(() {
-              _offlineMode = state.isOfflineMode;
-              _isDarkMode = state.isDarkMode;
-              _openAiKey = state.openAIKey ?? '';
+              _offlineMode = state.settings.isOfflineMode;
+              _isDarkMode = state.settings.isDarkMode;
+              _openAiKey = state.settings.openAIKey ?? '';
             });
         }
       },

@@ -44,12 +44,12 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
   Iterable<Mind> _minds = [];
   Map<int, List<Mind>> _mindsByDayIndex = {};
-  SettingsDataState? _settings;
+  SettingsDataState? _settingsDataState;
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
 
-  bool get _isOfflineMode => _settings?.isOfflineMode ?? false;
+  bool get _isOfflineMode => _settingsDataState?.settings.isOfflineMode ?? false;
 
   // NOTE: Состояние CreateMarkBar с вводом текста.
   final TextEditingController _createMarkEditingController = TextEditingController(text: null);
@@ -87,9 +87,9 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
 
       subscribeTo<SettingsBloc>(onNewState: (state) {
         switch (state) {
-          case SettingsDataState settings:
-            _settings = settings;
-            if (settings.isOfflineMode) {
+          case SettingsDataState settingsDataState:
+            _settingsDataState = settingsDataState;
+            if (settingsDataState.settings.isOfflineMode) {
               setState(() => _updating = false);
             }
             sendEventTo<AuthBloc>(AuthGetStatus());

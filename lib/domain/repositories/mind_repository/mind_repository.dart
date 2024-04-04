@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:keklist/domain/services/entities/mind.dart';
 
+// TODO: remove from here isUploadedToServer and etc.
+// TODO: merge with service
+
 abstract class MindRepository {
   Iterable<Mind> get values;
   Stream<Iterable<Mind>> get stream;
