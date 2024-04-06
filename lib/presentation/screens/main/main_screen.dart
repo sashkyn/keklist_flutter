@@ -13,14 +13,14 @@ import 'package:keklist/presentation/screens/mind_collection/mind_collection_scr
 import 'package:keklist/presentation/screens/settings/settings_screen.dart';
 import 'package:keklist/presentation/core/widgets/bottom_navigation_bar.dart';
 
-final class MainScreen extends StatefulWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
-final class _MainScreenState extends State<MainScreen> with DisposeBag {
+class _MainScreenState extends State<MainScreen> with DisposeBag {
   bool _isAuthShowed = false;
   int _tabSelectedIndex = 0;
 
@@ -35,7 +35,7 @@ final class _MainScreenState extends State<MainScreen> with DisposeBag {
     super.initState();
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
-      if (state is SettingsDataState && state.settings.isOfflineMode) {
+      if (state is SettingsAuthState && state.needToShowAuth) {
         setState(() => _tabSelectedIndex = 1);
         _showAuthBottomSheet();
       }
