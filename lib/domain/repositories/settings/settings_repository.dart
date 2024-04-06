@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
+import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
 
 abstract class SettingsRepository {
   KeklistSettings get value;

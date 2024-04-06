@@ -5,8 +5,8 @@ import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:hive/hive.dart';
-import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
+import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,26 +33,26 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     required this.repository,
   }) : super(
           SettingsDataState(
-            settings: KeklistSettings(
-              isMindContentVisible: true,
-              previousAppVersion: null,
-              isOfflineMode: false,
-              isDarkMode: true,
-              openAIKey: null,
-            ),
-          ),
+              isLoggedIn: client.auth.currentUser != null,
+              settings: KeklistSettings(
+                isMindContentVisible: true,
+                previousAppVersion: null,
+                isOfflineMode: false,
+                isDarkMode: true,
+                openAIKey: null,
+              )),
         ) {
     on<SettingsExportAllMindsToCSV>(_shareCSVFileWithMinds);
     on<SettingsChangeMindContentVisibility>(_changeMindContentVisibility);
     on<SettingsChangeOfflineMode>(_changeOfflineMode);
     on<SettingsWhatsNewShown>(_disableShowingWhatsNewUntillNewVersion);
     on<SettingsGet>(_getSettings);
-    on<SettingsNeedToShowAuth>(_showAuth);
     on<SettingGetWhatsNew>(_sendWhatsNewIfNeeded);
     on<SettingsChangeIsDarkMode>(_changeSettingsDarkMode);
     on<SettingsChangeOpenAIKey>(_changeOpenAIKey);
 
     repository.stream.listen((settings) => add(SettingsGet())).disposed(by: this);
+    client.auth.onAuthStateChange.listen((event) => add(SettingsGet())).disposed(by: this);
   }
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
@@ -69,11 +69,10 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
   }
 
   void _getSettings(SettingsGet event, Emitter<SettingsState> emit) {
-    emit(SettingsDataState(settings: repository.value));
-
-    // Cбор и отправка стейта показа Auth.
-    final bool needToShowAuth = !repository.value.isOfflineMode && client.auth.currentUser == null;
-    emit(SettingsAuthState(needToShowAuth));
+    emit(SettingsDataState(
+      isLoggedIn: client.auth.currentUser != null,
+      settings: repository.value,
+    ));
   }
 
   FutureOr<void> _disableShowingWhatsNewUntillNewVersion(
@@ -98,18 +97,10 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     Emitter<SettingsState> emit,
   ) async {
     await repository.updateOfflineMode(event.isOfflineMode);
-
-    // Cбор и отправка стейта показа Auth.
-    final bool needToShowAuth = !repository.value.isOfflineMode && client.auth.currentUser == null;
-    emit(SettingsAuthState(needToShowAuth));
   }
 
   FutureOr<void> _changeSettingsDarkMode(SettingsChangeIsDarkMode event, Emitter<SettingsState> emit) async {
     await repository.updateDarkMode(event.isDarkMode);
-  }
-
-  void _showAuth(SettingsNeedToShowAuth event, Emitter<SettingsState> emit) {
-    emit(SettingsAuthState(true));
   }
 
   Future<void> _sendWhatsNewIfNeeded(SettingGetWhatsNew event, Emitter<SettingsState> emit) async {

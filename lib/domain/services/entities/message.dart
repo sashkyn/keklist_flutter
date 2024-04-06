@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:keklist/presentation/core/enum_from_string.dart';
-import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
+import 'package:keklist/domain/repositories/message/message/message_object.dart';
 
 class Message with EquatableMixin {
   final String id;

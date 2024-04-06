@@ -8,13 +8,14 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
+import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/keklist_app.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
-import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
+import 'package:keklist/domain/repositories/message/message/message_object.dart';
+import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -95,7 +96,7 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
         BlocProvider(
           create: (context) => AuthBloc(
             mainService: mainInjector.get<MindService>(),
-            client: Supabase.instance.client,
+            authRepository: mainInjector.get<AuthMinotaur>(),
           ),
         ),
         BlocProvider(

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
+import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class SettingsHiveRepository implements SettingsRepository {

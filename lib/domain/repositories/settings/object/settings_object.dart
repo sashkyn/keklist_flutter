@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 
 part 'settings_object.g.dart';
 

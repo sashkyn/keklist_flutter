@@ -2,12 +2,13 @@ import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive/hive.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
-import 'package:keklist/domain/repositories/settings_repository/object/settings_object.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_hive_repository.dart';
-import 'package:keklist/domain/repositories/settings_repository/settings_repository.dart';
+import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
+import 'package:keklist/domain/repositories/mind/mind_hive_repository.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
+import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
+import 'package:keklist/domain/repositories/settings/settings_hive_repository.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/domain/services/mind_service/main_supabase_service.dart';
 import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,6 +39,9 @@ final class MainContainer {
     );
     injector.map<SettingsRepository>(
       (injector) => SettingsHiveRepository(box: Hive.box<SettingsObject>(HiveConstants.settingsBoxName)),
+    );
+    injector.map<AuthMinotaur>(
+      (injector) => AuthSupabaseMinotaur(client: Supabase.instance.client),
     );
     return injector;
   }

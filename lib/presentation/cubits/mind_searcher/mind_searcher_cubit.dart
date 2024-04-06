@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 
 part 'mind_searcher_state.dart';

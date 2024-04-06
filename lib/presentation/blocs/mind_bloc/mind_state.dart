@@ -2,15 +2,15 @@ part of 'mind_bloc.dart';
 
 sealed class MindState {}
 
-class MindList extends MindState {
+final class MindList extends MindState {
   final Iterable<Mind> values;
 
   MindList({required this.values});
 }
 
-class MindMobileWidgetsUpdated extends MindState {}
+final class MindMobileWidgetsUpdated extends MindState {}
 
-class MindSearching extends MindState {
+final class MindSearching extends MindState {
   final bool enabled;
   final Iterable<Mind> allValues;
   final List<Mind> resultValues;
@@ -22,7 +22,7 @@ class MindSearching extends MindState {
   });
 }
 
-class MindSuggestions extends MindState {
+final class MindSuggestions extends MindState {
   final List<String> values;
 
   MindSuggestions({required this.values});
@@ -40,7 +40,7 @@ enum MindOperationType {
   clearCache,
 }
 
-class MindOperationError extends MindState with EquatableMixin {
+final class MindOperationError extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
   final MindOperationType notCompleted;
 
@@ -75,7 +75,7 @@ class MindOperationError extends MindState with EquatableMixin {
   }
 }
 
-class MindServerOperationStarted extends MindState with EquatableMixin {
+final class MindServerOperationStarted extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
   final MindOperationType type;
 
@@ -107,7 +107,7 @@ class MindOperationCompleted extends MindState with EquatableMixin {
   bool? get stringify => true;
 }
 
-class MindCandidatesForUpload extends MindState with EquatableMixin {
+final class MindCandidatesForUpload extends MindState with EquatableMixin {
   final Iterable<Mind> values;
 
   MindCandidatesForUpload({required this.values});

@@ -9,7 +9,7 @@ import 'package:keklist/domain/services/entities/message.dart';
 import 'package:keklist/domain/services/entities/message_history.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/message_repository/message/message_object.dart';
+import 'package:keklist/domain/repositories/message/message/message_object.dart';
 import 'package:keklist/domain/services/message_service/message_open_ai_service.dart';
 import 'package:keklist/domain/services/message_service/message_service.dart';
 import 'package:uuid/uuid.dart';

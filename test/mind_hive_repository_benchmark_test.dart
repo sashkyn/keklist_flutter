@@ -1,9 +1,9 @@
 import 'package:benchmarking/benchmarking.dart';
 import 'package:hive/hive.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/mind_repository/object/mind_object.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_hive_repository.dart';
-import 'package:keklist/domain/repositories/mind_repository/mind_repository.dart';
+import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
+import 'package:keklist/domain/repositories/mind/mind_hive_repository.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 
 Future<void> main() async {
