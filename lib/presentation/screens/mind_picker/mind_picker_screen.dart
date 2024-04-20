@@ -44,43 +44,40 @@ class MindPickerScreenState extends State<MindPickerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          TextField(
-            autofocus: true,
-            controller: _textEditingController,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-              border: UnderlineInputBorder(),
-              hintText: 'Search your emoji...',
-            ),
+    return Column(
+      children: [
+        TextField(
+          autofocus: true,
+          controller: _textEditingController,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.all(8),
+            border: UnderlineInputBorder(),
+            hintText: 'Search your emoji...',
           ),
-          Flexible(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final widgetsInRowCount = (constraints.maxWidth / LayoutConstants.mindSide).ceil();
-                return GridView.custom(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: widgetsInRowCount),
-                  childrenDelegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final mark = _displayedMinds[index].char;
-                      return MindWidget(
-                        item: mark,
-                        onTap: () => _pickMark(mark),
-                        isHighlighted: true,
-                      );
-                    },
-                    childCount: _displayedMinds.length,
-                  ),
-                );
-              },
-            ),
+        ),
+        Flexible(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final widgetsInRowCount = (constraints.maxWidth / 80).ceil();
+              return GridView.custom(
+                padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: widgetsInRowCount),
+                childrenDelegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final mind = _displayedMinds[index].char;
+                    return MindWidget(
+                      item: mind,
+                      onTap: () => _pickMark(mind),
+                      isHighlighted: true,
+                    );
+                  },
+                  childCount: _displayedMinds.length,
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
