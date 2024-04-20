@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:keklist/helpers/mind_utils.dart';
-import 'package:keklist/services/entities/mind.dart';
+import 'package:keklist/presentation/core/helpers/mind_utils.dart';
+import 'package:keklist/domain/services/entities/mind.dart';
 
 void main() {
   test(
@@ -46,7 +46,7 @@ void main() {
         [5, 20, 10],
       );
 
-      final List<Mind> sortedList = unsortedMinds.mySortedBy((it) => it.sortIndex);
+      final List<Mind> sortedList = unsortedMinds.sortedByFunction((it) => it.sortIndex);
 
       expect(
         sortedList.map((e) => e.sortIndex),

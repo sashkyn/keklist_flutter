@@ -2,101 +2,115 @@
 
 import 'dart:io';
 
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/helpers/bloc_utils.dart';
-import 'package:keklist/helpers/extensions/dispose_bag.dart';
-import 'package:keklist/screens/main/main_screen.dart';
-import 'package:keklist/services/hive/constants.dart';
-import 'package:keklist/services/hive/entities/mind/mind_object.dart';
-import 'package:keklist/services/hive/entities/queue_transaction/queue_transaction_object.dart';
-import 'package:keklist/services/hive/entities/settings/settings_object.dart';
+import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
+import 'package:keklist/domain/repositories/settings/settings_repository.dart';
+import 'package:keklist/keklist_app.dart';
+import 'package:keklist/domain/hive_constants.dart';
+import 'package:keklist/domain/repositories/message/message/message_object.dart';
+import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
-import 'package:keklist/blocs/auth_bloc/auth_bloc.dart';
+import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keklist/blocs/mind_bloc/mind_bloc.dart';
-import 'package:keklist/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/constants.dart';
-import 'package:keklist/cubits/mind_searcher/mind_searcher_cubit.dart';
+import 'package:keklist/presentation/blocs/mind_bloc/mind_bloc.dart';
+import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/domain/constants.dart';
+import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
-import 'package:keklist/services/main_service.dart';
+import 'package:keklist/domain/services/mind_service/main_service.dart';
 
-import 'native/ios/watch/watch_communication_manager.dart';
+import 'presentation/native/ios/watch/watch_communication_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  _setupWidgets();
+  _initNativeWidgets();
   _setupBlockingLoadingWidget();
-  // _setupOrientations();
 
-  // Получение всех констант из .env файла.
   await dotenv.load(fileName: '.env');
-
-  // Удаляет # в пути в начале для web приложений.
   setPathUrlStrategy();
+  await _initHive();
+  await _initSupabase();
 
-  // Инициализация Hive.
-  await _setupHive();
+  // Инициализация DI-контейнера.
+  final Injector injector = Injector();
+  final Injector mainInjector = MainContainer().initialize(injector);
 
-  // Инициализация настроек Supabase.
+  _connectToWatchCommunicationManager(mainInjector);
+  _enableDebugBLOCLogs();
+  _configureOpenAI();
+
+  final Widget application = _getApplication(mainInjector);
+  runApp(application);
+}
+
+void _configureOpenAI() {
+  OpenAI.showLogs = !kReleaseMode;
+  OpenAI.requestsTimeOut = const Duration(seconds: 40);
+}
+
+Future<void> _initSupabase() async {
   await Supabase.initialize(
     url: dotenv.get('SUPABASE_URL'),
     anonKey: dotenv.get('SUPABASE_ANON_KEY'),
     authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
     debug: !kReleaseMode,
   );
+}
 
-  // Инициализация DI-контейнера.
-  final Injector injector = Injector();
-  final Injector mainInjector = MainContainer().initialize(injector);
+void _enableDebugBLOCLogs() {
+  if (!kReleaseMode) {
+    Bloc.observer = _LoggerBlocObserver();
+  }
+}
 
-  // Подключаемся к Apple Watch.
+void _connectToWatchCommunicationManager(Injector mainInjector) {
   if (kIsWeb) {
     // no-op
   } else if (Platform.isIOS) {
     mainInjector.get<WatchCommunicationManager>().connect();
   }
-
-  if (!kReleaseMode) {
-    Bloc.observer = LoggerBlocObserver();
-  }
-
-  // Инициализация приложения.
-  final Widget application = MultiBlocProvider(
-    providers: [
-      BlocProvider(
-        create: (context) => MindBloc(
-          mainService: mainInjector.get<MainService>(),
-          mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
-        ),
-      ),
-      BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
-      BlocProvider(
-        create: (context) => AuthBloc(
-          mainService: mainInjector.get<MainService>(),
-          client: Supabase.instance.client,
-        ),
-      ),
-      BlocProvider(
-        create: (context) => SettingsBloc(
-          mainService: mainInjector.get<MainService>(),
-          client: Supabase.instance.client,
-        ),
-      ),
-    ],
-    child: const KeklistApp(),
-  );
-  runApp(application);
 }
 
-void _setupWidgets() {
+MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => MindBloc(
+            mainService: mainInjector.get<MindService>(),
+            mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
+            mindRepository: mainInjector.get<MindRepository>(),
+            settingsRepository: mainInjector.get<SettingsRepository>(),
+          ),
+        ),
+        BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
+        BlocProvider(
+          create: (context) => AuthBloc(
+            mainService: mainInjector.get<MindService>(),
+            authRepository: mainInjector.get<AuthMinotaur>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => SettingsBloc(
+            mainService: mainInjector.get<MindService>(),
+            client: Supabase.instance.client,
+            repository: mainInjector.get<SettingsRepository>(),
+          ),
+        ),
+      ],
+      child: const KeklistApp(),
+    );
+
+void _initNativeWidgets() {
   HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
 }
 
@@ -116,90 +130,62 @@ void _setupBlockingLoadingWidget() {
     ..dismissOnTap = false;
 }
 
-Future<void> _setupHive() async {
+Future<void> _initHive() async {
   Hive.registerAdapter<SettingsObject>(SettingsObjectAdapter());
   Hive.registerAdapter<MindObject>(MindObjectAdapter());
-  Hive.registerAdapter<QueueTransactionObject>(QueueTransactionObjectAdapter());
+  Hive.registerAdapter<MessageObject>(MessageObjectAdapter());
   await Hive.initFlutter();
   final Box<SettingsObject> settingsBox = await Hive.openBox<SettingsObject>(HiveConstants.settingsBoxName);
-  // Открываем SettingBox и сохраняем дефолтные настройки.
   if (settingsBox.get(HiveConstants.settingsGlobalSettingsIndex) == null) {
-    settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, SettingsObject.initial());
+    settingsBox.put(HiveConstants.settingsGlobalSettingsIndex, KeklistSettings.initial().toObject());
   }
-  // Открываем MindBox.
   await Hive.openBox<MindObject>(HiveConstants.mindBoxName);
-
-  // Открываем MindQueueTransactionsBox.
-  await Hive.openBox<QueueTransactionObject>(HiveConstants.mindQueueTransactionsBoxName);
+  await Hive.openBox<MessageObject>(HiveConstants.messageChatBoxName);
 }
 
-class KeklistApp extends StatefulWidget {
-  const KeklistApp({super.key});
-
-  @override
-  State<KeklistApp> createState() => KeklistAppState();
-}
-
-class KeklistAppState extends State<KeklistApp> with DisposeBag {
-  bool _isDarkMode = true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    subscribeTo<SettingsBloc>(onNewState: (state) {
-      if (state is SettingsDataState) {
-        setState(() => _isDarkMode = state.isDarkMode);
-      }
-    })?.disposed(by: this);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Keklist',
-      home: const MainScreen(),
-      theme: _isDarkMode ? Themes.dark : Themes.light,
-      darkTheme: Themes.dark,
-      themeMode: ThemeMode.light,
-      builder: EasyLoading.init(),
-    );
-  }
-}
-
-class LoggerBlocObserver extends BlocObserver {
+final class _LoggerBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
 
-    print('onEvent: $event');
+    if (kDebugMode) {
+      print('onEvent: $event');
+    }
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
 
-    print(error);
+    if (kDebugMode) {
+      print(error);
+    }
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
 
-    print('onChange: ${bloc.state}');
+    if (kDebugMode) {
+      print('onChange: ${bloc.state}');
+    }
   }
 
   @override
   void onClose(BlocBase bloc) {
     super.onClose(bloc);
 
-    print('onClose: ${bloc.runtimeType}');
+    if (kDebugMode) {
+      print('onClose: ${bloc.runtimeType}');
+    }
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
 
-    print('onTransition: $bloc.state');
+    if (kDebugMode) {
+      print('onTransition: $bloc.state');
+    }
   }
 }

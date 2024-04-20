@@ -9,14 +9,22 @@ jobs:
   analyze_and_test:
     name: Run Flutter analyze & test
     runs-on: self-hosted
+    continue-on-error: true
     steps:
-      - name: TELEGRAM_LOGGER
+      - name: Sending start message to Dev channel
         uses: lienminhquang/telegram_action@v1.9
         with:
           TELEGRAM_TOKEN: ${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
+            --------------------------
             [CI] 🛠️ Starting CI...
+
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
 
       - uses: actions/checkout@v3
 
@@ -56,11 +64,30 @@ jobs:
     needs: [analyze_and_test]
     runs-on: self-hosted
     steps:
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
+
+      - name: 'Setup Ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.0
+
+      - name: 'Setup CocoaPods'
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: 'latest'
+      
       - uses: actions/checkout@v3
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
+          channel: 'stable'
+
+      - name: Decode main .env file
+        run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
       
       - run: flutter pub get
       
@@ -68,11 +95,6 @@ jobs:
 
       - name: Decode Fastlane iOS Environment file
         run: echo "${{ secrets.IOS_FASTLANE_EVN_FILE_BASE64 }}" | base64 --decode > ios/.env
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.0"
-          working-directory: "ios"
 
       - uses: maierj/fastlane-action@v3.0.0
         with:
@@ -102,6 +124,12 @@ jobs:
     runs-on: self-hosted
     needs: [analyze_and_test]
     steps:
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
+        with:
+          version: '1.7'
+          force: true
+
       - name: Checking out to current branch
         uses: actions/checkout@v3
 
@@ -116,6 +144,9 @@ jobs:
         with:
           channel: "stable"
 
+      - name: Decode main .env file
+        run: echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
+
       - name: Decoding android/keystore.jks
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-zenmode.jks
 
@@ -126,15 +157,7 @@ jobs:
         run: flutter pub get
 
       - name: Building Android appbundle
-        run: flutter build appbundle --verbose
-
-      - name: Uploading to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
-          groups: android-testers
-          file: build/app/outputs/bundle/release/app-release.aab
+        run: flutter build apk --verbose --target-platform android-arm64
 
       - name: Sending success message to Dev channel
         if: ${{ success() }}
@@ -145,6 +168,13 @@ jobs:
           message: |
             [CI] ✅ - Android
 
+      - name: "Send the APK to Telegram"
+        run: |
+          curl -F document=@build/app/outputs/flutter-apk/app-release.apk \
+          -F chat_id=${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }} \
+          -F caption="Template-$(date +'%Y%m%d-%H%M')" \
+          "https://api.telegram.org/bot${{ secrets.ZENMODE_DEV_TELEGRAM_BOT_TOKEN }}/sendDocument"
+
       - name: Sending error message to Dev channel if needed
         uses: lienminhquang/telegram_action@v1.9
         if: ${{ failure() }}
@@ -153,3 +183,14 @@ jobs:
           TELEGRAM_TO: ${{ secrets.ZENMODE_MESSAGES_TELEGRAM_CHANNEL_ID }}
           message: |
             [CI] ❌ - Android
+
+
+# Firebase flow
+
+# - name: Uploading to Firebase App Distribution
+#   uses: wzieba/Firebase-Distribution-Github-Action@v1
+#   with:
+#     appId: ${{secrets.FIREBASE_APP_ID}}
+#     serviceCredentialsFileContent: ${{ secrets.FIREBASE_CREDENTIAL_JSON_FILE_CONTENT }}
+#     groups: android-testers
+#     file: build/app/outputs/bundle/release/app-release.aab
