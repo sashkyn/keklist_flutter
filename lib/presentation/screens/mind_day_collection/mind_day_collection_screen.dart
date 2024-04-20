@@ -185,6 +185,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               }
             },
             child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               controller: _scrollController,
               padding: const EdgeInsets.only(bottom: 150),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
