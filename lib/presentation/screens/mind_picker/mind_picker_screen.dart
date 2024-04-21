@@ -1,4 +1,3 @@
-import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/widgets/mind_widget.dart';
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';

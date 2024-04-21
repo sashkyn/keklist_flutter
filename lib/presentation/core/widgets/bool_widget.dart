@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BoolWidget extends StatelessWidget {
+final class BoolWidget extends StatelessWidget {
   final bool condition;
   final Widget trueChild;
   final Widget falseChild;

@@ -1,6 +1,5 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
-import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
@@ -19,8 +18,6 @@ import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/presentation/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/presentation/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
-import 'package:keklist/presentation/screens/mind_picker/mind_picker_screen.dart';
-import 'package:keklist/presentation/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 

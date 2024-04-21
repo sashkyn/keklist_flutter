@@ -6,9 +6,11 @@ import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
+import 'package:keklist/presentation/screens/settings/settings_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -31,14 +33,14 @@ part 'local_widgets/app_bar/app_bar.dart';
 part 'local_widgets/body/body.dart';
 part 'local_widgets/body/demo_body.dart';
 
-class MindCollectionScreen extends StatefulWidget {
+final class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
 
   @override
   State<MindCollectionScreen> createState() => _MindCollectionScreenState();
 }
 
-class _MindCollectionScreenState extends State<MindCollectionScreen> with DisposeBag {
+final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
@@ -162,21 +164,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     });
   }
 
-  void _showDayCollectionAndHandleError({required MindOperationError state}) {
-    if ([
-      MindOperationType.create,
-      MindOperationType.edit,
-    ].contains(state.notCompleted)) {
-      if (state.minds.isEmpty) {
-        return;
-      }
-      _showDayCollectionScreen(
-        groupDayIndex: state.minds.first.dayIndex,
-        initialError: state,
-      );
-    }
-  }
-
   @override
   void dispose() {
     cancelSubscriptions();
@@ -206,6 +193,7 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () async => await _showDateSwitcher(),
+                onSettings: () async => await _showSettings(),
               )),
         ),
       ),
@@ -317,9 +305,33 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     _scrollToDayIndex(dayIndex);
   }
 
+  Future<void> _showSettings() {
+    return showCupertinoModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return const SettingsScreen();
+      },
+    );
+  }
+
   void _cancelSearch() {
     _searchTextController.clear();
     sendEventTo<MindBloc>(MindStopSearch());
     WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
+  }
+
+  void _showDayCollectionAndHandleError({required MindOperationError state}) {
+    if ([
+      MindOperationType.create,
+      MindOperationType.edit,
+    ].contains(state.notCompleted)) {
+      if (state.minds.isEmpty) {
+        return;
+      }
+      _showDayCollectionScreen(
+        groupDayIndex: state.minds.first.dayIndex,
+        initialError: state,
+      );
+    }
   }
 }
