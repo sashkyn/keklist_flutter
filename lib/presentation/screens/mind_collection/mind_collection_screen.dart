@@ -193,7 +193,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () async => await _showDateSwitcher(),
-                onSettings: () async => await _showSettings(),
+                onSettings: () => _showSettings(),
               )),
         ),
       ),
@@ -305,12 +305,12 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     _scrollToDayIndex(dayIndex);
   }
 
-  Future<void> _showSettings() {
-    return showCupertinoModalBottomSheet(
-      context: context,
-      builder: (builder) {
-        return const SettingsScreen();
-      },
+  void _showSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
     );
   }
 

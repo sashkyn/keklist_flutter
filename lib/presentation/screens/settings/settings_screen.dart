@@ -13,7 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 // TODO: move methods from MindBloc to SettingsBloc
 // TODO: fix bug with autologout after open it in offline mode
-// TODO: darkmode: add system mode 
+// TODO: darkmode: add system mode
 
 final class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -134,19 +134,7 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        titleSpacing: 0,
-        leading: const SizedBox.shrink(),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              })
-        ],
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: SettingsList(
         sections: [
           SettingsSection(

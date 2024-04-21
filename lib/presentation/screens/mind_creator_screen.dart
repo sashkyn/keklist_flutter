@@ -8,14 +8,18 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 final class MindCreatorScreen extends StatefulWidget {
   final Function(String text, String emoji) onDone;
+  final String buttonText;
+  final Icon buttonIcon;
   final String? initialText;
   final String? initialEmoji;
 
   const MindCreatorScreen({
     super.key,
     required this.onDone,
+    required this.buttonText,
     this.initialText,
     this.initialEmoji,
+    required this.buttonIcon,
   });
 
   @override
@@ -45,25 +49,25 @@ final class _MindCreatorScreenState extends KekWidgetState<MindCreatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        icon: widget.buttonIcon,
+        onPressed: () {
+          widget.onDone(textEditingController.text, _selectedEmoji);
+        },
+        label: Text(
+          widget.buttonText,
+          style: const TextStyle(fontSize: 16.0),
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        titleSpacing: 0,
         leading: const SizedBox.shrink(),
         actions: [
-          TextButton(
-            style: ButtonStyle(
-              splashFactory: NoSplash.splashFactory,
-              foregroundColor: MaterialStateProperty.all(Colors.blueAccent),
-            ),
-            onPressed: () {
-              widget.onDone(textEditingController.text, _selectedEmoji);
-              Navigator.of(context).pop();
-            },
-            child: const Text(
-              'Done',
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
-            ),
-          ),
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(),
+          )
         ],
       ),
       body: SingleChildScrollView(

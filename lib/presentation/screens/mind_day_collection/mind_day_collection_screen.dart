@@ -134,11 +134,19 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      resizeToAvoidBottomInset: false,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
         onPressed: () => _showMindCreator(),
+        label: const Text(
+          'Create',
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         enableFeedback: true,
-        isExtended: true,
-        child: const Text('🙂', style: TextStyle(fontSize: 26.0)),
       ),
       appBar: AppBar(
         title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(dayIndex))),
@@ -438,6 +446,8 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         context: context,
         builder: (_) {
           return MindCreatorScreen(
+            buttonIcon: initialEmoji == null ? const Icon(Icons.add) : const Icon(Icons.edit),
+            buttonText: initialEmoji == null ? 'Create' : 'Edit',
             initialEmoji: initialEmoji,
             initialText: initialText,
             onDone: (String text, String emoji) {
