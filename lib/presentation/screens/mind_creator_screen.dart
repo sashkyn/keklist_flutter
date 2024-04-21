@@ -53,6 +53,7 @@ final class _MindCreatorScreenState extends KekWidgetState<MindCreatorScreen> {
       floatingActionButton: FloatingActionButton.extended(
         icon: widget.buttonIcon,
         onPressed: () {
+          Navigator.of(context).pop();
           widget.onDone(textEditingController.text, _selectedEmoji);
         },
         label: Text(
