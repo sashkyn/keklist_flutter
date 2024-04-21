@@ -31,6 +31,8 @@ import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 import 'presentation/native/ios/watch/watch_communication_manager.dart';
 
+// TODO: fix or exclude home_widget for android only
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
