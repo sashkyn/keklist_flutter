@@ -32,16 +32,17 @@ class MindCollectionEmptyDayWidget extends StatelessWidget {
     );
   }
 
-  factory MindCollectionEmptyDayWidget.noMinds() {
-    return const MindCollectionEmptyDayWidget(
+  factory MindCollectionEmptyDayWidget.noMinds({String? text}) {
+    return MindCollectionEmptyDayWidget(
       emoji: '😔',
-      text: 'No minds for day',
+      text: text ?? 'No minds for day',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 16.0),
         MindWidget.sized(

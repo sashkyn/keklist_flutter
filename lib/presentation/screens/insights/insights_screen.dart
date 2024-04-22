@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:keklist/presentation/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
+import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/screens/insights/widgets/insights_pie_widget.dart';
 import 'package:keklist/presentation/screens/insights/widgets/insights_random_mind_widget.dart';
 import 'package:keklist/presentation/screens/insights/widgets/insights_today_minds_widget.dart';
@@ -12,14 +13,14 @@ import 'package:keklist/presentation/screens/mind_day_collection/mind_day_collec
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 
-class InsightsScreen extends StatefulWidget {
+final class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
 
   @override
   State<InsightsScreen> createState() => _InsightsScreenState();
 }
 
-class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
+final class _InsightsScreenState extends KekWidgetState<InsightsScreen> {
   final List<Mind> _minds = [];
 
   @override
@@ -35,19 +36,14 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
         });
       }
     }).disposed(by: this);
-  }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
+    context.read<MindBloc>().add(MindGetList());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(title: const Text('Insights')),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -95,16 +91,12 @@ class _InsightsScreenState extends State<InsightsScreen> with DisposeBag {
     );
   }
 
-  void _showDayCollectionScreen({
-    required int groupDayIndex,
-    MindOperationError? initialError,
-  }) {
+  void _showDayCollectionScreen({required int groupDayIndex}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => MindDayCollectionScreen(
           allMinds: _minds,
           initialDayIndex: groupDayIndex,
-          initialError: initialError,
         ),
       ),
     );

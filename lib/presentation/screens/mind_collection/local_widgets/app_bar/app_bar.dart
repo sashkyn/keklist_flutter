@@ -6,6 +6,7 @@ final class _AppBar extends StatelessWidget {
   final VoidCallback onTitle;
   final VoidCallback onCalendar;
   final VoidCallback onSettings;
+  final VoidCallback onInsights;
 
   const _AppBar({
     required this.isUpdating,
@@ -13,6 +14,7 @@ final class _AppBar extends StatelessWidget {
     required this.onTitle,
     required this.onCalendar,
     required this.onSettings,
+    required this.onInsights,
   });
 
   @override
@@ -43,6 +45,10 @@ final class _AppBar extends StatelessWidget {
 
   List<Widget>? _makeAppBarActions() {
     return [
+      IconButton(
+        icon: const Icon(Icons.insights),
+        onPressed: onInsights,
+      ),
       IconButton(
         icon: const Icon(Icons.settings),
         onPressed: onSettings,

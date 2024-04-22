@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/helpers/bloc_utils.dart';
@@ -15,7 +16,7 @@ final class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-final class _MainScreenState extends State<MainScreen> with DisposeBag {
+final class _MainScreenState extends KekWidgetState<MainScreen> {
   bool _isAuthShowed = false;
 
   @override
@@ -30,9 +31,7 @@ final class _MainScreenState extends State<MainScreen> with DisposeBag {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return const MindCollectionScreen();
-  }
+  Widget build(BuildContext context) => const MindCollectionScreen();
 
   Future<void> _showAuthBottomSheet() async {
     if (_isAuthShowed) {

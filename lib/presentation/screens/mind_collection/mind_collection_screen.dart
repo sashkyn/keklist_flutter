@@ -7,6 +7,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/screens/insights/insights_screen.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
@@ -194,6 +195,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 onTitle: () => _scrollToNow(),
                 onCalendar: () async => await _showDateSwitcher(),
                 onSettings: () => _showSettings(),
+                onInsights: () => _showInsights(),
               )),
         ),
       ),
@@ -310,6 +312,15 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
       context,
       MaterialPageRoute(
         builder: (context) => const SettingsScreen(),
+      ),
+    );
+  }
+
+  void _showInsights() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const InsightsScreen(),
       ),
     );
   }
