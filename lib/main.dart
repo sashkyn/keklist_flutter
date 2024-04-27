@@ -8,7 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
@@ -98,14 +98,15 @@ MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
         BlocProvider(
           create: (context) => AuthBloc(
             mainService: mainInjector.get<MindService>(),
-            authRepository: mainInjector.get<AuthMinotaur>(),
+            authRepository: mainInjector.get<AuthService>(),
           ),
         ),
         BlocProvider(
           create: (context) => SettingsBloc(
-            mainService: mainInjector.get<MindService>(),
-            client: Supabase.instance.client,
             repository: mainInjector.get<SettingsRepository>(),
+            authService: mainInjector.get<AuthService>(),
+            mindRepository: mainInjector.get<MindRepository>(),
+            mindService: mainInjector.get<MindService>(),
           ),
         ),
       ],

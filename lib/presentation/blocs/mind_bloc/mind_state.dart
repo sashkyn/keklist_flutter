@@ -23,7 +23,7 @@ final class MindSearching extends MindState {
 }
 
 final class MindSuggestions extends MindState {
-  final List<String> values;
+  final Iterable<String> values;
 
   MindSuggestions({required this.values});
 }

@@ -24,8 +24,12 @@ final class _MainScreenState extends KekWidgetState<MainScreen> {
     super.initState();
 
     subscribeTo<SettingsBloc>(onNewState: (state) {
-      if (state is SettingsAuthState && state.needToShowAuth) {
-        _showAuthBottomSheet();
+      switch (state) {
+        case SettingsDataState state:
+          if (!state.isLoggedIn && !state.settings.isOfflineMode) {
+            _showAuthBottomSheet();
+          }
+          break;
       }
     })?.disposed(by: this);
   }

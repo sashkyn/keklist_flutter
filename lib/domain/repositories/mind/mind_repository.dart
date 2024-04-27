@@ -10,6 +10,7 @@ abstract class MindRepository {
   Stream<Iterable<Mind>> get stream;
   FutureOr<Iterable<Mind>> obtainMinds();
   FutureOr<void> createMind({required Mind mind, required bool isUploadedToServer});
+  FutureOr<void> createMinds({required Iterable<Mind> minds, required bool isUploadedToServer});
   FutureOr<Mind?> obtainMind({required String mindId});
   FutureOr<Iterable<Mind>> obtainMindsWhere(bool Function(Mind) where);
   FutureOr<Iterable<Mind>> obtainNotUploadedToServerMinds();
@@ -19,5 +20,5 @@ abstract class MindRepository {
   FutureOr<void> updateMinds({required Iterable<Mind> minds, required bool isUploadedToServer});
   FutureOr<void> deleteMind({required String mindId});
   FutureOr<void> deleteMinds();
-  FutureOr<void> deleteMindsWhere(bool Function(Mind) where);
+  FutureOr<void> deleteMindsWhere(bool Function(Mind) where);  
 }

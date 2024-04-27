@@ -2,7 +2,7 @@ import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive/hive.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/hive_constants.dart';
-import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind/mind_hive_repository.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
@@ -40,8 +40,8 @@ final class MainContainer {
     injector.map<SettingsRepository>(
       (injector) => SettingsHiveRepository(box: Hive.box<SettingsObject>(HiveConstants.settingsBoxName)),
     );
-    injector.map<AuthMinotaur>(
-      (injector) => AuthSupabaseMinotaur(client: Supabase.instance.client),
+    injector.map<AuthService>(
+      (injector) => AuthSupabaseService(client: Supabase.instance.client),
     );
     return injector;
   }

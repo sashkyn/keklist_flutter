@@ -34,6 +34,12 @@ final class MindHiveRepository implements MindRepository {
   }
 
   @override
+  FutureOr<void> createMinds({required Iterable<Mind> minds, required bool isUploadedToServer}) {
+    final Iterable<MindObject> objects = minds.map((mind) => mind.toObject(isUploadedToServer: isUploadedToServer));
+    _mindHiveBox.putAll({for (var object in objects) object.id: object});
+  }
+
+  @override
   FutureOr<void> deleteMind({required String mindId}) {
     final MindObject? object = _mindHiveBox.get(mindId);
     object?.delete();
@@ -85,22 +91,21 @@ final class MindHiveRepository implements MindRepository {
   }
 
   @override
-  FutureOr<List<Mind>> obtainMindsWhere(bool Function(Mind) where) {
-    final List<Mind> minds = _mindObjects.map((mindObject) => mindObject.toMind()).where(where).toList();
-    return minds;
+  FutureOr<Iterable<Mind>> obtainMindsWhere(bool Function(Mind) where) {
+    return _mindObjects.map((mindObject) => mindObject.toMind()).where(where);
   }
 
   @override
   FutureOr<Iterable<Mind>> obtainNotUploadedToServerMinds() {
     final Iterable<Mind> notUploadedMinds =
-        _mindObjects.where((mindObject) => !mindObject.isUploadedToServer).map((mind) => mind.toMind()).toList();
+        _mindObjects.where((mindObject) => !mindObject.isUploadedToServer).map((mind) => mind.toMind());
     return notUploadedMinds;
   }
 
   @override
   FutureOr<void> deleteMindsWhere(bool Function(Mind) where) async {
-    final List<String> mindIds =
-        _mindObjects.map((mindObject) => mindObject.toMind()).where(where).map((mind) => mind.id).toList();
+    final Iterable<String> mindIds =
+        _mindObjects.map((mindObject) => mindObject.toMind()).where(where).map((mind) => mind.id);
     await _mindHiveBox.deleteAll(mindIds);
   }
 

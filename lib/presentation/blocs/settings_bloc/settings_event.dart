@@ -4,38 +4,44 @@ sealed class SettingsEvent {
   const SettingsEvent();
 }
 
-class SettingsGet extends SettingsEvent {}
+final class SettingsGet extends SettingsEvent {}
 
-class SettingsExportAllMindsToCSV extends SettingsEvent {}
+final class SettingsExportAllMindsToCSV extends SettingsEvent {}
 
-class SettingsChangeMindContentVisibility extends SettingsEvent {
+final class SettingsChangeMindContentVisibility extends SettingsEvent {
   final bool isVisible;
 
   const SettingsChangeMindContentVisibility({required this.isVisible});
 }
 
-class SettingsChangeOfflineMode extends SettingsEvent {
+final class SettingsChangeOfflineMode extends SettingsEvent {
   final bool isOfflineMode;
 
   const SettingsChangeOfflineMode({required this.isOfflineMode});
 }
 
-class SettingsWhatsNewShown extends SettingsEvent {}
+final class SettingsWhatsNewShown extends SettingsEvent {}
 
-class SettingsUploadMindsFromCacheToServer extends SettingsEvent {}
+final class SettingsUploadMindsFromCacheToServer extends SettingsEvent {}
 
-class SettingsNeedToShowAuth extends SettingsEvent {}
+final class SettingGetWhatsNew extends SettingsEvent {}
 
-class SettingGetWhatsNew extends SettingsEvent {}
-
-class SettingsChangeIsDarkMode extends SettingsEvent {
+final class SettingsChangeIsDarkMode extends SettingsEvent {
   final bool isDarkMode;
 
   const SettingsChangeIsDarkMode({required this.isDarkMode});
 }
 
-class SettingsChangeOpenAIKey extends SettingsEvent {
+final class SettingsChangeOpenAIKey extends SettingsEvent {
   final String openAIToken;
 
   const SettingsChangeOpenAIKey({required this.openAIToken});
 }
+
+final class SettingsLogout extends SettingsEvent {}
+
+final class SettingsGetMindCandidatesToUpload extends SettingsEvent {}
+
+final class SettingsUploadMindCandidates extends SettingsEvent {}
+
+final class SettingsGetAuthState extends SettingsEvent {}

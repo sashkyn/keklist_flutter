@@ -7,11 +7,14 @@ import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/helpers/bloc_utils.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
+import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/screens/auth/auth_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// TODO: move methods from MindBloc to SettingsBloc
+// TODO: move methods from MindBloc to SettingsBloc (in progress)
 // TODO: fix bug with autologout after open it in offline mode
 // TODO: darkmode: add system mode
 
@@ -22,7 +25,7 @@ final class SettingsScreen extends StatefulWidget {
   SettingsScreenState createState() => SettingsScreenState();
 }
 
-final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
+final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
   bool _isDarkMode = false;
@@ -34,36 +37,39 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
   void initState() {
     super.initState();
 
-    subscribeTo<SettingsBloc>(
-      onNewState: (state) {
-        switch (state.runtimeType) {
-          case const (SettingsDataState):
-            setState(() {
-              _offlineMode = state.settings.isOfflineMode;
-              _isDarkMode = state.settings.isDarkMode;
-              _openAiKey = state.settings.openAIKey ?? '';
-            });
-        }
-      },
-    )?.disposed(by: this);
+    subscribeTo<SettingsBloc>(onNewState: (state) {
+      switch (state) {
+        case SettingsDataState state:
+          setState(() {
+            _isLoggedIn = state.isLoggedIn;
+            _cachedMindCountToUpload = state.offlineMinds.length;
+            _offlineMode = state.settings.isOfflineMode;
+            _isDarkMode = state.settings.isDarkMode;
+            _openAiKey = state.settings.openAIKey ?? '';
+          });
+          break;
+        case SettingsLoadingState state:
+          if (state.isLoading) {
+            EasyLoading.show();
+          } else {
+            EasyLoading.dismiss();
+          }
+          break;
+        case SettingsUploadOfflineMindsErrorState _:
+          EasyLoading.dismiss();
+          showOkAlertDialog(
+            context: context,
+            title: 'Error',
+            message: 'Could not upload minds.',
+          );
+          break;
+        case SettingsUploadOfflineMindsCompletedState _:
+          sendEventTo<SettingsBloc>(SettingsGet());
+      }
+    })?.disposed(by: this);
 
     subscribeTo<MindBloc>(onNewState: (state) {
       switch (state.runtimeType) {
-        case const (MindList):
-          setState(() {
-            _clearCacheVisible = state.values.isNotEmpty;
-          });
-          if (!_offlineMode) {
-            sendEventTo<MindBloc>(MindGetUploadCandidates());
-          }
-        case const (MindCandidatesForUpload):
-          setState(() {
-            if (_isLoggedIn && !_offlineMode) {
-              _cachedMindCountToUpload = state.values.length;
-            } else {
-              _cachedMindCountToUpload = 0;
-            }
-          });
         case const (MindServerOperationStarted):
           if (state.type == MindOperationType.uploadCachedData ||
               state.type == MindOperationType.deleteAll ||
@@ -88,46 +94,18 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
               setState(() {
                 _clearCacheVisible = false;
               });
-            case MindOperationType.uploadCachedData:
-              EasyLoading.dismiss();
-              setState(() {
-                _cachedMindCountToUpload = 0;
-              });
-              showOkAlertDialog(
-                context: context,
-                title: 'Success',
-                message: 'Minds have uploaded successfully',
-              );
             case MindOperationType.deleteAll:
               EasyLoading.dismiss();
-              sendEventTo<MindBloc>(MindGetUploadCandidates());
+              sendEventTo<MindBloc>(SettingsGetMindCandidatesToUpload());
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
-                message: '`Your mind was cleared on server',
+                message: '`Your minds were completly deleted from server',
               );
           }
       }
     })?.disposed(by: this);
 
-    subscribeTo<AuthBloc>(
-      onNewState: (state) {
-        setState(() {
-          switch (state) {
-            case AuthCurrentState state when state.isLoggedIn:
-              _isLoggedIn = true;
-              sendEventTo<MindBloc>(MindGetUploadCandidates());
-            case AuthCurrentState state when !state.isLoggedIn:
-              _isLoggedIn = false;
-              if (!_offlineMode) {
-                sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
-              }
-          }
-        });
-      },
-    )?.disposed(by: this);
-
-    sendEventTo<AuthBloc>(AuthGetStatus());
     sendEventTo<SettingsBloc>(SettingsGet());
   }
 
@@ -145,7 +123,7 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: const Text('Login'),
                   leading: const Icon(Icons.login),
                   onPressed: (BuildContext context) {
-                    sendEventTo<SettingsBloc>(SettingsNeedToShowAuth());
+                    _showAuthBottomSheet();
                   },
                 ),
               if (_isLoggedIn)
@@ -153,7 +131,7 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: const Text('Logout'),
                   leading: const Icon(Icons.logout, color: Colors.red),
                   onPressed: (BuildContext context) {
-                    sendEventTo<AuthBloc>(AuthLogout());
+                    sendEventTo<SettingsBloc>(SettingsLogout());
                   },
                 ),
             ],
@@ -185,7 +163,7 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
                   title: Text('Upload $_cachedMindCountToUpload minds'),
                   leading: const Icon(Icons.cloud_upload, color: Colors.green),
                   onPressed: (BuildContext context) {
-                    sendEventTo<MindBloc>(MindUploadCandidates());
+                    sendEventTo<SettingsBloc>(SettingsUploadMindCandidates());
                   },
                 ),
               },
@@ -265,13 +243,6 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
     );
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    cancelSubscriptions();
-  }
-
   Future<void> _sendFeedback() async {
     final Uri uri = Uri(
       scheme: 'mailto',
@@ -345,9 +316,6 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
 
   Future<void> _switchOfflineMode(bool value) async {
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
-    if (!value) {
-      sendEventTo<MindBloc>(MindGetList());
-    }
   }
 
   Future<void> _switchDarkMode(bool value) async {
@@ -400,5 +368,14 @@ final class SettingsScreenState extends State<SettingsScreen> with DisposeBag {
       case OkCancelResult.cancel:
         break;
     }
+  }
+
+  _showAuthBottomSheet() {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => const AuthScreen(),
+      isDismissible: false,
+      enableDrag: false,
+    );
   }
 }

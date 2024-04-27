@@ -12,8 +12,8 @@ final class MindSupabaseService implements MindService {
   Future<Iterable<Mind>> getMindList() async {
     _validateUserAuthorization();
 
-    final List<dynamic> listOfEntities = await _client.from('minds').select();
-    final List<Mind> minds = listOfEntities.map((e) => Mind.fromSupabaseJson(e)).toList();
+    final Iterable<dynamic> listOfEntities = await _client.from('minds').select();
+    final Iterable<Mind> minds = listOfEntities.map((e) => Mind.fromSupabaseJson(e));
 
     return minds;
   }
@@ -46,7 +46,12 @@ final class MindSupabaseService implements MindService {
   Future<void> editMind({required Mind mind}) async {
     _validateUserAuthorization();
 
-    await _client.from('minds').update(mind.toSupabaseJson(userId: _client.auth.currentUser!.id)).eq('uuid', mind.id);
+    await _client
+        .from('minds')
+        .update(
+          mind.toSupabaseJson(userId: _client.auth.currentUser!.id),
+        )
+        .eq('uuid', mind.id);
   }
 
   @override
@@ -55,6 +60,13 @@ final class MindSupabaseService implements MindService {
     _validateUserAuthorization();
 
     await _client.from('minds').delete().eq('user_id', _client.auth.currentUser!.id);
+  }
+
+  @override
+  Future<void> deleteAllChildMinds({required String rootId}) async {
+    _validateUserAuthorization();
+
+    await _client.from('minds').delete().eq('user_id', _client.auth.currentUser!.id).eq('root_id', rootId);
   }
 
   @override
@@ -76,13 +88,4 @@ final class MindSupabaseService implements MindService {
       throw KeklistError.nonAuthorized();
     }
   }
-
-  // Future _generateError() {
-  //   return Future.delayed(
-  //     const Duration(seconds: 2),
-  //     () {
-  //       throw KeklistError.randomError();
-  //     },
-  //   );
-  // }
 }

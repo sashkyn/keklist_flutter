@@ -52,12 +52,10 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
       _enterTextSearch,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 300)).asyncExpand(mapper),
     );
-    on<MindUploadCandidates>(_uploadCandidates);
     on<MindChangeCreateText>(
       _changeTextOfCreatingMind,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
     );
-    on<MindGetUploadCandidates>(_getUploadCandidates);
     on<MindInternalGetListFromCache>((_, emit) => _emitMindList(emit));
     _repository.stream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
   }
@@ -143,34 +141,62 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     }
   }
 
-  // TODO: удалить каскадно все остальное
   Future<void> _deleteMind(MindDelete event, Emitter<MindState> emit) async {
-    _repository.deleteMind(mindId: event.mind.id);
+    final Mind rootMind = event.mind;
+    final Iterable<Mind> childMinds =
+        (await _repository.obtainMindsWhere((mind) => mind.rootId == rootMind.id)).toList();
+
+    await _repository.deleteMindsWhere((mind) => mind.rootId == event.mind.id);
+    await _repository.deleteMind(mindId: event.mind.id);
 
     if (!(_settingsRepository.value.isOfflineMode)) {
-      final Mind mindToDelete = event.mind;
+      // Removing childMinds.
       emit(
         MindServerOperationStarted(
-          minds: [mindToDelete],
+          minds: childMinds,
           type: MindOperationType.delete,
         ),
       );
-      // Удаляем на сервере.
-      await _service.deleteMind(mindToDelete.id).then((_) {
+      bool hasError = false;
+      await _service.deleteAllChildMinds(rootId: event.mind.id).onError((error, stackTrace) async {
+        // Rollback.
+        await _repository.createMinds(minds: childMinds, isUploadedToServer: true);
+
+        // Handle error.
+        hasError = true;
+        emit(
+          MindOperationError(
+            minds: childMinds,
+            notCompleted: MindOperationType.delete,
+          ),
+        );
+      });
+      if (hasError) {
+        return;
+      }
+
+      // Removing rootMind.
+      emit(
+        MindServerOperationStarted(
+          minds: [rootMind],
+          type: MindOperationType.delete,
+        ),
+      );
+      await _service.deleteMind(rootMind.id).then((_) {
         emit(
           MindOperationCompleted(
-            minds: [mindToDelete],
+            minds: [rootMind],
             type: MindOperationType.delete,
           ),
         );
       }).onError((error, _) async {
-        // Роллбек
-        await _repository.createMind(mind: mindToDelete, isUploadedToServer: true);
+        // Rollback.
+        await _repository.createMind(mind: rootMind, isUploadedToServer: true);
 
-        // Обработка ошибки
+        // Handle error.
         emit(
           MindOperationError(
-            minds: [mindToDelete],
+            minds: [rootMind],
             notCompleted: MindOperationType.delete,
           ),
         );
@@ -209,15 +235,15 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  List<String> _lastSuggestions = [];
+  Iterable<String> _lastSuggestions = [];
 
   FutureOr<void> _changeTextOfCreatingMind(
     MindChangeCreateText event,
     Emitter<MindState> emit,
   ) async {
     const count = 9;
-    final List<Mind> minds = _repository.values.toList();
-    final List<String> suggestions = _repository.values
+    final Iterable<Mind> minds = _repository.values;
+    final Iterable<String> suggestions = _repository.values
         .where((Mind mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
         .map((Mind mind) => mind.emoji)
         .toList()
@@ -225,9 +251,8 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         .sorted((String emoji1, String emoji2) => minds
             .where((Mind mind) => mind.emoji == emoji2)
             .length
-            .compareTo(minds.where((mind) => mind.emoji == emoji1).length)) // NOTE: Сортировка очень дорогая
-        .take(count)
-        .toList();
+            .compareTo(minds.where((mind) => mind.emoji == emoji1).length))
+        .take(9);
 
     if (suggestions.isEmpty) {
       if (minds.isEmpty) {
@@ -352,88 +377,6 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
         type: MindOperationType.clearCache,
       ),
     );
-  }
-
-  Future<void> _uploadCandidates(
-    MindUploadCandidates event,
-    Emitter<MindState> emit,
-  ) async {
-    final Iterable<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
-    emit(
-      MindServerOperationStarted(
-        minds: uploadCandidates,
-        type: MindOperationType.uploadCachedData,
-      ),
-    );
-
-    final Iterable<Mind> rootMinds = uploadCandidates.where((Mind mind) => mind.rootId == null);
-
-    final Future<void> uploadRootTasks = _service.addAllMinds(values: rootMinds).onError(
-      (error, _) {
-        emit(
-          MindOperationError(
-            minds: uploadCandidates,
-            notCompleted: MindOperationType.uploadCachedData,
-          ),
-        );
-      },
-    );
-
-    final Iterable<Mind> notRootMinds = uploadCandidates.where((Mind mind) => mind.rootId != null);
-
-    final Future<void> uploadNonRootTasks = _service.addAllMinds(values: notRootMinds).onError(
-      (error, _) {
-        emit(
-          MindOperationError(
-            minds: uploadCandidates,
-            notCompleted: MindOperationType.uploadCachedData,
-          ),
-        );
-      },
-    );
-
-    await uploadRootTasks.then((_) async {
-      await uploadNonRootTasks.then((_) async {
-        await _repository
-            .deleteMindsWhere((Mind mind) => uploadCandidates.any((Mind candidate) => candidate.id == mind.id));
-        await _repository.updateMinds(
-          minds: uploadCandidates.toList(),
-          isUploadedToServer: true,
-        );
-        emit(
-          MindOperationCompleted(
-            minds: uploadCandidates,
-            type: MindOperationType.uploadCachedData,
-          ),
-        );
-      }).onError((error, _) {
-        emit(
-          MindOperationError(
-            minds: uploadCandidates,
-            notCompleted: MindOperationType.uploadCachedData,
-          ),
-        );
-      });
-    }).onError((error, _) {
-      emit(
-        MindOperationError(
-          minds: uploadCandidates,
-          notCompleted: MindOperationType.uploadCachedData,
-        ),
-      );
-    });
-  }
-
-  Future<void> _getUploadCandidates(
-    MindGetUploadCandidates event,
-    Emitter<MindState> emit,
-  ) async {
-    final Iterable<Mind> uploadCandidates = await _repository.obtainNotUploadedToServerMinds();
-    if (uploadCandidates.isEmpty) {
-      emit(MindCandidatesForUpload(values: []));
-      return;
-    }
-    emit(MindCandidatesForUpload(values: uploadCandidates));
   }
 
   Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
