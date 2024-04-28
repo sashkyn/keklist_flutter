@@ -54,13 +54,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
 
   Map<String, List<Mind>> get _mindIdsToChildren => MindUtils.convertToMindChildren(minds: allMinds);
 
-  // TODO: Перетащить стейт в бар
-  // NOTE: Состояние CreateMarkBar с вводом текста.
-  // final TextEditingController _createMindEditingController = TextEditingController(text: null);
-  // final FocusNode _mindCreatorFocusNode = FocusNode();
-  //MindSuggestions? _mindSuggestions;
   bool _isMindContentVisible = false;
-  // bool _hasFocus = false;
   Mind? _editableMind;
   bool _overscrollVibrationWorked = false;
 
@@ -88,20 +82,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       if (widget.initialError != null) {
         _handleError(widget.initialError!);
       }
-
-      // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
-      // _createMindEditingController.addListener(() {
-      //   sendEventTo<MindBloc>(MindChangeCreateText(text: _createMindEditingController.text));
-      // });
-
-      // _mindCreatorFocusNode.addListener(() {
-      //   if (_hasFocus == _mindCreatorFocusNode.hasFocus) {
-      //     return;
-      //   }
-      //   setState(() {
-      //     _hasFocus = _mindCreatorFocusNode.hasFocus;
-      //   });
-      // });
     });
 
     subscribeTo<MindBloc>(onNewState: (state) async {
@@ -111,10 +91,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
             ..clear()
             ..addAll(state.values.sortedBySortIndex());
         });
-      } else if (state is MindSuggestions) {
-        // setState(() {
-        //   _mindSuggestions = state;
-        // });
       } else if (state is MindOperationError) {
         _handleError(state);
       }
@@ -208,71 +184,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
               ),
             ),
           ),
-          // Visibility(
-          //   visible: false,
-          //   child: Stack(
-          //     children: [
-          //       // NOTE: Подложка для скрытия текста эмодзи.
-          //       Align(
-          //         alignment: Alignment.bottomCenter,
-          //         child: Container(
-          //           color: Theme.of(context).scaffoldBackgroundColor,
-          //           height: 90,
-          //         ),
-          //       ),
-          //       Column(
-          //         mainAxisAlignment: MainAxisAlignment.end,
-          //         children: [
-          //           MindCreatorBottomBar(
-          //             editableMind: _editableMind,
-          //             focusNode: _mindCreatorFocusNode,
-          //             textEditingController: _createMindEditingController,
-          //             placeholder: 'Create a mind...',
-          //             onDone: (CreateMindData data) {
-          //               if (_editableMind == null) {
-          //                 sendEventTo<MindBloc>(
-          //                   MindCreate(
-          //                     dayIndex: dayIndex,
-          //                     note: data.text,
-          //                     emoji: data.emoji,
-          //                     rootId: null,
-          //                   ),
-          //                 );
-          //               } else {
-          //                 final Mind mindForEdit = _editableMind!.copyWith(
-          //                   note: data.text,
-          //                   emoji: data.emoji,
-          //                 );
-          //                 sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
-          //               }
-          //               _resetMindCreator();
-          //             },
-          //             suggestionMinds: _hasFocus ? _mindSuggestions?.values ?? [] : [],
-          //             selectedEmoji: _selectedEmoji,
-          //             onTapSuggestionEmoji: (String suggestionEmoji) {
-          //               setState(() {
-          //                 _selectedEmoji = suggestionEmoji;
-          //               });
-          //             },
-          //             onTapEmoji: () {
-          //               _showEmojiPickerScreen(
-          //                 onSelect: (String emoji) {
-          //                   setState(() {
-          //                     _selectedEmoji = emoji;
-          //                   });
-          //                 },
-          //               );
-          //             },
-          //             doneTitle: 'DONE',
-          //             onTapCancelEdit: () {
-          //               _resetMindCreator();
-          //             },
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );
@@ -285,46 +196,13 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     super.dispose();
   }
 
-  // void _resetMindCreator() {
-  //   setState(() {
-  //     _editableMind = null;
-  //     _createMindEditingController.text = '';
-  //   });
-  // }
-
   void _changeContentVisibility() {
     HapticFeedback.mediumImpact();
     sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible));
   }
 
   void _handleError(MindOperationError error) {
-    // if (error.notCompleted == MindOperationType.create) {
-    //   final Mind? notCreatedMind = error.minds.firstOrNull;
-    //   if (notCreatedMind == null) {
-    //     return;
-    //   }
-
-    //   setState(() {
-    //     _createMindEditingController.text = notCreatedMind.note;
-    //     _selectedEmoji = notCreatedMind.emoji;
-    //     _showKeyboard();
-    //   });
-    // } else if (error.notCompleted == MindOperationType.edit) {
-    //   final Mind? notEditedMind = error.minds.firstOrNull;
-    //   if (notEditedMind == null) {
-    //     return;
-    //   }
-
-    //   final Mind? oldMind = allMinds.firstWhereOrNull((Mind mind) => mind.id == notEditedMind.id);
-    //   if (oldMind == null) {
-    //     return;
-    //   }
-    //   setState(() {
-    //     _editableMind = oldMind;
-    //     _createMindEditingController.text = notEditedMind.note;
-    //     _selectedEmoji = notEditedMind.emoji;
-    //   });
-    // }
+    // TODO: handle error if needed
   }
 
   Future<int?> _showDateSwitcherToNewDay() async {

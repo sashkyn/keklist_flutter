@@ -15,7 +15,6 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // TODO: move methods from MindBloc to SettingsBloc (in progress)
-// TODO: fix bug with autologout after open it in offline mode
 // TODO: darkmode: add system mode
 
 final class SettingsScreen extends StatefulWidget {
