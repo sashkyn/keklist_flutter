@@ -65,7 +65,7 @@ final class MindMessageWidget extends StatelessWidget {
             const Gap(16.0),
             MindBulletListWidget(
               models: children
-                  .sortedByFunction((it) => it.creationDate)
+                  .sortedByProperty((it) => it.creationDate)
                   .map(
                     (mind) => MindBulletModel(
                       entityId: mind.id,

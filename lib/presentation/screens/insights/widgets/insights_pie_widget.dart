@@ -7,6 +7,7 @@ import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
+import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 
 // Improvements:
 // Переключатель по количеству символов
@@ -30,7 +31,7 @@ enum InsightsPieWidgetChoice {
   });
 }
 
-class InsightsPieWidget extends StatefulWidget {
+final class InsightsPieWidget extends StatefulWidget {
   final List<Mind> allMinds;
 
   const InsightsPieWidget({
@@ -42,7 +43,7 @@ class InsightsPieWidget extends StatefulWidget {
   State<InsightsPieWidget> createState() => _InsightsPieWidgetState();
 }
 
-class _InsightsPieWidgetState extends State<InsightsPieWidget> {
+final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
   final List<InsightsPieWidgetChoice> _choices = [
     InsightsPieWidgetChoice.today,
     InsightsPieWidgetChoice.yesterday,
@@ -124,20 +125,24 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             ),
             SizedBox(
               height: 350,
-              child: PieChart(
-                PieChartData(
-                  sections: pieSections,
-                  centerSpaceRadius: 0,
-                  sectionsSpace: 0,
-                  startDegreeOffset: 0,
+              child: BoolWidget(
+                condition: pieSections.isNotEmpty,
+                trueChild: PieChart(
+                  PieChartData(
+                    sections: pieSections,
+                    centerSpaceRadius: 0,
+                    sectionsSpace: 0,
+                    startDegreeOffset: 0,
+                  ),
+                  swapAnimationCurve: Curves.bounceInOut,
                 ),
-                swapAnimationCurve: Curves.bounceInOut,
+                falseChild: Center(child: MindCollectionEmptyDayWidget.noMinds(text: 'No minds for this period')),
               ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: intervalChoiceMap.entries.sortedByFunction((e) => e.value, reversed: true).map(
+                children: intervalChoiceMap.entries.sortedByProperty((e) => e.value, reversed: true).map(
                   (entry) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -168,7 +173,7 @@ class _InsightsPieWidgetState extends State<InsightsPieWidget> {
 
   List<PieChartSectionData> _getPieSections({required HashMap<String, int> choiceMap}) {
     final int allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
-    return choiceMap.entries.sortedByFunction((e) => e.value).map(
+    return choiceMap.entries.sortedByProperty((e) => e.value).map(
       (entry) {
         final currentValue = choiceMap.entries
             .where((element) => element.key == entry.key)

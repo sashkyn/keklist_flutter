@@ -8,7 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
@@ -16,6 +16,7 @@ import 'package:keklist/keklist_app.dart';
 import 'package:keklist/domain/hive_constants.dart';
 import 'package:keklist/domain/repositories/message/message/message_object.dart';
 import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -30,6 +31,8 @@ import 'package:keklist/di/containers.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
 
 import 'presentation/native/ios/watch/watch_communication_manager.dart';
+
+// TODO: fix or exclude home_widget for android only
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,33 +85,39 @@ void _connectToWatchCommunicationManager(Injector mainInjector) {
   }
 }
 
-MultiBlocProvider _getApplication(Injector mainInjector) => MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => MindBloc(
-            mainService: mainInjector.get<MindService>(),
-            mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
-            mindRepository: mainInjector.get<MindRepository>(),
-            settingsRepository: mainInjector.get<SettingsRepository>(),
+Widget _getApplication(Injector mainInjector) => MultiProvider(
+  providers: [
+    RepositoryProvider(create: (context) => mainInjector.get<MindRepository>()),
+  ],
+  child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => MindBloc(
+              mainService: mainInjector.get<MindService>(),
+              mindSearcherCubit: mainInjector.get<MindSearcherCubit>(),
+              mindRepository: mainInjector.get<MindRepository>(),
+              settingsRepository: mainInjector.get<SettingsRepository>(),
+            ),
           ),
-        ),
-        BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
-        BlocProvider(
-          create: (context) => AuthBloc(
-            mainService: mainInjector.get<MindService>(),
-            authRepository: mainInjector.get<AuthMinotaur>(),
+          BlocProvider(create: (context) => mainInjector.get<MindSearcherCubit>()),
+          BlocProvider(
+            create: (context) => AuthBloc(
+              mainService: mainInjector.get<MindService>(),
+              authRepository: mainInjector.get<AuthService>(),
+            ),
           ),
-        ),
-        BlocProvider(
-          create: (context) => SettingsBloc(
-            mainService: mainInjector.get<MindService>(),
-            client: Supabase.instance.client,
-            repository: mainInjector.get<SettingsRepository>(),
+          BlocProvider(
+            create: (context) => SettingsBloc(
+              repository: mainInjector.get<SettingsRepository>(),
+              authService: mainInjector.get<AuthService>(),
+              mindRepository: mainInjector.get<MindRepository>(),
+              mindService: mainInjector.get<MindService>(),
+            ),
           ),
-        ),
-      ],
-      child: const KeklistApp(),
-    );
+        ],
+        child: const KeklistApp(),
+      ),
+);
 
 void _initNativeWidgets() {
   HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);

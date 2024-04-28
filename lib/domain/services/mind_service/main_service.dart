@@ -10,4 +10,5 @@ abstract class MindService {
   Future<Iterable<Mind>> getMindList();
   Future<void> deleteAccount();
   Future<void> deleteAllMinds();
+  Future<void> deleteAllChildMinds({required String rootId});
 }

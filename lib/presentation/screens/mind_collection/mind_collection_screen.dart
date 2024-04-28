@@ -6,9 +6,12 @@ import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/screens/insights/insights_screen.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
+import 'package:keklist/presentation/screens/settings/settings_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -31,14 +34,14 @@ part 'local_widgets/app_bar/app_bar.dart';
 part 'local_widgets/body/body.dart';
 part 'local_widgets/body/demo_body.dart';
 
-class MindCollectionScreen extends StatefulWidget {
+final class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
 
   @override
   State<MindCollectionScreen> createState() => _MindCollectionScreenState();
 }
 
-class _MindCollectionScreenState extends State<MindCollectionScreen> with DisposeBag {
+final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScreen> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
@@ -50,9 +53,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
   bool _isDemoMode = false;
 
   bool get _isOfflineMode => _settingsDataState?.settings.isOfflineMode ?? false;
-
-  // NOTE: Состояние CreateMarkBar с вводом текста.
-  final TextEditingController _createMarkEditingController = TextEditingController(text: null);
 
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
@@ -75,13 +75,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
       _searchTextController.addListener(() {
         sendEventTo<MindBloc>(
           MindEnterSearchText(text: _searchTextController.text),
-        );
-      });
-
-      // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
-      _createMarkEditingController.addListener(() {
-        sendEventTo<MindBloc>(
-          MindChangeCreateText(text: _createMarkEditingController.text),
         );
       });
 
@@ -162,21 +155,6 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     });
   }
 
-  void _showDayCollectionAndHandleError({required MindOperationError state}) {
-    if ([
-      MindOperationType.create,
-      MindOperationType.edit,
-    ].contains(state.notCompleted)) {
-      if (state.minds.isEmpty) {
-        return;
-      }
-      _showDayCollectionScreen(
-        groupDayIndex: state.minds.first.dayIndex,
-        initialError: state,
-      );
-    }
-  }
-
   @override
   void dispose() {
     cancelSubscriptions();
@@ -206,6 +184,8 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () async => await _showDateSwitcher(),
+                onSettings: () => _showSettings(),
+                onInsights: () => _showInsights(),
               )),
         ),
       ),
@@ -317,9 +297,42 @@ class _MindCollectionScreenState extends State<MindCollectionScreen> with Dispos
     _scrollToDayIndex(dayIndex);
   }
 
+  void _showSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
+    );
+  }
+
+  void _showInsights() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const InsightsScreen(),
+      ),
+    );
+  }
+
   void _cancelSearch() {
     _searchTextController.clear();
     sendEventTo<MindBloc>(MindStopSearch());
     WidgetsBinding.instance.addPostFrameCallback((_) async => _jumpToNow());
+  }
+
+  void _showDayCollectionAndHandleError({required MindOperationError state}) {
+    if ([
+      MindOperationType.create,
+      MindOperationType.edit,
+    ].contains(state.notCompleted)) {
+      if (state.minds.isEmpty) {
+        return;
+      }
+      _showDayCollectionScreen(
+        groupDayIndex: state.minds.first.dayIndex,
+        initialError: state,
+      );
+    }
   }
 }

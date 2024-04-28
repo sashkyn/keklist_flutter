@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:keklist/domain/repositories/auth/kek_user.dart';
+import 'package:keklist/domain/services/auth/kek_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-abstract class AuthMinotaur {
-  KekUser? get value;
-  Stream<KekUser?> get stream;
+abstract class AuthService {
+  KekUser? get currentUser;
+  Stream<KekUser?> get currentUserStream;
   FutureOr<OAuthResponse> getAuthWebURL({required OAuthProvider socialProvider});
   FutureOr<void> loginWithCredentials({required String email, required String password});
   FutureOr<void> loginWithOTP({required String email});
@@ -13,13 +13,13 @@ abstract class AuthMinotaur {
   FutureOr<void> logout();
 }
 
-final class AuthSupabaseMinotaur implements AuthMinotaur {
+final class AuthSupabaseService implements AuthService {
   final SupabaseClient _client;
 
-  AuthSupabaseMinotaur({required SupabaseClient client}) : _client = client;
+  AuthSupabaseService({required SupabaseClient client}) : _client = client;
 
   @override
-  KekUser? get value {
+  KekUser? get currentUser {
     final User? supabaseUser = _client.auth.currentUser;
     if (supabaseUser == null) {
       return null;
@@ -28,7 +28,7 @@ final class AuthSupabaseMinotaur implements AuthMinotaur {
   }
 
   @override
-  Stream<KekUser?> get stream => _client.auth.onAuthStateChange.map(
+  Stream<KekUser?> get currentUserStream => _client.auth.onAuthStateChange.map(
         (event) {
           final User? supabaseUser = event.session?.user;
           if (supabaseUser == null) {

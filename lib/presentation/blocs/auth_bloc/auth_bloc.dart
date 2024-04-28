@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:keklist/domain/repositories/auth/auth_minotaur.dart';
+import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/domain/limitations.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -15,7 +15,7 @@ part 'auth_state.dart';
 
 final class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   final MindService mainService;
-  final AuthMinotaur authRepository;
+  final AuthService authRepository;
   final SupabaseClient _client = Supabase.instance.client;
 
   AuthBloc({
@@ -28,11 +28,11 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
     on<AuthDeleteAccount>(_deleteAccount);
     on<AuthLogout>(_logout);
     on<AuthGetStatus>(_getStatus);
-    authRepository.stream.listen((event) => add(AuthGetStatus())).disposed(by: this);
+    authRepository.currentUserStream.listen((event) => add(AuthGetStatus())).disposed(by: this);
   }
 
   void _getStatus(event, emit) {
-    emit(AuthCurrentState(isLoggedIn: authRepository.value != null));
+    emit(AuthCurrentState(isLoggedIn: authRepository.currentUser != null));
   }
 
   Future<void> _logout(event, emit) async => await authRepository.logout();

@@ -3,7 +3,7 @@ description: Like TODO-List but Keklist
 
 publish_to: "none"
 
-version: 3.0.0+62
+version: 3.1.0+62
 
 environment:
   sdk: ">=3.0.0"
@@ -62,6 +62,7 @@ dependencies:
   bottom_sheet: ^4.0.0
   action_sheet: ^1.0.4
   haptic_feedback: ^0.4.2
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

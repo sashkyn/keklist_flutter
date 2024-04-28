@@ -48,7 +48,7 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
       final List<Message> messages = _hiveObjects
           .map((messageObject) => messageObject.toMessage())
           .where((message) => message.sender != MessageSender.system)
-          .sortedByFunction((message) => message.timestamp)
+          .sortedByProperty((message) => message.timestamp)
           .toList();
       emit(MessageChat(messages: messages));
     } catch (error) {
@@ -116,7 +116,7 @@ final class MessageBloc extends Bloc<MessageEvent, MessageState> with DisposeBag
 
     final Message openAIAnswerMessage = await _messageService.requestAnswer(
       history: MessageHistory(
-        messages: _hiveObjects.map((object) => object.toMessage()).sortedByFunction((object) => object.timestamp),
+        messages: _hiveObjects.map((object) => object.toMessage()).sortedByProperty((object) => object.timestamp),
         rootMindId: event.rootMindId,
       ),
     );

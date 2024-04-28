@@ -22,12 +22,6 @@ final class MindSearching extends MindState {
   });
 }
 
-final class MindSuggestions extends MindState {
-  final List<String> values;
-
-  MindSuggestions({required this.values});
-}
-
 // MARK: - Errors
 
 enum MindOperationType {

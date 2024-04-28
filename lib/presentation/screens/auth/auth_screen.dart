@@ -44,7 +44,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
   }
 
   void _dismiss() {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    Navigator.of(context).pop();
   }
 
   @override

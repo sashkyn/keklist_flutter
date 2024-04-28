@@ -81,15 +81,7 @@ class _Body extends StatelessWidget {
                           : null,
                       child: BoolWidget(
                         condition: minds.isEmpty,
-                        trueChild: BoolWidget(
-                          condition: dayIndex < getNowDayIndex(),
-                          trueChild: MindCollectionEmptyDayWidget.past(),
-                          falseChild: BoolWidget(
-                            condition: dayIndex > getNowDayIndex(),
-                            trueChild: MindCollectionEmptyDayWidget.future(),
-                            falseChild: MindCollectionEmptyDayWidget.present(),
-                          ),
-                        ),
+                        trueChild: MindCollectionEmptyDayWidget.noMinds(),
                         falseChild: MindRowWidget(minds: minds),
                       ),
                     ),

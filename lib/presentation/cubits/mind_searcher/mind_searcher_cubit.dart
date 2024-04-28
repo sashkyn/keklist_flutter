@@ -9,11 +9,9 @@ import 'package:keklist/domain/services/entities/mind.dart';
 part 'mind_searcher_state.dart';
 
 final class MindSearcherCubit extends Cubit<MindSearcherState> {
-  late final MindRepository repository;
+  final MindRepository repository;
 
-  MindSearcherCubit({required MindRepository repository}) : super(MindSearcherInitial()) {
-    repository = repository;
-  }
+  MindSearcherCubit({required this.repository}) : super(MindSearcherInitial());
 
   final _emojiParser = EmojiParser();
 
