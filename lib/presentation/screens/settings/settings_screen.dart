@@ -30,7 +30,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _offlineMode = false;
   bool _isDarkMode = false;
   int _cachedMindCountToUpload = 0;
-  bool _clearCacheVisible = false;
+  bool _clearCacheVisible = true;
   String _openAiKey = '';
 
   @override
