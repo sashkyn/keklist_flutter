@@ -142,7 +142,7 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: intervalChoiceMap.entries.sortedByFunction((e) => e.value, reversed: true).map(
+                children: intervalChoiceMap.entries.sortedByProperty((e) => e.value, reversed: true).map(
                   (entry) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -173,7 +173,7 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
 
   List<PieChartSectionData> _getPieSections({required HashMap<String, int> choiceMap}) {
     final int allValues = choiceMap.values.map((e) => e).fold<int>(0, (a, b) => a + b);
-    return choiceMap.entries.sortedByFunction((e) => e.value).map(
+    return choiceMap.entries.sortedByProperty((e) => e.value).map(
       (entry) {
         final currentValue = choiceMap.entries
             .where((element) => element.key == entry.key)

@@ -43,7 +43,7 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
   List<Mind> get _allMinds => widget.allMinds;
 
   List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
-      .sortedByFunction((mind) => mind.creationDate);
+      .sortedByProperty((mind) => mind.creationDate);
 
   @override
   void initState() {

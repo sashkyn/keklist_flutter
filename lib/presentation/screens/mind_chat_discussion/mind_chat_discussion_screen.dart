@@ -40,7 +40,7 @@ final class _MindChatDiscussionScreenState extends KekWidgetState<MindChatDiscus
   List<Mind> get mindChildren => MindUtils.findMindsByRootId(
         rootId: rootMind.id,
         allMinds: widget.allMinds,
-      ).sortedByFunction((mind) => mind.creationDate);
+      ).sortedByProperty((mind) => mind.creationDate);
 
   @override
   void initState() {
@@ -53,9 +53,9 @@ final class _MindChatDiscussionScreenState extends KekWidgetState<MindChatDiscus
 
   @override
   Future<void> dispose() async {
-    super.dispose();
-
     await _bloc.close();
+
+    super.dispose();
   }
 
   @override

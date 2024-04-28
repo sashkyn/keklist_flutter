@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
@@ -15,7 +14,6 @@ import 'package:rxdart/rxdart.dart';
 import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
-import 'package:emojis/emoji.dart' as emojies_pub;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
@@ -51,10 +49,6 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     on<MindEnterSearchText>(
       _enterTextSearch,
       transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 300)).asyncExpand(mapper),
-    );
-    on<MindChangeCreateText>(
-      _changeTextOfCreatingMind,
-      transformer: (events, mapper) => events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper),
     );
     on<MindInternalGetListFromCache>((_, emit) => _emitMindList(emit));
     _repository.stream.listen((event) => add(MindInternalGetListFromCache())).disposed(by: this);
@@ -103,13 +97,14 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     final int sortIndex =
         ((await _findMindsByDayIndex(event.dayIndex)).map((mind) => mind.sortIndex).maxOrNull ?? -1) + 1;
     final Mind mind = Mind(
-        id: const Uuid().v4(),
-        dayIndex: event.dayIndex,
-        note: event.note.trim(),
-        emoji: event.emoji,
-        creationDate: DateTime.now().toUtc(),
-        sortIndex: sortIndex,
-        rootId: event.rootId);
+      id: const Uuid().v4(),
+      dayIndex: event.dayIndex,
+      note: event.note.trim(),
+      emoji: event.emoji,
+      creationDate: DateTime.now().toUtc(),
+      sortIndex: sortIndex,
+      rootId: event.rootId,
+    );
     _repository.createMind(mind: mind, isUploadedToServer: false);
 
     if (!(_settingsRepository.value.isOfflineMode)) {
@@ -235,40 +230,11 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     );
   }
 
-  Iterable<String> _lastSuggestions = [];
-
-  FutureOr<void> _changeTextOfCreatingMind(
-    MindChangeCreateText event,
-    Emitter<MindState> emit,
-  ) async {
-    const count = 9;
-    final Iterable<Mind> minds = _repository.values;
-    final Iterable<String> suggestions = _repository.values
-        .where((Mind mind) => mind.note.trim().toLowerCase().contains(event.text.trim().toLowerCase()))
-        .map((Mind mind) => mind.emoji)
-        .toList()
-        .distinct()
-        .sorted((String emoji1, String emoji2) => minds
-            .where((Mind mind) => mind.emoji == emoji2)
-            .length
-            .compareTo(minds.where((mind) => mind.emoji == emoji1).length))
-        .take(9);
-
-    if (suggestions.isEmpty) {
-      if (minds.isEmpty) {
-        _lastSuggestions = emojies_pub.Emoji.all().take(count).map((emoji) => emoji.char).toList();
-      }
-    } else {
-      _lastSuggestions = suggestions;
-    }
-    emit(MindSuggestions(values: _lastSuggestions));
-  }
-
   Future<List<Mind>> _findMindsByDayIndex(int index) async {
     final minds = await _repository.obtainMindsWhere(
       (mind) => mind.dayIndex == index && mind.rootId == null,
     )
-      ..sortedByFunction((it) => it.sortIndex);
+      ..sortedByProperty((it) => it.sortIndex);
     return minds.toList();
   }
 

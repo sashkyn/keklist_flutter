@@ -86,15 +86,6 @@ final class MindEnterSearchText extends MindEvent {
 
 final class MindStopSearch extends MindEvent {}
 
-final class MindChangeCreateText extends MindEvent {
-  final String text;
-
-  MindChangeCreateText({required this.text});
-
-  @override
-  List<Object?> get props => [text];
-}
-
 final class MindDeleteAllMinds extends MindEvent {}
 
 final class MindClearCache extends MindEvent {}

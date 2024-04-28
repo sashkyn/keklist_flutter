@@ -54,9 +54,6 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
 
   bool get _isOfflineMode => _settingsDataState?.settings.isOfflineMode ?? false;
 
-  // NOTE: Состояние CreateMarkBar с вводом текста.
-  final TextEditingController _createMarkEditingController = TextEditingController(text: null);
-
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
   bool get _isSearching => _searchingMindState != null && _searchingMindState!.enabled;
@@ -78,13 +75,6 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
       _searchTextController.addListener(() {
         sendEventTo<MindBloc>(
           MindEnterSearchText(text: _searchTextController.text),
-        );
-      });
-
-      // NOTE: Слежение за полем ввода в создании нового майнда при изменении его значения.
-      _createMarkEditingController.addListener(() {
-        sendEventTo<MindBloc>(
-          MindChangeCreateText(text: _createMarkEditingController.text),
         );
       });
 
