@@ -20,6 +20,9 @@ final class SettingsObject extends HiveObject {
   @HiveField(4, defaultValue: null)
   late String? openAIKey = '';
 
+  @HiveField(5, defaultValue: true)
+  late bool shouldShowTitles;
+
   SettingsObject();
 
   KeklistSettings toSettings() => KeklistSettings(
@@ -27,6 +30,7 @@ final class SettingsObject extends HiveObject {
         previousAppVersion: previousAppVersion,
         isOfflineMode: isOfflineMode,
         openAIKey: openAIKey,
+        shouldShowTitles: shouldShowTitles,
         isDarkMode: isDarkMode,
       );
 }

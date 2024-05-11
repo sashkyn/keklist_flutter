@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 
 class MindRowWidget extends StatelessWidget {
-  final List<Mind> minds;
+  final Iterable<Mind> minds;
 
   const MindRowWidget({super.key, required this.minds});
 

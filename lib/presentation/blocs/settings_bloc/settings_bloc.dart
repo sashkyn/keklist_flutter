@@ -34,13 +34,7 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
           SettingsDataState(
             isLoggedIn: authService.currentUser != null,
             offlineMinds: const [],
-            settings: KeklistSettings(
-              isMindContentVisible: true,
-              previousAppVersion: null,
-              isOfflineMode: false,
-              isDarkMode: true,
-              openAIKey: null,
-            ),
+            settings: KeklistSettings.initial(),
           ),
         ) {
     on<SettingsExportAllMindsToCSV>(_shareCSVFileWithMinds);
@@ -54,6 +48,7 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     on<SettingsLogout>(_logout);
     on<SettingsGetMindCandidatesToUpload>(_getMindUploadCandidates);
     on<SettingsUploadMindCandidates>(_uploadMindCandidates);
+    on<SettingsUpdateShouldShowTitlesMode>(_updateShouldShowTitlesMode);
 
     repository.stream.listen((settings) => add(SettingsGet())).disposed(by: this);
     authService.currentUserStream.listen((_) => add(SettingsGet())).disposed(by: this);
@@ -175,5 +170,10 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     });
     emit(SettingsUploadOfflineMindsCompletedState());
     emit(SettingsLoadingState(false));
+  }
+
+  FutureOr<void> _updateShouldShowTitlesMode(
+      SettingsUpdateShouldShowTitlesMode event, Emitter<SettingsState> emit) async {
+    await repository.updateShouldShowTitles(event.value);
   }
 }

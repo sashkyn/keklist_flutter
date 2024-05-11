@@ -28,6 +28,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
   bool _isDarkMode = false;
+  bool _showTitles = true;
   int _cachedMindCountToUpload = 0;
   bool _clearCacheVisible = true;
   String _openAiKey = '';
@@ -45,6 +46,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             _offlineMode = state.settings.isOfflineMode;
             _isDarkMode = state.settings.isDarkMode;
             _openAiKey = state.settings.openAIKey ?? '';
+            _showTitles = state.settings.shouldShowTitles;
           });
           break;
         case SettingsLoadingState state:
@@ -144,6 +146,12 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
                 title: const Text('Dark mode'),
                 onToggle: (bool value) => _switchDarkMode(value),
               ),
+              SettingsTile.switchTile(
+                initialValue: _showTitles,
+                leading: const Icon(Icons.title, color: Colors.grey),
+                title: const Text('Show day dividers'),
+                onToggle: (bool value) => _switchShowTitles(value),
+              ),
             ],
           ),
           SettingsSection(
@@ -153,9 +161,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
                 initialValue: _offlineMode,
                 leading: const Icon(Icons.cloud_off, color: Colors.grey),
                 title: const Text('Offline mode'),
-                onToggle: (bool value) async {
-                  await _switchOfflineMode(value);
-                },
+                onToggle: (bool value) => _switchOfflineMode(value),
               ),
               if (_cachedMindCountToUpload > 0 && !_offlineMode && _isLoggedIn) ...{
                 SettingsTile(
@@ -313,12 +319,16 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
     }
   }
 
-  Future<void> _switchOfflineMode(bool value) async {
+  void _switchOfflineMode(bool value) {
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
   }
 
-  Future<void> _switchDarkMode(bool value) async {
+  void _switchDarkMode(bool value) {
     sendEventTo<SettingsBloc>(SettingsChangeIsDarkMode(isDarkMode: value));
+  }
+
+  void _switchShowTitles(bool value) {
+    sendEventTo<SettingsBloc>(SettingsUpdateShouldShowTitlesMode(value: value));
   }
 
   void _showWhatsNew() {

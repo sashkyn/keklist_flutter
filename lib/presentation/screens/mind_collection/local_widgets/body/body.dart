@@ -5,10 +5,11 @@ class _Body extends StatelessWidget {
   final List<Mind> searchResults;
   final VoidCallback hideKeyboard;
   final Function(int) onTapToDay;
-  final Map<int, List<Mind>> mindsByDayIndex;
+  final Map<int, Iterable<Mind>> mindsByDayIndex;
   final ItemScrollController itemScrollController;
   final ItemPositionsListener itemPositionsListener;
   final Function getNowDayIndex;
+  final bool shouldShowTitles;
 
   const _Body({
     required this.isSearching,
@@ -19,21 +20,17 @@ class _Body extends StatelessWidget {
     required this.itemPositionsListener,
     required this.getNowDayIndex,
     required this.mindsByDayIndex,
+    required this.shouldShowTitles,
   });
 
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
+  static final DateFormat _yearTitleFormatter = DateFormat.y();
+  static final DateFormat _monthTitleFormatter = DateFormat.MMMM().addPattern('').addPattern('yy', '');
 
   @override
   Widget build(BuildContext context) {
     return BoolWidget(
       condition: !isSearching,
-      falseChild: MindSearchResultListWidget(
-        results: searchResults,
-        onTapToMind: (mind) => () {
-          hideKeyboard();
-          onTapToDay(mind.dayIndex);
-        },
-      ),
       trueChild: GestureDetector(
         onPanDown: (_) => hideKeyboard(),
         child: ScrollablePositionedList.builder(
@@ -42,29 +39,58 @@ class _Body extends StatelessWidget {
           itemScrollController: itemScrollController,
           itemPositionsListener: itemPositionsListener,
           itemBuilder: (_, int dayIndex) {
-            final List<Mind> minds = mindsByDayIndex[dayIndex]?.sortedBySortIndex() ?? [];
-            // final List<Mind> minds = List.generate(
-            //   Random().nextInt(50) + 1,
-            //   (index) {
-            //     final String randomEmoji = KeklistConstants.demoModeEmojiList[index];
-            //     return Mind(
-            //       emoji: randomEmoji,
-            //       creationDate: DateTime.now(),
-            //       note: '',
-            //       dayIndex: 0,
-            //       id: const Uuid().v4(),
-            //       sortIndex: 0,
-            //       rootId: null,
-            //     );
-            //   },
-            // ).toList();
+            final Iterable<Mind> minds = mindsByDayIndex[dayIndex]?.sortedBySortIndex() ?? [];
             final bool isToday = dayIndex == getNowDayIndex();
+            final DateTime currentDayDateIndex = MindUtils.getDateFromIndex(dayIndex);
+            final DateTime previousDayDateIndex = currentDayDateIndex.subtract(const Duration(days: 1));
+            final String currentDayYearTitle = _yearTitleFormatter.format(currentDayDateIndex);
+            final String previousDayYearTitle = _yearTitleFormatter.format(previousDayDateIndex);
+            final String currentDayMonthTitle = _monthTitleFormatter.format(currentDayDateIndex);
+            final String previousDayMonthTitle = _monthTitleFormatter.format(previousDayDateIndex);
+            final int currentDayWeekNumber = _getWeekNumber(currentDayDateIndex);
+            final int previousDayWeekNumber = _getWeekNumber(previousDayDateIndex);
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 18.0),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: BoolWidget(
+                    condition: shouldShowTitles,
+                    trueChild: Column(
+                      children: [
+                        BoolWidget(
+                          condition: currentDayYearTitle != previousDayYearTitle,
+                          trueChild: Text(
+                            currentDayYearTitle,
+                            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                          ),
+                          falseChild: const SizedBox.shrink(),
+                        ),
+                        BoolWidget(
+                          condition: currentDayMonthTitle != previousDayMonthTitle,
+                          trueChild: Text(
+                            currentDayMonthTitle,
+                            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                          ),
+                          falseChild: const SizedBox.shrink(),
+                        ),
+                        BoolWidget(
+                          condition: currentDayWeekNumber != previousDayWeekNumber,
+                          trueChild: Text(
+                            'Week ${_getWeekNumber(currentDayDateIndex)}',
+                            style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                          ),
+                          falseChild: const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                    falseChild: const SizedBox.shrink(),
+                  ),
+                ),
                 Text(
-                  _formatter.format(MindUtils.getDateFromIndex(dayIndex)),
+                  _formatter.format(currentDayDateIndex),
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
                 ),
                 const SizedBox(height: 4.0),
@@ -92,6 +118,21 @@ class _Body extends StatelessWidget {
           },
         ),
       ),
+      falseChild: MindSearchResultListWidget(
+        results: searchResults,
+        onTapToMind: (mind) => () {
+          hideKeyboard();
+          onTapToDay(mind.dayIndex);
+        },
+      ),
     );
+  }
+
+  int _getWeekNumber(DateTime date) {
+    final DateTime firstDayOfYear = DateTime(date.year, 1, 1);
+    final int dayOfYear = date.difference(firstDayOfYear).inDays;
+    final int weekdayOfFirstDay = firstDayOfYear.weekday;
+    final int weekNumber = ((dayOfYear + weekdayOfFirstDay) / 7).ceil();
+    return weekNumber;
   }
 }
