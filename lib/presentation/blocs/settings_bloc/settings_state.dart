@@ -7,7 +7,11 @@ final class SettingsDataState extends SettingsState {
   final Iterable<Mind> offlineMinds;
   final KeklistSettings settings;
 
-  SettingsDataState({required this.settings, required this.isLoggedIn, required this.offlineMinds});
+  SettingsDataState({
+    required this.settings,
+    required this.isLoggedIn,
+    required this.offlineMinds,
+  });
 }
 
 final class SettingsNeedToShowWhatsNew extends SettingsState {}

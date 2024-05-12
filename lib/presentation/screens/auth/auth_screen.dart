@@ -44,6 +44,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
   }
 
   void _dismiss() {
+    cancelSubscriptions();
     Navigator.of(context).pop();
   }
 
@@ -84,7 +85,7 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
-                onPressed: () async {
+                onPressed: () {
                   if (_loginTextEditingController.text == KeklistConstants.demoAccountEmail) {
                     _displayTextInputDialog(
                       context,

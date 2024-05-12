@@ -81,11 +81,13 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
 
   FutureOr _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
     final Iterable<Mind> offlineMinds = await mindRepository.obtainNotUploadedToServerMinds();
-    emit(SettingsDataState(
-      offlineMinds: offlineMinds,
-      settings: repository.value,
-      isLoggedIn: authService.currentUser != null,
-    ));
+    emit(
+      SettingsDataState(
+        offlineMinds: offlineMinds,
+        settings: repository.value,
+        isLoggedIn: authService.currentUser != null,
+      ),
+    );
   }
 
   FutureOr<void> _disableShowingWhatsNewUntillNewVersion(
