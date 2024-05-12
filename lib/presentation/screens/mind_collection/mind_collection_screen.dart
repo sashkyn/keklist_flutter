@@ -241,6 +241,9 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
   }
 
   void _jumpToNow() {
+    if (_isDemoMode) {
+      return;
+    }
     _itemScrollController.jumpTo(index: _getNowDayIndex());
   }
 
