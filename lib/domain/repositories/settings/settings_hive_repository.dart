@@ -20,9 +20,9 @@ final class SettingsHiveRepository implements SettingsRepository {
     _behaviorSubject.addStream(
       _hiveBox
           .watch()
-          .where((_) => _settingsObject?.toSettings() != null)
+          .whereNotNull()
           .map((_) => _settingsObject!.toSettings())
-          .debounceTime(const Duration(milliseconds: 100)),
+          .debounceTime(const Duration(milliseconds: 10)),
     );
   }
 
@@ -70,5 +70,12 @@ final class SettingsHiveRepository implements SettingsRepository {
   @override
   FutureOr<void> updateSettings(KeklistSettings settings) async {
     await _hiveBox.put(HiveConstants.settingsGlobalSettingsIndex, settings.toObject());
+  }
+
+  @override
+  FutureOr<void> updateShouldShowTitles(bool shouldShowTitles) async {
+    final SettingsObject? settingsObject = _hiveBox.get(HiveConstants.settingsGlobalSettingsIndex);
+    settingsObject?.shouldShowTitles = shouldShowTitles;
+    await settingsObject?.save();
   }
 }

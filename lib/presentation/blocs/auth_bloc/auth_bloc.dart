@@ -108,7 +108,7 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   //     throw 'Google: No ID Token found.';
   //   }
 
-  //   return client.auth.signInWithIdToken(
+  //   return Supabase.instance.client.auth.signInWithIdToken(
   //     provider: OAuthProvider.google,
   //     idToken: idToken,
   //     accessToken: googleAuth.accessToken,

@@ -5,6 +5,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/widgets.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/screens/insights/insights_screen.dart';
@@ -46,13 +47,14 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
 
   Iterable<Mind> _minds = [];
-  Map<int, List<Mind>> _mindsByDayIndex = {};
+  Map<int, Iterable<Mind>> _mindsByDayIndex = {};
   SettingsDataState? _settingsDataState;
   MindSearching? _searchingMindState;
 
   bool _isDemoMode = false;
 
   bool get _isOfflineMode => _settingsDataState?.settings.isOfflineMode ?? false;
+  bool get _shouldShowTitles => _settingsDataState?.settings.shouldShowTitles ?? true;
 
   // NOTE: Состояние SearchBar.
   final TextEditingController _searchTextController = TextEditingController(text: null);
@@ -156,13 +158,6 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
   }
 
   @override
-  void dispose() {
-    cancelSubscriptions();
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
@@ -204,6 +199,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
           itemScrollController: _itemScrollController,
           itemPositionsListener: _itemPositionsListener,
           getNowDayIndex: _getNowDayIndex,
+          shouldShowTitles: _shouldShowTitles,
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -245,6 +241,9 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
   }
 
   void _jumpToNow() {
+    if (_isDemoMode) {
+      return;
+    }
     _itemScrollController.jumpTo(index: _getNowDayIndex());
   }
 

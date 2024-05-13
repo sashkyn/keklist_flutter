@@ -44,4 +44,10 @@ final class SettingsGetMindCandidatesToUpload extends SettingsEvent {}
 
 final class SettingsUploadMindCandidates extends SettingsEvent {}
 
+final class SettingsUpdateShouldShowTitlesMode extends SettingsEvent {
+  final bool value;
+
+  const SettingsUpdateShouldShowTitlesMode({required this.value});
+}
+
 final class SettingsGetAuthState extends SettingsEvent {}
