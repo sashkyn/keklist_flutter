@@ -8,16 +8,6 @@ abstract class MindEvent with EquatableMixin {
 
 final class MindGetList extends MindEvent {}
 
-final class MindGetPeriodedList extends MindEvent {
-  final int startDayIndex;
-  final int endDayIndex;
-
-  MindGetPeriodedList({
-    required this.startDayIndex,
-    required this.endDayIndex,
-  });
-}
-
 final class MindCreate extends MindEvent {
   final int dayIndex;
   final String note;

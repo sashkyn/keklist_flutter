@@ -17,7 +17,7 @@ import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;
-  final List<Mind> allMinds;
+  final Iterable<Mind> allMinds;
 
   const MindInfoScreen({
     super.key,
@@ -40,7 +40,7 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
         (element) => element.id == widget.rootMind.id,
         orElse: () => widget.rootMind,
       );
-  List<Mind> get _allMinds => widget.allMinds;
+  late final List<Mind> _allMinds = widget.allMinds.toList();
 
   List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
       .sortedByProperty((mind) => mind.creationDate);
@@ -85,23 +85,25 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       ),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.only(bottom: 150.0),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MindMessageWidget(
-                      mind: _rootMind,
-                      children: _rootMindChildren,
-                      onRootOptions: null,
-                      onChildOptions: (Mind mind) => _showActions(mind: mind),
+          Scrollbar(
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.only(bottom: 150.0),
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MindMessageWidget(
+                        mind: _rootMind,
+                        children: _rootMindChildren,
+                        onRootOptions: null,
+                        onChildOptions: (Mind mind) => _showActions(mind: mind),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

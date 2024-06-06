@@ -109,12 +109,3 @@ final class MindCandidatesForUpload extends MindState with EquatableMixin {
   @override
   List<Object?> get props => [values];
 }
-
-final class MindPeriodedList extends MindState with EquatableMixin {
-  final Iterable<Mind> values;
-
-  MindPeriodedList({required this.values});
-
-  @override
-  List<Object?> get props => [values];
-}

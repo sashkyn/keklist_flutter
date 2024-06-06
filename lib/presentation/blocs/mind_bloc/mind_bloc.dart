@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 //import 'package:home_widget/home_widget.dart';
-import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
-import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';

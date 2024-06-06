@@ -125,7 +125,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         enableFeedback: true,
       ),
       appBar: AppBar(
-        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(dayIndex))),
+        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex))),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),
@@ -209,7 +209,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
       value: [
-        MindUtils.getDateFromIndex(this.dayIndex),
+        MindUtils.getDateFromDayIndex(this.dayIndex),
       ],
       config: CalendarDatePicker2WithActionButtonsConfig(firstDayOfWeek: 1),
       dialogSize: const Size(325, 400),
@@ -226,11 +226,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   }
 
   void _showMindInfo(Mind mind) {
-    if (mountedContext == null) {
-      return;
-    }
-
-    Navigator.of(mountedContext!).push(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MindInfoScreen(
           rootMind: mind,
