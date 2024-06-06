@@ -11,7 +11,7 @@ environment:
 dependencies:
   adaptive_dialog: ^2.0.0
   bloc: ^8.1.1
-  blur: ^3.1.0
+  blur: ^4.0.0
   calendar_date_picker2: ^1.0.2
   collection: ^1.17.0
   cross_file: ^0.3.3+4
@@ -36,7 +36,7 @@ dependencies:
   form_field_validator: ^1.1.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  intl: ^0.18.1
+  intl: ^0.19.0
   modal_bottom_sheet: ^3.0.0-pre
   package_info_plus: ^8.0.0
   path_provider: ^2.0.12
@@ -51,13 +51,12 @@ dependencies:
   uuid: ^4.2.1
   webview_flutter: ^4.1.0
   gap: ^3.0.1
-  #home_widget: ^0.5.0
+  home_widget: ^0.6.0
   workmanager: ^0.5.2
   flutter_dotenv: ^5.1.0
   flutter_staggered_grid_view: ^0.7.0
   sign_in_with_apple: ^6.0.0
   crypto: ^3.0.3
-  google_sign_in: ^6.2.1
   dart_openai: ^5.1.0
   bottom_sheet: ^4.0.0
   action_sheet: ^1.0.4
