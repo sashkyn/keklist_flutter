@@ -182,7 +182,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 isUpdating: _updating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
-                onCalendar: () => _showActions(),
+                onCalendar: () => _showCalendarActions(),
                 onSettings: () => _showSettings(),
                 onInsights: () => _showInsights(),
               )),
@@ -336,7 +336,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     );
   }
 
-  void _showActions() {
+  void _showCalendarActions() {
     showBarModalBottomSheet(
       context: context,
       builder: (context) => ActionsScreen(
