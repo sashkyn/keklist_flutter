@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:home_widget/home_widget.dart';
+//import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
@@ -346,24 +346,24 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
   }
 
   Future<void> _updateMobileWidgets(MindUpdateMobileWidgets event, Emitter<MindState> emit) async {
-    if (DeviceUtils.safeGetPlatform() != SupportedPlatform.iOS) {
-      return;
-    }
-    final Iterable<Mind> todayMinds =
-        await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex());
+    // if (DeviceUtils.safeGetPlatform() != SupportedPlatform.iOS) {
+    //   return;
+    // }
+    // final Iterable<Mind> todayMinds =
+    //     await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex());
 
-    final List<String> todayMindJSONList = todayMinds
-        .map(
-          (mind) => json.encode(
-            mind,
-            toEncodable: (i) => mind.toShortJson(),
-          ),
-        )
-        .toList();
-    await HomeWidget.saveWidgetData(
-      'mind_today_widget_today_minds',
-      todayMindJSONList,
-    );
-    await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
+    // final List<String> todayMindJSONList = todayMinds
+    //     .map(
+    //       (mind) => json.encode(
+    //         mind,
+    //         toEncodable: (i) => mind.toShortJson(),
+    //       ),
+    //     )
+    //     .toList();
+    // await HomeWidget.saveWidgetData(
+    //   'mind_today_widget_today_minds',
+    //   todayMindJSONList,
+    // );
+    // await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
   }
 }
