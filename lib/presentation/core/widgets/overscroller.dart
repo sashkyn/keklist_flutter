@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 final class Overscroller extends StatefulWidget {
   final Widget child;
@@ -10,11 +10,11 @@ final class Overscroller extends StatefulWidget {
 
   const Overscroller({
     super.key,
-    required this.childScrollController,
     this.onOverscrollTopPointerUp,
     this.onOverscrollBottomPointerUp,
     this.onOverscrollTop,
     this.onOverscrollBottom,
+    required this.childScrollController,
     required this.child,
   });
 
@@ -38,12 +38,25 @@ final class _OverscrollerState extends State<Overscroller> {
   bool get _isOverscrolledBottom =>
       _scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150;
 
+  // final double _overscrollWidgetOffset = 32.0;
+  // late double _topWidgetY = -_overscrollWidgetOffset;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // _scrollController.addListener(() {
+    //   setState(() {
+    //     _topWidgetY = -_scrollController.position.pixels - _overscrollWidgetOffset;
+    //   });
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Listener(
-          onPointerDown: (_) {},
           onPointerUp: (_) {
             if (_isOverscrolledTop) {
               widget.onOverscrollTopPointerUp?.call();
@@ -66,6 +79,15 @@ final class _OverscrollerState extends State<Overscroller> {
           },
           child: widget.child,
         ),
+        // Positioned(
+        //   top: _topWidgetY,
+        //   child: const Row(
+        //     children: [
+        //       Icon(Icons.arrow_upward),
+        //       Text('Go to previous day'),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
