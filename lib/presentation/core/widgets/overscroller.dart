@@ -69,13 +69,13 @@ final class _OverscrollerState extends State<Overscroller> {
           },
           onPointerMove: (event) {
             if (_isOverscrolledBottom) {
-              _overscrollTop();
+              _overscrollBottom();
             } else if (_isBeginOverscrollBottom) {
               _overscrollCalled = false;
             }
 
             if (_isOverscrolledTop) {
-              _overscrollBottom();
+              _overscrollTop();
             } else if (_isBeginOverscrollTop) {
               _overscrollCalled = false;
             }
