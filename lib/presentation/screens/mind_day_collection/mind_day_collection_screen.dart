@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:intl/intl.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
@@ -137,23 +138,23 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         ],
       ),
       body: OverscrollListener(
-        onOverscrollTopPointerUp: () => _switchToDayIndex(dayIndex - 1),
-        onOverscrollBottomPointerUp: () => _switchToDayIndex(dayIndex + 1),
+        onOverscrollTopPointerUp: () => _switchToDayIndexWithScrollToTop(dayIndex - 1),
+        onOverscrollBottomPointerUp: () => _switchToDayIndexWithScrollToBottom(dayIndex + 1),
         onOverscrollTop: () => _vibrate(),
         onOverscrollBottom: () => _vibrate(),
         overscrollTargetOffset: 150.0,
         scrollBottomOffset: 150.0,
         childScrollController: _scrollController,
-        topOverscrollChild: const Column(
+        topOverscrollChild: Column(
           children: [
-            Icon(Icons.arrow_upward),
-            Text('Go to previous day'),
+            Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex - 1))),
+            const Icon(Icons.arrow_upward),
           ],
         ),
-        bottomOverscrollChild: const Column(
+        bottomOverscrollChild: Column(
           children: [
-            Text('Go to next day'),
-            Icon(Icons.arrow_downward),
+            const Icon(Icons.arrow_downward),
+            Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex + 1))),
           ],
         ),
         child: SingleChildScrollView(
@@ -221,6 +222,30 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
 
   void _switchToDayIndex(int dayIndex) {
     _scrollController.jumpTo(0);
+    setState(() {
+      this.dayIndex = dayIndex;
+    });
+  }
+
+  void _switchToDayIndexWithScrollToTop(int dayIndex) {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+    setState(() {
+      this.dayIndex = dayIndex;
+    });
+  }
+
+  void _switchToDayIndexWithScrollToBottom(int dayIndex) {
+    _scrollController.jumpTo(0);
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
     setState(() {
       this.dayIndex = dayIndex;
     });
