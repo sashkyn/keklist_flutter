@@ -7,6 +7,7 @@ final class Overscroller extends StatefulWidget {
   final Function? onOverscrollBottomPointerUp;
   final Function? onOverscrollTop;
   final Function? onOverscrollBottom;
+  final double overscrollOffset;
 
   const Overscroller({
     super.key,
@@ -14,6 +15,7 @@ final class Overscroller extends StatefulWidget {
     this.onOverscrollBottomPointerUp,
     this.onOverscrollTop,
     this.onOverscrollBottom,
+    this.overscrollOffset = 150.0,
     required this.childScrollController,
     required this.child,
   });
@@ -27,16 +29,17 @@ final class _OverscrollerState extends State<Overscroller> {
 
   bool _overscrollCalled = false;
 
-  bool get _isBeginOverscrollTop => _scrollController.position.pixels > -150 && _scrollController.position.pixels < 0;
+  bool get _isBeginOverscrollTop =>
+      _scrollController.position.pixels > -widget.overscrollOffset && _scrollController.position.pixels < 0;
 
   bool get _isBeginOverscrollBottom =>
-      _scrollController.position.pixels < _scrollController.position.maxScrollExtent + 150 &&
+      _scrollController.position.pixels < _scrollController.position.maxScrollExtent + widget.overscrollOffset &&
       _scrollController.position.pixels > 0;
 
-  bool get _isOverscrolledTop => _scrollController.position.pixels < -150;
+  bool get _isOverscrolledTop => _scrollController.position.pixels < -widget.overscrollOffset;
 
   bool get _isOverscrolledBottom =>
-      _scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150;
+      _scrollController.position.pixels >= _scrollController.position.maxScrollExtent + widget.overscrollOffset;
 
   // final double _overscrollWidgetOffset = 32.0;
   // late double _topWidgetY = -_overscrollWidgetOffset;

@@ -141,6 +141,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         onOverscrollBottomPointerUp: () => _switchToDayIndex(dayIndex + 1),
         onOverscrollTop: () => _vibrate(),
         onOverscrollBottom: () => _vibrate(),
+        overscrollOffset: 150.0,
         childScrollController: _scrollController,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

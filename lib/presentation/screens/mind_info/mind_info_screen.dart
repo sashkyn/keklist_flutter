@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/core/widgets/overscroller.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -71,9 +73,12 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
     })?.disposed(by: this);
   }
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
@@ -85,9 +90,15 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       ),
       body: Stack(
         children: [
-          Scrollbar(
+          Overscroller(
+            overscrollOffset: 150.0,
+            onOverscrollBottomPointerUp: () => _mindCreatorFocusNode.requestFocus(),
+            onOverscrollBottom: () => Haptics.vibrate(HapticsType.heavy),
+            childScrollController: _scrollController,
             child: SingleChildScrollView(
+              controller: _scrollController,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 150.0),
               child: SafeArea(
                 child: Column(
