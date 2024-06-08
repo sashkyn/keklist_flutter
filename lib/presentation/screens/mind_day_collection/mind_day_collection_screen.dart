@@ -143,6 +143,18 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         onOverscrollBottom: () => _vibrate(),
         overscrollOffset: 150.0,
         childScrollController: _scrollController,
+        topOverscrollChild: const Row(
+          children: [
+            Icon(Icons.arrow_upward),
+            Text('Go to previous day'),
+          ],
+        ),
+        bottomOverscrollChild: const Row(
+          children: [
+            Icon(Icons.arrow_downward),
+            Text('Go to next day'),
+          ],
+        ),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _scrollController,
