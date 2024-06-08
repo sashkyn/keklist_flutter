@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
-import 'package:keklist/presentation/core/widgets/overscroller.dart';
+import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -136,7 +136,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           ),
         ],
       ),
-      body: Overscroller(
+      body: OverscrollListener(
         onOverscrollTopPointerUp: () => _switchToDayIndex(dayIndex - 1),
         onOverscrollBottomPointerUp: () => _switchToDayIndex(dayIndex + 1),
         onOverscrollTop: () => _vibrate(),

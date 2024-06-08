@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final class Overscroller extends StatefulWidget {
+final class OverscrollListener extends StatefulWidget {
   final Widget child;
   final ScrollController childScrollController;
   final Function? onOverscrollTopPointerUp;
@@ -9,7 +9,7 @@ final class Overscroller extends StatefulWidget {
   final Function? onOverscrollBottom;
   final double overscrollOffset;
 
-  const Overscroller({
+  const OverscrollListener({
     super.key,
     this.onOverscrollTopPointerUp,
     this.onOverscrollBottomPointerUp,
@@ -21,10 +21,10 @@ final class Overscroller extends StatefulWidget {
   });
 
   @override
-  State<Overscroller> createState() => _OverscrollerState();
+  State<OverscrollListener> createState() => _OverscrollListenerState();
 }
 
-final class _OverscrollerState extends State<Overscroller> {
+final class _OverscrollListenerState extends State<OverscrollListener> {
   ScrollController get _scrollController => widget.childScrollController;
 
   bool _overscrollCalled = false;
