@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
@@ -95,6 +96,13 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
             onOverscrollBottomPointerUp: () => _mindCreatorFocusNode.requestFocus(),
             onOverscrollBottom: () => Haptics.vibrate(HapticsType.heavy),
             childScrollController: _scrollController,
+            bottomOverscrollChild: const Row(
+              children: [
+                Icon(Icons.arrow_upward),
+                SizedBox(width: 8.0),
+                Icon(Icons.keyboard_alt_outlined),
+              ],
+            ),
             child: SingleChildScrollView(
               controller: _scrollController,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

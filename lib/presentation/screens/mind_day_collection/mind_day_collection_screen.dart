@@ -228,10 +228,10 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   }
 
   void _switchToDayIndexWithScrollToTop(int dayIndex) {
-    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent + 500.0);
     _scrollController.animateTo(
       0,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
     );
     setState(() {
@@ -240,10 +240,10 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   }
 
   void _switchToDayIndexWithScrollToBottom(int dayIndex) {
-    _scrollController.jumpTo(0);
+    _scrollController.jumpTo(-500);
     _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 200),
+      0,
+      duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
     );
     setState(() {
