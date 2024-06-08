@@ -10,7 +10,7 @@ final class OverscrollListener extends StatefulWidget {
   final Function? onOverscrollBottomPointerUp;
   final Function? onOverscrollTop;
   final Function? onOverscrollBottom;
-  final double overscrollOffset;
+  final double overscrollTargetOffset;
   final double scrollBottomOffset;
 
   const OverscrollListener({
@@ -19,7 +19,7 @@ final class OverscrollListener extends StatefulWidget {
     this.onOverscrollBottomPointerUp,
     this.onOverscrollTop,
     this.onOverscrollBottom,
-    this.overscrollOffset = 150.0,
+    this.overscrollTargetOffset = 150.0,
     this.scrollBottomOffset = 150.0,
     required this.childScrollController,
     required this.child,
@@ -44,18 +44,18 @@ final class _OverscrollListenerState extends State<OverscrollListener> {
   bool _overscrollCalled = false;
 
   bool get _isBeginOverscrollTop =>
-      (_scrollPosition?.pixels ?? 0.0) > -widget.overscrollOffset && (_scrollPosition?.pixels ?? 0.0) < 0;
+      (_scrollPosition?.pixels ?? 0.0) > -widget.overscrollTargetOffset && (_scrollPosition?.pixels ?? 0.0) < 0;
 
   bool get _isBeginOverscrollBottom =>
-      (_scrollPosition?.pixels ?? 0.0) < (_scrollPosition?.maxScrollExtent ?? 0.0) + widget.overscrollOffset &&
+      (_scrollPosition?.pixels ?? 0.0) < (_scrollPosition?.maxScrollExtent ?? 0.0) + widget.overscrollTargetOffset &&
       (_scrollPosition?.pixels ?? 0.0) > 0.0;
 
-  bool get _isOverscrolledTop => (_scrollPosition?.pixels ?? 0.0) < -widget.overscrollOffset;
+  bool get _isOverscrolledTop => (_scrollPosition?.pixels ?? 0.0) < -widget.overscrollTargetOffset;
 
   bool get _isOverscrolledBottom =>
-      (_scrollPosition?.pixels ?? 0.0) >= (_scrollPosition?.maxScrollExtent ?? 0.0) + widget.overscrollOffset;
+      (_scrollPosition?.pixels ?? 0.0) >= (_scrollPosition?.maxScrollExtent ?? 0.0) + widget.overscrollTargetOffset;
 
-  final double _overscrollWidgetOffset = 24.0;
+  final double _overscrollWidgetOffset = 40.0;
   late double _topWidgetY = -_overscrollWidgetOffset;
   late double _bottomWidgetY = 0.0;
 
@@ -72,10 +72,9 @@ final class _OverscrollListenerState extends State<OverscrollListener> {
             }
             if (widget.bottomOverscrollChild != null) {
               _bottomWidgetY = (_scrollPosition?.pixels ?? 0.0) -
-                  (_scrollPosition?.maxScrollExtent ?? 0.0) -
-                  _overscrollWidgetOffset +
-                  widget.scrollBottomOffset +
-                  24.0;
+                  (_scrollPosition?.maxScrollExtent ?? 0.0) +
+                  widget.scrollBottomOffset -
+                  _overscrollWidgetOffset;
             }
           });
         },

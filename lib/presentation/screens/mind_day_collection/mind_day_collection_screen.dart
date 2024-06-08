@@ -141,18 +141,19 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         onOverscrollBottomPointerUp: () => _switchToDayIndex(dayIndex + 1),
         onOverscrollTop: () => _vibrate(),
         onOverscrollBottom: () => _vibrate(),
-        overscrollOffset: 150.0,
+        overscrollTargetOffset: 150.0,
+        scrollBottomOffset: 150.0,
         childScrollController: _scrollController,
-        topOverscrollChild: const Row(
+        topOverscrollChild: const Column(
           children: [
             Icon(Icons.arrow_upward),
             Text('Go to previous day'),
           ],
         ),
-        bottomOverscrollChild: const Row(
+        bottomOverscrollChild: const Column(
           children: [
-            Icon(Icons.arrow_downward),
             Text('Go to next day'),
+            Icon(Icons.arrow_downward),
           ],
         ),
         child: SingleChildScrollView(

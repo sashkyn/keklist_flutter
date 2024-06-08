@@ -91,7 +91,7 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       body: Stack(
         children: [
           OverscrollListener(
-            overscrollOffset: 150.0,
+            overscrollTargetOffset: 150.0,
             onOverscrollBottomPointerUp: () => _mindCreatorFocusNode.requestFocus(),
             onOverscrollBottom: () => Haptics.vibrate(HapticsType.heavy),
             childScrollController: _scrollController,
