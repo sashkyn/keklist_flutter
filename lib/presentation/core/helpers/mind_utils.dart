@@ -8,7 +8,7 @@ class MindUtils {
 
   static int getTodayIndex() => MindUtils.getDayIndex(from: DateTime.now());
 
-  static DateTime getDateFromIndex(int index) => DateTime.fromMillisecondsSinceEpoch(millisecondsInDay * index);
+  static DateTime getDateFromDayIndex(int dayIndex) => DateTime.fromMillisecondsSinceEpoch(millisecondsInDay * dayIndex);
 
   static List<Mind> findMindsByDayIndex({
     required int dayIndex,

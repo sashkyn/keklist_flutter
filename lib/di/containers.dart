@@ -28,7 +28,8 @@ final class MainContainer {
     if (DeviceUtils.safeGetPlatform() == SupportedPlatform.iOS) {
       injector.map<WatchCommunicationManager>(
         (injector) => (AppleWatchCommunicationManager(
-          mainService: injector.get<MindService>(),
+          mindService: injector.get<MindService>(),
+          mindRepository: injector.get<MindRepository>(),
           client: Supabase.instance.client,
         )),
         isSingleton: true,

@@ -17,6 +17,8 @@ sealed class ActionModel {
   factory ActionModel.delete() => const DeleteMenuActionModel();
   factory ActionModel.share() => const ShareMenuActionModel();
   factory ActionModel.switchDay() => const SwitchDayMenuActionModel();
+  factory ActionModel.showDigestForPeriod() => const ShowDigestForPeriodActionModel();
+  factory ActionModel.goToDate() => const GoToDateMenuActionModel();
   factory ActionModel.showAll() => const ShowAllMenuActionModel();
 }
 
@@ -81,6 +83,22 @@ final class SwitchDayMenuActionModel extends ActionModel {
       : super(
           title: 'Switch day',
           icon: const Icon(Icons.calendar_today),
+        );
+}
+
+final class GoToDateMenuActionModel extends ActionModel {
+  const GoToDateMenuActionModel()
+      : super(
+          title: 'Go to date',
+          icon: const Icon(Icons.calendar_today),
+        );
+}
+
+final class ShowDigestForPeriodActionModel extends ActionModel {
+  const ShowDigestForPeriodActionModel()
+      : super(
+          title: 'Show digest for period',
+          icon: const Icon(Icons.filter_center_focus),
         );
 }
 

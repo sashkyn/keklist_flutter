@@ -85,7 +85,7 @@ final class MindServerOperationStarted extends MindState with EquatableMixin {
   bool? get stringify => true;
 }
 
-class MindOperationCompleted extends MindState with EquatableMixin {
+final class MindOperationCompleted extends MindState with EquatableMixin {
   final Iterable<Mind> minds;
   final MindOperationType type;
 

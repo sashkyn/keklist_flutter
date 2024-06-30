@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -17,7 +20,7 @@ import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;
-  final List<Mind> allMinds;
+  final Iterable<Mind> allMinds;
 
   const MindInfoScreen({
     super.key,
@@ -40,7 +43,7 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
         (element) => element.id == widget.rootMind.id,
         orElse: () => widget.rootMind,
       );
-  List<Mind> get _allMinds => widget.allMinds;
+  late final List<Mind> _allMinds = widget.allMinds.toList();
 
   List<Mind> get _rootMindChildren => MindUtils.findMindsByRootId(rootId: _rootMind.id, allMinds: widget.allMinds)
       .sortedByProperty((mind) => mind.creationDate);
@@ -71,9 +74,12 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
     })?.disposed(by: this);
   }
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
@@ -85,23 +91,38 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       ),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.only(bottom: 150.0),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MindMessageWidget(
-                      mind: _rootMind,
-                      children: _rootMindChildren,
-                      onRootOptions: null,
-                      onChildOptions: (Mind mind) => _showActions(mind: mind),
+          OverscrollListener(
+            overscrollTargetOffset: 150.0,
+            onOverscrollBottomPointerUp: () => _mindCreatorFocusNode.requestFocus(),
+            onOverscrollBottom: () => Haptics.vibrate(HapticsType.heavy),
+            childScrollController: _scrollController,
+            bottomOverscrollChild: const Row(
+              children: [
+                Icon(Icons.arrow_upward),
+                SizedBox(width: 8.0),
+                Icon(Icons.keyboard_alt_outlined),
+              ],
+            ),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 150.0),
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MindMessageWidget(
+                        mind: _rootMind,
+                        children: _rootMindChildren,
+                        onRootOptions: null,
+                        onChildOptions: (Mind mind) => _showActions(mind: mind),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

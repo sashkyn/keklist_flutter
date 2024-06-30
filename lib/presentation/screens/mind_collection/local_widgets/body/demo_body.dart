@@ -64,7 +64,7 @@ class _DemoBodyState extends State<_DemoBody> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 18.0),
-              Text(_DemoBody._formatter.format(MindUtils.getDateFromIndex(dayIndex))),
+              Text(_DemoBody._formatter.format(MindUtils.getDateFromDayIndex(dayIndex))),
               const SizedBox(height: 4.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
