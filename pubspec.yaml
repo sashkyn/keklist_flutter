@@ -63,6 +63,7 @@ dependencies:
   haptic_feedback: ^0.5.1+1
   provider: ^6.1.2
   collection: ^1.18.0
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

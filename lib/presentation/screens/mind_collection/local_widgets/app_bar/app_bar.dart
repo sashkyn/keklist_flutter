@@ -39,7 +39,7 @@ final class _AppBar extends StatelessWidget {
                 falseChild: BoolWidget(
                   condition: isOfflineMode,
                   trueChild: const Icon(Icons.cloud_off),
-                  falseChild: const Icon(Icons.cloud),
+                  falseChild: const Icon(Icons.cloud_done_outlined),
                 ),
               ),
             ),
