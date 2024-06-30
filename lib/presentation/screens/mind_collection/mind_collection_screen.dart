@@ -5,6 +5,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
@@ -175,12 +176,16 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 onSearchCancel: () => _cancelSearch(),
               ),
               falseChild: _AppBar(
+                isOfflineMode: _isOfflineMode,
                 isUpdating: _updating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () async => await _showDateSwitcher(),
                 onSettings: () => _showSettings(),
                 onInsights: () => _showInsights(),
+                onOfflineMode: () {
+                  print('heheh');
+                },
               )),
         ),
       ),

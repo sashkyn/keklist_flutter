@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-// TODO: добавить обработку ошибок
-
-class WebPageScreen extends StatefulWidget {
+final class WebPageScreen extends StatefulWidget {
   final String title;
   final Uri initialUri;
 

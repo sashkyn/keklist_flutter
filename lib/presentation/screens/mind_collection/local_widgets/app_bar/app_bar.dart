@@ -2,11 +2,13 @@ part of '../../mind_collection_screen.dart';
 
 final class _AppBar extends StatelessWidget {
   final bool isUpdating;
+  final bool isOfflineMode;
   final VoidCallback onSearch;
   final VoidCallback onTitle;
   final VoidCallback onCalendar;
   final VoidCallback onSettings;
   final VoidCallback onInsights;
+  final VoidCallback onOfflineMode;
 
   const _AppBar({
     required this.isUpdating,
@@ -15,6 +17,8 @@ final class _AppBar extends StatelessWidget {
     required this.onCalendar,
     required this.onSettings,
     required this.onInsights,
+    required this.isOfflineMode,
+    required this.onOfflineMode,
   });
 
   @override
@@ -27,16 +31,19 @@ final class _AppBar extends StatelessWidget {
         onTap: onTitle,
         child: Row(
           children: [
-            const Text('Your minds'),
-            BoolWidget(
+            IconButton(
+              onPressed: onOfflineMode,
+              icon: BoolWidget(
                 condition: isUpdating,
-                trueChild: const Row(
-                  children: [
-                    SizedBox(width: 4),
-                    CircularProgressIndicator.adaptive(),
-                  ],
+                trueChild: const CupertinoActivityIndicator(),
+                falseChild: BoolWidget(
+                  condition: isOfflineMode,
+                  trueChild: const Icon(Icons.cloud_off),
+                  falseChild: const Icon(Icons.cloud),
                 ),
-                falseChild: const SizedBox.shrink())
+              ),
+            ),
+            const Text('Notes'),
           ],
         ),
       ),
