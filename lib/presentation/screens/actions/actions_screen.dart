@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 
-class ActionsScreen extends StatelessWidget {
-  final List<(ActionModel, Function())> actions;
-  const ActionsScreen({super.key, required this.actions});
+final class ActionsScreen extends StatelessWidget {
+  final List<(ActionModel, FutureOr<void> Function())> actions;
+
+  const ActionsScreen({
+    super.key,
+    required this.actions,
+  });
 
   @override
   Widget build(BuildContext context) {

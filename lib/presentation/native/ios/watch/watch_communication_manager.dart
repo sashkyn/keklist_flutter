@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/services.dart';
+import 'package:keklist/domain/repositories/mind/mind_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:keklist/presentation/core/enum_from_string.dart';
@@ -17,14 +18,16 @@ abstract class WatchCommunicationManager {
   void connect() {}
 }
 
-class AppleWatchCommunicationManager implements WatchCommunicationManager {
+final class AppleWatchCommunicationManager implements WatchCommunicationManager {
   final MethodChannel _channel = const MethodChannel('com.sashkyn.kekable');
 
-  final MindService mainService;
+  final MindService mindService;
+  final MindRepository mindRepository;
   final SupabaseClient client;
 
   AppleWatchCommunicationManager({
-    required this.mainService,
+    required this.mindService,
+    required this.mindRepository,
     required this.client,
   });
 
@@ -90,8 +93,8 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
     required String emoji,
   }) async {
     final int dayIndex = MindUtils.getDayIndex(from: DateTime.now());
-    final Iterable<Mind> mindList = await mainService.getMindList();
-    final int sortIndex = mindList.where((element) => element.dayIndex == dayIndex).length;
+    final Iterable<Mind> mindList = await mindRepository.obtainMindsWhere((element) => element.dayIndex == dayIndex);
+    final int sortIndex = mindList.length;
 
     final Mind mind = Mind(
       id: const Uuid().v4(),
@@ -102,7 +105,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
       sortIndex: sortIndex,
       rootId: null,
     );
-    await mainService.createMind(mind);
+    await mindService.createMind(mind);
     final String mindJSON = json.encode(
       mind,
       toEncodable: (_) => mind.toShortJson(),
@@ -116,8 +119,9 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _showMindList() async {
-    final Iterable<Mind> mindList = await mainService.getMindList();
-    final List<Mind> todayMindList = MindUtils.findTodayMinds(allMinds: mindList.toList());
+    final Iterable<Mind> mindList =
+        await mindRepository.obtainMindsWhere((element) => element.dayIndex == MindUtils.getTodayIndex());
+    final Iterable<Mind> todayMindList = MindUtils.findTodayMinds(allMinds: mindList.toList());
     final List<String> mindJSONList = todayMindList
         .map(
           (mind) => json.encode(
@@ -135,7 +139,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _removeMindFromToday({required String id}) async {
-    await mainService.deleteMind(id);
+    await mindService.deleteMind(id);
     return _sendToWatch(
       outputMethod: WatchOutputMethod.mindDidDeleted,
       arguments: {},
@@ -143,7 +147,7 @@ class AppleWatchCommunicationManager implements WatchCommunicationManager {
   }
 
   Future<void> _showPredictedEmojies({required String mindText}) async {
-    final Iterable<Mind> minds = await mainService.getMindList();
+    final Iterable<Mind> minds = await mindRepository.obtainMinds();
     List<String> predictedEmojies = minds
         .map((mind) => mind.emoji)
         .toList()

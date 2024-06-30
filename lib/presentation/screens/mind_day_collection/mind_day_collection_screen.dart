@@ -3,6 +3,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:intl/intl.dart';
+import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -56,18 +58,6 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
 
   bool _isMindContentVisible = false;
   Mind? _editableMind;
-  bool _overscrollVibrationWorked = false;
-
-  bool get _isBeginOverscrollTop => _scrollController.position.pixels > -150 && _scrollController.position.pixels < 0;
-
-  bool get _isBeginOverscrollBottom =>
-      _scrollController.position.pixels < _scrollController.position.maxScrollExtent + 150 &&
-      _scrollController.position.pixels > 0;
-
-  bool get _isOverscrolledTop => _scrollController.position.pixels < -150;
-
-  bool get _isOverscrolledBottom =>
-      _scrollController.position.pixels >= _scrollController.position.maxScrollExtent + 150;
 
   _MindDayCollectionScreenState({
     required this.dayIndex,
@@ -125,7 +115,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         enableFeedback: true,
       ),
       appBar: AppBar(
-        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromIndex(dayIndex))),
+        title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex))),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),
@@ -147,44 +137,38 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Listener(
-            onPointerDown: (_) {},
-            onPointerUp: (_) {
-              if (_isOverscrolledTop) {
-                _switchToDayIndex(dayIndex - 1);
-              } else if (_isOverscrolledBottom) {
-                _switchToDayIndex(dayIndex + 1);
-              }
-            },
-            onPointerMove: (event) {
-              if (_isOverscrolledBottom) {
-                _vibrateOnOverscroll();
-              } else if (_isBeginOverscrollBottom) {
-                _overscrollVibrationWorked = false;
-              }
-
-              if (_isOverscrolledTop) {
-                _vibrateOnOverscroll();
-              } else if (_isBeginOverscrollTop) {
-                _overscrollVibrationWorked = false;
-              }
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 150),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: MindMonologListWidget(
-                minds: _dayMinds,
-                onTap: (Mind mind) => _showMindInfo(mind),
-                onOptions: (Mind mind) => _showActions(context, mind),
-                mindIdsToChildren: _mindIdsToChildren,
-              ),
-            ),
+      body: OverscrollListener(
+        onOverscrollTopPointerUp: () => _switchToDayIndexWithScrollToTop(dayIndex - 1),
+        onOverscrollBottomPointerUp: () => _switchToDayIndexWithScrollToBottom(dayIndex + 1),
+        onOverscrollTop: () => _vibrate(),
+        onOverscrollBottom: () => _vibrate(),
+        overscrollTargetOffset: 150.0,
+        scrollBottomOffset: 150.0,
+        childScrollController: _scrollController,
+        topOverscrollChild: Column(
+          children: [
+            Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex - 1))),
+            const Icon(Icons.arrow_upward),
+          ],
+        ),
+        bottomOverscrollChild: Column(
+          children: [
+            const Icon(Icons.arrow_downward),
+            Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex + 1))),
+          ],
+        ),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _scrollController,
+          padding: const EdgeInsets.only(bottom: 150),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: MindMonologListWidget(
+            minds: _dayMinds,
+            onTap: (Mind mind) => _showMindInfo(mind),
+            onOptions: (Mind mind) => _showActions(context, mind),
+            mindIdsToChildren: _mindIdsToChildren,
           ),
-        ],
+        ),
       ),
     );
   }
@@ -209,7 +193,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
       value: [
-        MindUtils.getDateFromIndex(this.dayIndex),
+        MindUtils.getDateFromDayIndex(this.dayIndex),
       ],
       config: CalendarDatePicker2WithActionButtonsConfig(firstDayOfWeek: 1),
       dialogSize: const Size(325, 400),
@@ -226,11 +210,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
   }
 
   void _showMindInfo(Mind mind) {
-    if (mountedContext == null) {
-      return;
-    }
-
-    Navigator.of(mountedContext!).push(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MindInfoScreen(
           rootMind: mind,
@@ -247,11 +227,31 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     });
   }
 
-  void _vibrateOnOverscroll() {
-    if (_overscrollVibrationWorked) {
-      return;
-    }
-    _overscrollVibrationWorked = true;
+  void _switchToDayIndexWithScrollToTop(int dayIndex) {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent + 500.0);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+    setState(() {
+      this.dayIndex = dayIndex;
+    });
+  }
+
+  void _switchToDayIndexWithScrollToBottom(int dayIndex) {
+    _scrollController.jumpTo(-500);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+    setState(() {
+      this.dayIndex = dayIndex;
+    });
+  }
+
+  void _vibrate() {
     Haptics.vibrate(HapticsType.heavy);
   }
 
@@ -321,32 +321,33 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
 
   void _showMindCreator({String? initialText, String? initialEmoji}) {
     showCupertinoModalBottomSheet(
-        context: context,
-        builder: (_) {
-          return MindCreatorScreen(
-            buttonIcon: initialEmoji == null ? const Icon(Icons.add) : const Icon(Icons.edit),
-            buttonText: initialEmoji == null ? 'Create' : 'Edit',
-            initialEmoji: initialEmoji,
-            initialText: initialText,
-            onDone: (String text, String emoji) {
-              if (_editableMind == null) {
-                final MindCreate event = MindCreate(
-                  dayIndex: dayIndex,
-                  note: text,
-                  emoji: emoji,
-                  rootId: null,
-                );
-                sendEventTo<MindBloc>(event);
-              } else {
-                final Mind mindForEdit = _editableMind!.copyWith(
-                  note: text,
-                  emoji: emoji,
-                );
-                sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
-                _editableMind = null;
-              }
-            },
-          );
-        });
+      context: context,
+      builder: (_) {
+        return MindCreatorScreen(
+          buttonIcon: initialEmoji == null ? const Icon(Icons.add) : const Icon(Icons.edit),
+          buttonText: initialEmoji == null ? 'Create' : 'Edit',
+          initialEmoji: initialEmoji,
+          initialText: initialText,
+          onDone: (String text, String emoji) {
+            if (_editableMind == null) {
+              final MindCreate event = MindCreate(
+                dayIndex: dayIndex,
+                note: text,
+                emoji: emoji,
+                rootId: null,
+              );
+              sendEventTo<MindBloc>(event);
+            } else {
+              final Mind mindForEdit = _editableMind!.copyWith(
+                note: text,
+                emoji: emoji,
+              );
+              sendEventTo<MindBloc>(MindEdit(mind: mindForEdit));
+              _editableMind = null;
+            }
+          },
+        );
+      },
+    );
   }
 }

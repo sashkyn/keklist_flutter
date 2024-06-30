@@ -14,7 +14,7 @@ import 'package:keklist/domain/services/entities/mind.dart';
 
 final class MindChatDiscussionScreen extends StatefulWidget {
   final Mind rootMind;
-  final List<Mind> allMinds;
+  final Iterable<Mind> allMinds;
 
   const MindChatDiscussionScreen({
     super.key,

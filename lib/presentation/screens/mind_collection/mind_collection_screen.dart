@@ -5,13 +5,17 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/widgets.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
+import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/screens/actions/action_model.dart';
+import 'package:keklist/presentation/screens/actions/actions_screen.dart';
+import 'package:keklist/presentation/screens/digest/mind_universal_list_screen.dart';
 import 'package:keklist/presentation/screens/insights/insights_screen.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
+import 'package:keklist/presentation/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/presentation/screens/settings/settings_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
@@ -178,7 +182,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 isUpdating: _updating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
-                onCalendar: () async => await _showDateSwitcher(),
+                onCalendar: () => _showCalendarActions(),
                 onSettings: () => _showSettings(),
                 onInsights: () => _showInsights(),
               )),
@@ -296,6 +300,54 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     _scrollToDayIndex(dayIndex);
   }
 
+  Future<void> _showDatePeriod() async {
+    final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
+      context: context,
+      value: [],
+      config: CalendarDatePicker2WithActionButtonsConfig(
+        firstDayOfWeek: 1,
+        calendarType: CalendarDatePicker2Type.range,
+      ),
+      dialogSize: const Size(325, 400),
+      borderRadius: BorderRadius.circular(15),
+    );
+
+    if (dates == null || dates.length < 2) {
+      return;
+    }
+
+    final int startDayIndex = MindUtils.getDayIndex(from: dates[0]!);
+    final int endDayIndex = MindUtils.getDayIndex(from: dates[1]!);
+
+    if (mountedContext == null) {
+      return;
+    }
+
+    Navigator.push(
+      mountedContext!,
+      MaterialPageRoute(
+        builder: (context) => MindUniversalListScreen(
+          allMinds: _minds,
+          filter: (mind) => mind.dayIndex >= startDayIndex && mind.dayIndex <= endDayIndex,
+          title: 'Digest',
+          onSelectMind: (mind) => _showMindInfo(mind),
+        ),
+      ),
+    );
+  }
+
+  void _showCalendarActions() {
+    showBarModalBottomSheet(
+      context: context,
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.goToDate(), () => _showDateSwitcher()),
+          (ActionModel.showDigestForPeriod(), () => _showDatePeriod()),
+        ],
+      ),
+    );
+  }
+
   void _showSettings() {
     Navigator.push(
       context,
@@ -333,5 +385,16 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
         initialError: state,
       );
     }
+  }
+
+  void _showMindInfo(Mind mind) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MindInfoScreen(
+          rootMind: mind,
+          allMinds: _minds,
+        ),
+      ),
+    );
   }
 }

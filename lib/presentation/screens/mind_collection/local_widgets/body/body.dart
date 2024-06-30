@@ -41,7 +41,7 @@ class _Body extends StatelessWidget {
           itemBuilder: (_, int dayIndex) {
             final Iterable<Mind> minds = mindsByDayIndex[dayIndex]?.sortedBySortIndex() ?? [];
             final bool isToday = dayIndex == getNowDayIndex();
-            final DateTime currentDayDateIndex = MindUtils.getDateFromIndex(dayIndex);
+            final DateTime currentDayDateIndex = MindUtils.getDateFromDayIndex(dayIndex);
             final DateTime previousDayDateIndex = currentDayDateIndex.subtract(const Duration(days: 1));
             final String currentDayYearTitle = _yearTitleFormatter.format(currentDayDateIndex);
             final String previousDayYearTitle = _yearTitleFormatter.format(previousDayDateIndex);

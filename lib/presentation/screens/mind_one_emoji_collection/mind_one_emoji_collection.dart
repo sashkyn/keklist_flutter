@@ -263,7 +263,7 @@ final class _MindOneEmojiCollectionScreenState extends State<MindOneEmojiCollect
     final List<DateTime?>? dates = await showCalendarDatePicker2Dialog(
       context: context,
       value: [
-        MindUtils.getDateFromIndex(MindUtils.getTodayIndex()),
+        MindUtils.getDateFromDayIndex(MindUtils.getTodayIndex()),
       ],
       config: CalendarDatePicker2WithActionButtonsConfig(firstDayOfWeek: 1),
       dialogSize: const Size(325, 400),
