@@ -337,6 +337,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
             allMinds: _minds,
             filterFunction: filterFunction,
             title: 'Digest (${_minds.where(filterFunction).length} minds)',
+            emptyStateMessage: 'No minds in selected period',
             onSelectMind: (mind) => _showMindInfo(mind),
           );
         },
