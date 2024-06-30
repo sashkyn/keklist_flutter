@@ -3,11 +3,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
-import 'package:intl/intl.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
+import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_creator_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
@@ -158,15 +158,18 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           ],
         ),
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: FlutterConstants.mobileOverscrollPhysics,
           controller: _scrollController,
-          padding: const EdgeInsets.only(bottom: 150),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: MindMonologListWidget(
-            minds: _dayMinds,
-            onTap: (Mind mind) => _showMindInfo(mind),
-            onOptions: (Mind mind) => _showActions(context, mind),
-            mindIdsToChildren: _mindIdsToChildren,
+          padding: const EdgeInsets.only(bottom: 150), // FAB offset.
+          child: BoolWidget(
+            condition: _dayMinds.isNotEmpty,
+            trueChild: MindMonologListWidget(
+              minds: _dayMinds,
+              onTap: (Mind mind) => _showMindInfo(mind),
+              onOptions: (Mind mind) => _showActions(context, mind),
+              mindIdsToChildren: _mindIdsToChildren,
+            ),
+            falseChild: MindCollectionEmptyDayWidget.noMinds(text: 'No minds for current day'),
           ),
         ),
       ),

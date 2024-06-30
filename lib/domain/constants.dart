@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
@@ -47,6 +48,11 @@ class DateFormatters {
 class PlatformConstants {
   static String iosGroupId = 'group.kekable';
   static String iosMindDayWidgetName = 'MindDayWidget';
+}
+
+class FlutterConstants {
+  static ScrollPhysics mobileOverscrollPhysics =
+      const BouncingScrollPhysics().applyTo(const AlwaysScrollableScrollPhysics());
 }
 
 enum SupportedPlatform { iOS, android, web }

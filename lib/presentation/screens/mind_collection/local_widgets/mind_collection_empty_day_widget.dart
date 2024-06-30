@@ -43,6 +43,7 @@ final class MindCollectionEmptyDayWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: [
         const SizedBox(height: 16.0),
         MindWidget.sized(

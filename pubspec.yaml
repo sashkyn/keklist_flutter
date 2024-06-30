@@ -45,7 +45,7 @@ dependencies:
   settings_ui: ^2.0.2
   share_plus: ^9.0.0
   supabase_flutter: ^2.0.1
-  syncfusion_flutter_charts: ^25.1.37
+  syncfusion_flutter_charts: ^26.1.39
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
   uuid: ^4.2.1
@@ -60,7 +60,7 @@ dependencies:
   dart_openai: ^5.1.0
   bottom_sheet: ^4.0.0
   action_sheet: ^1.0.4
-  haptic_feedback: ^0.4.2
+  haptic_feedback: ^0.5.1+1
   provider: ^6.1.2
   collection: ^1.18.0
 
