@@ -13,7 +13,6 @@ dependencies:
   bloc: ^8.1.1
   blur: ^4.0.0
   calendar_date_picker2: ^1.0.2
-  #collection: ^1.17.0
   cross_file: ^0.3.3+4
   csv: ^6.0.0
   cupertino_icons: ^1.0.5
