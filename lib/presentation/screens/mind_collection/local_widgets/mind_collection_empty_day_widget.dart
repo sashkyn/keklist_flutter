@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:keklist/presentation/core/widgets/mind_widget.dart';
 
-class MindCollectionEmptyDayWidget extends StatelessWidget {
+final class MindCollectionEmptyDayWidget extends StatelessWidget {
   final String emoji;
   final String text;
 

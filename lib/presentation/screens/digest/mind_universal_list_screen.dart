@@ -9,17 +9,21 @@ import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 
+// TODO: Empty state
+
 final class MindUniversalListScreen extends StatefulWidget {
   final String title;
-  final bool Function(Mind) filter;
+  final String emptyStateMessage;
+  final bool Function(Mind) filterFunction;
   final Iterable<Mind> allMinds;
   final Function? onSelectMind;
 
   const MindUniversalListScreen({
     super.key,
     required this.allMinds,
-    required this.filter,
+    required this.filterFunction,
     this.title = "Minds",
+    this.emptyStateMessage = "No minds",
     this.onSelectMind,
   });
 
@@ -40,7 +44,7 @@ final class _MindUniversalListScreenState extends KekWidgetState<MindUniversalLi
     _allMinds.addAll(widget.allMinds);
     _filteredMinds.addAll(
       widget.allMinds
-          .where(widget.filter)
+          .where(widget.filterFunction)
           .where((element) => element.rootId == null)
           .sortedByProperty((mind) => mind.dayIndex)
           .toList(
@@ -76,9 +80,15 @@ final class _MindUniversalListScreenState extends KekWidgetState<MindUniversalLi
                 children: [
                   BoolWidget(
                     condition: shouldShowTitle,
-                    trueChild: Text(
-                      title,
-                      style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                    trueChild: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     falseChild: const SizedBox.shrink(),
                   ),

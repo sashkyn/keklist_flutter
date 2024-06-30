@@ -331,12 +331,15 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     Navigator.push(
       mountedContext!,
       MaterialPageRoute(
-        builder: (context) => MindUniversalListScreen(
-          allMinds: _minds,
-          filter: (mind) => mind.dayIndex >= startDayIndex && mind.dayIndex <= endDayIndex,
-          title: 'Digest',
-          onSelectMind: (mind) => _showMindInfo(mind),
-        ),
+        builder: (context) {
+          bool filterFunction(mind) => mind.dayIndex >= startDayIndex && mind.dayIndex <= endDayIndex;
+          return MindUniversalListScreen(
+            allMinds: _minds,
+            filterFunction: filterFunction,
+            title: 'Digest (${_minds.where(filterFunction).length} minds)',
+            onSelectMind: (mind) => _showMindInfo(mind),
+          );
+        },
       ),
     );
   }
