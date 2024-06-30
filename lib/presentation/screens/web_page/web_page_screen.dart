@@ -40,6 +40,7 @@ class _WebPageScreenState extends State<WebPageScreen> {
         falseChild: WebViewWidget(
           controller: WebViewController()
             ..loadRequest(widget.initialUri)
+            ..setJavaScriptMode(JavaScriptMode.unrestricted)
             ..setNavigationDelegate(
               NavigationDelegate(
                 onPageFinished: (uri) {

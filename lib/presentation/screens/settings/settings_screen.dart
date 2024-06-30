@@ -193,6 +193,13 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             title: Text('About'.toUpperCase()),
             tiles: [
               SettingsTile.navigation(
+                title: const Text('Suggest a feature'),
+                leading: const Icon(Icons.handyman, color: Colors.yellow),
+                onPressed: (BuildContext context) {
+                  _openFeatureSuggestion();
+                },
+              ),
+              SettingsTile.navigation(
                 title: const Text('Whats new?'),
                 leading: const Icon(Icons.new_releases, color: Colors.purple),
                 onPressed: (BuildContext context) {
@@ -261,6 +268,13 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
 
   Future<void> _openSourceCode() async {
     final Uri uri = Uri.parse(KeklistConstants.sourceCodeURL);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _openFeatureSuggestion() async {
+    final Uri uri = Uri.parse(KeklistConstants.featureSuggestionURL);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
