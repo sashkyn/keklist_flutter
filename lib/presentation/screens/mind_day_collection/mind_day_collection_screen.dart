@@ -9,6 +9,7 @@ import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_creator_screen.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
@@ -183,9 +184,42 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     super.dispose();
   }
 
-  void _changeContentVisibility() {
+  Future<void> _changeContentVisibility() async {
     HapticFeedback.mediumImpact();
-    sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible));
+    if (!_isMindContentVisible) {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+      if (canAuthenticate) {
+        try {
+          final bool didAuthenticate = await auth.authenticate(
+              localizedReason: 'Please authenticate to show account balance',
+              options: const AuthenticationOptions(useErrorDialogs: false));
+          if (didAuthenticate) {
+            setState(() {
+              sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: true));
+            });
+          }
+        } on PlatformException catch (e) {
+          print(e);
+          // if (e.code == auth_error.notAvailable) {
+          //   // Add handling of no hardware here.
+          // } else if (e.code == auth_error.notEnrolled) {
+          //   // ...
+          // } else {
+          //   // ...
+          // }
+        }
+      } else {
+        setState(() {
+          sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: true));
+        });
+      }
+    } else {
+      setState(() {
+        sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: false));
+      });
+    }
   }
 
   void _handleError(MindOperationError error) {

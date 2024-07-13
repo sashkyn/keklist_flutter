@@ -63,6 +63,7 @@ dependencies:
   provider: ^6.1.2
   collection: ^1.18.0
   google_sign_in: ^6.2.1
+  local_auth: ^2.2.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

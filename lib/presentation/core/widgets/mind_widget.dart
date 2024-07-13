@@ -8,7 +8,7 @@ enum MindSize {
   large,
 }
 
-class MindWidget extends StatelessWidget {
+final class MindWidget extends StatelessWidget {
   final String item;
   final String? badge;
   final bool isHighlighted;

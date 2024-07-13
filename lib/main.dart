@@ -33,6 +33,14 @@ import 'presentation/native/ios/watch/watch_communication_manager.dart';
 
 // TODO: fix or exclude home_widget for android only
 
+final class PrivacySettings {
+  static final PrivacySettings _instance = PrivacySettings();
+
+  bool isTextHidden = false;
+
+  factory PrivacySettings() => _instance;
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -85,10 +93,10 @@ void _connectToWatchCommunicationManager(Injector mainInjector) {
 }
 
 Widget _getApplication(Injector mainInjector) => MultiProvider(
-  providers: [
-    RepositoryProvider(create: (context) => mainInjector.get<MindRepository>()),
-  ],
-  child: MultiBlocProvider(
+      providers: [
+        RepositoryProvider(create: (context) => mainInjector.get<MindRepository>()),
+      ],
+      child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => MindBloc(
@@ -116,7 +124,7 @@ Widget _getApplication(Injector mainInjector) => MultiProvider(
         ],
         child: const KeklistApp(),
       ),
-);
+    );
 
 void _initNativeWidgets() {
   //HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
