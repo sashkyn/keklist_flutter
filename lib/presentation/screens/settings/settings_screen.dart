@@ -8,7 +8,6 @@ import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/helpers/bloc_utils.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
-import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/auth/auth_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -28,7 +27,7 @@ final class SettingsScreen extends StatefulWidget {
 final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
-  bool _isSensitiveContentShowed = false;
+  //bool _isSensitiveContentShowed = false;
   bool _isDarkMode = false;
   bool _showTitles = true;
   int _cachedMindCountToUpload = 0;
@@ -46,7 +45,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             _isLoggedIn = state.isLoggedIn;
             _cachedMindCountToUpload = state.offlineMinds.length;
             _offlineMode = state.settings.isOfflineMode;
-            _isSensitiveContentShowed = state.settings.isMindContentVisible;
+            // _isSensitiveContentShowed = state.settings.isMindContentVisible;
             _isDarkMode = state.settings.isDarkMode;
             _openAiKey = state.settings.openAIKey ?? '';
             _showTitles = state.settings.shouldShowTitles;
