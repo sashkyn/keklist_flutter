@@ -1,6 +1,6 @@
 part of '../../mind_collection_screen.dart';
 
-final class _AppBar extends StatelessWidget {
+final class _MindCollectionAppBar extends StatelessWidget {
   final bool isUpdating;
   final bool isOfflineMode;
   final VoidCallback onSearch;
@@ -10,7 +10,7 @@ final class _AppBar extends StatelessWidget {
   final VoidCallback onInsights;
   final VoidCallback onOfflineMode;
 
-  const _AppBar({
+  const _MindCollectionAppBar({
     required this.isUpdating,
     required this.onSearch,
     required this.onTitle,
@@ -64,9 +64,14 @@ final class _AppBar extends StatelessWidget {
         icon: const Icon(Icons.calendar_month),
         onPressed: onCalendar,
       ),
-      IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: onSearch,
+      SensitiveWidget(
+        mode: SensitiveMode.blurred,
+        child: IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            !SensitiveWidget.isProtected ? onSearch() : null;
+          },
+        ),
       ),
     ];
   }

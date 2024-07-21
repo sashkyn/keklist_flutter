@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/digest/mind_universal_list_screen.dart';
@@ -16,7 +17,6 @@ import 'package:keklist/presentation/screens/insights/insights_screen.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_row_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
-import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:keklist/presentation/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/presentation/screens/settings/settings_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
@@ -37,9 +37,9 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:uuid/uuid.dart';
 part 'local_widgets/search_app_bar/search_app_bar.dart';
-part 'local_widgets/app_bar/app_bar.dart';
-part 'local_widgets/body/body.dart';
-part 'local_widgets/body/demo_body.dart';
+part 'local_widgets/app_bar/mind_collection_app_bar.dart';
+part 'local_widgets/body/mind_collection_body.dart';
+part 'local_widgets/body/mind_collection_demo_body.dart';
 
 final class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
@@ -180,7 +180,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 }),
                 onSearchCancel: () => _cancelSearch(),
               ),
-              falseChild: _AppBar(
+              falseChild: _MindCollectionAppBar(
                 isOfflineMode: _isOfflineMode,
                 isUpdating: _updating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
@@ -196,8 +196,8 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
       ),
       body: BoolWidget(
         condition: _isDemoMode,
-        trueChild: _DemoBody(),
-        falseChild: _Body(
+        trueChild: _MindCollectionDemoBody(),
+        falseChild: _MindCollectionBody(
           mindsByDayIndex: _mindsByDayIndex,
           isSearching: _isSearching,
           searchResults: _searchResults,

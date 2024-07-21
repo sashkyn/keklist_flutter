@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -103,17 +104,20 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        onPressed: () => _showMindCreator(),
-        label: const Text(
-          'Create',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.w500,
+      floatingActionButton: SensitiveWidget(
+        mode: SensitiveMode.blurredAndNonTappable,
+        child: FloatingActionButton.extended(
+          icon: const Icon(Icons.add),
+          onPressed: () => _showMindCreator(),
+          label: const Text(
+            'Create',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          enableFeedback: true,
         ),
-        enableFeedback: true,
       ),
       appBar: AppBar(
         title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex))),

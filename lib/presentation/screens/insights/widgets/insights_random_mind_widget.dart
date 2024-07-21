@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 
 // TODO: добавить дату
 // TODO: возможность перехода на источник
@@ -70,10 +71,12 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
                         style: Theme.of(context).textTheme.displayLarge,
                       ),
                       const SizedBox(height: 8.0),
-                      Text(
-                        randomMind.note,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
+                      SensitiveWidget(
+                        child: Text(
+                          randomMind.note,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ],
                   ),

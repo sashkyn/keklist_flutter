@@ -10,8 +10,6 @@ import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/domain/services/auth/kek_user.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
-import 'package:keklist/presentation/core/widgets/mind_widget.dart';
-import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
@@ -83,7 +81,6 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
 
   FutureOr _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
     final Iterable<Mind> offlineMinds = await mindRepository.obtainNotUploadedToServerMinds();
-    MindMessageWidget.isBlurred = !repository.value.isMindContentVisible;
     emit(
       SettingsDataState(
         offlineMinds: offlineMinds,
@@ -107,7 +104,6 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     SettingsChangeMindContentVisibility event,
     Emitter<SettingsState> emit,
   ) async {
-    MindMessageWidget.isBlurred = event.isVisible;
     await repository.updateMindContentVisibility(event.isVisible);
   }
 

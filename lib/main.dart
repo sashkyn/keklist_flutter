@@ -33,14 +33,6 @@ import 'presentation/native/ios/watch/watch_communication_manager.dart';
 
 // TODO: fix or exclude home_widget for android only
 
-final class PrivacySettings {
-  static final PrivacySettings _instance = PrivacySettings();
-
-  bool isTextHidden = false;
-
-  factory PrivacySettings() => _instance;
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

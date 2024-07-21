@@ -7,6 +7,7 @@ import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 
 // Improvements:
@@ -109,13 +110,15 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                           });
                         },
                         selectedColor: Theme.of(context).colorScheme.primary,
-                        child: Text(
-                          _choices[index].localizedTitle,
-                          style: TextStyle(
-                              fontSize: 14.0,
-                              color: _selectedChoiceIndex == index
-                                  ? Theme.of(context).colorScheme.onPrimary
-                                  : Theme.of(context).colorScheme.primary),
+                        child: SensitiveWidget(
+                          child: Text(
+                            _choices[index].localizedTitle,
+                            style: TextStyle(
+                                fontSize: 14.0,
+                                color: _selectedChoiceIndex == index
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : Theme.of(context).colorScheme.primary),
+                          ),
                         ),
                       ),
                     );
@@ -127,14 +130,16 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
               height: 350,
               child: BoolWidget(
                 condition: pieSections.isNotEmpty,
-                trueChild: PieChart(
-                  PieChartData(
-                    sections: pieSections,
-                    centerSpaceRadius: 0,
-                    sectionsSpace: 0,
-                    startDegreeOffset: 0,
+                trueChild: SensitiveWidget(
+                  child: PieChart(
+                    PieChartData(
+                      sections: pieSections,
+                      centerSpaceRadius: 0,
+                      sectionsSpace: 0,
+                      startDegreeOffset: 0,
+                    ),
+                    swapAnimationCurve: Curves.bounceInOut,
                   ),
-                  swapAnimationCurve: Curves.bounceInOut,
                 ),
                 falseChild: Center(child: MindCollectionEmptyDayWidget.noMinds(text: 'No minds for this period')),
               ),
@@ -154,9 +159,11 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                           });
                         },
                         selectedColor: _colorFromEmoji(entry.key),
-                        child: Text(
-                          entry.key,
-                          style: const TextStyle(fontSize: 24.0),
+                        child: SensitiveWidget(
+                          child: Text(
+                            entry.key,
+                            style: const TextStyle(fontSize: 24.0),
+                          ),
                         ),
                       ),
                     );

@@ -45,9 +45,7 @@ class _InsightsTodayMindsWidgetState extends State<InsightsTodayMindsWidget> {
                   ),
                 ),
               ),
-              MindRowWidget(
-                minds: widget.todayMinds,
-              ),
+              MindRowWidget(minds: widget.todayMinds),
             ],
           ),
         ),

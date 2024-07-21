@@ -1,8 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_list_widget.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/bulleted_list/mind_bullet_widget.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
@@ -13,8 +12,6 @@ final class MindMessageWidget extends StatelessWidget {
   final List<Mind> children;
   final Function(Mind)? onRootOptions;
   final Function(Mind)? onChildOptions;
-
-  static bool isBlurred = true;
 
   const MindMessageWidget({
     super.key,
@@ -44,9 +41,7 @@ final class MindMessageWidget extends StatelessWidget {
                         style: Theme.of(context).textTheme.displayLarge,
                       ),
                       const SizedBox(height: 8.0),
-                      ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        enabled: isBlurred,
+                      SensitiveWidget(
                         child: Text(
                           mind.note,
                           style: Theme.of(context).textTheme.bodyLarge,
@@ -60,9 +55,12 @@ final class MindMessageWidget extends StatelessWidget {
               if (onRootOptions != null) ...{
                 Align(
                   alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () => onRootOptions?.call(mind),
+                  child: SensitiveWidget(
+                    mode: SensitiveMode.blurredAndNonTappable,
+                    child: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () => onRootOptions?.call(mind),
+                    ),
                   ),
                 ),
               },

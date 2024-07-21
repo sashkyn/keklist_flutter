@@ -4,6 +4,7 @@ import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -83,9 +84,12 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
-          IconButton(
-            onPressed: () => _showActions(mind: _rootMind),
-            icon: const Icon(Icons.more_vert),
+          SensitiveWidget(
+            mode: SensitiveMode.blurredAndNonTappable,
+            child: IconButton(
+              onPressed: () => _showActions(mind: _rootMind),
+              icon: const Icon(Icons.more_vert),
+            ),
           )
         ],
       ),

@@ -6,6 +6,7 @@ import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/helpers/bloc_utils.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/main/main_screen.dart';
 
 final class KeklistApp extends StatefulWidget {
@@ -28,7 +29,10 @@ final class KeklistAppState extends KekWidgetState<KeklistApp> {
           if (state.settings.openAIKey != null) {
             OpenAI.apiKey = state.settings.openAIKey!;
           }
-          setState(() => _isDarkMode = state.settings.isDarkMode);
+          setState(() {
+            _isDarkMode = state.settings.isDarkMode;
+            SensitiveWidget.isProtected = !state.settings.isMindContentVisible;
+          });
         }
       },
     )?.disposed(by: this);

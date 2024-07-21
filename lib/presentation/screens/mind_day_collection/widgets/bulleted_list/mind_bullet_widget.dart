@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 
 final class MindBulletWidget extends StatelessWidget {
   final MindBulletModel model;
@@ -27,9 +25,7 @@ final class MindBulletWidget extends StatelessWidget {
             fit: FlexFit.tight,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                enabled: MindMessageWidget.isBlurred,
+              child: SensitiveWidget(
                 child: Text(
                   model.text,
                   maxLines: null,
