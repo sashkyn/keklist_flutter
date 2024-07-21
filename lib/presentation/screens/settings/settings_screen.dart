@@ -28,6 +28,7 @@ final class SettingsScreen extends StatefulWidget {
 final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
+  bool _isSensitiveContentShowed = false;
   bool _isDarkMode = false;
   bool _showTitles = true;
   int _cachedMindCountToUpload = 0;
@@ -45,6 +46,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             _isLoggedIn = state.isLoggedIn;
             _cachedMindCountToUpload = state.offlineMinds.length;
             _offlineMode = state.settings.isOfflineMode;
+            _isSensitiveContentShowed = state.settings.isMindContentVisible;
             _isDarkMode = state.settings.isDarkMode;
             _openAiKey = state.settings.openAIKey ?? '';
             _showTitles = state.settings.shouldShowTitles;
@@ -102,7 +104,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
-                message: '`Your minds were completly deleted from server',
+                message: 'Your minds were completly deleted from server',
               );
           }
       }
@@ -115,146 +117,149 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: SensitiveWidget(
-        mode: SensitiveMode.blurredAndNonTappable,
-        child: SettingsList(
-          sections: [
-            SettingsSection(
-              title: Text('Account'.toUpperCase()),
-              tiles: [
-                if (!_isLoggedIn)
-                  SettingsTile(
-                    title: const Text('Login'),
-                    leading: const Icon(Icons.login),
-                    onPressed: (BuildContext context) {
-                      _showAuthBottomSheet();
-                    },
-                  ),
-                if (_isLoggedIn)
-                  SettingsTile(
-                    title: const Text('Logout'),
-                    leading: const Icon(Icons.logout, color: Colors.red),
-                    onPressed: (BuildContext context) {
-                      sendEventTo<SettingsBloc>(SettingsLogout());
-                    },
-                  ),
-              ],
-            ),
-            SettingsSection(
-              title: Text('Appearance'.toUpperCase()),
-              tiles: [
-                SettingsTile.switchTile(
-                  initialValue: _isDarkMode,
-                  leading: const Icon(Icons.dark_mode, color: Colors.grey),
-                  title: const Text('Dark mode'),
-                  onToggle: (bool value) => _switchDarkMode(value),
+      body: SettingsList(
+        sections: [
+          SettingsSection(
+            title: Text('Account'.toUpperCase()),
+            tiles: [
+              if (!_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Login'),
+                  leading: const Icon(Icons.login),
+                  onPressed: (BuildContext context) {
+                    _showAuthBottomSheet();
+                  },
                 ),
-                SettingsTile.switchTile(
-                  initialValue: _showTitles,
-                  leading: const Icon(Icons.title, color: Colors.grey),
-                  title: const Text('Show day dividers'),
-                  onToggle: (bool value) => _switchShowTitles(value),
+              if (_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Logout'),
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  onPressed: (BuildContext context) {
+                    sendEventTo<SettingsBloc>(SettingsLogout());
+                  },
                 ),
-              ],
-            ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Appearance'.toUpperCase()),
+            tiles: [
+              SettingsTile.switchTile(
+                initialValue: _isDarkMode,
+                leading: const Icon(Icons.dark_mode, color: Colors.grey),
+                title: const Text('Dark mode'),
+                onToggle: (bool value) => _switchDarkMode(value),
+              ),
+              SettingsTile.switchTile(
+                initialValue: _showTitles,
+                leading: const Icon(Icons.title, color: Colors.grey),
+                title: const Text('Show day dividers'),
+                onToggle: (bool value) => _switchShowTitles(value),
+              ),
+              // SettingsTile.switchTile(
+              //   initialValue: !_isSensitiveContentShowed,
+              //   leading: const Icon(Icons.visibility_off, color: Colors.grey),
+              //   title: const Text('Hide sensitive content'),
+              //   onToggle: (bool value) => _switchSensitiveContentVisibility(!value),
+              // ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Data'.toUpperCase()),
+            tiles: [
+              SettingsTile.switchTile(
+                initialValue: _offlineMode,
+                leading: const Icon(Icons.cloud_off, color: Colors.grey),
+                title: const Text('Offline mode'),
+                onToggle: (bool value) => _switchOfflineMode(value),
+              ),
+              if (_cachedMindCountToUpload > 0 && !_offlineMode && _isLoggedIn) ...{
+                SettingsTile(
+                  title: Text('Upload $_cachedMindCountToUpload minds'),
+                  leading: const Icon(Icons.cloud_upload, color: Colors.green),
+                  onPressed: (BuildContext context) {
+                    sendEventTo<SettingsBloc>(SettingsUploadMindCandidates());
+                  },
+                ),
+              },
+              SettingsTile(
+                title: const Text('Setup OpenAI Token'),
+                leading: const Icon(Icons.chat, color: Colors.redAccent),
+                onPressed: (BuildContext context) async {
+                  await _showOpenAITokenChanger();
+                },
+              ),
+              SettingsTile(
+                title: const Text('Export to CSV'),
+                leading: const Icon(Icons.file_download, color: Colors.brown),
+                onPressed: (BuildContext context) {
+                  // TODO: Add loading
+                  sendEventTo<SettingsBloc>(SettingsExportAllMindsToCSV());
+                },
+              ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('About'.toUpperCase()),
+            tiles: [
+              SettingsTile.navigation(
+                title: const Text('Suggest a feature'),
+                leading: const Icon(Icons.handyman, color: Colors.yellow),
+                onPressed: (BuildContext context) {
+                  _openFeatureSuggestion();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Whats new?'),
+                leading: const Icon(Icons.new_releases, color: Colors.purple),
+                onPressed: (BuildContext context) {
+                  _showWhatsNew();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Send feedback'),
+                leading: const Icon(Icons.feedback, color: Colors.blue),
+                onPressed: (BuildContext context) async {
+                  await _sendFeedback();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Source code'),
+                leading: const Icon(Icons.code, color: Colors.grey),
+                onPressed: (BuildContext context) async {
+                  await _openSourceCode();
+                },
+              ),
+            ],
+          ),
+          if (_isLoggedIn || _clearCacheVisible) ...{
             SettingsSection(
-              title: Text('Data'.toUpperCase()),
+              title: Text('Danger zone'.toUpperCase()),
               tiles: [
-                SettingsTile.switchTile(
-                  initialValue: _offlineMode,
-                  leading: const Icon(Icons.cloud_off, color: Colors.grey),
-                  title: const Text('Offline mode'),
-                  onToggle: (bool value) => _switchOfflineMode(value),
-                ),
-                if (_cachedMindCountToUpload > 0 && !_offlineMode && _isLoggedIn) ...{
+                if (_isLoggedIn) ...{
                   SettingsTile(
-                    title: Text('Upload $_cachedMindCountToUpload minds'),
-                    leading: const Icon(Icons.cloud_upload, color: Colors.green),
-                    onPressed: (BuildContext context) {
-                      sendEventTo<SettingsBloc>(SettingsUploadMindCandidates());
-                    },
+                    title: const Text('Delete all data from server'),
+                    leading: const Icon(Icons.delete_forever, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
                   ),
                 },
-                SettingsTile(
-                  title: const Text('Setup OpenAI Token'),
-                  leading: const Icon(Icons.chat, color: Colors.redAccent),
-                  onPressed: (BuildContext context) async {
-                    await _showOpenAITokenChanger();
-                  },
-                ),
-                SettingsTile(
-                  title: const Text('Export to CSV'),
-                  leading: const Icon(Icons.file_download, color: Colors.brown),
-                  onPressed: (BuildContext context) {
-                    // TODO: Add loading
-                    sendEventTo<SettingsBloc>(SettingsExportAllMindsToCSV());
-                  },
-                ),
+                if (_clearCacheVisible) ...{
+                  SettingsTile(
+                    title: const Text('Clear cache'),
+                    leading: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _clearCache(),
+                  )
+                },
+                if (_isLoggedIn) ...{
+                  SettingsTile(
+                    title: const Text('Delete account'),
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: (BuildContext context) async => await _deleteAccount(),
+                  ),
+                },
               ],
-            ),
-            SettingsSection(
-              title: Text('About'.toUpperCase()),
-              tiles: [
-                SettingsTile.navigation(
-                  title: const Text('Suggest a feature'),
-                  leading: const Icon(Icons.handyman, color: Colors.yellow),
-                  onPressed: (BuildContext context) {
-                    _openFeatureSuggestion();
-                  },
-                ),
-                SettingsTile.navigation(
-                  title: const Text('Whats new?'),
-                  leading: const Icon(Icons.new_releases, color: Colors.purple),
-                  onPressed: (BuildContext context) {
-                    _showWhatsNew();
-                  },
-                ),
-                SettingsTile.navigation(
-                  title: const Text('Send feedback'),
-                  leading: const Icon(Icons.feedback, color: Colors.blue),
-                  onPressed: (BuildContext context) async {
-                    await _sendFeedback();
-                  },
-                ),
-                SettingsTile.navigation(
-                  title: const Text('Source code'),
-                  leading: const Icon(Icons.code, color: Colors.grey),
-                  onPressed: (BuildContext context) async {
-                    await _openSourceCode();
-                  },
-                ),
-              ],
-            ),
-            if (_isLoggedIn || _clearCacheVisible) ...{
-              SettingsSection(
-                title: Text('Danger zone'.toUpperCase()),
-                tiles: [
-                  if (_isLoggedIn) ...{
-                    SettingsTile(
-                      title: const Text('Delete all data from server'),
-                      leading: const Icon(Icons.delete_forever, color: Colors.red),
-                      onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
-                    ),
-                  },
-                  if (_clearCacheVisible) ...{
-                    SettingsTile(
-                      title: const Text('Clear cache'),
-                      leading: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: (BuildContext context) async => await _clearCache(),
-                    )
-                  },
-                  if (_isLoggedIn) ...{
-                    SettingsTile(
-                      title: const Text('Delete account'),
-                      leading: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: (BuildContext context) async => await _deleteAccount(),
-                    ),
-                  },
-                ],
-              )
-            },
-          ],
-        ),
+            )
+          },
+        ],
       ),
     );
   }
@@ -339,6 +344,10 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
 
   void _switchOfflineMode(bool value) {
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
+  }
+
+  void _switchSensitiveContentVisibility(bool value) {
+    sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: value));
   }
 
   void _switchDarkMode(bool value) {
