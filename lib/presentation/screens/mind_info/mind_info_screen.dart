@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
@@ -83,9 +84,12 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       appBar: AppBar(
         title: const Text('Mind'),
         actions: [
-          IconButton(
-            onPressed: () => _showActions(mind: _rootMind),
-            icon: const Icon(Icons.more_vert),
+          SensitiveWidget(
+            mode: SensitiveMode.blurredAndNonTappable,
+            child: IconButton(
+              onPressed: () => _showActions(mind: _rootMind),
+              icon: const Icon(Icons.more_vert),
+            ),
           )
         ],
       ),
@@ -93,10 +97,10 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
         children: [
           OverscrollListener(
             overscrollTargetOffset: 150.0,
-            onOverscrollBottomPointerUp: () => _mindCreatorFocusNode.requestFocus(),
-            onOverscrollBottom: () => Haptics.vibrate(HapticsType.heavy),
+            onOverscrollTop: () => Haptics.vibrate(HapticsType.heavy),
+            onOverscrollTopPointerUp: () => _mindCreatorFocusNode.requestFocus(),
             childScrollController: _scrollController,
-            bottomOverscrollChild: const Row(
+            topOverscrollChild: const Row(
               children: [
                 Icon(Icons.arrow_upward),
                 SizedBox(width: 8.0),
@@ -106,7 +110,7 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
             child: SingleChildScrollView(
               controller: _scrollController,
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: FlutterConstants.mobileOverscrollPhysics,
               padding: const EdgeInsets.only(bottom: 150.0),
               child: SafeArea(
                 child: Column(

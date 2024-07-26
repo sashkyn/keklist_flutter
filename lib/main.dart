@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:home_widget/home_widget.dart';
+// import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
@@ -25,7 +25,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keklist/presentation/blocs/mind_bloc/mind_bloc.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
-import 'package:keklist/domain/constants.dart';
 import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/di/containers.dart';
 import 'package:keklist/domain/services/mind_service/main_service.dart';
@@ -86,10 +85,10 @@ void _connectToWatchCommunicationManager(Injector mainInjector) {
 }
 
 Widget _getApplication(Injector mainInjector) => MultiProvider(
-  providers: [
-    RepositoryProvider(create: (context) => mainInjector.get<MindRepository>()),
-  ],
-  child: MultiBlocProvider(
+      providers: [
+        RepositoryProvider(create: (context) => mainInjector.get<MindRepository>()),
+      ],
+      child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (context) => MindBloc(
@@ -117,7 +116,7 @@ Widget _getApplication(Injector mainInjector) => MultiProvider(
         ],
         child: const KeklistApp(),
       ),
-);
+    );
 
 void _initNativeWidgets() {
   //HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);

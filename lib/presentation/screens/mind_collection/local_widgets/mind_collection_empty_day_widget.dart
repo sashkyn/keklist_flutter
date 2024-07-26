@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:keklist/presentation/core/widgets/mind_widget.dart';
 
-class MindCollectionEmptyDayWidget extends StatelessWidget {
+final class MindCollectionEmptyDayWidget extends StatelessWidget {
   final String emoji;
   final String text;
 
@@ -43,6 +43,7 @@ class MindCollectionEmptyDayWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: [
         const SizedBox(height: 16.0),
         MindWidget.sized(

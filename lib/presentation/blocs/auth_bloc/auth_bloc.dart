@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:keklist/domain/services/auth/auth_service.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/domain/limitations.dart';
@@ -95,25 +96,24 @@ final class AuthBloc extends Bloc<AuthEvent, AuthState> with DisposeBag {
   }
 
   /// TODO:
-  /// Add scope only for email
-  /// Wait responce from Google about adding logo
+  /// Wait response from Google about adding logo
   /// Test on iOS, make only for android if needed
-  // Future<AuthResponse> _signInWithGoogle() async {
-  //   final GoogleSignIn googleSignIn = GoogleSignIn();
-  //   final googleUser = await googleSignIn.signIn();
-  //   final googleAuth = await googleUser!.authentication;
-  //   final idToken = googleAuth.idToken;
+  Future<AuthResponse> _signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    final idToken = googleAuth?.idToken;
 
-  //   if (idToken == null) {
-  //     throw 'Google: No ID Token found.';
-  //   }
+    if (idToken == null) {
+      throw 'Google: No ID Token found.';
+    }
 
-  //   return Supabase.instance.client.auth.signInWithIdToken(
-  //     provider: OAuthProvider.google,
-  //     idToken: idToken,
-  //     accessToken: googleAuth.accessToken,
-  //   );
-  // }
+    return Supabase.instance.client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: googleAuth?.accessToken,
+    );
+  }
 
   Future<AuthResponse> _signInWithApple() async {
     final rawNonce = _client.auth.generateRawNonce();

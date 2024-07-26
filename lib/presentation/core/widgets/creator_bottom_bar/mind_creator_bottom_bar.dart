@@ -2,10 +2,11 @@ import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/mind_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 
 // TODO: превратить suggestions в миничипсы и убрать эмодзик слева как нибудь
 
-class MindCreatorBottomBar extends StatefulWidget {
+final class MindCreatorBottomBar extends StatefulWidget {
   final Mind? editableMind;
   final TextEditingController textEditingController;
   final List<String> suggestionMinds;
@@ -57,9 +58,12 @@ class _MindCreatorBottomBarState extends State<MindCreatorBottomBar> {
             if (widget.suggestionMinds.isNotEmpty &&
                 MediaQuery.of(context).orientation != Orientation.landscape &&
                 DeviceUtils.isPhone(context)) ...[
-              _SuggestionsWidget(
-                suggestionMinds: widget.suggestionMinds,
-                onSelectSuggestionEmoji: widget.onTapSuggestionEmoji,
+              SensitiveWidget(
+                mode: SensitiveMode.blurredAndNonTappable,
+                child: _SuggestionsWidget(
+                  suggestionMinds: widget.suggestionMinds,
+                  onSelectSuggestionEmoji: widget.onTapSuggestionEmoji,
+                ),
               ),
               const SizedBox(height: 8.0),
             ],
@@ -208,15 +212,18 @@ class _TextFieldWidget extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 ),
                 hintText: placeholder,
-                suffixIcon: TextButton(
-                  style: ButtonStyle(
-                    splashFactory: NoSplash.splashFactory,
-                    foregroundColor: MaterialStateProperty.all(Colors.blueAccent),
-                  ),
-                  onPressed: onDone,
-                  child: const Text(
-                    'DONE',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                suffixIcon: SensitiveWidget(
+                  mode: SensitiveMode.blurredAndNonTappable,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      splashFactory: NoSplash.splashFactory,
+                      foregroundColor: WidgetStateProperty.all(Colors.blueAccent),
+                    ),
+                    onPressed: onDone,
+                    child: const Text(
+                      'DONE',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),

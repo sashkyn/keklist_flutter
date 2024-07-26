@@ -3,12 +3,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
-import 'package:intl/intl.dart';
 import 'package:keklist/presentation/core/widgets/overscroll_listener.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/mind_chat_discussion/mind_chat_discussion_screen.dart';
+import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_creator_screen.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_monolog_list_widget.dart';
@@ -102,17 +104,20 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        onPressed: () => _showMindCreator(),
-        label: const Text(
-          'Create',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.w500,
+      floatingActionButton: SensitiveWidget(
+        mode: SensitiveMode.blurredAndNonTappable,
+        child: FloatingActionButton.extended(
+          icon: const Icon(Icons.add),
+          onPressed: () => _showMindCreator(),
+          label: const Text(
+            'Create',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          enableFeedback: true,
         ),
-        enableFeedback: true,
       ),
       appBar: AppBar(
         title: Text(DateFormatters.fullDateFormat.format(MindUtils.getDateFromDayIndex(dayIndex))),
@@ -158,15 +163,18 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           ],
         ),
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: FlutterConstants.mobileOverscrollPhysics,
           controller: _scrollController,
-          padding: const EdgeInsets.only(bottom: 150),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: MindMonologListWidget(
-            minds: _dayMinds,
-            onTap: (Mind mind) => _showMindInfo(mind),
-            onOptions: (Mind mind) => _showActions(context, mind),
-            mindIdsToChildren: _mindIdsToChildren,
+          padding: const EdgeInsets.only(bottom: 150), // FAB offset.
+          child: BoolWidget(
+            condition: _dayMinds.isNotEmpty,
+            trueChild: MindMonologListWidget(
+              minds: _dayMinds,
+              onTap: (Mind mind) => _showMindInfo(mind),
+              onOptions: (Mind mind) => _showActions(context, mind),
+              mindIdsToChildren: _mindIdsToChildren,
+            ),
+            falseChild: MindCollectionEmptyDayWidget.noMinds(text: 'No minds for current day'),
           ),
         ),
       ),
@@ -180,9 +188,42 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     super.dispose();
   }
 
-  void _changeContentVisibility() {
+  Future<void> _changeContentVisibility() async {
     HapticFeedback.mediumImpact();
-    sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: !_isMindContentVisible));
+    if (!_isMindContentVisible) {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+      if (canAuthenticate) {
+        try {
+          final bool didAuthenticate = await auth.authenticate(
+              localizedReason: 'Please authenticate to show account balance',
+              options: const AuthenticationOptions(useErrorDialogs: false));
+          if (didAuthenticate) {
+            setState(() {
+              sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: true));
+            });
+          }
+        } on PlatformException catch (e) {
+          print(e);
+          // if (e.code == auth_error.notAvailable) {
+          //   // Add handling of no hardware here.
+          // } else if (e.code == auth_error.notEnrolled) {
+          //   // ...
+          // } else {
+          //   // ...
+          // }
+        }
+      } else {
+        setState(() {
+          sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: true));
+        });
+      }
+    } else {
+      setState(() {
+        sendEventTo<SettingsBloc>(const SettingsChangeMindContentVisibility(isVisible: false));
+      });
+    }
   }
 
   void _handleError(MindOperationError error) {

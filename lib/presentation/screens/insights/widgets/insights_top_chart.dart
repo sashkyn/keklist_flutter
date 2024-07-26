@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class InsightsTopChartWidget extends StatelessWidget {
@@ -46,26 +47,28 @@ class InsightsTopChartWidget extends StatelessWidget {
                 ),
               ),
             ),
-            SfCartesianChart(
-              primaryYAxis: const CategoryAxis(
-                isVisible: false,
-                labelStyle: TextStyle(fontSize: 16.0),
+            SensitiveWidget(
+              child: SfCartesianChart(
+                primaryYAxis: const CategoryAxis(
+                  isVisible: false,
+                  labelStyle: TextStyle(fontSize: 16.0),
+                ),
+                primaryXAxis: const CategoryAxis(
+                  labelStyle: TextStyle(fontSize: 32.0),
+                ),
+                series: <CartesianSeries>[
+                  ColumnSeries<_MindData, String>(
+                    dataSource: chartData.take(8).toList(),
+                    dataLabelSettings: const DataLabelSettings(
+                      isVisible: true,
+                      labelPosition: ChartDataLabelPosition.outside,
+                      textStyle: TextStyle(fontSize: 16.0),
+                    ),
+                    xValueMapper: (_MindData mind, _) => mind.emoji,
+                    yValueMapper: (_MindData mind, _) => mind.count,
+                  )
+                ],
               ),
-              primaryXAxis: const CategoryAxis(
-                labelStyle: TextStyle(fontSize: 32.0),
-              ),
-              series: <CartesianSeries>[
-                ColumnSeries<_MindData, String>(
-                  dataSource: chartData.take(8).toList(),
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    labelPosition: ChartDataLabelPosition.outside,
-                    textStyle: TextStyle(fontSize: 16.0),
-                  ),
-                  xValueMapper: (_MindData mind, _) => mind.emoji,
-                  yValueMapper: (_MindData mind, _) => mind.count,
-                )
-              ],
             ),
           ],
         ),

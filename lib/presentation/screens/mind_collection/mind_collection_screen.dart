@@ -5,9 +5,11 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:blur/blur.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
+import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
 import 'package:keklist/presentation/screens/actions/actions_screen.dart';
 import 'package:keklist/presentation/screens/digest/mind_universal_list_screen.dart';
@@ -35,9 +37,9 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:uuid/uuid.dart';
 part 'local_widgets/search_app_bar/search_app_bar.dart';
-part 'local_widgets/app_bar/app_bar.dart';
-part 'local_widgets/body/body.dart';
-part 'local_widgets/body/demo_body.dart';
+part 'local_widgets/app_bar/mind_collection_app_bar.dart';
+part 'local_widgets/body/mind_collection_body.dart';
+part 'local_widgets/body/mind_collection_demo_body.dart';
 
 final class MindCollectionScreen extends StatefulWidget {
   const MindCollectionScreen({super.key});
@@ -178,20 +180,24 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 }),
                 onSearchCancel: () => _cancelSearch(),
               ),
-              falseChild: _AppBar(
+              falseChild: _MindCollectionAppBar(
+                isOfflineMode: _isOfflineMode,
                 isUpdating: _updating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () => _showCalendarActions(),
                 onSettings: () => _showSettings(),
                 onInsights: () => _showInsights(),
+                onOfflineMode: () {
+                  print('heheh');
+                },
               )),
         ),
       ),
       body: BoolWidget(
         condition: _isDemoMode,
-        trueChild: _DemoBody(),
-        falseChild: _Body(
+        trueChild: _MindCollectionDemoBody(),
+        falseChild: _MindCollectionBody(
           mindsByDayIndex: _mindsByDayIndex,
           isSearching: _isSearching,
           searchResults: _searchResults,
@@ -326,12 +332,16 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     Navigator.push(
       mountedContext!,
       MaterialPageRoute(
-        builder: (context) => MindUniversalListScreen(
-          allMinds: _minds,
-          filter: (mind) => mind.dayIndex >= startDayIndex && mind.dayIndex <= endDayIndex,
-          title: 'Digest',
-          onSelectMind: (mind) => _showMindInfo(mind),
-        ),
+        builder: (context) {
+          bool filterFunction(mind) => mind.dayIndex >= startDayIndex && mind.dayIndex <= endDayIndex;
+          return MindUniversalListScreen(
+            allMinds: _minds,
+            filterFunction: filterFunction,
+            title: 'Digest (${_minds.where(filterFunction).length} minds)',
+            emptyStateMessage: 'No minds in selected period',
+            onSelectMind: (mind) => _showMindInfo(mind),
+          );
+        },
       ),
     );
   }

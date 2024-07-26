@@ -143,18 +143,9 @@ class AuthScreenState extends State<AuthScreen> with DisposeBag {
                     ),
                     falseChild: const SizedBox.shrink(),
                   ),
-                  BoolWidget(
-                    condition: DeviceUtils.safeGetPlatform() == SupportedPlatform.android,
-                    trueChild: const SizedBox.shrink(),
-                    falseChild: Row(
-                      children: [
-                        AuthButton(
-                          onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.google()),
-                          type: AuthButtonType.google,
-                        ),
-                        const SizedBox(width: 16.0),
-                      ],
-                    ),
+                  AuthButton(
+                    onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.google()),
+                    type: AuthButtonType.google,
                   ),
                   AuthButton(
                     onTap: () => sendEventTo<AuthBloc>(AuthLoginWithSocialNetwork.facebook()),

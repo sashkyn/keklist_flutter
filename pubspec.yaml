@@ -3,7 +3,7 @@ description: Like TODO-List but Keklist
 
 publish_to: "none"
 
-version: 3.3.0+62
+version: 3.4.0+63
 
 environment:
   sdk: ">=3.0.0"
@@ -13,7 +13,6 @@ dependencies:
   bloc: ^8.1.1
   blur: ^4.0.0
   calendar_date_picker2: ^1.0.2
-  collection: ^1.17.0
   cross_file: ^0.3.3+4
   csv: ^6.0.0
   cupertino_icons: ^1.0.5
@@ -45,13 +44,13 @@ dependencies:
   settings_ui: ^2.0.2
   share_plus: ^9.0.0
   supabase_flutter: ^2.0.1
-  syncfusion_flutter_charts: ^25.1.37
+  syncfusion_flutter_charts: ^26.1.39
   url_launcher: ^6.1.9
   url_strategy: ^0.2.0
   uuid: ^4.2.1
   webview_flutter: ^4.1.0
   gap: ^3.0.1
-  home_widget: ^0.6.0
+  #home_widget: ^0.6.0
   workmanager: ^0.5.2
   flutter_dotenv: ^5.1.0
   flutter_staggered_grid_view: ^0.7.0
@@ -60,8 +59,11 @@ dependencies:
   dart_openai: ^5.1.0
   bottom_sheet: ^4.0.0
   action_sheet: ^1.0.4
-  haptic_feedback: ^0.4.2
+  haptic_feedback: ^0.5.1+1
   provider: ^6.1.2
+  collection: ^1.18.0
+  google_sign_in: ^6.2.1
+  local_auth: ^2.2.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

@@ -1,13 +1,13 @@
 part of '../../mind_collection_screen.dart';
 
-class _DemoBody extends StatefulWidget {
+final class _MindCollectionDemoBody extends StatefulWidget {
   static final DateFormat _formatter = DateFormat('dd.MM.yyyy - EEEE');
 
   @override
-  State<_DemoBody> createState() => _DemoBodyState();
+  State<_MindCollectionDemoBody> createState() => _MindCollectionDemoBodyState();
 }
 
-class _DemoBodyState extends State<_DemoBody> {
+final class _MindCollectionDemoBodyState extends State<_MindCollectionDemoBody> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
   late final _demoModeRandom = Random();
@@ -64,7 +64,7 @@ class _DemoBodyState extends State<_DemoBody> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 18.0),
-              Text(_DemoBody._formatter.format(MindUtils.getDateFromDayIndex(dayIndex))),
+              Text(_MindCollectionDemoBody._formatter.format(MindUtils.getDateFromDayIndex(dayIndex))),
               const SizedBox(height: 4.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),

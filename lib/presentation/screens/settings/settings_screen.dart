@@ -27,6 +27,7 @@ final class SettingsScreen extends StatefulWidget {
 final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   bool _isLoggedIn = false;
   bool _offlineMode = false;
+  //bool _isSensitiveContentShowed = false;
   bool _isDarkMode = false;
   bool _showTitles = true;
   int _cachedMindCountToUpload = 0;
@@ -44,6 +45,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             _isLoggedIn = state.isLoggedIn;
             _cachedMindCountToUpload = state.offlineMinds.length;
             _offlineMode = state.settings.isOfflineMode;
+            // _isSensitiveContentShowed = state.settings.isMindContentVisible;
             _isDarkMode = state.settings.isDarkMode;
             _openAiKey = state.settings.openAIKey ?? '';
             _showTitles = state.settings.shouldShowTitles;
@@ -101,7 +103,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
               showOkAlertDialog(
                 context: context,
                 title: 'Success',
-                message: '`Your minds were completly deleted from server',
+                message: 'Your minds were completly deleted from server',
               );
           }
       }
@@ -152,6 +154,12 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
                 title: const Text('Show day dividers'),
                 onToggle: (bool value) => _switchShowTitles(value),
               ),
+              // SettingsTile.switchTile(
+              //   initialValue: !_isSensitiveContentShowed,
+              //   leading: const Icon(Icons.visibility_off, color: Colors.grey),
+              //   title: const Text('Hide sensitive content'),
+              //   onToggle: (bool value) => _switchSensitiveContentVisibility(!value),
+              // ),
             ],
           ),
           SettingsSection(
@@ -192,6 +200,13 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
           SettingsSection(
             title: Text('About'.toUpperCase()),
             tiles: [
+              SettingsTile.navigation(
+                title: const Text('Suggest a feature'),
+                leading: const Icon(Icons.handyman, color: Colors.yellow),
+                onPressed: (BuildContext context) {
+                  _openFeatureSuggestion();
+                },
+              ),
               SettingsTile.navigation(
                 title: const Text('Whats new?'),
                 leading: const Icon(Icons.new_releases, color: Colors.purple),
@@ -266,6 +281,13 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
     }
   }
 
+  Future<void> _openFeatureSuggestion() async {
+    final Uri uri = Uri.parse(KeklistConstants.featureSuggestionURL);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   Future<void> _showOpenAITokenChanger() async {
     String openAiToken = '';
 
@@ -321,6 +343,10 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
 
   void _switchOfflineMode(bool value) {
     sendEventTo<SettingsBloc>(SettingsChangeOfflineMode(isOfflineMode: value));
+  }
+
+  void _switchSensitiveContentVisibility(bool value) {
+    sendEventTo<SettingsBloc>(SettingsChangeMindContentVisibility(isVisible: value));
   }
 
   void _switchDarkMode(bool value) {

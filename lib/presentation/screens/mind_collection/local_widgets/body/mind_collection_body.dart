@@ -1,6 +1,6 @@
 part of '../../mind_collection_screen.dart';
 
-class _Body extends StatelessWidget {
+final class _MindCollectionBody extends StatelessWidget {
   final bool isSearching;
   final List<Mind> searchResults;
   final VoidCallback hideKeyboard;
@@ -11,7 +11,7 @@ class _Body extends StatelessWidget {
   final Function getNowDayIndex;
   final bool shouldShowTitles;
 
-  const _Body({
+  const _MindCollectionBody({
     required this.isSearching,
     required this.searchResults,
     required this.hideKeyboard,
