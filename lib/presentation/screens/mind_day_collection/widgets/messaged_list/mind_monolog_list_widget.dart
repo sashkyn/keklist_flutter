@@ -8,6 +8,7 @@ final class MindMonologListWidget extends StatelessWidget {
   final List<Mind> minds;
   final Map<String, List<Mind>>? mindIdsToChildren;
   final Function(Mind) onTap;
+  final Function(Mind)? onLongTap;
   final Function(Mind) onOptions;
 
   const MindMonologListWidget({
@@ -16,6 +17,7 @@ final class MindMonologListWidget extends StatelessWidget {
     required this.onTap,
     required this.mindIdsToChildren,
     required this.onOptions,
+    this.onLongTap,
   });
 
   @override
@@ -34,6 +36,7 @@ final class MindMonologListWidget extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () => onTap(mind),
+                      onLongPress: () => onLongTap?.call(mind),
                       child: MindMessageWidget(
                         mind: mind,
                         children: mindIdsToChildren?[mind.id] ?? [],

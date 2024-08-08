@@ -24,6 +24,7 @@ import 'package:keklist/presentation/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/presentation/screens/mind_one_emoji_collection/mind_one_emoji_collection.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:translator/translator.dart';
 
 final class MindDayCollectionScreen extends StatefulWidget {
   final int initialDayIndex;
@@ -57,6 +58,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
       );
 
   Map<String, List<Mind>> get _mindIdsToChildren => MindUtils.convertToMindChildren(minds: allMinds);
+  final Map<String, String> mindIdsToTranslations = {};
 
   bool _isMindContentVisible = false;
   Mind? _editableMind;
@@ -296,6 +298,17 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
     Haptics.vibrate(HapticsType.heavy);
   }
 
+  void _showNerdActions(BuildContext context, Mind mind) {
+    showBarModalBottomSheet(
+      context: context,
+      builder: (context) => ActionsScreen(
+        actions: [
+          (ActionModel.tranlsateToEnglish(), () => _translateToEnglish(mind: mind)),
+        ],
+      ),
+    );
+  }
+
   // TODO: extract to some navigator
 
   void _showActions(BuildContext context, Mind mind) {
@@ -390,5 +403,19 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
         );
       },
     );
+  }
+
+  void _translateToEnglish({required Mind mind}) async {
+    if (mindIdsToTranslations.containsKey(mind.id)) {
+      print('Mind already translated.');
+      return;
+    }
+
+    final GoogleTranslator translator = GoogleTranslator();
+    final Translation translation = await translator.translate(mind.note, to: 'en');
+
+    setState(() {
+      mindIdsToTranslations[mind.id] = translation.text;
+    });
   }
 }

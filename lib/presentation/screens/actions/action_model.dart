@@ -20,6 +20,7 @@ sealed class ActionModel {
   factory ActionModel.showDigestForPeriod() => const ShowDigestForPeriodActionModel();
   factory ActionModel.goToDate() => const GoToDateMenuActionModel();
   factory ActionModel.showAll() => const ShowAllMenuActionModel();
+  factory ActionModel.tranlsateToEnglish() => const TranslateToEnglishMenuActionModel();
 }
 
 final class ChatWithAIActionModel extends ActionModel {
@@ -107,5 +108,13 @@ final class ShowAllMenuActionModel extends ActionModel {
       : super(
           title: 'Show all',
           icon: const Icon(Icons.show_chart),
+        );
+}
+
+final class TranslateToEnglishMenuActionModel extends ActionModel {
+  const TranslateToEnglishMenuActionModel()
+      : super(
+          title: 'Translate to English',
+          icon: const Icon(Icons.translate),
         );
 }

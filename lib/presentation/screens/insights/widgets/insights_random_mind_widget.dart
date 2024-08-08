@@ -5,6 +5,7 @@ import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
+import 'package:translator/translator.dart';
 
 // TODO: добавить дату
 // TODO: возможность перехода на источник
@@ -26,6 +27,7 @@ class InsightsRandomMindWidget extends StatefulWidget {
 class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
   final Random _random = Random();
   late int nextInt = _random.nextInt(widget.allMinds.length);
+  // String? translatedText;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,13 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
           nextInt = _random.nextInt(listLenght);
         });
       },
+      // onLongPress: () => {
+      //   setState(() async {
+      //     var translation = await randomMind.note.translate(to: 'en');
+      //     final text = translation.text;
+      //     translatedText = text;
+      //   }),
+      // },
       child: BoolWidget(
         condition: widget.allMinds.isNotEmpty,
         falseChild: Container(),

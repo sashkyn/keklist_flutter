@@ -14,7 +14,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// TODO: move methods from MindBloc to SettingsBloc (in progress)
+// TODO: move methods from MindBloc to SettingsBloc
 // TODO: darkmode: add system mode
 
 final class SettingsScreen extends StatefulWidget {
@@ -33,6 +33,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
   int _cachedMindCountToUpload = 0;
   bool _clearCacheVisible = true;
   String _openAiKey = '';
+  String? translateLanguageCode;
 
   @override
   void initState() {
