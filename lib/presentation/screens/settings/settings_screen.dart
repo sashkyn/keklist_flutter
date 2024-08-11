@@ -163,7 +163,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
                 title: const Text('Send feedback'),
                 leading: const Icon(Icons.feedback, color: Colors.blue),
                 onPressed: (BuildContext context) async {
-                  await _sendFeedback();
+                  await _openEmailFeedbackForm();
                 },
               ),
               SettingsTile.navigation(
@@ -252,7 +252,7 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
     );
   }
 
-  Future<void> _sendFeedback() async {
+  Future<void> _openEmailFeedbackForm() async {
     final Uri uri = Uri(
       scheme: 'mailto',
       path: KeklistConstants.feedbackEmail,
