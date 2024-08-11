@@ -120,27 +120,6 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: Text('Account'.toUpperCase()),
-            tiles: [
-              if (!_isLoggedIn)
-                SettingsTile(
-                  title: const Text('Login'),
-                  leading: const Icon(Icons.login),
-                  onPressed: (BuildContext context) {
-                    _showAuthBottomSheet();
-                  },
-                ),
-              if (_isLoggedIn)
-                SettingsTile(
-                  title: const Text('Logout'),
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  onPressed: (BuildContext context) {
-                    sendEventTo<SettingsBloc>(SettingsLogout());
-                  },
-                ),
-            ],
-          ),
-          SettingsSection(
             title: Text('Appearance'.toUpperCase()),
             tiles: [
               SettingsTile.switchTile(
@@ -164,8 +143,57 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
             ],
           ),
           SettingsSection(
-            title: Text('Data'.toUpperCase()),
+            title: Text('About'.toUpperCase()),
             tiles: [
+              SettingsTile.navigation(
+                title: const Text('Whats new?'),
+                leading: const Icon(Icons.new_releases, color: Colors.purple),
+                onPressed: (BuildContext context) {
+                  _showWhatsNew();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Suggest a feature'),
+                leading: const Icon(Icons.handyman, color: Colors.yellow),
+                onPressed: (BuildContext context) {
+                  _openFeatureSuggestion();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Send feedback'),
+                leading: const Icon(Icons.feedback, color: Colors.blue),
+                onPressed: (BuildContext context) async {
+                  await _sendFeedback();
+                },
+              ),
+              SettingsTile.navigation(
+                title: const Text('Source code'),
+                leading: const Icon(Icons.code, color: Colors.grey),
+                onPressed: (BuildContext context) async {
+                  await _openSourceCode();
+                },
+              ),
+            ],
+          ),
+          SettingsSection(
+            title: Text('Synchronization'.toUpperCase()),
+            tiles: [
+              if (!_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Sign in'),
+                  leading: const Icon(Icons.login),
+                  onPressed: (BuildContext context) {
+                    _showAuthBottomSheet();
+                  },
+                ),
+              if (_isLoggedIn)
+                SettingsTile(
+                  title: const Text('Logout'),
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  onPressed: (BuildContext context) {
+                    sendEventTo<SettingsBloc>(SettingsLogout());
+                  },
+                ),
               SettingsTile.switchTile(
                 initialValue: _offlineMode,
                 leading: const Icon(Icons.cloud_off, color: Colors.grey),
@@ -196,69 +224,29 @@ final class SettingsScreenState extends KekWidgetState<SettingsScreen> {
                   sendEventTo<SettingsBloc>(SettingsExportAllMindsToCSV());
                 },
               ),
+              if (_isLoggedIn) ...{
+                SettingsTile(
+                  title: const Text('Delete all data from server'),
+                  leading: const Icon(Icons.delete_forever, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
+                ),
+              },
+              if (_clearCacheVisible) ...{
+                SettingsTile(
+                  title: const Text('Clear cache'),
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _clearCache(),
+                )
+              },
+              if (_isLoggedIn) ...{
+                SettingsTile(
+                  title: const Text('Delete account'),
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: (BuildContext context) async => await _deleteAccount(),
+                ),
+              },
             ],
           ),
-          SettingsSection(
-            title: Text('About'.toUpperCase()),
-            tiles: [
-              SettingsTile.navigation(
-                title: const Text('Suggest a feature'),
-                leading: const Icon(Icons.handyman, color: Colors.yellow),
-                onPressed: (BuildContext context) {
-                  _openFeatureSuggestion();
-                },
-              ),
-              SettingsTile.navigation(
-                title: const Text('Whats new?'),
-                leading: const Icon(Icons.new_releases, color: Colors.purple),
-                onPressed: (BuildContext context) {
-                  _showWhatsNew();
-                },
-              ),
-              SettingsTile.navigation(
-                title: const Text('Send feedback'),
-                leading: const Icon(Icons.feedback, color: Colors.blue),
-                onPressed: (BuildContext context) async {
-                  await _sendFeedback();
-                },
-              ),
-              SettingsTile.navigation(
-                title: const Text('Source code'),
-                leading: const Icon(Icons.code, color: Colors.grey),
-                onPressed: (BuildContext context) async {
-                  await _openSourceCode();
-                },
-              ),
-            ],
-          ),
-          if (_isLoggedIn || _clearCacheVisible) ...{
-            SettingsSection(
-              title: Text('Danger zone'.toUpperCase()),
-              tiles: [
-                if (_isLoggedIn) ...{
-                  SettingsTile(
-                    title: const Text('Delete all data from server'),
-                    leading: const Icon(Icons.delete_forever, color: Colors.red),
-                    onPressed: (BuildContext context) async => await _deleteAllMindsFromServer(),
-                  ),
-                },
-                if (_clearCacheVisible) ...{
-                  SettingsTile(
-                    title: const Text('Clear cache'),
-                    leading: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: (BuildContext context) async => await _clearCache(),
-                  )
-                },
-                if (_isLoggedIn) ...{
-                  SettingsTile(
-                    title: const Text('Delete account'),
-                    leading: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: (BuildContext context) async => await _deleteAccount(),
-                  ),
-                },
-              ],
-            )
-          },
         ],
       ),
     );

@@ -148,18 +148,14 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
 
       subscribeTo<AuthBloc>(onNewState: (state) {
         switch (state) {
-          case AuthCurrentState state when (state.isLoggedIn || _isOfflineMode):
-            _disableDemoMode();
+          case AuthCurrentState _:
             sendEventTo<MindBloc>(MindGetList());
-          case AuthCurrentState state when !state.isLoggedIn:
-            _enableDemoMode();
         }
       })?.disposed(by: this);
 
       sendEventTo<AuthBloc>(AuthGetStatus());
       sendEventTo<SettingsBloc>(SettingsGet());
-      // sendEventTo<SettingsBloc>(SettingGetWhatsNew());
-      //_payementService.initConnection();
+      sendEventTo<MindBloc>(MindGetList());
     });
   }
 
