@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_simple_dependency_injection/injector.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:home_widget/home_widget.dart';
+// import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/constants.dart';
 // import 'package:home_widget/home_widget.dart';
 import 'package:keklist/domain/services/auth/auth_service.dart';
@@ -121,7 +121,7 @@ Widget _getApplication(Injector mainInjector) => MultiProvider(
     );
 
 void _initNativeWidgets() {
-  HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
+  // HomeWidget.setAppGroupId(PlatformConstants.iosGroupId);
 }
 
 void _setupBlockingLoadingWidget() {
