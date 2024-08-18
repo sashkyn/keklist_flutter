@@ -5,12 +5,11 @@ import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
-import 'package:translator/translator.dart';
 
 // TODO: добавить дату
 // TODO: возможность перехода на источник
 
-class InsightsRandomMindWidget extends StatefulWidget {
+final class InsightsRandomMindWidget extends StatefulWidget {
   final List<Mind> allMinds;
   final Function(Mind) onTapToMind;
 
@@ -24,7 +23,7 @@ class InsightsRandomMindWidget extends StatefulWidget {
   State<InsightsRandomMindWidget> createState() => _InsightsRandomMindWidgetState();
 }
 
-class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
+final class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
   final Random _random = Random();
   late int nextInt = _random.nextInt(widget.allMinds.length);
   // String? translatedText;

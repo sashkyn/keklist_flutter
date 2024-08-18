@@ -10,8 +10,6 @@ import 'package:keklist/presentation/core/widgets/bool_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
 import 'package:keklist/presentation/screens/mind_day_collection/widgets/messaged_list/mind_message_widget.dart';
 
-// TODO: Empty state
-
 final class MindUniversalListScreen extends StatefulWidget {
   final String title;
   final String emptyStateMessage;
