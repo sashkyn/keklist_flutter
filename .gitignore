@@ -120,11 +120,16 @@ app.*.symbols
 # Certificates
 *.p8
 
-# Fastlane
+# Fastlane iOS
 **/ios/.env
 **/ios/fastlane/report.xml
 Runner.app.dSYM.zip
 Runner.ipa
+
+# Fastlane Android
+**/android/fastlane
+**/android/.env
+**/android/Gemfile
 
 # dotenv
 .env

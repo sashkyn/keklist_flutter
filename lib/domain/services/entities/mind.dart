@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:keklist/domain/repositories/mind/object/mind_object.dart';
 
-class Mind with EquatableMixin {
+final class Mind with EquatableMixin {
   final String id;
   final String emoji;
   final String note;

@@ -1,3 +1,4 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:keklist/domain/constants.dart';
@@ -18,6 +19,7 @@ import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/presentation/core/widgets/creator_bottom_bar/mind_creator_bottom_bar.dart';
 import 'package:keklist/presentation/screens/mind_picker/mind_picker_screen.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
+import 'package:translator/translator.dart';
 
 final class MindInfoScreen extends StatefulWidget {
   final Mind rootMind;
@@ -216,11 +218,22 @@ final class _MindInfoScreenState extends KekWidgetState<MindInfoScreen> {
       builder: (context) => ActionsScreen(
         actions: [
           (ActionModel.chatWithAI(), () => _showMessageScreen(mind: mind)),
+          (ActionModel.tranlsateToEnglish(), () => _translateToEnglish(mind: mind)),
           (ActionModel.edit(), () => _editMind(mind)),
           (ActionModel.showAll(), () => _showAllMinds(mind)),
           (ActionModel.delete(), () => _removeMind(mind)),
         ],
       ),
+    );
+  }
+
+  void _translateToEnglish({required Mind mind}) async {
+    final GoogleTranslator translator = GoogleTranslator();
+    final Translation translation = await translator.translate(mind.note, to: 'en');
+
+    await showOkAlertDialog(
+      context: context,
+      message: translation.text,
     );
   }
 

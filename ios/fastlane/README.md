@@ -39,6 +39,22 @@ Archive, Build IPA, Signing, Upload to TestFilght
 
 Locally: Archive * Build IPA * Signing * Upload to TF
 
+### ios register_new_device
+
+```sh
+[bundle exec] fastlane ios register_new_device
+```
+
+Register new device
+
+### ios revoke_all_certificates
+
+```sh
+[bundle exec] fastlane ios revoke_all_certificates
+```
+
+Revoke all certificates
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

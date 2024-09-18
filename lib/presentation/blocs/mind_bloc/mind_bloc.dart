@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-//import 'package:home_widget/home_widget.dart';
+// import 'package:home_widget/home_widget.dart';
+import 'package:keklist/domain/constants.dart';
 import 'package:keklist/domain/repositories/settings/settings_repository.dart';
 import 'package:keklist/presentation/core/dispose_bag.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/domain/repositories/mind/mind_repository.dart';
+import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:keklist/presentation/cubits/mind_searcher/mind_searcher_cubit.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
@@ -347,7 +349,7 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     //   return;
     // }
     // final Iterable<Mind> todayMinds =
-    //     await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex());
+    //     await _repository.obtainMindsWhere((mind) => mind.dayIndex == MindUtils.getTodayIndex() && mind.rootId == null);
 
     // final List<String> todayMindJSONList = todayMinds
     //     .map(
@@ -357,10 +359,11 @@ final class MindBloc extends Bloc<MindEvent, MindState> with DisposeBag {
     //       ),
     //     )
     //     .toList();
-    // await HomeWidget.saveWidgetData(
-    //   'mind_today_widget_today_minds',
-    //   todayMindJSONList,
-    // );
+    // final List<Object?>? currentWidgetData = await HomeWidget.getWidgetData('mind_today_widget_today_minds');
+    // if (listEquals(currentWidgetData, todayMindJSONList)) {
+    //   return;
+    // }
+    // await HomeWidget.saveWidgetData('mind_today_widget_today_minds', todayMindJSONList);
     // await HomeWidget.updateWidget(iOSName: PlatformConstants.iosMindDayWidgetName);
   }
 }

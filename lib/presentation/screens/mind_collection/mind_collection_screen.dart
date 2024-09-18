@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:keklist/presentation/blocs/settings_bloc/settings_bloc.dart';
 import 'package:keklist/presentation/core/helpers/extensions/state_extensions.dart';
+import 'package:keklist/presentation/core/helpers/platform_utils.dart';
 import 'package:keklist/presentation/core/screen/kek_screen_state.dart';
 import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/actions/action_model.dart';
@@ -71,7 +72,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
   // final PaymentService _payementService = PaymentService();
 
   // NOTE: Состояние обновления с сервером.
-  bool _updating = false;
+  bool _isUpdating = false;
   @override
   void initState() {
     super.initState();
@@ -91,7 +92,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
           case SettingsDataState settingsDataState:
             _settingsDataState = settingsDataState;
             if (settingsDataState.settings.isOfflineMode) {
-              setState(() => _updating = false);
+              setState(() => _isUpdating = false);
             }
             sendEventTo<AuthBloc>(AuthGetStatus());
           case SettingsNeedToShowWhatsNew _:
@@ -108,15 +109,16 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
               _mindsByDayIndex =
                   state.values.where((element) => element.rootId == null).groupListsBy((element) => element.dayIndex);
             });
+            if (DeviceUtils.safeGetPlatform() == SupportedPlatform.iOS) {
+              sendEventTo<MindBloc>(MindUpdateMobileWidgets());
+            }
           } else if (state is MindServerOperationStarted) {
             if (state.type == MindOperationType.fetch) {
-              setState(() => _updating = true);
+              setState(() => _isUpdating = true);
             }
-            // INFO: запрос для виджета
-            sendEventTo<MindBloc>(MindUpdateMobileWidgets());
           } else if (state is MindOperationCompleted) {
             if (state.type == MindOperationType.fetch) {
-              setState(() => _updating = false);
+              setState(() => _isUpdating = false);
             }
           } else if (state is MindOperationError) {
             if (ModalRoute.of(context)?.isCurrent ?? false) {
@@ -124,7 +126,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
             }
 
             if (state.notCompleted == MindOperationType.fetch) {
-              setState(() => _updating = false);
+              setState(() => _isUpdating = false);
             }
 
             // TODO: сделать единый центр обработки блокирующих событий UI-ных
@@ -148,18 +150,14 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
 
       subscribeTo<AuthBloc>(onNewState: (state) {
         switch (state) {
-          case AuthCurrentState state when (state.isLoggedIn || _isOfflineMode):
-            _disableDemoMode();
+          case AuthCurrentState _:
             sendEventTo<MindBloc>(MindGetList());
-          case AuthCurrentState state when !state.isLoggedIn:
-            _enableDemoMode();
         }
       })?.disposed(by: this);
 
       sendEventTo<AuthBloc>(AuthGetStatus());
       sendEventTo<SettingsBloc>(SettingsGet());
-      // sendEventTo<SettingsBloc>(SettingGetWhatsNew());
-      //_payementService.initConnection();
+      sendEventTo<MindBloc>(MindGetList());
     });
   }
 
@@ -182,7 +180,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
               ),
               falseChild: _MindCollectionAppBar(
                 isOfflineMode: _isOfflineMode,
-                isUpdating: _updating,
+                isUpdating: _isUpdating,
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () => _showCalendarActions(),

@@ -3,7 +3,7 @@ import Flutter
 import WatchConnectivity
 import workmanager
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
     
     private var watchSession: WCSession?

@@ -1,15 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 
-class Themes {
+final class Themes {
   static final ThemeData light = ThemeData(
     scaffoldBackgroundColor: Colors.white,
     colorScheme: const ColorScheme.light(
       primary: Colors.black,
       onPrimary: Colors.white,
-      secondary: Colors.black,
+      secondary: Colors.grey,
     ),
     cardTheme: const CardTheme(color: Colors.white),
     iconTheme: const IconThemeData(color: Colors.black),
@@ -25,7 +24,7 @@ class Themes {
     colorScheme: const ColorScheme.dark(
       primary: Colors.white,
       onPrimary: Colors.black,
-      secondary: Colors.white,
+      secondary: Colors.grey,
     ),
     cardTheme: const CardTheme(color: Colors.black),
     iconTheme: const IconThemeData(color: Colors.white),

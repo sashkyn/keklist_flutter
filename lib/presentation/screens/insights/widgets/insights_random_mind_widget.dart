@@ -9,7 +9,7 @@ import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 // TODO: добавить дату
 // TODO: возможность перехода на источник
 
-class InsightsRandomMindWidget extends StatefulWidget {
+final class InsightsRandomMindWidget extends StatefulWidget {
   final List<Mind> allMinds;
   final Function(Mind) onTapToMind;
 
@@ -23,9 +23,10 @@ class InsightsRandomMindWidget extends StatefulWidget {
   State<InsightsRandomMindWidget> createState() => _InsightsRandomMindWidgetState();
 }
 
-class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
+final class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
   final Random _random = Random();
   late int nextInt = _random.nextInt(widget.allMinds.length);
+  // String? translatedText;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +44,13 @@ class _InsightsRandomMindWidgetState extends State<InsightsRandomMindWidget> {
           nextInt = _random.nextInt(listLenght);
         });
       },
+      // onLongPress: () => {
+      //   setState(() async {
+      //     var translation = await randomMind.note.translate(to: 'en');
+      //     final text = translation.text;
+      //     translatedText = text;
+      //   }),
+      // },
       child: BoolWidget(
         condition: widget.allMinds.isNotEmpty,
         falseChild: Container(),
