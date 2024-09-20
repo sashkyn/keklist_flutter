@@ -20,6 +20,7 @@ import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_search_result_widget.dart';
 import 'package:keklist/presentation/screens/mind_info/mind_info_screen.dart';
 import 'package:keklist/presentation/screens/settings/settings_screen.dart';
+import 'package:keklist/presentation/screens/user_profile/user_profile_screen.dart';
 import 'package:keklist/presentation/screens/web_page/web_page_screen.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/blocs/auth_bloc/auth_bloc.dart';
@@ -184,7 +185,7 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
                 onSearch: () => sendEventTo<MindBloc>(MindStartSearch()),
                 onTitle: () => _scrollToNow(),
                 onCalendar: () => _showCalendarActions(),
-                onSettings: () => _showSettings(),
+                onUserProfile: () => _showUserProfile(),
                 onInsights: () => _showInsights(),
                 onOfflineMode: () {
                   print('heheh');
@@ -356,11 +357,11 @@ final class _MindCollectionScreenState extends KekWidgetState<MindCollectionScre
     );
   }
 
-  void _showSettings() {
+  void _showUserProfile() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SettingsScreen(),
+        builder: (context) => const UserProfileScreen(),
       ),
     );
   }

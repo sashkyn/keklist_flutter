@@ -6,7 +6,7 @@ final class _MindCollectionAppBar extends StatelessWidget {
   final VoidCallback onSearch;
   final VoidCallback onTitle;
   final VoidCallback onCalendar;
-  final VoidCallback onSettings;
+  final VoidCallback onUserProfile;
   final VoidCallback onInsights;
   final VoidCallback onOfflineMode;
 
@@ -15,7 +15,7 @@ final class _MindCollectionAppBar extends StatelessWidget {
     required this.onSearch,
     required this.onTitle,
     required this.onCalendar,
-    required this.onSettings,
+    required this.onUserProfile,
     required this.onInsights,
     required this.isOfflineMode,
     required this.onOfflineMode,
@@ -50,29 +50,27 @@ final class _MindCollectionAppBar extends StatelessWidget {
     );
   }
 
-  List<Widget>? _makeAppBarActions() {
-    return [
-      IconButton(
-        icon: const Icon(Icons.insights),
-        onPressed: onInsights,
-      ),
-      IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: onSettings,
-      ),
-      IconButton(
-        icon: const Icon(Icons.calendar_month),
-        onPressed: onCalendar,
-      ),
-      SensitiveWidget(
-        mode: SensitiveMode.blurred,
-        child: IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            !SensitiveWidget.isProtected ? onSearch() : null;
-          },
+  List<Widget>? _makeAppBarActions() => [
+        IconButton(
+          icon: const Icon(Icons.insights),
+          onPressed: onInsights,
         ),
-      ),
-    ];
-  }
+        IconButton(
+          icon: const Icon(Icons.person),
+          onPressed: onUserProfile,
+        ),
+        IconButton(
+          icon: const Icon(Icons.calendar_month),
+          onPressed: onCalendar,
+        ),
+        SensitiveWidget(
+          mode: SensitiveMode.blurred,
+          child: IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              !SensitiveWidget.isProtected ? onSearch() : null;
+            },
+          ),
+        ),
+      ];
 }
