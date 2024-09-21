@@ -51,70 +51,92 @@ final class _UserProfileScreenState extends KekWidgetState<UserProfileScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Gap(16.0),
-            const CircleAvatar(
-              radius: 80.0,
-              backgroundColor: Colors.blueAccent,
-            ),
-            const Gap(16.0),
-            Text(
-              _userProfileState.userName,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.w500,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Gap(16.0),
+              const CircleAvatar(
+                radius: 80.0,
+                backgroundColor: Colors.blueAccent,
               ),
-            ),
-            const Gap(16.0),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: [
-                  ..._userProfileState.userDescribingMinds.map(
-                    (mind) => MyChipWidget(
-                      isSelected: false,
-                      onSelect: (_) => print('didSelect'),
-                      selectedColor: Colors.white,
-                      child: Text(
-                        '${mind.emoji} ${mind.note}',
-                        style: const TextStyle(fontSize: 14.0),
+              const Gap(16.0),
+              Text(
+                _userProfileState.userName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Gap(4.0),
+              const Text(
+                'I AM',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: [
+                    ..._userProfileState.userDescribingMinds.map(
+                      (mind) => MyChipWidget(
+                        isSelected: false,
+                        onSelect: (_) => print('didSelect'),
+                        selectedColor: Colors.white,
+                        child: Text(
+                          '${mind.emoji} ${mind.note}',
+                          style: const TextStyle(fontSize: 14.0),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const Gap(16.0),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: [
-                  ..._userProfileState.userDescribingSuggestionEmojies.map(
-                    (emoji) => MyChipWidget(
+                    MyChipWidget(
                       isSelected: false,
                       onSelect: (_) => {
-                        _showMindCreator(initialEmoji: emoji),
+                        // TODO: show picker with suggestions
+                        _showMindCreator(initialEmoji: '🙂')
                       },
-                      selectedColor: Colors.grey,
-                      child: Text(
-                        '$emoji +',
-                        style: const TextStyle(fontSize: 14.0),
+                      selectedColor: Colors.white,
+                      child: const Text(
+                        '+ ADD TAG',
+                        style: TextStyle(fontSize: 14.0),
                       ),
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: [
+                    ..._userProfileState.userDescribingSuggestionEmojies.map(
+                      (emoji) => MyChipWidget(
+                        isSelected: false,
+                        onSelect: (_) => {
+                          _showMindCreator(initialEmoji: emoji),
+                        },
+                        selectedColor: Colors.grey,
+                        child: Text(
+                          '$emoji',
+                          style: const TextStyle(fontSize: 24.0),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
