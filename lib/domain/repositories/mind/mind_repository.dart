@@ -9,7 +9,7 @@ abstract class MindRepository {
   Iterable<Mind> get values;
   Stream<Iterable<Mind>> get stream;
   FutureOr<Iterable<Mind>> obtainMinds();
-  FutureOr<void> createMind({required Mind mind, required bool isUploadedToServer});
+  FutureOr<Mind> createMind({required Mind mind, required bool isUploadedToServer});
   FutureOr<void> createMinds({required Iterable<Mind> minds, required bool isUploadedToServer});
   FutureOr<Mind?> obtainMind({required String mindId});
   FutureOr<Iterable<Mind>> obtainMindsWhere(bool Function(Mind) where);

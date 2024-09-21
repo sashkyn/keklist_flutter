@@ -28,9 +28,10 @@ final class MindHiveRepository implements MindRepository {
   Stream<Iterable<Mind>> get stream => _mindsBehaviorSubject.stream;
 
   @override
-  FutureOr<void> createMind({required Mind mind, required bool isUploadedToServer}) async {
+  FutureOr<Mind> createMind({required Mind mind, required bool isUploadedToServer}) async {
     final MindObject object = mind.toObject(isUploadedToServer: isUploadedToServer);
     await _mindHiveBox.put(mind.id, object);
+    return mind;
   }
 
   @override

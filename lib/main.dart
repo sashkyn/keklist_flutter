@@ -17,6 +17,7 @@ import 'package:keklist/keklist_app.dart';
 import 'package:keklist/domain/hive_constants.dart';
 import 'package:keklist/domain/repositories/message/message/message_object.dart';
 import 'package:keklist/domain/repositories/settings/object/settings_object.dart';
+import 'package:keklist/presentation/blocs/user_profile_bloc/user_profile_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -113,6 +114,9 @@ Widget _getApplication(Injector mainInjector) => MultiProvider(
               mindRepository: mainInjector.get<MindRepository>(),
               mindService: mainInjector.get<MindService>(),
             ),
+          ),
+          BlocProvider(
+            create: (context) => UserProfileBloc(mindRepository: mainInjector.get<MindRepository>()),
           ),
         ],
         child: const KeklistApp(),

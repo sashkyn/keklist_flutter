@@ -382,6 +382,7 @@ final class _MindDayCollectionScreenState extends State<MindDayCollectionScreen>
           buttonText: initialEmoji == null ? 'Create' : 'Edit',
           initialEmoji: initialEmoji,
           initialText: initialText,
+          shouldSuggestEmoji: true,
           onDone: (String text, String emoji) {
             if (_editableMind == null) {
               final MindCreate event = MindCreate(

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:keklist/presentation/core/helpers/mind_utils.dart';
 import 'package:keklist/domain/services/entities/mind.dart';
 import 'package:keklist/presentation/core/widgets/bool_widget.dart';
+import 'package:keklist/presentation/core/widgets/my_chip_widget.dart';
 import 'package:keklist/presentation/core/widgets/rounded_container.dart';
 import 'package:keklist/presentation/core/widgets/sensitive_widget.dart';
 import 'package:keklist/presentation/screens/mind_collection/local_widgets/mind_collection_empty_day_widget.dart';
@@ -102,7 +103,7 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                   (index) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
-                      child: MyChip(
+                      child: MyChipWidget(
                         isSelected: _selectedChoiceIndex == index,
                         onSelect: (bool selected) {
                           setState(() {
@@ -151,7 +152,7 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
                   (entry) {
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
-                      child: MyChip(
+                      child: MyChipWidget(
                         isSelected: _selectedEmoji == entry.key,
                         onSelect: (bool selected) {
                           setState(() {
@@ -226,41 +227,6 @@ final class _InsightsPieWidgetState extends State<InsightsPieWidget> {
       random.nextInt(256),
       random.nextInt(256),
       random.nextInt(256),
-    );
-  }
-}
-
-class MyChip extends StatelessWidget {
-  final bool isSelected;
-  final Widget child;
-  final Function(bool) onSelect;
-  final Color selectedColor;
-
-  const MyChip({
-    super.key,
-    required this.child,
-    required this.isSelected,
-    required this.onSelect,
-    required this.selectedColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return RawChip(
-      showCheckmark: false,
-      label: child,
-      backgroundColor: isSelected ? selectedColor : null,
-      shape: StadiumBorder(
-        side: BorderSide(
-          color: selectedColor,
-          width: 2.0,
-        ),
-      ),
-      selectedColor: selectedColor,
-      selected: isSelected,
-      onPressed: () {
-        onSelect(isSelected);
-      },
     );
   }
 }

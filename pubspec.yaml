@@ -19,7 +19,7 @@ dependencies:
   emojis: ^0.9.9
   equatable: ^2.0.5
   fast_immutable_collections: ^10.0.0
-  fl_chart: ^0.68.0
+  fl_chart: ^0.69.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -39,7 +39,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0-pre
   package_info_plus: ^8.0.0
   path_provider: ^2.0.12
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   scrollable_positioned_list: ^0.3.5
   settings_ui: ^2.0.2
   share_plus: ^10.0.0

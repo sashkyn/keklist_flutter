@@ -20,17 +20,21 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with DisposeBag {
-  final SettingsRepository repository;
-  final MindRepository mindRepository;
-  final MindService mindService;
-  final AuthService authService;
+  final SettingsRepository _repository;
+  final MindRepository _mindRepository;
+  final MindService _mindService;
+  final AuthService _authService;
 
   SettingsBloc({
-    required this.authService,
-    required this.repository,
-    required this.mindRepository,
-    required this.mindService,
-  }) : super(
+    required AuthService authService,
+    required SettingsRepository repository,
+    required MindRepository mindRepository,
+    required MindService mindService,
+  })  : _authService = authService,
+        _mindService = mindService,
+        _repository = repository,
+        _mindRepository = mindRepository,
+        super(
           SettingsDataState(
             isLoggedIn: authService.currentUser != null,
             offlineMinds: const [],
@@ -50,11 +54,11 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     on<SettingsUploadMindCandidates>(_uploadMindCandidates);
     on<SettingsUpdateShouldShowTitlesMode>(_updateShouldShowTitlesMode);
 
-    repository.stream.listen((settings) => add(SettingsGet())).disposed(by: this);
-    authService.currentUserStream.listen((_) => add(SettingsGet())).disposed(by: this);
+    _repository.stream.listen((settings) => add(SettingsGet())).disposed(by: this);
+    _authService.currentUserStream.listen((_) => add(SettingsGet())).disposed(by: this);
     Rx.combineLatest2(
-      authService.currentUserStream,
-      repository.stream.map((settings) => settings.isOfflineMode),
+      _authService.currentUserStream,
+      _repository.stream.map((settings) => settings.isOfflineMode),
       (KekUser? currentUser, bool offlineMode) => currentUser != null || !offlineMode,
     ).listen((event) => add(SettingsGet())).disposed(by: this);
   }
@@ -67,7 +71,7 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
 
   FutureOr<void> _shareCSVFileWithMinds(event, emit) async {
     // Получение minds.
-    final Iterable<Mind> minds = mindRepository.values;
+    final Iterable<Mind> minds = _mindRepository.values;
     // Конвертация в CSV и шаринг.
     final List<List<String>> csvEntryList = minds.map((entry) => entry.toCSVEntry()).toList(growable: false);
     final String csv = const ListToCsvConverter(fieldDelimiter: ';').convert(csvEntryList);
@@ -80,12 +84,12 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
   }
 
   FutureOr _getSettings(SettingsGet event, Emitter<SettingsState> emit) async {
-    final Iterable<Mind> offlineMinds = await mindRepository.obtainNotUploadedToServerMinds();
+    final Iterable<Mind> offlineMinds = await _mindRepository.obtainNotUploadedToServerMinds();
     emit(
       SettingsDataState(
         offlineMinds: offlineMinds,
-        settings: repository.value,
-        isLoggedIn: authService.currentUser != null,
+        settings: _repository.value,
+        isLoggedIn: _authService.currentUser != null,
       ),
     );
   }
@@ -97,30 +101,30 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
 
-    await repository.updatePreviousAppVersion(appVersion);
+    await _repository.updatePreviousAppVersion(appVersion);
   }
 
   FutureOr<void> _changeMindContentVisibility(
     SettingsChangeMindContentVisibility event,
     Emitter<SettingsState> emit,
   ) async {
-    await repository.updateMindContentVisibility(event.isVisible);
+    await _repository.updateMindContentVisibility(event.isVisible);
   }
 
   FutureOr<void> _changeOfflineMode(
     SettingsChangeOfflineMode event,
     Emitter<SettingsState> emit,
   ) async {
-    await repository.updateOfflineMode(event.isOfflineMode);
+    await _repository.updateOfflineMode(event.isOfflineMode);
   }
 
   FutureOr<void> _changeSettingsDarkMode(SettingsChangeIsDarkMode event, Emitter<SettingsState> emit) async {
-    await repository.updateDarkMode(event.isDarkMode);
+    await _repository.updateDarkMode(event.isDarkMode);
   }
 
   FutureOr<void> _sendWhatsNewIfNeeded(SettingGetWhatsNew event, Emitter<SettingsState> emit) async {
     // Cбор и отправка стейта Whats new.
-    final String? previousAppVersion = repository.value.previousAppVersion;
+    final String? previousAppVersion = _repository.value.previousAppVersion;
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String appVersion = '${packageInfo.version} ${packageInfo.buildNumber}';
     final bool needToShowWhatsNewOnStart = previousAppVersion != appVersion;
@@ -131,18 +135,18 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
 
   FutureOr<void> _changeOpenAIKey(SettingsChangeOpenAIKey event, Emitter<SettingsState> emit) {
     OpenAI.apiKey = event.openAIToken;
-    repository.updateOpenAIKey(event.openAIToken);
+    _repository.updateOpenAIKey(event.openAIToken);
   }
 
   FutureOr<void> _logout(SettingsLogout event, Emitter<SettingsState> emit) async {
-    await authService.logout();
+    await _authService.logout();
   }
 
   FutureOr<void> _getMindUploadCandidates(
     SettingsGetMindCandidatesToUpload event,
     Emitter<SettingsState> emit,
   ) async {
-    final Iterable<Mind> uploadCandidates = await mindRepository.obtainNotUploadedToServerMinds();
+    final Iterable<Mind> uploadCandidates = await _mindRepository.obtainNotUploadedToServerMinds();
     emit(SettingsOfflineMindsState(uploadCandidates));
   }
 
@@ -150,19 +154,19 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
     SettingsUploadMindCandidates event,
     Emitter<SettingsState> emit,
   ) async {
-    final Iterable<Mind> offlineMinds = await mindRepository.obtainNotUploadedToServerMinds();
+    final Iterable<Mind> offlineMinds = await _mindRepository.obtainNotUploadedToServerMinds();
     emit(SettingsLoadingState(true));
 
     final Iterable<Mind> rootOfflineMinds = offlineMinds.where((Mind mind) => mind.rootId == null);
-    final Future<void> uploadRootMind = mindService.addAllMinds(values: rootOfflineMinds);
+    final Future<void> uploadRootMind = _mindService.addAllMinds(values: rootOfflineMinds);
     final Iterable<Mind> childOfflineMinds = offlineMinds.where((Mind mind) => mind.rootId != null);
-    final Future<void> uploadChildMinds = mindService.addAllMinds(values: childOfflineMinds);
+    final Future<void> uploadChildMinds = _mindService.addAllMinds(values: childOfflineMinds);
 
     await uploadRootMind.then((_) async {
       await uploadChildMinds.then((_) async {
-        await mindRepository
+        await _mindRepository
             .deleteMindsWhere((Mind mind) => offlineMinds.any((Mind candidate) => candidate.id == mind.id));
-        await mindRepository.updateMinds(
+        await _mindRepository.updateMinds(
           minds: offlineMinds,
           isUploadedToServer: true,
         );
@@ -176,6 +180,6 @@ final class SettingsBloc extends Bloc<SettingsEvent, SettingsState> with Dispose
 
   FutureOr<void> _updateShouldShowTitlesMode(
       SettingsUpdateShouldShowTitlesMode event, Emitter<SettingsState> emit) async {
-    await repository.updateShouldShowTitles(event.value);
+    await _repository.updateShouldShowTitles(event.value);
   }
 }

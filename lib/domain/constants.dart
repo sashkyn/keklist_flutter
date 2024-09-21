@@ -17,6 +17,10 @@ final class Themes {
           displayColor: Colors.black,
           decorationColor: Colors.black,
         ),
+    inputDecorationTheme: const InputDecorationTheme(
+      labelStyle: TextStyle(color: Colors.black),
+      hintStyle: TextStyle(color: Colors.grey),
+    ),
   );
 
   static final ThemeData dark = ThemeData(
@@ -33,30 +37,34 @@ final class Themes {
           displayColor: Colors.white,
           decorationColor: Colors.white,
         ),
+    inputDecorationTheme: const InputDecorationTheme(
+      labelStyle: TextStyle(color: Colors.white),
+      hintStyle: TextStyle(color: Colors.grey),
+    ),
   );
 }
 
-class LayoutConstants {
+final class LayoutConstants {
   static double mindSide = 100.0;
 }
 
-class DateFormatters {
+final class DateFormatters {
   static DateFormat fullDateFormat = DateFormat('dd.MM.yyyy - EEEE');
 }
 
-class PlatformConstants {
+final class PlatformConstants {
   static String iosGroupId = 'group.kekable';
   static String iosMindDayWidgetName = 'MindDayWidget';
 }
 
-class FlutterConstants {
+final class FlutterConstants {
   static ScrollPhysics mobileOverscrollPhysics =
       const BouncingScrollPhysics().applyTo(const AlwaysScrollableScrollPhysics());
 }
 
 enum SupportedPlatform { iOS, android, web }
 
-class KeklistConstants {
+final class KeklistConstants {
   static String demoAccountEmail = dotenv.get('DEMO_ACCOUNT_EMAIL');
   static String termsOfUseURL = 'https://sashkyn.notion.site/Zenmode-Terms-of-Use-df179704b2d149b8a5a915296f5cb78f';
   static String whatsNewURL = 'https://sashkyn.notion.site/Rememoji-Mind-Tracker-8548383aede2406bbb8d26c7f58e769c';
